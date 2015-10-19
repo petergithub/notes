@@ -1,0 +1,11 @@
+
+STEP 1 -> Create a Google Web Application Project project within Eclipse.
+Copy the contents of the /resources folder as gxt folder
+
+STEP 3 -> Add the following stylesheet to your host page.
+<link rel="stylesheet" type="text/css" href="gxt/css/gxt-all.css" />
+<script language='javascript' src='gxt/flash/swfobject.js'></script>
+
+STEP 4 -> Add the following entry to you projects module xml file.
+<inherits name='com.extjs.gxt.ui.GXT'/>
+	

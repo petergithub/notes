@@ -1,0 +1,23 @@
+SQLexpress服务器默认是禁用的并且端口号没有配置,所以要进行重新设置
+
+1.去下载一个SQL Server用的JDBC驱动。直接去微软下载就行，下载下来是一个exe文件，运行那个exe把文件解压到随便一个文件夹，取里面的sqljdbc4.jar和sqljdbc.jar备用。
+(The JDBC Driver version 2.0 includes 2 JAR class libraries in each installation package: sqljdbc.jar and sqljdbc4.jar  The sqljdbc.jar provides support for JDBC 3.0 and requires a JRE of version 5.0.  Please adjust your classpath accordingly to include this file. If you want to run your application with Java 6.0, please use sqljdbc4.jar.)
+2.配置SQL Server 2005 。在SQL Server 2005中，默认不开启TCP/IP协议，此步主要是开启协议并使SQL Server接受远程访问。具体步骤如下：
+(1)打开SQLServer配置管理器(SQLServer Configuration Manager)，在配置管理器重转到SQL Server 2005 网络配置(SQL Server 2005 Network Configuration)下面的SQLEXPRESS协议(Protocols for SQLEXPRESS)。
+(2)打开SQL Server 外围应用配置器(SQLServer Surface Area Configuration)，然后打开"服务和连接的外围应用配置器"，转到SQLEXPRESS->Database Engine->远程连接，选择"本地链接和远程连接"下面的"仅使用TCP/IP"或者"同时使用TCP/IP和named pipes"，这里我选择了前者，然后应用，确定。
+
+oracle
+C:\Oracle\Ora92\network\ADMIN\TNSNAMES.ORA
+gdmsp2.groton.pfizer.com = 
+  (DESCRIPTION = 
+    (ADDRESS_LIST = 
+      (ADDRESS = 
+        (PROTOCOL = TCP)
+        (HOST = <host_name>)
+        (PORT = <port>)
+      )
+    )
+    (CONNECT_DATA = 
+      (SERVICE_NAME = <service_name>)
+    )
+  )
