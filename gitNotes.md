@@ -5,7 +5,7 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 
 # Commands
 ## Basic commands
-HEAD指向最后一次commit的信息
+HEAD指向最后一次commit的信息  
 git cat-file -p [SHA-1]	输出数据内容
 git cat-file -t [SHA-1]	输出数据对象的类型
 
