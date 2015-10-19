@@ -1,6 +1,10 @@
+[TOC]
+
 git://github.com/petergithub/helloworld.git
 git push https://github.com/petergithub/eclipsePluginOpen.git master
 
+# Commands
+## Basic commands
 HEAD指向最后一次commit的信息
 git cat-file -p [SHA-1]	输出数据内容
 git cat-file -t [SHA-1]	输出数据对象的类型
@@ -72,7 +76,8 @@ git diff HEAD得到的是从(3)到(1)的变化
 git diff global origin/global: fetch后对比文件
 gitk: view commite graph
 
-########### restore flies BEGIN ##########
+# Git skills
+## restore flies
 撤销工作区操作 git checkout -- <file_name>
 这个命令有2种情况需要考虑：
     一种是file_name自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
@@ -83,9 +88,8 @@ gitk: view commite graph
     场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD <file_name>，就回到了场景1，第二步按场景1操作。
     场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(git reset --hard HEAD^)，不过前提是没有推送到远程库。
 恢复 git reset --hard 删除的文件 通过git reflog找到commitID,然后git reset --hard commitID
-########### restore fliess END ##########
 
-########### untrack files BEGIN ##########
+## Untrack files
 删掉已经track的文件
 This will tell git you want to start ignoring the changes to the file
 git update-index --assume-unchanged path/to/file
@@ -93,24 +97,23 @@ When you want to start keeping track again
 git update-index --no-assume-unchanged path/to/file
 停止追踪一个文件 git rm --cached path/to/file
 
-.gitignore文件的例子:
+## .gitignore文件的例子:
+```
 # 此为注释 – 将被 Git 忽略 
 *.a                          # 忽略所有 .a 结尾的文件 
 !lib.a                       # 但 lib.a 除外 
 /TODO                   # 仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO 
 build/                      # 忽略 build/ 目录下的所有文件 
 doc/*.txt                  # 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt 
-########### untrack files END ##########
+```
 
-########### Get rid of large files BEGIN ##########
+## Get rid of large files
 https://help.github.com/articles/remove-sensitive-data/	  
 git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
 git gc --aggressive --prune
 git push origin --force --all
-########### Get rid of large files END ##########
 
-########### git中文乱码解决 BEGIN ##########
-	注：这些是git bash中的中文乱码问题
+## git中文乱码解决(git bash中的中文乱码问题)
 ls命令查看当前文件夹下文件时，中文文件、文件名乱码：
 	编辑git安装目录下 git/etc/git-completion.bash ，新增一行 alias ls='ls --show-control-chars --color=auto'
 不能递交中文commit log：
@@ -124,9 +127,9 @@ git log无法显示中文注释：
 	说明：我们的代码库是统一用的 utf-8，这样设置可以在 git gui 中正常显示代码中的中文。
 	[i18n]commitencoding = GB2312
 	说明：如果没有这一条，虽然我们在本地用 $ git log 看自己的中文修订没问题，但，一、我们的 log 推到服务器后会变成乱码；二、别人在 Linux 下推的中文 log 我们 pull 过来之后看起来也是乱码。这是因为，我们的 commit log 会被先存放在项目的 .git/COMMIT_EDITMSG 文件中；在中文 Windows 里，新建文件用的是 GB2312 的编码；但是 Git 不知道，当成默认的 utf-8 的送出去了，所以就乱码了。有了这条之后，Git 会先将其转换成 utf-8，再发出去，于是就没问题了。 
-########### git中文乱码解决 END ##########
 
-########### create repository BEGIN ##########
+# Examples
+## create repository
 Create A Repo
 
 First: Create A Repo
@@ -135,12 +138,13 @@ First: Create A Repo
 Next: Create a README for your repo.
 1. Create the README file
 	In the prompt, type the following code:
+	
 		$ mkdir ~/Hello-World	//Creates a directory for your project called "Hello-World" in your user directory
 		$ cd ~/Hello-World	//Changes the current working directory to your newly created directory
 		$ git init	//Sets up the necessary Git files
 		Initialized empty Git repository in /Users/your_user_directory/Hello-World/.git/
 		$ touch README
-	Open the new README file found in your Hello-World directory in a text editor and add the text "Hello World!" When you are finished, save and close the file.
+Open the new README file found in your Hello-World directory in a text editor and add the text "Hello World!" When you are finished, save and close the file.
 2. Commit your README
 	Now that you have your README set up, it's time to commit it. A commit is essentially a snapshot of all the files in your project at a particular point in time. In the prompt, type the following code:
 		More about commits
@@ -157,22 +161,22 @@ THE CODE ABOVE EXECUTES ACTIONS LOCALLY, meaning you still haven't done anything
 		$ git remote add origin git@github.com:petergithub/Hello-World.git	//Sets the origin for the Hello-World repo
 		$ git push -u origin master	//Sends your commit to GitHub
 		
-	Now if you look at your repository on GitHub, you will see your README has been added to it.
+Now if you look at your repository on GitHub, you will see your README has been added to it.
 Your README has been created 
-########### create repository END ##########
-########### You have an empty repository To get started BEGIN ##########
+
+## You have an empty repository To get started
 You have an empty repository To get started you will need to run these commands in your terminal.
 
-Configure Git for the first time
+### Configure Git for the first time
 	git config --global user.name peter
 	git config --global user.email "email@gmail.com"
 
-Working with your repository
+### Working with your repository
 I just want to clone this repository
 If you want to simply clone this empty repository then run this command in your terminal.
 	it clone http://username@host/project.git
 
-My code is ready to be pushed
+### My code is ready to be pushed
 If you already have code ready to be pushed to this repository then run this in your terminal.
 	cd existing-project
 	git init
@@ -180,10 +184,9 @@ If you already have code ready to be pushed to this repository then run this in 
 	git commit -m "Initial Commit"
 	git remote add origin http://username@host/project.git
 	git push origin master
-My code is already tracked by Git
-
+	
+### My code is already tracked by Git
 If your code is already tracked by Git then set this repository as your "origin" to push to.
 	cd existing-project
 	git remote set-url origin http://username@host/project.git
 	git push origin master
-########### You have an empty repository To get started END ##########
