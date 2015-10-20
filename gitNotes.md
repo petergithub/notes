@@ -61,20 +61,21 @@ git push -u origin master 将本地的master分支推送到origin主机，同时
 git pull <远程主机名> <远程分支名>:<本地分支名>
 git push <远程主机名> <本地分支名>:<远程分支名>
 git branch --set-upstream master origin/next 指定master分支追踪origin/next分支
-将 Current working directory 记为 (1)
-将 Index file 记为 (2)
-将 Git repository 记为 (3)
-他们之间的提交层次关系是 (1) -> (2) -> (3)
-git add完成的是(1) -> (2)
-git commit完成的是(2) -> (3)
-git commit -a两者的直接结合
-从时间上看，可以认为(1)是最新的代码，(2)比较旧，(3)更旧
-按时间排序就是 (1) <- (2) <- (3)
 git diff得到的是从(2)到(1)的变化
 git diff --cached得到的是从(3)到(2)的变化
 git diff HEAD得到的是从(3)到(1)的变化
 git diff global origin/global: fetch后对比文件
 gitk: view commite graph
+
+## Advanced Command
+把feature_branch上所有提交合并为一次提交到当前分支上再commit
+git merge --squash feature_branch
+git commit -v
+git pull --rebase origin master合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
+git rebase --onto master commitId 在非master分支上执行,在master上重复commitId之后的提交,开区间
+git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
+git merge --no-ff myfeature 将feature 分支合并到当前分支
+	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
 
 # Git skills
 ## restore flies

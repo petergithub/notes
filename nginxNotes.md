@@ -3,6 +3,11 @@
 # Nginx offical
 [nginx documentation](http://nginx.org/en/docs/)
 
+NGINX (发音为 “engine X”)
+cd /data/softwares/tengine-2.1/sbin 
+./sbin/nginx -s reload
+./sbin/nginx -s stop
+
 ## Location正则写法
 ### 规则[doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)
 

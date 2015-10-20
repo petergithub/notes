@@ -1,9 +1,4 @@
 [TOC]
-ubuntu上如何使用郵箱客戶端去接收發送outlook exchange 郵件？ 試試 thunderbird + exquilla 插件
-HTTPS://HELP.UBUNTU.COM/COMMUNITY/THUNDERBIRDEXCHANGE
-https://exquilla.zendesk.com/home
-http://www.5dmail.net/html/2013-5-7/201357111547.htm
-
 学习系统结构的最好方法是自己做一个linux系统，再也没有什么能比自己做一个linux系统更能学习系统结构的了。LFS (linux from strach)可以教你从源代码自己编译一个系统。通过自己编译一个系统，你就可以了结linux系统结构，知道哪些文件是干什么用的，以及他们如何协调 工作。
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
@@ -20,7 +15,7 @@ location: make a command can be call anywhere
 :set nu / :set nonu	(不)列出行号 (nu为行数)
 :set ic / :set noic	vi在查找过程中(不)区分大小写 :set ignorecase/:set noignorecase
 ~	切换大小写
-:sp	^Z jobs fg :bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
+:sp	^Z jobs fg 
 dt"  删除所有的内容，直到遇到"
 改变与替换操作命令 
 <r> 替换光标所在的字符 
@@ -37,8 +32,26 @@ sleep 2; echo 'end sleep 2 sec
 
 zoom in on your terminal with Ctrl+Shift++.
 Zoom out with Ctrl+-
-:n next file :p previous file
 
+:x == :wq 当文件被修改时两个命令时相同的。但如果未被修改，使用 :x 不会更改文件的修改时间，而使用 :wq 会改变文件的修改时间
+:w !sudo tee %  在VIM中保存一个当前用户无权限修改的文件
+. 命令重复上次的修改。
+:! command allows you to enter the name of a shell command
+修改在这里就是插入、删除或者替换文本。能够重复是一个非常强大的机制。如果你基于它来安排你的编辑，许多修改将变得只是敲.键。留意其间的其他修改，因为它会替代你原来要重复的修改。相反，你可以用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。
+重复修改一个单词。
+如果是在整个文件中，你可以使用:s（substitute）命令。如果只是几个地方需要修改，一种快速的方法是使用 * 命令去找到下一个出现的单词，使用cw命令修改它。然后输入n去找到下一个单词，输入英文逗点 . 去重复cw命令。
+删除多行
+1. 如果要删除的段落的下一行是空行 一般用d} , 按两个键就可以了 多段的时候再按 .
+2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
+
+
+yw 只有当当前光标处于单词的第一个字母时才是“复制整个单词”(包含末尾的空格)，而 yiw 不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
+输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
+guw	光标下的单词变为小写
+gUw	光标下的单词变为大写
+ga	显示光标下的字符在当前使用的encoding下的内码
+
+### 文件对比 合并 多窗口
 diff -u
 vimdiff  FILE_LEFT  FILE_RIGHT
 :qa (quit all)同时退出两个文件
@@ -56,7 +69,6 @@ ctrl-w,r 交换上/下、左/右两个分隔窗口的位置
 可以使用快捷键在各个差异点之间快速移动。跳转到下一个差异点：]c. 反向跳转是：[c
 > -+ 调整窗口大小
 
-文件合并 
 dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
 do (diff "get"，之所以不用dg，是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
 :diffu[pdate] #更新diff 修改文件后，vimdiff会试图自动来重新比较文件，来实时反映比较结果。但是也会有处理失败的情况，这个时候需要手工来刷新比较结果：
@@ -64,17 +76,11 @@ zo (folding open，之所以用z这个字母，是因为它看上去比较像折
 zc (folding close)重新折叠
 ```
 
-:x == :wq 当文件被修改时两个命令时相同的。但如果未被修改，使用 :x 不会更改文件的修改时间，而使用 :wq 会改变文件的修改时间
-:w !sudo tee %  在VIM中保存一个当前用户无权限修改的文件
-. 命令重复上次的修改。
-:! command allows you to enter the name of a shell command
-修改在这里就是插入、删除或者替换文本。能够重复是一个非常强大的机制。如果你基于它来安排你的编辑，许多修改将变得只是敲.键。留意其间的其他修改，因为它会替代你原来要重复的修改。相反，你可以用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。
-重复修改一个单词。
-如果是在整个文件中，你可以使用:s（substitute）命令。如果只是几个地方需要修改，一种快速的方法是使用 * 命令去找到下一个出现的单词，使用cw命令修改它。然后输入n去找到下一个单词，输入英文逗点 . 去重复cw命令。
-删除多行
-1. 如果要删除的段落的下一行是空行 一般用d} , 按两个键就可以了 多段的时候再按 .
-2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
+### Mutiple tab
+:n next file :p previous file
+:bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
 
+### Replace
 :g/old			查找old，并打印出现它的每一行
 :s/old/new		替换当前行第一个old
 :s/old/new/gc	当前行old全替换并需要确认
@@ -89,33 +95,112 @@ zc (folding close)重新折叠
 :%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
 pattern [^0-9]*,	matches string start with non-number until to (,)
 
-在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些“^M”。有几种方法可以处理,注意：这里的“^M”要使用“CTRL-V CTRL-M”生成，而不是直接键入“^M”。 
-1. $ dos2unix myfile.txt
-2. vi :%s/^M$//g # 去掉行尾的^M。
-	:%s/^M//g # 去掉所有的^M。
-3. sed -e 's/^M//n/g' myfile.txt // evluate
- sed -i 's/^M//n/g' myfile.txt // replace
+### custom keyboard shortcut
+inoremap jj <ESC>	# Remap Your ESCAPE Key in Vim
+nnoremap j VipJ
+:sh	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
+:r!command	将命令command的输出结果放到当前行【强大】
+diw	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
+daw	删除当前光标所在的word(包括空白字符)，意为Delete A Word
+:map	列出当前已定义的映射
  
-## xargs
-xargs 工具的经典用法示例 find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments
-kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
-kill $(ps -aef | grep java | grep apache-tomcat-7.0.27 | awk '{print $2}')
-kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
-awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
-Print every line that has at least one field: awk 'NF > 0' data
-其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
-过滤记录
-awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的“==”为比较运算符。其他比较运算符：!=, >, <, >=, <=
-如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
+
+### VI正则表达式
+元字符 	说明
+. 	匹配任意字符
+[abc] 	匹配方括号中的任意一个字符，可用-表示字符范围。如[a-z0-9]匹配小写字母和数字
+[^abc] 	匹配除方括号中字符之外的任意字符
+\d 	匹配阿拉伯数字，等同于[0-9]
+\D 	匹配阿拉伯数字之外的任意字符，等同于[^0-9]
+\x 	匹配十六进制数字，等同于[0-9A-Fa-f]
+\X 	匹配十六进制数字之外的任意字符，等同于[^0-9A-Fa-f]
+\l 	匹配[a-z]
+\L 	匹配[^a-z]
+\u 	匹配[A-Z]
+\U 	匹配[^A-Z]
+\w 	匹配单词字母，等同于[0-9A-Za-z_]
+\W 	匹配单词字母之外的任意字符，等同于[^0-9A-Za-z_]
+\t 	匹配<TAB>字符
+\s 	匹配空白字符，等同于[\t]
+\S 	匹配非空白字符，等同于[^\t]
+
+一些普通字符需转意
+元字符 	说明
+\* 	匹配* 字符
+. 	匹配. 字符
+\/ 	匹配 / 字符
+\ 	匹配 \ 字符
+\[ 	匹配 [ 字符
+\] 	匹配 ] 字符
+
+表示数量的元字符
+元字符 	说明
+* 	匹配0-任意个
+\+ 	匹配1-任意个
+\? 	匹配0-1个
+\{n,m} 	匹配n-m个
+\{n} 	匹配n个
+\{n,} 	匹配n-任意个
+\{,m} 	匹配0-m个
+
+表示位置的元字符
+元字符 	说明
+$ 	匹配行尾
+^ 	匹配行首
+\< 	匹配单词词首
+\> 	匹配单词词尾
 
 
 ## find grep sed
+```
 grep pattern files – 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir – 递归搜索 dir 中匹配 pattern 的内容
 grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
 sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
 sed -i 's#../../gxt#../../gxt2#g' */*.html
+
+:%s#":.*$#gc
+sed -i 's#":.*$#;//#g' test
+sed -i 's#":.*//#;//#g' test
+sed -i 's#":#;//#g' test
+sed -i 's#"#private String #g' test
+
+sed -i 's#\s`#private String #g' test
+sed -i 's#`\(.*\)COMMENT#;//#g' test
+sed -i "s#'##g" test
+sed -i "s#,##g" test
+
+删除行尾空格：:%s/\s+$//g
+删除行首多余空格：%s/^\s*// 或者 %s/^ *//
+删除沒有內容的空行：%s/^$// 或者 g/^$/d
+删除包含有空格组成的空行：%s/^\s*$// 或者 g/^\s*$/d
+删除以空格或TAB开头到结尾的空行：%s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
+替换变量:在正则式中以\(和\)括起来的正则表达式，在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容。
+把文中的所有字符串“abc……xyz”替换为“xyz……abc”可以有下列写法
+    :%s/abc\(.*\)xyz/xyz\1abc/g
+    :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
+把ABC转换为小写
+    echo "ABC" | sed 's/[A-Z]*/\L&\E/' 或
+    echo "ABC" | sed 's/[A-Z]/\l&/g'
+    把abc转换为大写
+    echo "abc" | sed 's/[a-z]*/\U&\E/' 或
+    echo "abc" | sed 's/[a-z]/\u&/g'
+
+    echo "ab_c" | sed 's/_[a-z]/\u&/g'
+    echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
+	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格，用一个空格代替
+	‘s/^[ ][ ] *//g’ 删除行首空格
+	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格，代之以一个空格
+	‘s/\ . $//g’ 删除以句点结尾行
+	‘-e/abcd/d’ 删除包含a b c d的行
+	‘/^ $/d’ 删除空行
+	‘s/^ .//g’ 删除第一个字符
+	‘s/COL \ ( . . . \ )//g’ 删除紧跟C O L的后三个字母
+	‘s/^ \///g’ 从路径中删除第一个\
+	‘s/[ ]/[TAB]//g’ 删除所有空格并用tab键替代
+	‘S/^ [TAB]//g’ 删除行首所有tab键
+	‘s/[TAB] *//g’ 删除所有tab键
 
 find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
 find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含”ERROR”的行
@@ -130,12 +215,27 @@ find . -name "*.svn"  | xargs rm -rf  或
 find . -type d -iname ".svn" -exec rm -rf {} \;
 
 多目录重命名文件 
-```
 for file in `find . -name 'sync1.properties'`; do echo $file; done
 for i in `find . -name sync1.properties`; do mv $i `echo $i | sed 's/sync1.properties$/sync.properties/'`; done
 ```
+
 查找包含class的jar文件 find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
+ 
+## xargs
+xargs 工具的经典用法示例 
+```
+find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments
+kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
+kill $(ps -aef | grep java | grep apache-tomcat-7.0.27 | awk '{print $2}')
+kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
+```
+awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
+Print every line that has at least one field: awk 'NF > 0' data
+其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
+过滤记录
+awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的“==”为比较运算符。其他比较运算符：!=, >, <, >=, <=
+如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
 
 ## shell
 
@@ -212,12 +312,21 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
 alt+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按alt+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用alt+0 alt+., 就是先输入alt+0, 再输入alt+.. 如果是上上条命令的第一个参数呢? 当然是alt+0 alt+. alt+.了.
 undo 	C-/
 
+### bash profile
 bash Startup Files: it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile
  You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you’d see it every time you open a new terminal window.
 add  one line in .profile
 alias ls='ls --color=never'
 add one line in .bashrc
 .bashrc:  alias grep='grep --color=auto'
+
+### file carriage
+在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些“^M”。有几种方法可以处理,注意：这里的“^M”要使用“CTRL-V CTRL-M”生成，而不是直接键入“^M”。 
+1. $ dos2unix myfile.txt
+2. vi :%s/^M$//g # 去掉行尾的^M。
+	:%s/^M//g # 去掉所有的^M。
+3. sed -e 's/^M//n/g' myfile.txt // evluate
+ sed -i 's/^M//n/g' myfile.txt // replace
 
 
 ## zip/jar 
@@ -245,10 +354,10 @@ java命令引入jar时可以-cp参数，但-cp不能用通配符(JDK 5中多个j
 如：java -Djava.ext.dirs=lib MyClass
 
 ## mail
-mail -s "subject" -a /opt/attachment.txt pu.shang@pfizer.com < /dev/null
-mail -s "Got permission" pu.shang@pfizer.com < /dev/null
+mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null
+mail -s "Got permission" username@gmail.com < /dev/null
 mutt -s "Sample" -a /file/path/file user@local.com < /tmp/msg	send email
-mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip pu.shang@pfizer.com < /tmp/msg	send email
+mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip username@gmail.com < /tmp/msg	send email
 sendmail user@example.com  < /tmp/email.txt
 
 ## help
@@ -378,6 +487,11 @@ python -m SimpleHTTPServer  HTTP服务在8000号端口上侦听
 ## Software List
 chromium browser
 screenshot: shutter,deepin-scrot
+
+ubuntu上如何使用郵箱客戶端去接收發送outlook exchange 郵件？ 試試 thunderbird + exquilla 插件
+HTTPS://HELP.UBUNTU.COM/COMMUNITY/THUNDERBIRDEXCHANGE
+https://exquilla.zendesk.com/home
+http://www.5dmail.net/html/2013-5-7/201357111547.htm
 
 ## JDK installation
 1. 安装JDK
@@ -533,11 +647,11 @@ ssh dmftst08@amrndhl180
 创建Kerberos的keytab文件
 cd /data/
 ktutil
-addent -password -p pu.shang@TCL.COM -k 1 -e aes256-cts
-wkt pu.keytab
+addent -password -p username@GMAIL.COM -k 1 -e aes256-cts
+wkt username.keytab
 quit
 
-alias ssh35="kinit pu.shang@TCL.COM -k -t ~/sp/pu.keytab;ssh work@124.251.36.21 -t 'ssh 192.168.1.135;bash -l'"
+alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@IP1 -t 'ssh IP2;bash -l'"
 ssh root@MachineB 'bash -s' < local_script.sh	# run local shell script on a remote machine
 
 ### SCP

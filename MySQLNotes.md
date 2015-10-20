@@ -11,6 +11,10 @@ mysql -h110.110.110.110 -u root -p 123;（注:u与root之间可以不用加空�
 3、退出MYSQL命令： exit （回车）
 mysql> SELECT VERSION();来查看数据库版本
 
+## MySQL Workbench update shortcut Auto-complete 
+D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
+/usr/share/mysql-workbench/data/main_menu.xml
+
 ## 二、修改密码。
 格式：mysqladmin -u用户名 -p旧密码 password 新密码
 1、给root加个密码ab12。首先在DOS下进入目录mysql\bin，然后键入以下命令
@@ -140,9 +144,11 @@ update mysql.user set password=old_password('123456') where user='test_db';
 
 
 # Advanced SQL
-```
-SELECT 
-    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`, 
-    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
-FROM prince
+
+``` sql
+
+	SELECT 
+	    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`, 
+	    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
+	FROM prince
 ```
