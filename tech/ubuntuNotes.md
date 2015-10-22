@@ -9,27 +9,7 @@ Ctrl+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
 
-# Common command
-用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。重复修改一个单词。
-
-` jump back to the exact position 
-' jump back to the start of the line
-'a 	jump to line of mark a (first non-blank character in line)
-
-{	移到段落的开头
-}	移到下一个段落的开头
-%	匹配括号移动，包括 (, {, [.（陈皓注：你需要把光标先移到括号上） 跳转到与之匹配的括号处
-
-:sh	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
-:r!command	将命令command的输出结果放到当前行【强大】
-
-diw	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
-daw	删除当前光标所在的word(包括空白字符)，意为Delete A Word
-
-
-kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
-
-# Basic command
+# Basic Command
 ## VI
 ```
 :set nu / :set nonu	(不)列出行号 (nu为行数)
@@ -64,31 +44,6 @@ Zoom out with Ctrl+-
 1. 如果要删除的段落的下一行是空行 一般用d} , 按两个键就可以了 多段的时候再按 .
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
 
-` jump back to the exact position 
-' jump back to the start of the line
-'. last edit line the start of the line
-`. last edit line the exact position 
-'' last location the start of the line
-`` last location the exact position 
-Use `` to jump back to the exact position you were in before you searched/jumped, or '' to jump back to the start of the line you were on before you searched/jumped.
-You really should read :help jumplist it explains all of this very well.
-
-'a 	jump to line of mark a (first non-blank character in line)
-:marks 	list all the current marks
-:marks aB 	list marks a, B
-
-段落
-{	移到段落的开头
-}	移到下一个段落的开头
-%	匹配括号移动，包括 (, {, [.（陈皓注：你需要把光标先移到括号上） 跳转到与之匹配的括号处
-zf 	折叠（需加方向键）
-zo	展开（空格也可以展开） 可以zf进行折叠, 用zo打开折叠,也可以方向键向右打开折叠,zc 关闭折叠(只要在被折叠的块中的任一个语句就行)
-zz(or z.)	put the line under cusor in the middle of the screenv(z字取其象形意义模拟一张纸的折叠及变形位置重置)
-zt	命令会把当前行置于屏幕顶端(top)
-zb	命令会把当前行置于屏幕底端(bottom)
-
-Add comments for multiple lines
-	press Ctrl-V to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 
 yw 只有当当前光标处于单词的第一个字母时才是“复制整个单词”(包含末尾的空格)，而 yiw 不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
 输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
@@ -124,8 +79,6 @@ zc (folding close)重新折叠
 ### Mutiple tab
 :n next file :p previous file
 :bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
-Ctrl+o takes me to the previous tab location.
-Ctrl+^ last tab
 
 ### Replace
 :g/old			查找old，并打印出现它的每一行
@@ -150,6 +103,7 @@ nnoremap j VipJ
 diw	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
 daw	删除当前光标所在的word(包括空白字符)，意为Delete A Word
 :map	列出当前已定义的映射
+ 
 
 ### VI正则表达式
 元字符 	说明
@@ -197,10 +151,56 @@ $ 	匹配行尾
 \> 	匹配单词词尾
 
 
-## find grep
+## find grep sed
 ```
 grep pattern files – 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir – 递归搜索 dir 中匹配 pattern 的内容
+grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
+sed -n '/old/p' `grep -l old *.htm`
+sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
+sed -i 's#../../gxt#../../gxt2#g' */*.html
+
+:%s#":.*$#gc
+sed -i 's#":.*$#;//#g' test
+sed -i 's#":.*//#;//#g' test
+sed -i 's#":#;//#g' test
+sed -i 's#"#private String #g' test
+
+sed -i 's#\s`#private String #g' test
+sed -i 's#`\(.*\)COMMENT#;//#g' test
+sed -i "s#'##g" test
+sed -i "s#,##g" test
+
+删除行尾空格：:%s/\s+$//g
+删除行首多余空格：%s/^\s*// 或者 %s/^ *//
+删除沒有內容的空行：%s/^$// 或者 g/^$/d
+删除包含有空格组成的空行：%s/^\s*$// 或者 g/^\s*$/d
+删除以空格或TAB开头到结尾的空行：%s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
+替换变量:在正则式中以\(和\)括起来的正则表达式，在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容。
+把文中的所有字符串“abc……xyz”替换为“xyz……abc”可以有下列写法
+    :%s/abc\(.*\)xyz/xyz\1abc/g
+    :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
+把ABC转换为小写
+    echo "ABC" | sed 's/[A-Z]*/\L&\E/' 或
+    echo "ABC" | sed 's/[A-Z]/\l&/g'
+    把abc转换为大写
+    echo "abc" | sed 's/[a-z]*/\U&\E/' 或
+    echo "abc" | sed 's/[a-z]/\u&/g'
+
+    echo "ab_c" | sed 's/_[a-z]/\u&/g'
+    echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
+	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格，用一个空格代替
+	‘s/^[ ][ ] *//g’ 删除行首空格
+	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格，代之以一个空格
+	‘s/\ . $//g’ 删除以句点结尾行
+	‘-e/abcd/d’ 删除包含a b c d的行
+	‘/^ $/d’ 删除空行
+	‘s/^ .//g’ 删除第一个字符
+	‘s/COL \ ( . . . \ )//g’ 删除紧跟C O L的后三个字母
+	‘s/^ \///g’ 从路径中删除第一个\
+	‘s/[ ]/[TAB]//g’ 删除所有空格并用tab键替代
+	‘S/^ [TAB]//g’ 删除行首所有tab键
+	‘s/[TAB] *//g’ 删除所有tab键
 
 find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
 find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含”ERROR”的行
@@ -230,6 +230,12 @@ kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
 kill $(ps -aef | grep java | grep apache-tomcat-7.0.27 | awk '{print $2}')
 kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 ```
+awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
+Print every line that has at least one field: awk 'NF > 0' data
+其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
+过滤记录
+awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的“==”为比较运算符。其他比较运算符：!=, >, <, >=, <=
+如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
 
 ## shell
 
@@ -238,13 +244,11 @@ xargs echo
 在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
 
 ## bash
-- `man readline` 查看 Bash 中的默认快捷键
-
-### Emacs style key-bindings
-if you love vi-style key-bindings, use `set -o vi` (and `set -o emacs` to put it back).
 ^u remove line command
 ^T It will reverse two characters
 ^Q Windows vi region select
+Add comments for mutillines
+	press Ctrl-V to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 编辑命令
     * Ctrl + a ：移到命令行首
     * Ctrl + e ：移到命令行尾
@@ -279,25 +283,26 @@ if you love vi-style key-bindings, use `set -o vi` (and `set -o emacs` to put it
     * Ctrl + z：挂起命令
 Bang (!) 命令
     * !!：执行上一条命令
-    * sudo !!	以root的身份执行上一条命令
     * !blah：执行最近的以 blah 开头的命令，如 !ls
     * !blah:p：仅打印输出，而不执行
     * !$：上一条命令的最后一个参数，与 Alt + . 相同
-    * echo !!:1	to call 1st arg
-    * echo !!:2	to call 2nd arg
-    * echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
     * !$:p：打印输出 !$ 的内容
     * !*：上一条命令的所有参数
     * !*:p：打印输出 !* 的内容
     * ^blah：删除上一条命令中的 blah
     * ^blah^foo：将上一条命令中的 blah 替换为 foo
     * ^blah^foo^：将上一条命令中所有的 blah 都替换为 foo
-    * ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new
+$ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new
+!$	是一个特殊的环境变量，它代表了上一个命令的最后一个字符串
+!!	Run the last command-name
+sudo !!	以root的身份执行上一条命令
+echo !!:1	to call 1st arg
+echo !!:2	to call 2nd arg
+echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
 
 友情提示：
    1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过 set -o emacs 设置。
-	For editing long commands, after setting your editor (for example export EDITOR=vim), ctrl-x ctrl-e will open the current command in an editor for multi-line editing. Or in vi style, escape-v.
-   2. `^S、^Q、^C、^Z` 是由终端设备处理的，可用 stty 命令设置。
+   2. ^S、^Q、^C、^Z 是由终端设备处理的，可用 stty 命令设置。
    3.  用C-p取出历史命令列表中某一个命令后, 按C-o可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用C-p取出命令A后, 再按C-o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. C-o有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入du -sh dir去执行, 但用C-o可以非常完美的解决这个问题, 方法就是:
     输入du -sh dir, 按回车执行命令
     C-p, C-o, 然后就可以不停的按C-o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
@@ -396,69 +401,6 @@ uname -a	# find out kernel versiontree directory
 常见的场景是由于某种原因 ls 无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做*扩展，所以我们可以用 `echo * == ls`
 
 # Advanced command
-
-## awk
-length( 字符串 ) : 返回该字符串的长度.
-substr( 字符串,起始位置,长度) 
-grep HeaderBean httpDailyFile.log.2015-02-21.log | awk '{print substr($3,length($3)-11-12,13)}' |less 
-
-awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
-Print every line that has at least one field: awk 'NF > 0' data
-其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
-过滤记录
-awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的“==”为比较运算符。其他比较运算符：!=, >, <, >=, <=
-如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt 
-
-## sed
-``` bash
-grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
-sed -n '/old/p' `grep -l old *.htm`
-sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
-sed -i 's#../../gxt#../../gxt2#g' */*.html
-
-:%s#":.*$#gc
-sed -i 's#":.*$#;//#g' test
-sed -i 's#":.*//#;//#g' test
-sed -i 's#":#;//#g' test
-sed -i 's#"#private String #g' test
-
-sed -i 's#\s`#private String #g' test
-sed -i 's#`\(.*\)COMMENT#;//#g' test
-sed -i "s#'##g" test
-sed -i "s#,##g" test
-
-删除行尾空格：:%s/\s+$//g
-删除行首多余空格：%s/^\s*// 或者 %s/^ *//
-删除沒有內容的空行：%s/^$// 或者 g/^$/d
-删除包含有空格组成的空行：%s/^\s*$// 或者 g/^\s*$/d
-删除以空格或TAB开头到结尾的空行：%s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
-替换变量:在正则式中以\(和\)括起来的正则表达式，在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容。
-把文中的所有字符串“abc……xyz”替换为“xyz……abc”可以有下列写法
-    :%s/abc\(.*\)xyz/xyz\1abc/g
-    :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
-把ABC转换为小写
-    echo "ABC" | sed 's/[A-Z]*/\L&\E/' 或
-    echo "ABC" | sed 's/[A-Z]/\l&/g'
-    把abc转换为大写
-    echo "abc" | sed 's/[a-z]*/\U&\E/' 或
-    echo "abc" | sed 's/[a-z]/\u&/g'
-
-    echo "ab_c" | sed 's/_[a-z]/\u&/g'
-    echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
-	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格，用一个空格代替
-	‘s/^[ ][ ] *//g’ 删除行首空格
-	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格，代之以一个空格
-	‘s/\ . $//g’ 删除以句点结尾行
-	‘-e/abcd/d’ 删除包含a b c d的行
-	‘/^ $/d’ 删除空行
-	‘s/^ .//g’ 删除第一个字符
-	‘s/COL \ ( . . . \ )//g’ 删除紧跟C O L的后三个字母
-	‘s/^ \///g’ 从路径中删除第一个\
-	‘s/[ ]/[TAB]//g’ 删除所有空格并用tab键替代
-	‘S/^ [TAB]//g’ 删除行首所有tab键
-	‘s/[TAB] *//g’ 删除所有tab键   
-```
-
 ## Tmux 
 tmux	CRTL-b
 tmux使用C/S模型构建，主要包括以下单元模块：
@@ -499,7 +441,7 @@ Alt+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 #!/bin/bash
 SESSION=Redis
 
-	# Setup a session and setup a window for redis
+# Setup a session and setup a window for redis
 tmux -2 new-session -d -s $SESSION -n $SESSION
 tmux split-window -h
 tmux select-pane -t 0
@@ -513,7 +455,7 @@ tmux select-pane -t 2
 tmux send-keys "cd ~/opt/redis-sentinel" C-m
 tmux send-keys "startRedisSlave6382.sh" C-m
 
-	#tmux new-window -t $WINDOW2:1 -n $WINDOW2
+#tmux new-window -t $WINDOW2:1 -n $WINDOW2
 ```
 
 ## screen 
@@ -646,131 +588,10 @@ Listeningfor transport dt_socket at address: 8000
 4.under "input method",add Chinese input method
 5.auto start it: system->administrator->language support->Keyboard input method system, choose ibus
 
-## Wireshark
-sudo apt-get install wireshark
-sudo chmod 4711 `which dumpcap`
-
 # Misc.
 
 ## Missing clock menu bar fix:
 killall unity-panel-service
-
-## Processing files and data
-Reference: [Processing files and data](https://github.com/jlevy/the-art-of-command-line/blob/master/README.md#processing-files-and-data)
-
-- To locate a file by name in the current directory, `find . -iname '*something*'` (or similar). To find a file anywhere by name, use `locate something` (but bear in mind `updatedb` may not have indexed recently created files).
-
-- For general searching through source or data files (more advanced than `grep -r`), use [`ag`](https://github.com/ggreer/the_silver_searcher).
-
-- To convert HTML to text: `lynx -dump -stdin`
-
-- For Markdown, HTML, and all kinds of document conversion, try [`pandoc`](http://pandoc.org/).
-
-- If you must handle XML, `xmlstarlet` is old but good.
-
-- For JSON, use [`jq`](http://stedolan.github.io/jq/).
-
-- For YAML, use [`shyaml`](https://github.com/0k/shyaml).
-
-- For Excel or CSV files, [csvkit](https://github.com/onyxfish/csvkit) provides `in2csv`, `csvcut`, `csvjoin`, `csvgrep`, etc.
-
-- For Amazon S3, [`s3cmd`](https://github.com/s3tools/s3cmd) is convenient and [`s4cmd`](https://github.com/bloomreach/s4cmd) is faster. Amazon's [`aws`](https://github.com/aws/aws-cli) and the improved [`saws`](https://github.com/donnemartin/saws) are essential for other AWS-related tasks.
-
-- Know about `sort` and `uniq`, including uniq's `-u` and `-d` options -- see one-liners below. See also `comm`.
-
-- Know about `cut`, `paste`, and `join` to manipulate text files. Many people use `cut` but forget about `join`.
-
-- Know about `wc` to count newlines (`-l`), characters (`-m`), words (`-w`) and bytes (`-c`).
-
-- Know about `tee` to copy from stdin to a file and also to stdout, as in `ls -al | tee file.txt`.
-
-- Know that locale affects a lot of command line tools in subtle ways, including sorting order (collation) and performance. Most Linux installations will set `LANG` or other locale variables to a local setting like US English. But be aware sorting will change if you change locale. And know i18n routines can make sort or other commands run *many times* slower. In some situations (such as the set operations or uniqueness operations below) you can safely ignore slow i18n routines entirely and use traditional byte-based sort order, using `export LC_ALL=C`.
-
-- Know basic `awk` and `sed` for simple data munging. For example, summing all numbers in the third column of a text file: `awk '{ x += $3 } END { print x }'`. This is probably 3X faster and 3X shorter than equivalent Python.
-
-- To replace all occurrences of a string in place, in one or more files:
-```sh
-      perl -pi.bak -e 's/old-string/new-string/g' my-files-*.txt
-```
-
-- To rename many files at once according to a pattern, use `rename`. For complex renames, [`repren`](https://github.com/jlevy/repren) may help.
-```sh
-      # Recover backup files foo.bak -> foo:
-      rename 's/\.bak$//' *.bak
-      # Full rename of filenames, directories, and contents foo -> bar:
-      repren --full --preserve-case --from foo --to bar .
-```
-
-- As the man page says, `rsync` really is a fast and extraordinarily versatile file copying tool. It's known for synchronizing between machines but is equally useful locally. It also is among the [fastest ways](https://web.archive.org/web/20130929001850/http://linuxnote.net/jianingy/en/linux/a-fast-way-to-remove-huge-number-of-files.html) to delete large numbers of files:
-```sh
-mkdir empty && rsync -r --delete empty/ some-dir && rmdir some-dir
-```
-
-- Use `shuf` to shuffle or select random lines from a file.
-
-- Know `sort`'s options. For numbers, use `-n`, or `-h` for handling human-readable numbers (e.g. from `du -h`). Know how keys work (`-t` and `-k`). In particular, watch out that you need to write `-k1,1` to sort by only the first field; `-k1` means sort according to the whole line. Stable sort (`sort -s`) can be useful. For example, to sort first by field 2, then secondarily by field 1, you can use `sort -k1,1 | sort -s -k2,2`.
-
-- If you ever need to write a tab literal in a command line in Bash (e.g. for the -t argument to sort), press **ctrl-v** **[Tab]** or write `$'\t'` (the latter is better as you can copy/paste it).
-
-- The standard tools for patching source code are `diff` and `patch`. See also `diffstat` for summary statistics of a diff and `sdiff` for a side-by-side diff. Note `diff -r` works for entire directories. Use `diff -r tree1 tree2 | diffstat` for a summary of changes. Use `vimdiff` to compare and edit files.
-
-- For binary files, use `hd`, `hexdump` or `xxd` for simple hex dumps and `bvi` or `biew` for binary editing.
-
-- Also for binary files, `strings` (plus `grep`, etc.) lets you find bits of text.
-
-- For binary diffs (delta compression), use `xdelta3`.
-
-- To convert text encodings, try `iconv`. Or `uconv` for more advanced use; it supports some advanced Unicode things. For example, this command lowercases and removes all accents (by expanding and dropping them):
-```sh
-      uconv -f utf-8 -t utf-8 -x '::Any-Lower; ::Any-NFD; [:Nonspacing Mark:] >; ::Any-NFC; ' < input.txt > output.txt
-```
-
-- To split files into pieces, see `split` (to split by size) and `csplit` (to split by a pattern).
-
-- To manipulate date and time expressions, use `dateadd`, `datediff`, `strptime` etc. from [`dateutils`](http://www.fresse.org/dateutils).
-
-- Use `zless`, `zmore`, `zcat`, and `zgrep` to operate on compressed files.
-
-## System debugging
-Reference:[System debugging](https://github.com/jlevy/the-art-of-command-line/blob/master/README.md#system-debugging)
-
-- For web debugging, `curl` and `curl -I` are handy, or their `wget` equivalents, or the more modern [`httpie`](https://github.com/jakubroztocil/httpie).
-
-- To know current cpu/disk status, the classic tools are `top` (or the better `htop`), `iostat`, and `iotop`. Use `iostat -mxz 15` for basic CPU and detailed per-partition disk stats and performance insight.
-
-- For network connection details, use `netstat` and `ss`.
-
-- For a quick overview of what's happening on a system, `dstat` is especially useful. For broadest overview with details, use [`glances`](https://github.com/nicolargo/glances).
-
-- To know memory status, run and understand the output of `free` and `vmstat`. In particular, be aware the "cached" value is memory held by the Linux kernel as file cache, so effectively counts toward the "free" value.
-
-- Java system debugging is a different kettle of fish, but a simple trick on Oracle's and some other JVMs is that you can run `kill -3 <pid>` and a full stack trace and heap summary (including generational garbage collection details, which can be highly informative) will be dumped to stderr/logs. The JDK's `jps`, `jstat`, `jstack`, `jmap` are useful. [SJK tools](https://github.com/aragozin/jvm-tools) are more advanced.
-
-- Use `mtr` as a better traceroute, to identify network issues.
-
-- For looking at why a disk is full, `ncdu` saves time over the usual commands like `du -sh *`.
-
-- To find which socket or process is using bandwidth, try `iftop` or `nethogs`.
-
-- The `ab` tool (comes with Apache) is helpful for quick-and-dirty checking of web server performance. For more complex load testing, try `siege`.
-
-- For more serious network debugging, `wireshark`, `tshark`, or `ngrep`.
-
-- Know about `strace` and `ltrace`. These can be helpful if a program is failing, hanging, or crashing, and you don't know why, or if you want to get a general idea of performance. Note the profiling option (`-c`), and the ability to attach to a running process (`-p`).
-
-- Know about `ldd` to check shared libraries etc.
-
-- Know how to connect to a running process with `gdb` and get its stack traces.
-
-- Use `/proc`. It's amazingly helpful sometimes when debugging live problems. Examples: `/proc/cpuinfo`, `/proc/meminfo`, `/proc/cmdline`, `/proc/xxx/cwd`, `/proc/xxx/exe`, `/proc/xxx/fd/`, `/proc/xxx/smaps` (where `xxx` is the process id or pid).
-
-- When debugging why something went wrong in the past, `sar` can be very helpful. It shows historic statistics on CPU, memory, network, etc.
-
-- For deeper systems and performance analyses, look at `stap` ([SystemTap](https://sourceware.org/systemtap/wiki)), [`perf`](http://en.wikipedia.org/wiki/Perf_(Linux)), and [`sysdig`](https://github.com/draios/sysdig).
-
-- Check what OS you're on with `uname` or `uname -a` (general Unix/kernel info) or `lsb_release -a` (Linux distro info).
-
-- Use `dmesg` whenever something's acting really funny (it could be hardware or driver issues).
 
 ## Launcher customization
 launcher icon path: ./local/share/applications
@@ -790,14 +611,12 @@ Find Out CPU is 32bit or 64bit?
 		Protected Mode is 32-bit CPU
 
 ## Network
-netstat -lntp 或者 ss -plat 检查哪些进程在监听端口（默认是检查 TCP 端口; 使用参数 -u 检查 UDP 端口）
-netstat -anp | grep PORT: Listening open ports
-$ netstat -anp | less
-Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
-tcp        0      0 *:pssc                      *:*                         LISTEN      -   
-
 设定 DNS 的 IP：/etc/resolv.conf
-nameserver 192.168.1.1    
+nameserver 192.168.1.1
+Listening open ports: netstat -an | grep PORT
+$ netstat -ap | less
+Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
+tcp        0      0 *:pssc                      *:*                         LISTEN      -       
 
 ### Restart network
 sudo service network-manager restart
