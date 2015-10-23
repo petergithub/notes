@@ -28,7 +28,7 @@ dt"  删除所有的内容，直到遇到"
 <cc> 替换当前行
 read -p "Press enter to continue"
 read -n 1 -p "Press any key to continue"
-sleep 2; echo 'end sleep 2 sec
+sleep 2; echo 'end sleep 2 sec'
 
 zoom in on your terminal with Ctrl+Shift++.
 Zoom out with Ctrl+-
@@ -160,7 +160,7 @@ sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
 sed -i 's#../../gxt#../../gxt2#g' */*.html
 
-:%s#":.*$#gc
+:%s#":.*$#gc   "
 sed -i 's#":.*$#;//#g' test
 sed -i 's#":.*//#;//#g' test
 sed -i 's#":#;//#g' test
@@ -170,6 +170,8 @@ sed -i 's#\s`#private String #g' test
 sed -i 's#`\(.*\)COMMENT#;//#g' test
 sed -i "s#'##g" test
 sed -i "s#,##g" test
+sed -i 's/_[a-z]/\U&\E/g' test
+sed -i 's/_//g' test
 
 删除行尾空格：:%s/\s+$//g
 删除行首多余空格：%s/^\s*// 或者 %s/^ *//
@@ -426,7 +428,7 @@ n(到达下一个窗口) p(到达上一个窗口)
 , Rename the current window.
 
 ### panel operation
-" 将当前面板上下分屏
+" 将当前面板上下分屏"
 % 将当前面板左右分屏
 x 关闭当前面板
 <光标键> 移动光标选择对应面板
@@ -778,7 +780,7 @@ fmask: file umask
 2 	write
 1 	execute
 
-### NTFS permission The mode is determined by the partition's mount options
+### NTFS permission The mode is determined by the partition''s mount options
 bash script.sh	# You can always explicitly invoke the script interpreter
 
 ## Main directories
@@ -788,17 +790,17 @@ Here, only the most important directories in the system will be presented.
 /bin is a place for most commonly used terminal commands, like ls, mount, rm, etc.
 /boot contains files needed to start up the system, including the Linux kernel, a RAM disk image and bootloader configuration files.
 /dev contains all device files, which are not regular files but instead refer to various hardware devices on the system, including hard drives.
-/etc contains system-global configuration files, which affect the system's behavior for all users.
-/home home sweet home, this is the place for users' home directories.
+/etc contains system-global configuration files, which affect the system''s behavior for all users.
+/home home sweet home, this is the place for users'' home directories.
 /lib contains very important dynamic libraries and kernel modules
 /media is intended as a mount point for external devices, such as hard drives or removable media (floppies, CDs, DVDs).
 /mnt is also a place for mount points, but dedicated specifically to "temporarily mounted" devices, such as network filesystems.
 /opt can be used to store addition software for your system, which is not handled by the package manager.
 /proc is a virtual filesystem that provides a mechanism for kernel to send information to processes.
-/root is the superuser's home directory, not in /home/ to allow for booting the system even if /home/ is not available.
+/root is the superuser''s home directory, not in /home/ to allow for booting the system even if /home/ is not available.
 /sbin contains important administrative commands that should generally only be employed by the superuser.
 /srv can contain data directories of services such as HTTP (/srv/www/) or FTP.
-/sys is a virtual filesystem that can be accessed to set or obtain information about the kernel's view of the system.
+/sys is a virtual filesystem that can be accessed to set or obtain information about the kernel''s view of the system.
 /tmp is a place for temporary files used by applications.
 /usr contains the majority of user utilities and applications, and partly replicates the root directory structure, containing for instance, among others, /usr/bin/ and /usr/lib.
 /var is dedicated variable data that potentially changes rapidly; a notable directory it contains is /var/log where system log files are kept.
