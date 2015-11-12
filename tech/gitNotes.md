@@ -3,8 +3,8 @@
 git://github.com/petergithub/helloworld.git
 git push https://github.com/petergithub/eclipsePluginOpen.git master
 
-# Commands
-## Basic commands
+## Commands
+### Basic commands
 HEAD指向最后一次commit的信息  
 git cat-file -p [SHA-1]	输出数据内容
 git cat-file -t [SHA-1]	输出数据对象的类型
@@ -67,7 +67,7 @@ git diff HEAD得到的是从(3)到(1)的变化
 git diff global origin/global: fetch后对比文件
 gitk: view commite graph
 
-## Advanced Command
+### Advanced Command
 把feature_branch上所有提交合并为一次提交到当前分支上再commit
 git merge --squash feature_branch
 git commit -v
@@ -77,8 +77,8 @@ git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一�
 git merge --no-ff myfeature 将feature 分支合并到当前分支
 	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
 
-# Git skills
-## restore flies
+## Git skills
+### restore flies
 撤销工作区操作 git checkout -- <file_name>
 这个命令有2种情况需要考虑：
     一种是file_name自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
@@ -90,7 +90,7 @@ git merge --no-ff myfeature 将feature 分支合并到当前分支
     场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(git reset --hard HEAD^)，不过前提是没有推送到远程库。
 恢复 git reset --hard 删除的文件 通过git reflog找到commitID,然后git reset --hard commitID
 
-## Untrack files
+### Untrack files
 删掉已经track的文件
 This will tell git you want to start ignoring the changes to the file
 git update-index --assume-unchanged path/to/file
@@ -98,23 +98,32 @@ When you want to start keeping track again
 git update-index --no-assume-unchanged path/to/file
 停止追踪一个文件 git rm --cached path/to/file
 
-## .gitignore文件的例子:
+### .gitignore文件的例子:
 ```
-# 此为注释 – 将被 Git 忽略 
-*.a                          # 忽略所有 .a 结尾的文件 
-!lib.a                       # 但 lib.a 除外 
-/TODO                   # 仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO 
-build/                      # 忽略 build/ 目录下的所有文件 
-doc/*.txt                  # 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt 
+#此为注释 – 将被 Git 忽略 
+*.a                          #忽略所有 .a 结尾的文件 
+!lib.a                       #但 lib.a 除外 
+/TODO                   #仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO 
+build/                      #忽略 build/ 目录下的所有文件 
+doc/*.txt                  #会忽略 doc/notes.txt 但不包括 doc/server/arch.txt 
 ```
 
-## Get rid of large files
+### Get rid of large files
 https://help.github.com/articles/remove-sensitive-data/	  
 git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
 git gc --aggressive --prune
 git push origin --force --all
+	
+## Git configuration
 
-## git中文乱码解决(git bash中的中文乱码问题)
+### git auto complete　自动补全
+download git-completion.bash from souce code
+wget https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+if [ -f .git-completion.bash ]; then
+        . ~/.git-completion.bash
+fi
+
+### git中文乱码解决(git bash中的中文乱码问题)
 ls命令查看当前文件夹下文件时，中文文件、文件名乱码：
 	编辑git安装目录下 git/etc/git-completion.bash ，新增一行 alias ls='ls --show-control-chars --color=auto'
 不能递交中文commit log：
@@ -129,8 +138,8 @@ git log无法显示中文注释：
 	[i18n]commitencoding = GB2312
 	说明：如果没有这一条，虽然我们在本地用 $ git log 看自己的中文修订没问题，但，一、我们的 log 推到服务器后会变成乱码；二、别人在 Linux 下推的中文 log 我们 pull 过来之后看起来也是乱码。这是因为，我们的 commit log 会被先存放在项目的 .git/COMMIT_EDITMSG 文件中；在中文 Windows 里，新建文件用的是 GB2312 的编码；但是 Git 不知道，当成默认的 utf-8 的送出去了，所以就乱码了。有了这条之后，Git 会先将其转换成 utf-8，再发出去，于是就没问题了。 
 
-# Examples
-## create repository
+## Examples
+### create repository
 Create A Repo
 
 First: Create A Repo
@@ -165,19 +174,19 @@ THE CODE ABOVE EXECUTES ACTIONS LOCALLY, meaning you still haven't done anything
 Now if you look at your repository on GitHub, you will see your README has been added to it.
 Your README has been created 
 
-## You have an empty repository To get started
+### You have an empty repository To get started
 You have an empty repository To get started you will need to run these commands in your terminal.
 
-### Configure Git for the first time
+#### Configure Git for the first time
 	git config --global user.name peter
 	git config --global user.email "email@gmail.com"
 
-### Working with your repository
+#### Working with your repository
 I just want to clone this repository
 If you want to simply clone this empty repository then run this command in your terminal.
 	it clone http://username@host/project.git
 
-### My code is ready to be pushed
+#### My code is ready to be pushed
 If you already have code ready to be pushed to this repository then run this in your terminal.
 	cd existing-project
 	git init
@@ -186,7 +195,7 @@ If you already have code ready to be pushed to this repository then run this in 
 	git remote add origin http://username@host/project.git
 	git push origin master
 	
-### My code is already tracked by Git
+#### My code is already tracked by Git
 If your code is already tracked by Git then set this repository as your "origin" to push to.
 	cd existing-project
 	git remote set-url origin http://username@host/project.git

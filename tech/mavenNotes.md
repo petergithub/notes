@@ -12,6 +12,8 @@ mvn eclipse:eclipse (eclipse:clean, idea:idea)		create (clear) configuration fil
 mvn clean清空生成的文件
 mvn compile编译	mvn test-compile编译项目测试代码		mvn test编译并测试
 mvn test -skipping compile -skipping test-compile	只测试而不编译, 也不测试编译(-skipping 的灵活运用, 当然也可以用于其他组合命令) 
+mvn test -Dtest=TestChannelService  执行指定测试类
+mvn clean test -Dtest=xxxxTest#testＭethodA   执行指定测试类里的方法testＭethodA
 mvn package  生成target目录, 编译、测试代码, 生成测试报告, 生成jar/war文件	mvn jar:jar	打jar包
 mvn jetty:run 调用 Jetty插件的 Run目标在 Jetty Servlet容器中启动 web应用 mvn tomcat:run
 mvn install 在本地Repository中安装jar	mvn clean install 删除再编译

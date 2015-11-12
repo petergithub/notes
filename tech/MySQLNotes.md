@@ -23,7 +23,7 @@ mysql线上将采用一master多slave的方式来进行部署
 
 
 ### Common command
-连接MYSQL mysql -h主机地址 -u用户名 －p用户密码 -S /data/mysql/mysql.sock
+连接MYSQL mysql -h主机地址 -Pport -u用户名 －p用户密码 -S /data/mysql/mysql.sock
 mysql -h110.110.110.110 -u root -p 123;（注:u与root之间可以不用加空格，其它也一样）
 显示当前数据库服务器中的数据库列表：SHOW DATABASES;
 USE 库名；

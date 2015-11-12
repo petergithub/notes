@@ -149,7 +149,7 @@ sudo /var/cache/apt/archives/acrobat7_cn/INSTALL
 #第二个问题问你是否接受协议，键入accept后回车；
 #第三个问题要你定义Acrobat的安装目录，输入/usr/lib/Adobe/Acrobat7.0后回车。
 
-########### gedit config BEGIN ##########
+########### gedit config
 ## Ubuntu gedit recent files dconf set max recents to something like 40
 gsettings set org.gnome.gedit.preferences.ui max-recents "uint32 40"
 ## gedit add encoding for Chinese GB18030
@@ -161,4 +161,9 @@ sudo apt-get install dconf-editor
 #mkdir -p ~/.local/share/gedit/plugins
 ## plugin to restore tabs opened last time
 ## https://github.com/raelgc/gedit-restore-tabs
-########### gedit config END ##########
+
+########### make: install from source
+#如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
+#make >& LOG_make &
+#make install >& LOG_install &
+#用于保存安装信息日志，这样需要卸载的时候方便查看哪些文件安装在了系统目录中，例如/usr/lib下的库文件 

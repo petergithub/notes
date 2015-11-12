@@ -9,8 +9,8 @@ Ctrl+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
 
-# Basic Command
-## VI
+## Basic Command
+### VI
 ```
 :set nu / :set nonu	(不)列出行号 (nu为行数)
 :set ic / :set noic	vi在查找过程中(不)区分大小写 :set ignorecase/:set noignorecase
@@ -45,13 +45,13 @@ Zoom out with Ctrl+-
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
 
 
-yw 只有当当前光标处于单词的第一个字母时才是“复制整个单词”(包含末尾的空格)，而 yiw 不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
+yw 只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)，而 yiw 不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
 输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
 guw	光标下的单词变为小写
 gUw	光标下的单词变为大写
 ga	显示光标下的字符在当前使用的encoding下的内码
 
-### 文件对比 合并 多窗口
+#### 文件对比 合并 多窗口
 diff -u
 vimdiff  FILE_LEFT  FILE_RIGHT
 :qa (quit all)同时退出两个文件
@@ -76,11 +76,11 @@ zo (folding open，之所以用z这个字母，是因为它看上去比较像折
 zc (folding close)重新折叠
 ```
 
-### Mutiple tab
+#### Mutiple tab
 :n next file :p previous file
 :bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
 
-### Replace
+#### Replace
 :g/old			查找old，并打印出现它的每一行
 :s/old/new		替换当前行第一个old
 :s/old/new/gc	当前行old全替换并需要确认
@@ -95,8 +95,8 @@ zc (folding close)重新折叠
 :%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
 pattern [^0-9]*,	matches string start with non-number until to (,)
 
-### custom keyboard shortcut
-inoremap jj <ESC>	# Remap Your ESCAPE Key in Vim
+#### custom keyboard shortcut
+inoremap jj <ESC>	#Remap Your ESCAPE Key in Vim
 nnoremap j VipJ
 :sh	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
 :r!command	将命令command的输出结果放到当前行【强大】
@@ -105,7 +105,7 @@ daw	删除当前光标所在的word(包括空白字符)，意为Delete A Word
 :map	列出当前已定义的映射
  
 
-### VI正则表达式
+#### VI正则表达式
 元字符 	说明
 . 	匹配任意字符
 [abc] 	匹配方括号中的任意一个字符，可用-表示字符范围。如[a-z0-9]匹配小写字母和数字
@@ -151,7 +151,7 @@ $ 	匹配行尾
 \> 	匹配单词词尾
 
 
-## find grep sed
+### find grep sed
 ```
 grep pattern files – 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir – 递归搜索 dir 中匹配 pattern 的内容
@@ -179,7 +179,7 @@ sed -i 's/_//g' test
 删除包含有空格组成的空行：%s/^\s*$// 或者 g/^\s*$/d
 删除以空格或TAB开头到结尾的空行：%s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
 替换变量:在正则式中以\(和\)括起来的正则表达式，在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容。
-把文中的所有字符串“abc……xyz”替换为“xyz……abc”可以有下列写法
+把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法
     :%s/abc\(.*\)xyz/xyz\1abc/g
     :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
 把ABC转换为小写
@@ -205,7 +205,7 @@ sed -i 's/_//g' test
 	‘s/[TAB] *//g’ 删除所有tab键
 
 find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
-find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含”ERROR”的行
+find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含"ERROR"的行
 find . -name dfc.properties
 delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xargs rm
 替换多文件中的内容
@@ -224,7 +224,7 @@ for i in `find . -name sync1.properties`; do mv $i `echo $i | sed 's/sync1.prope
 查找包含class的jar文件 find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
  
-## xargs
+### xargs
 xargs 工具的经典用法示例 
 ```
 find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments
@@ -236,16 +236,16 @@ awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
 Print every line that has at least one field: awk 'NF > 0' data
 其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
 过滤记录
-awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的“==”为比较运算符。其他比较运算符：!=, >, <, >=, <=
+awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的"=="为比较运算符。其他比较运算符：!=, >, <, >=, <=
 如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
 
-## shell
+### shell
 
 xargs echo
 在bash的脚本中，你可以使用 set -x 来debug输出。使用 set -e 来当有错误发生的时候abort执行。考虑使用 set -o pipefail 来限制错误。还可以使用trap来截获信号（如截获ctrl+c）。
 在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
 
-## bash
+### bash
 ^u remove line command
 ^T It will reverse two characters
 ^Q Windows vi region select
@@ -314,31 +314,31 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
 alt+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按alt+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用alt+0 alt+., 就是先输入alt+0, 再输入alt+.. 如果是上上条命令的第一个参数呢? 当然是alt+0 alt+. alt+.了.
 undo 	C-/
 
-### bash profile
+#### bash profile
 bash Startup Files: it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile
- You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you’d see it every time you open a new terminal window.
+ You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.
 add  one line in .profile
 alias ls='ls --color=never'
 add one line in .bashrc
 .bashrc:  alias grep='grep --color=auto'
 
-### file carriage
-在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些“^M”。有几种方法可以处理,注意：这里的“^M”要使用“CTRL-V CTRL-M”生成，而不是直接键入“^M”。 
+#### file carriage
+在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL-V CTRL-M"生成，而不是直接键入"^M"。 
 1. $ dos2unix myfile.txt
-2. vi :%s/^M$//g # 去掉行尾的^M。
-	:%s/^M//g # 去掉所有的^M。
+2. vi :%s/^M$//g #去掉行尾的^M。
+	:%s/^M//g #去掉所有的^M。
 3. sed -e 's/^M//n/g' myfile.txt // evluate
  sed -i 's/^M//n/g' myfile.txt // replace
 
 
-## zip/jar 
+### zip/jar 
 ps -ef | grep gdms | grep jboss
 unzip gdms.war WEB-INF/lib/gdms.jar only unzip the jar from the war
 unzip -l gdms.war | grep jaxen
 unzip -l archive.zip lists the contents of a ZIP archive to ensure your file is inside.
 unzip -c archive.zip file1.txt file2.txt | less :Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
 unzip -O cp936 fix linux下文件解压乱码
-convmv -f 源编码 -t 新编码 [选项] 文件名 # linux文件名编码批量转换
+convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量转换
 zip -u gdms.war WEB-INF/lib/jaxen-core.jar update zip file
 zip -d gdms.war WEB-INF/lib/jaxen-core.jar
 
@@ -355,23 +355,23 @@ java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
 java命令引入jar时可以-cp参数，但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar)，通常的jar都在同一目录，且多于1个
 如：java -Djava.ext.dirs=lib MyClass
 
-## mail
+### mail
 mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null
 mail -s "Got permission" username@gmail.com < /dev/null
 mutt -s "Sample" -a /file/path/file user@local.com < /tmp/msg	send email
 mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip username@gmail.com < /tmp/msg	send email
 sendmail user@example.com  < /tmp/email.txt
 
-## help
+### help
 help命令用来描述不同的内置Bash命令help –s printf
 open another terminal: gnome-terminal
 man -k or apropos: key words search for command
 find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
 locate indexserverconfig.xml
 
-## Other
+### Other
 查看最后一个日志文件cat /app/dmfdev08/dba/log/0001d795/bp/`ls -tr /app/dmfdev08/dba/log/0001d795/bp | tail -1`
-sudo usermod -a -G vboxsf your_user_name	# add user to group vboxsf
+sudo usermod -a -G vboxsf your_user_name	:add user to group vboxsf
 cat << EOF > test.txt
 ABC
 DEF
@@ -399,11 +399,11 @@ du -s * | sort -n | tail	列出当前目录里最大的10个文件。
 source .profile 使profile改动生效
 ntsysv 就会*出图形界面给你选择(有的则显示在里面)，如果在文本界面就用ntsysv命令
 less /etc/*-release: find system version
-uname -a	# find out kernel versiontree directory
+uname -a	find out kernel versiontree directory
 常见的场景是由于某种原因 ls 无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做*扩展，所以我们可以用 `echo * == ls`
 
-# Advanced command
-## Tmux 
+## Advanced command
+### Tmux 
 tmux	CRTL-b
 tmux使用C/S模型构建，主要包括以下单元模块：
     server服务器。输入tmux命令时就开启了一个服务器。
@@ -413,21 +413,21 @@ tmux使用C/S模型构建，主要包括以下单元模块：
 tmux ls #列出会话
 tmux a[ttach] -t session
 
-### session operation：
+#### session operation：
 :new	create new session(:new -s sessionName)
 ? 列出所有快捷键；按q返回
 d 脱离当前会话,可暂时返回Shell界面，输入tmux a[ttach]能够重新进入之前会话
 s 选择并切换会话；在同时开启了多个会话时使用
 $ Rename the current session
 
-### window operation
+#### window operation
 c 创建一个新的窗口
 w 以菜单方式显示及选择窗口
 n(到达下一个窗口) p(到达上一个窗口)
 & 关掉当前窗口，也可以输入 exit
 , Rename the current window.
 
-### panel operation
+#### panel operation
 " 将当前面板上下分屏"
 % 将当前面板左右分屏
 x 关闭当前面板
@@ -438,12 +438,12 @@ space 调整panel摆放方式
 Ctrl+方向键 	以1个单元格为单位移动边缘以调整当前面板大小
 Alt+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 
-### Example: tmux scripts:
+#### Example: tmux scripts:
 ``` shell
 #!/bin/bash
 SESSION=Redis
 
-# Setup a session and setup a window for redis
+## Setup a session and setup a window for redis
 tmux -2 new-session -d -s $SESSION -n $SESSION
 tmux split-window -h
 tmux select-pane -t 0
@@ -460,33 +460,35 @@ tmux send-keys "startRedisSlave6382.sh" C-m
 #tmux new-window -t $WINDOW2:1 -n $WINDOW2
 ```
 
-## screen 
+### screen 
 screen vi test.c
 screen -ls
 screen -r PID
 可以通过C-a ?来查看所有的键绑定，常用的键绑定有：
 C-a ?	显示所有键绑定信息
 C-a w	显示所有窗口列表
+Ctrl+a A	set window title
 C-a C-a	切换到之前显示的窗口
 C-a c	创建一个新的运行shell的窗口并切换到该窗口
 C-a n	切换到下一个窗口
 C-a p	切换到前一个窗口(与C-a n相对)
+C+a "	select window from list
 C-a 0..9	切换到窗口0..9
-C-a a	发送 C-a到当前窗口
+C-a a	发送C-a到当前窗口 bash中到行首
 C-a d	暂时断开screen会话
 C-a k	杀掉当前窗口
 C-a [	进入拷贝/回滚模式
 -c file	使用配置文件file，而不使用默认的$HOME/.screenrc
 screen -wipe命令清除死掉的会话
 
-## Python
+### Python
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
 var = raw_input('Prompt')
 python -m SimpleHTTPServer  HTTP服务在8000号端口上侦听
 
-# Programs
+## Programs
 
-## Software List
+### Software List
 chromium browser
 screenshot: shutter,deepin-scrot
 
@@ -495,7 +497,7 @@ HTTPS://HELP.UBUNTU.COM/COMMUNITY/THUNDERBIRDEXCHANGE
 https://exquilla.zendesk.com/home
 http://www.5dmail.net/html/2013-5-7/201357111547.htm
 
-## JDK installation
+### JDK installation
 1. 安装JDK
 0.1 download
 	wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-i586.tar.gz"
@@ -510,7 +512,7 @@ http://www.5dmail.net/html/2013-5-7/201357111547.htm
 1.3. 接下来要配置环境变量，修改profile文件。
 	sudo gedit /etc/profile
 	在文本中添加以下代码：
-	# Sun JDK profile
+	#Sun JDK profile
 	export JAVA_HOME=/opt/jdk1.6.0_26
 	export JRE_HOME=/opt/jdk1.6.0_26/jre
 	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
@@ -518,7 +520,7 @@ http://www.5dmail.net/html/2013-5-7/201357111547.htm
 1.4. 还要修改另外一个文件environment：
 	sudo gedit /etc/environment
 	在文本中添加以下代码：
-	# Sun JDK environment
+	#Sun JDK environment
 	export JAVA_HOME=/opt/jdk1.6.0_26
 	export JRE_Home=/opt/jdk1.6.0_26/jre
 	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
@@ -530,7 +532,7 @@ http://www.5dmail.net/html/2013-5-7/201357111547.htm
 1.7. 验证安装JDK是否成功。
 	java –version
 
-## eclipse installation
+### eclipse installation
 To install eclipse on ubuntu you need to download it first from http://www.eclipse.org/downloads/ Extract the downloaded file by right click on it and extract here or running the following:
 	tar xzf dir/eclipse-SDK-3.3.1.1-linux-gtk.tar.gz
 	Where eclipse-SDK-3.3.1.1-linux-gtk is your eclipse-SDK name with version and dir is the directory of eclipse-sdk.
@@ -552,7 +554,7 @@ Create an executable in your path:
 export ECLIPSE_HOME="/home/peter/opt/eclipse"
 $ECLIPSE_HOME/eclipse $*
 ```
-Let’s also make eclipse executable everywhere by creating a symlink: 
+Let's also make eclipse executable everywhere by creating a symlink: 
 sudo ln -s /usr/bin/eclipse /bin/eclipse 
 Create the menu icon: sudo gedit /usr/share/applications/eclipse.desktop Type in this content and save:
 ```
@@ -577,32 +579,32 @@ update as below:
 tooltip_bg_color #f5f5b5;
 tooltip_fg_color #000000;
 
-## Tomcat
+### Tomcat
 export JPDA_ADDRESS=8000
 catalina.sh jpda start
 java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n -jar remoting-debug.jar
 Listeningfor transport dt_socket at address: 8000
 
-## Chinese input installation 
+### Chinese input installation 
 1.click dash home, search for "language support"
 2.click "install/remove language" and add Chinese
 3.click dash home, search for "keyboard input method"
 4.under "input method",add Chinese input method
 5.auto start it: system->administrator->language support->Keyboard input method system, choose ibus
 
-# Misc.
+## Misc.
 
-## Missing clock menu bar fix:
+### Missing clock menu bar fix:
 killall unity-panel-service
 
-## Launcher customization
+### Launcher customization
 launcher icon path: ./local/share/applications
 Globally in /usr/share/applications, locally in ~/.local/share/applications.
 If you want to add a custom launcher, create it in ~/.local/share/applications, make it executable, drag and drop it on the launcher*, and finally pin it (right-click on the launcher item → Keep In Launcher).
 make it executable
 
-# System
-## Kernel
+## System
+### Kernel
 Find Out If Running Kernel Is 32 Or 64 Bit (find out if my Linux server CPU can run a 64 bit kernel version (apps) or not)
 	uname -a	print system information: 
 Find Out CPU is 32bit or 64bit?
@@ -612,18 +614,32 @@ Find Out CPU is 32bit or 64bit?
 		Real mode 16 bit CPU
 		Protected Mode is 32-bit CPU
 
-## Network
+### Network
 设定 DNS 的 IP：/etc/resolv.conf
 nameserver 192.168.1.1
-Listening open ports: netstat -an | grep PORT
-$ netstat -ap | less
+
+netstat
+-t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接; 
+-a标记，还会显示出等待连接（也就是说处于监听模式）的套接字; 
+-l 显示正在被监听(listen)的端口
+-n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名; 
+-p选项表示列出监听的程序
+--numeric , -n
+       Show numerical addresses instead of trying to determine symbolic  host,
+       port or user names.
+
+Listening open ports: netstat -anp | grep PORT
+netstat -antup 查看已建立的连接进程，所占用的端口
+$ netstat -anp | less: Finding the PID of the process using a specific port
 Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
 tcp        0      0 *:pssc                      *:*                         LISTEN      -       
 
-### Restart network
+lsof -i
+
+#### Restart network
 sudo service network-manager restart
 
-### vi /etc/sysconfig/network-scripts/ifcfg-eth0
+#### vi /etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE   =   eth0   
 ONBOOT   =   yes   
 BOOTPROTO   =   static   
@@ -640,29 +656,108 @@ USERCTL   =   yes
 BOOTPROTO   =   dhcp  
 重启网络服务service network restart
 
-### SSH
-ssh user@host – 以 user 用户身份连接到 host
-ssh -p port user@host – 在端口 port 以 user 用户身份连接到 host
-ssh-copy-id user@host – 将密钥添加到 host 以实现无密码登录
-ssh dmftst08@amrndhl180
+#### SSH
+ssh user@host	以 user 用户身份连接到 host
+ssh -p port user@host	在端口 port 以 user 用户身份连接到 host
+-f ssh将在后台运行 
+-N 不执行命令，仅转发端口 
+-C 压缩传送的数据 
+-i 使用指定的密钥登录 
 
-创建Kerberos的keytab文件
+escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;
+~^Z	suspends the connection
+fg reconnect
+
+ssh-keygen -t rsa　#Generate a new SSH key
+ssh-copy-id user@host	将公钥添加到 host 以实现无密码登录
+ssh-copy-id -i ~/.ssh/id_rsa.pub username@IP
+cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
+ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'
+
+cd && tar czv src | ssh user@host 'tar xz'	将$HOME/src/目录下面的所有文件，复制到远程主机的$HOME/src/目录
+ssh user@host 'tar cz src' | tar xzv	将远程主机$HOME/src/目录下面的所有文件，复制到用户的当前目录
+ssh user@host 'ps ax | grep [h]ttpd'	查看远程主机是否运行进程httpd
+
+yes | pv | ssh $host "cat > /dev/null"	实时SSH网络吞吐量测试 通过SSH连接到主机，显示实时的传输速度，将所有传输数据指向/dev/null，需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
+yes | pv | cat > /dev/null
+
+ssh host -l user "`cat cmd.txt`"	通过SSH运行复杂的远程shell命令
+mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"	通过SSH将MySQL数据库复制到新服务器
+
+##### SSH端口转发(Port Forwarding)
+这是一种隧道(tunneling)技术
+[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html )
+``` bash
+ssh -L 9090:remoteSecret:8080 remoteHost 本地端口转发Local forwarding:connect remoteSecret through remoteHost
+ssh -L <local port>:<remote host>:<remote port> <SSH hostname>
+ssh -R <local port>:<remote host>:<remote port> <SSH hostname> 远程端口转发remote forwarding
+ssh -D <local port> <SSH Server>	动态转发 如果SSH Server是境外服务器，则该SOCKS代理实际上具备了翻墙功能
+```
+
+[实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward/ )
+[实战 SSH 端口转发 evernote copy](https://www.evernote.com/shard/s45/sh/659cae7f-4264-40f6-a05d-0fed2cfb5361/e1d88e29a968d3905789c94c98f5ae23 )
+本地端口转发例子: 在实验室里有一台 LDAP 服务器（LdapServerHost），但是限制了只有本机上部署的应用才能直接连接此 LDAP 服务器。如果我们由于调试或者测试的需要想临时从远程机器（LdapClientHost）直接连接到这个 LDAP 服务器
+在 LdapClientHost 上执行如下命令即可建立一个 SSH 的本地端口转发，例如：
+`$ ssh -L 7001:localhost:389 LdapServerHost`
+
+远程端口转发例子:　假设由于网络或防火墙的原因我们不能用 SSH 直接从 LdapClientHost 连接到 LDAP 服务器（LdapServertHost），但是反向连接却是被允许的。那此时我们的选择自然就是远程端口转发了。
+在 LDAP 服务器（LdapServertHost）端执行如下命令：
+`$ ssh -R 7001:localhost:389 LdapClientHost`
+
+##### Jumphost
+[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/)
+
+Jumphosts are used as intermediate hops between your actual SSH target and yourself. Instead of using something like "unsecure" SSH agent forwarding, you can use ProxyCommand to proxy all your commands through your jumphost.
+You want to connect to HOST B and have to go through HOST A, because of firewalling, routing, access privileges
++---+       +---+       +---+
+|You|   ->  | A |   ->  | B |
++---+       +---+       +---+
+
+Classic SSH Jumphost configuration
+A configuration like this will allow you to proxy through HOST A.
+
+```
+$ cat .ssh/config
+Host host-a
+  User your_username
+  Hostname 10.0.0.5
+
+Host host_b
+  User your_username
+  Hostname 192.168.0.1
+  Port 22
+  ProxyCommand ssh -q -W %h:%p host-a
+```
+Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that's the `ProxyCommand` being executed) and start the SSH session to your actual target.
+
+SSH Jumphost configuration with netcat (nc)
+Alternatively, if you can't/don't want to use ssh to tunnel your connections, you can also use nc (netcat).
+configure it in ./ssh/config with `ProxyCommand`
+`ProxyCommand ssh host-a nc -w 120 %h %p`
+
+If netcat is not available to you as a regular user, because permissions are limited, you can prefix it with sudo
+`ProxyCommand ssh host-a sudo nc -w 120 %h %p`
+
+
+##### 创建Kerberos的keytab文件
+```bash
 cd /data/
 ktutil
 addent -password -p username@GMAIL.COM -k 1 -e aes256-cts
 wkt username.keytab
 quit
+```
 
 alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@IP1 -t 'ssh IP2;bash -l'"
-ssh root@MachineB 'bash -s' < local_script.sh	# run local shell script on a remote machine
+ssh root@MachineB 'bash -s' < local_script.sh	#run local shell script on a remote machine
 
-### SCP
+#### SCP
 scp client_file user@server:filepath	上传文件到服务器端
 scp user@server:server_files client_file_path	下载文件
 client_file 待上传的文件，可以有多个，多个文件之间用空格隔开。也可以用*.filetype上传某个类型的全部文件
 user 服务端登录用户名, server 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
 
-### Windows putty plink pscp
+#### Windows putty plink pscp
 pscp.exe -pw pwd filename username@host:directory/subdirectory
 plink -pw pwd username@host ls;ls
 plink -pw pwd username@host -m local_script.sh
@@ -672,67 +767,60 @@ Windows的控制台会把两个双引号之间的字符串作为一个参数传�
 Windows控制台不认得单引号，所以上面那个命令的正确用法应该是：
 c:\>plink 192.168.6.200 ls '-l'
 
-
-## make源码包安装
-如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
-make >& LOG_make &
-make install >& LOG_install &
-用于保存安装信息日志，这样需要卸载的时候方便查看哪些文件安装在了系统目录中，例如/usr/lib下的库文件。 
-
-## software manage
-dpkg -i AdbeRdr*.deb  # install
+### software manage
+dpkg -i AdbeRdr*.deb  #install
 abort installation or recover from failed installing by apt-get
 sudo dpkg -r <package name>
 
 uninstall qq
 1. find the name: dpkg -l | grep package 
 2. sudo dpkg -r qq-for-wine 或 sudo dpkg -P qq-for-wine
-sudo apt-get remove acroread;sudo apt-get autoremove  ## uninstall
+sudo apt-get remove acroread;sudo apt-get autoremove  #uninstall
 
-apt-cache search # ------(package 搜索包)
+apt-cache search #package 搜索包
 
 aptitude name for failed resolving dependency
 
-## apt command
+#### apt command
 apt-get 下载后，软件所在路径是 /var/cache/apt/archives
 
-apt-cache policy maven	# check the version of package from apt-get
-apt-cache pkgnames # To list all the available packages,
-apt-cache pkgnames packageName	# To find and list down all the packages starting with 'packageName'
-apt-cache search packageName	# To find out the package name and with it description before installing
-apt-cache show packageName	# check information of package along with it short description say (version number, check sums, size, installed size, category etc)
+apt-cache policy maven	#check the version of package from apt-get
+apt-cache pkgnames #To list all the available packages,
+apt-cache pkgnames packageName	#To find and list down all the packages starting with 'packageName'
+apt-cache search packageName	#To find out the package name and with it description before installing
+apt-cache show packageName	#check information of package along with it short description say (version number, check sums, size, installed size, category etc)
 
 apt-get install 
-apt-get install packageName --only-upgrade	# do not install new packages but it only upgrade the already installed packages and disables new installation of packages
-apt-get install vsftpd=2.3.5-3ubuntu1	# Install Specific Package Version
+apt-get install packageName --only-upgrade	#do not install new packages but it only upgrade the already installed packages and disables new installation of packages
+apt-get install vsftpd=2.3.5-3ubuntu1	#Install Specific Package Version
 
-apt-get remove vsftpd	# To un-install software packages without removing their configuration files
-apt-get purge vsftpd	# To remove software packages including their configuration files
-apt-get --download-only source vsftpd	# To download only source code of particular package
-apt-get source vsftpd	# To download and unpack source code of a package to a specific directory
-apt-get --compile source goaccess	# download, unpack and compile the source code at the same time
-apt-get download nethogs	# Download a Package Without Installing
-apt-get changelog vsftpd	# downloads a package change-log and shows the package version that is installed
+apt-get remove vsftpd	#To un-install software packages without removing their configuration files
+apt-get purge vsftpd	#To remove software packages including their configuration files
+apt-get --download-only source vsftpd	#To download only source code of particular package
+apt-get source vsftpd	#To download and unpack source code of a package to a specific directory
+apt-get --compile source goaccess	#download, unpack and compile the source code at the same time
+apt-get download nethogs	#Download a Package Without Installing
+apt-get changelog vsftpd	#downloads a package change-log and shows the package version that is installed
 
-## dpkg command
-sudo apt-get install gdebi    # gdebi is a simple tool to install deb files,apt does the same, but only for remote (http, ftp) located package repositories.
+#### dpkg command
+sudo apt-get install gdebi    #gdebi is a simple tool to install deb files,apt does the same, but only for remote (http, ftp) located package repositories.
 
-dpkg -i packageName	# Install a Package
-dpkg -l	# List all the installed Packages
-dpkg -r packageName	# The “-r” option is used to remove/uninstall a package
-dpkg -p packageName	# use ‘p‘ option in place of ‘r’ which will remove the package along with configuration files
-dpkg -c packageName	# View the Content of a Package
+dpkg -i packageName	#Install a Package
+dpkg -l	#List all the installed Packages
+dpkg -r packageName	#The "-r" option is used to remove/uninstall a package
+dpkg -p packageName	#use 'p' option in place of 'r' which will remove the package along with configuration files
+dpkg -c packageName	#View the Content of a Package
 dpkg -S packageName	#显示所有包含该软件包的目录
-dpkg -s packageName	# Check a Package is installed or not
-dpkg -L packageName	# Check the location of Packages installed
-dpkg --unpack packageName	# Unpack the Package but dont’ Configure
-dpkg --configure packageName	# Reconfigure a Unpacked Package
+dpkg -s packageName	#Check a Package is installed or not
+dpkg -L packageName	#Check the location of Packages installed
+dpkg --unpack packageName	#Unpack the Package but dont' Configure
+dpkg --configure packageName	#Reconfigure a Unpacked Package
 
-## update hostname
+### update hostname
 vi /etc/hostname
 vi /etc/hosts
 
-## update hosts
+### update hosts
 redirect it to ustc:lug.ustc.edu.cn
 var url = request.url.replace('googleapis.com', 'lug.ustc.edu.cn');
 refer to https://github.com/justjavac/ReplaceGoogleCDN
@@ -740,17 +828,17 @@ vi /etc/hosts
 202.141.162.123 www.ajax.googleapis.com
 202.141.162.123 ajax.googleapis.com
 
-## 设置主DNS
+### 设置主DNS
 /etc/resolvconf/resolv.conf.d/head 
 sudo resolvconf -u
 cat /etc/resolv.conf
 
-## set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
+### set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
 sudo vi /etc/default/grub
 update seconds: GRUB_HIDDEN_TIMEOUT=1
 sudo update-grub
 
-## mount disk
+### mount disk
 用mount挂载你的windows分区，事先以root权限用fdisk -l查看。你就知道该挂载哪个了
 mount /dev/cdrom /mnt/cdrom 挂载光盘
 
@@ -765,7 +853,7 @@ Note: Be careful with you modify, it may cause the system not to work properly.
 $sudo fdisk -l
  id username
 vi /etc/fstab
- /dev/sda3      /media/program    ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0	# defaults = rw, suid, dev, exec, auto, nouser, and async.
+ /dev/sda3      /media/program    ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0	#defaults = rw, suid, dev, exec, auto, nouser, and async.
 auto= mounted at boot
 noauto= not mounted at boot
 user= when mounted the mount point is owned by the user who mounted the partition
@@ -775,15 +863,15 @@ rw= read/write
 dmask: directory umask
 fmask: file umask
 
-### Permission mapping
+#### Permission mapping
 4 	read
 2 	write
 1 	execute
 
-### NTFS permission The mode is determined by the partition''s mount options
-bash script.sh	# You can always explicitly invoke the script interpreter
+#### NTFS permission The mode is determined by the partition''s mount options
+bash script.sh	#You can always explicitly invoke the script interpreter
 
-## Main directories
+### Main directories
 [LinuxFilesystemTreeOverview](https://help.ubuntu.com/community/LinuxFilesystemTreeOverview)
 The standard Ubuntu directory structure mostly follows the Filesystem Hierarchy Standard, which can be referred to for more detailed information.
 Here, only the most important directories in the system will be presented.
