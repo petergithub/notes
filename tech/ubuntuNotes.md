@@ -425,7 +425,15 @@ c 创建一个新的窗口
 w 以菜单方式显示及选择窗口
 n(到达下一个窗口) p(到达上一个窗口)
 & 关掉当前窗口，也可以输入 exit
-, Rename the current window.
+, Rename the current window
+```
+#if the window name keeps renaming, create file .tmux.conf with content below
+#reload tmux config .tmux.conf 
+#within tmux, by pressing Ctrl+B and then :source-file ~/.tmux.conf
+#Or simply from a shell: tmux source-file ~/.tmux.conf
+set-option -g allow-rename off
+#set -g default-terminal "xterm-256color"
+```
 
 #### panel operation
 " 将当前面板上下分屏"
@@ -668,7 +676,8 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 ~^Z	suspends the connection
 fg reconnect
 
-ssh-keygen -t rsa　#Generate a new SSH key
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"	#Creates a new ssh key, using the provided email as a label #Generating public/private rsa key pair.
+
 ssh-copy-id user@host	将公钥添加到 host 以实现无密码登录
 ssh-copy-id -i ~/.ssh/id_rsa.pub username@IP
 cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器

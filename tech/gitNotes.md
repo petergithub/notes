@@ -118,7 +118,7 @@ git push origin --force --all
 
 ### git auto complete　自动补全
 download git-completion.bash from souce code
-wget https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 if [ -f .git-completion.bash ]; then
         . ~/.git-completion.bash
 fi
