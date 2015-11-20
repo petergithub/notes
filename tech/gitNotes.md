@@ -4,6 +4,11 @@ git://github.com/petergithub/helloworld.git
 git push https://github.com/petergithub/eclipsePluginOpen.git master
 
 ## Commands
+### Most recent
+`git log -g branchName` show Git branch created time just for local fetch/create time
+`git log --name-only ` show changed file name only
+`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
+
 ### Basic commands
 HEAD指向最后一次commit的信息  
 git cat-file -p [SHA-1]	输出数据内容

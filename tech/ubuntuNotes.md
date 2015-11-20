@@ -223,7 +223,13 @@ for i in `find . -name sync1.properties`; do mv $i `echo $i | sed 's/sync1.prope
 
 查找包含class的jar文件 find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
- 
+
+#### 乱码文件名的文件处理
+1. `ls -i` print the index number of each file(文件的i节点) 12345
+2. `find . -inum 12345 -print -exec rm {} -r \;` rm
+3. `find . -inum 12345 -exec mv {} NewName \;` mv
+命令中的"{}"表示find命令找到的文件，在-exec选项执行mv命令的时候，会利用按i节点号找到的文件名替换掉"{}"
+
 ### xargs
 xargs 工具的经典用法示例 
 ```
@@ -887,6 +893,7 @@ Here, only the most important directories in the system will be presented.
 /bin is a place for most commonly used terminal commands, like ls, mount, rm, etc.
 /boot contains files needed to start up the system, including the Linux kernel, a RAM disk image and bootloader configuration files.
 /dev contains all device files, which are not regular files but instead refer to various hardware devices on the system, including hard drives.
+/dev/shm 这个目录是在内存里 采用tmpfs文件系统 默认值是内存的一半
 /etc contains system-global configuration files, which affect the system''s behavior for all users.
 /home home sweet home, this is the place for users'' home directories.
 /lib contains very important dynamic libraries and kernel modules

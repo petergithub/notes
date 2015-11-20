@@ -1,3 +1,5 @@
+https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references#Predefined_entities_in_XML
+
 How to use special characters in XML?
 Because XML syntax uses some characters for tags and attributes it is not possible to directly use those characters inside XML tags or attribute values.
 To include special characters inside XML files you must use the numeric character reference instead of that character. The numeric character reference must be UTF-8 because the supported encoding for XML files is defined in the prolog as encoding="UTF-8" and should not be changed.
@@ -42,17 +44,6 @@ Code	Name                  Displayed as
 &#124;	Vertical bar        |
 &#125;	Right curly brace   }
 &#126;	Tilde               ~
-
-
-Symbol (name)                    Escape Sequence
-< (less-than)                    &#60; or &lt;
-> (greater-than)                 &#62; or  &gt;
-& (ampersand)                    &#38;
-' (apostrophe or single quote)   &#39;
-" (double-quote)                 &#34;
-
-\u0026	&
-\u003d	=
 
 
 
@@ -331,3 +322,18 @@ DEC 	OCT 	HEX 	BIN 	Symbol 	HTML Number 	HTML Name 	Description
 6. # 表示书签 %23    
 7. & URL 中指定的参数间的分隔符 %26    
 8. = URL 中指定参数的值 %3D 
+
+Symbol (name)                    Escape Sequence
+< (less-than)                    &#60;	&lt;
+> (greater-than)                 &#62;	&gt;
+& (ampersand)                    &#38;	&amp;
+' (apostrophe or single quote)   &#39;
+" (double-quote)                 &#34;
+
+\u003d	=
+Name 	Character 	Unicode code point (decimal) 	Standard 	Description
+quot 	" 			U+0022 (34) 					XML 1.0 	double quotation mark
+amp 	& 			U+0026 (38) 					XML 1.0 	ampersand
+apos 	' 			U+0027 (39) 					XML 1.0 	apostrophe (apostrophe-quote)
+lt 		< 			U+003C (60) 					XML 1.0 	less-than sign
+gt 		> 			U+003E (62) 					XML 1.0 	greater-than sign

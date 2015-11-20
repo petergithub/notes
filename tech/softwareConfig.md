@@ -100,14 +100,6 @@ type: Windows Displays the contents of a text file or files.
 nslookup http://wsyc.lqwang.com/
 tracert http://haijia.bjxueche.net/
 
-## Linux
-### Bash
-vi ~/.bash_profile
-export CLICOLOR="true"
-alias ll='ls -l'
-alias l='ls -a'
-# Tool
-
 # Network tools
 ## putty显示中文
 在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.
