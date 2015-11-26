@@ -64,7 +64,6 @@ For each phase, we’ll use the STOP / START / CONTINUE method to guide our less
 2. What did we miss (START)?
  - Start review of requirements sooner
  - Consider separate work stream for data remediation
- - Project schedule missing details that outline tasks and dependencies clearly – difficult to know if we were on track
  - Good understanding of Integrating Systems
 
 3. What did work well (CONTINUE)?
@@ -93,3 +92,6 @@ For each phase, we’ll use the STOP / START / CONTINUE method to guide our less
 ##### Test
 ##### Deploy
 ##### Support
+
+## Design
+返回list时带上下一条ID, 然后请求数据时带上ID 查询用ID做条件减少翻页

@@ -11,12 +11,12 @@ location: make a command can be call anywhere
 
 ## Basic Command
 ### VI
-```
 :set nu / :set nonu	(不)列出行号 (nu为行数)
 :set ic / :set noic	vi在查找过程中(不)区分大小写 :set ignorecase/:set noignorecase
 ~	切换大小写
-:sp	^Z jobs fg 
+:sp split window above and below
 dt"  删除所有的内容，直到遇到"
+
 改变与替换操作命令 
 <r> 替换光标所在的字符 
 <R> 替换字符序列 
@@ -26,9 +26,16 @@ dt"  删除所有的内容，直到遇到"
 <c$> 替换自光标位置至行尾的所有字符 
 <C> 同<c$> 
 <cc> 替换当前行
-read -p "Press enter to continue"
-read -n 1 -p "Press any key to continue"
-sleep 2; echo 'end sleep 2 sec'
+
+`yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)
+`yiw`	不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
+`diw`	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
+`daw`	删除当前光标所在的word(包括空白字符)，意为Delete A Word
+guw	光标下的单词变为小写
+gUw	光标下的单词变为大写
+ga	显示光标下的字符在当前使用的encoding下的内码
+`:sh`	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
+`:r!command`	将命令command的输出结果放到当前行【强大】
 
 zoom in on your terminal with Ctrl+Shift++.
 Zoom out with Ctrl+-
@@ -43,13 +50,10 @@ Zoom out with Ctrl+-
 删除多行
 1. 如果要删除的段落的下一行是空行 一般用d} , 按两个键就可以了 多段的时候再按 .
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
-
-
-yw 只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)，而 yiw 不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
 输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
-guw	光标下的单词变为小写
-gUw	光标下的单词变为大写
-ga	显示光标下的字符在当前使用的encoding下的内码
+
+#### Vim: move around quickly inside of long line
+`gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
 #### 文件对比 合并 多窗口
 diff -u
@@ -67,27 +71,26 @@ ctrl-w,r 交换上/下、左/右两个分隔窗口的位置
 其中2和4两个操作会把窗口改成垂直分割方式。
 在两个文件之间来回跳转，可以用下列命令序列Ctrl-w, w
 可以使用快捷键在各个差异点之间快速移动。跳转到下一个差异点：]c. 反向跳转是：[c
-> -+ 调整窗口大小
+`> -`, `> +` 调整窗口大小
 
 dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
 do (diff "get"，之所以不用dg，是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
 :diffu[pdate] #更新diff 修改文件后，vimdiff会试图自动来重新比较文件，来实时反映比较结果。但是也会有处理失败的情况，这个时候需要手工来刷新比较结果：
 zo (folding open，之所以用z这个字母，是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
 zc (folding close)重新折叠
-```
 
 #### Mutiple tab
 :n next file :p previous file
 :bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
 
 #### Replace
+/可以用#代替
 :g/old			查找old，并打印出现它的每一行
 :s/old/new		替换当前行第一个old
 :s/old/new/gc	当前行old全替换并需要确认
 :n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line
 :%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束
 :%s/^ *//gc		去掉所有的行首空格
-/可以用#代替, 
 :s：等同于 :s//~/，即会重复上一次替换
 :& repeat last :s command
 :g/^\s*$/d	delete the blank lines
@@ -96,13 +99,9 @@ zc (folding close)重新折叠
 pattern [^0-9]*,	matches string start with non-number until to (,)
 
 #### custom keyboard shortcut
-inoremap jj <ESC>	#Remap Your ESCAPE Key in Vim
-nnoremap j VipJ
-:sh	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
-:r!command	将命令command的输出结果放到当前行【强大】
-diw	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
-daw	删除当前光标所在的word(包括空白字符)，意为Delete A Word
-:map	列出当前已定义的映射
+`inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim
+`nnoremap j VipJ`
+`:map`	列出当前已定义的映射
  
 
 #### VI正则表达式
@@ -208,21 +207,28 @@ find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
 find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含"ERROR"的行
 find . -name dfc.properties
 delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xargs rm
-替换多文件中的内容
-find . -name '*.htm' | xargs sed -n '/old/p'  (查询个数)
-find . -name '*.htm' | xargs sed -i 's/old/new/g' (替换或者 s#old#new#g)
-删除.svn文件夹
+```
+
+#### 替换多文件中的内容
+`find . -name '*.htm' | xargs sed -n '/old/p'`  (查询个数)
+`find . -name '*.htm' | xargs sed -i 's/old/new/g'` (替换或者 s#old#new#g)
+
+#### 删除.svn文件夹
 find . -type d -name ".svn" | xargs rm -rf
 find . -name "*.svn"  | xargs rm -rf  或
 find . -type d -iname ".svn" -exec rm -rf {} \;
 
-多目录重命名文件 
+#### 多目录重命名文件
+```
 for file in `find . -name 'sync1.properties'`; do echo $file; done
 for i in `find . -name sync1.properties`; do mv $i `echo $i | sed 's/sync1.properties$/sync.properties/'`; done
 ```
 
-查找包含class的jar文件 find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
+#### 查找包含class的jar文件
+```
+find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
+```
 
 #### 乱码文件名的文件处理
 1. `ls -i` print the index number of each file(文件的i节点) 12345
@@ -250,6 +256,10 @@ awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的"=="为比较运算符。其�
 xargs echo
 在bash的脚本中，你可以使用 set -x 来debug输出。使用 set -e 来当有错误发生的时候abort执行。考虑使用 set -o pipefail 来限制错误。还可以使用trap来截获信号（如截获ctrl+c）。
 在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
+
+read -p "Press enter to continue"
+read -n 1 -p "Press any key to continue"
+sleep 2; echo 'end sleep 2 sec'
 
 ### bash
 ^u remove line command
@@ -373,7 +383,8 @@ help命令用来描述不同的内置Bash命令help –s printf
 open another terminal: gnome-terminal
 man -k or apropos: key words search for command
 find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
-locate indexserverconfig.xml
+`locate indexserverconfig.xml`	find file based on index /var/lib/mlocate/mlocate.db
+`updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf 
 
 ### Other
 查看最后一个日志文件cat /app/dmfdev08/dba/log/0001d795/bp/`ls -tr /app/dmfdev08/dba/log/0001d795/bp | tail -1`
@@ -618,6 +629,45 @@ If you want to add a custom launcher, create it in ~/.local/share/applications, 
 make it executable
 
 ## System
+
+### File
+
+#### 文件特殊权限 SUID、SGID、STICKY简介
+linux中除了常见的读（r）、写（w）、执行（x）权限以外，还有3个特殊的权限，分别是setuid、setgid和stick bit
+setuid、setgid实例，/usr/bin/passwd 与/etc/passwd文件的权限
+```
+[root@MyLinux ~]# ls -l /usr/bin/passwd /etc/passwd
+-rw-r--r-- 1 root root  1549 08-19 13:54 /etc/passwd
+-rwsr-xr-x 1 root root 22984 2007-01-07 /usr/bin/passwd
+```
+从权限上看，/etc/passwd仅有root权限的写（w）权，可实际上每个用户都可以通过/usr/bin/passwd命令去修改这个文件，于是这里就涉及了linux里的特殊权限setuid，正如-rwsr-xr-x中的s
+
+stick bit （粘贴位） 实例，查看/tmp目录的权限
+```
+[root@MyLinux ~]# ls -dl /tmp
+drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
+```
+ tmp目录是所有用户共有的临时文件夹，所有用户都拥有读写权限，这就必然出现一个问题，A用户在/tmp里创建了文件a.file，此时B用户看了不爽，在/tmp里把它给删了（因为拥有读写权限），那肯定是不行的。实际上在/tmp目录中，只有文件的拥有者和root才能对其进行修改和删除，其他用户则不行，因为有特殊权限stick bit（粘贴位）权限，正如drwxrwxrwt中的最后一个t 
+
+##### 特殊位作用
+- SUID:对一个可执行文件，不是以发起者身份来获取资源，而是以可执行文件的属主身份来执行。
+- SGID对一个可执行文件，不是以发起者身份来获取资源，而是以可执行文件的属组身份来执行。
+- STICKY：粘滞位，通常对目录而言。通常对于全局可写目录（other也可写）来说，让该目录具有sticky后，删除只对属于自己的文件有效（但是仍能编辑修改别人的文件，除了root的）。不能根据安全上下文获取对别人的文件的写权限
+
+##### 设置方式：
+  SUID：置于 u 的 x 位，原位置有执行权限，就置为 s，没有了为 S . `#chmod u+s`
+  SGID：置于 g 的 x 位，原位置有执行权限，就置为 s，没有了为 S . `#chmod g+s`
+  STICKY：粘滞位，置于 o 的 x 位，原位置有执行权限，就置为 t ，否则为T  `#chmod o+t`
+在一些文件设置了特殊权限后，字母不是小写的s或者t，而是大写的S和T，那代表此文件的特殊权限没有生效，是因为你尚未给它对应用户的x权限  
+去除特殊位有： `#chmou u-s`等
+将三个特殊位的用八进制数值表示，放于 u/g/o 位之前。其中 suid :4 sgid:2  sticky:1
+也可以这样设:
+```
+setuid:chmod 4755 xxx
+setgid:chmod 2755 xxx
+stick bit:chmod 1755 xxx
+```
+
 ### Kernel
 Find Out If Running Kernel Is 32 Or 64 Bit (find out if my Linux server CPU can run a 64 bit kernel version (apps) or not)
 	uname -a	print system information: 

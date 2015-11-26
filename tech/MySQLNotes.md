@@ -9,6 +9,11 @@ mysqlreport --user root --password
 show full processlist;
 explain sql query;
 
+MySQL 5.5 UTF8mb4支持emoj 
+HA: percona xtradb cluster, galera cluster 
+
+
+
 ## Basic command
 
 ### MySQL调优
@@ -32,6 +37,7 @@ USE 库名；
 显示数据库中的数据表： SHOW TABLES;
 显示数据表的结构： DESCRIBE 表名;
 建立数据表： CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));
+SHOW CREATE TABLE
 删除数据表： DROP TABLE 表名；
 将表中记录清空： DELETE FROM 表名;
 往表中插入记录： INSERT INTO 表名 VALUES (”hyq”,”M”);

@@ -162,7 +162,10 @@ sudo apt-get install dconf-editor
 ## plugin to restore tabs opened last time
 ## https://github.com/raelgc/gedit-restore-tabs
 
-########### make: install from source
+########### CacheBrowser https://cachebrowser.info/#/download
+#sudo apt-get install python-setuptools
+#sudo apt-get install python-dev
+
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
 #make >& LOG_make &
 #make install >& LOG_install &

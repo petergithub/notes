@@ -17,6 +17,154 @@
 
 CountDownLatch
 
+## Code Logic
+
+### Provider start process
+com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler.init()
+实现了InitializingBean接口，在设置了bean的所有属性后会调用afterPropertiesSet方法
+org.springframework.beans.factory.InitializingBean.afterPropertiesSet()
+
+``` java
+[23/11/15 04:04:31:031 CST] main ERROR container.Main:  [DUBBO] Fail to start server(url: dubbo://172.27.2.27:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&channel.readonly.sent=true&codec=dubbo&dubbo=2.0.0&generic=false&heartbeat=60000&interface=com.alibaba.dubbo.demo.DemoService&loadbalance=roundrobin&methods=sayHello&owner=william&pid=24622&side=provider&timestamp=1448265869456) Failed to bind NettyServer on /172.27.2.27:20880, cause: Failed to bind to: /0.0.0.0:20880, dubbo version: 2.0.0, current host: 127.0.0.1
+com.alibaba.dubbo.rpc.RpcException: Fail to start server(url: dubbo://172.27.2.27:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&channel.readonly.sent=true&codec=dubbo&dubbo=2.0.0&generic=false&heartbeat=60000&interface=com.alibaba.dubbo.demo.DemoService&loadbalance=roundrobin&methods=sayHello&owner=william&pid=24622&side=provider&timestamp=1448265869456) Failed to bind NettyServer on /172.27.2.27:20880, cause: Failed to bind to: /0.0.0.0:20880
+	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol.createServer(DubboProtocol.java:289)
+	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol.openServer(DubboProtocol.java:266)
+	at com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol.export(DubboProtocol.java:253)
+	at com.alibaba.dubbo.rpc.protocol.ProtocolListenerWrapper.export(ProtocolListenerWrapper.java:56)
+	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper.export(ProtocolFilterWrapper.java:55)
+	at com.alibaba.dubbo.rpc.Protocol$Adpative.export(Protocol$Adpative.java)
+	at com.alibaba.dubbo.registry.integration.RegistryProtocol.doLocalExport(RegistryProtocol.java:153)
+	at com.alibaba.dubbo.registry.integration.RegistryProtocol.export(RegistryProtocol.java:107)
+	at com.alibaba.dubbo.rpc.protocol.ProtocolListenerWrapper.export(ProtocolListenerWrapper.java:54)
+	at com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper.export(ProtocolFilterWrapper.java:53)
+	at com.alibaba.dubbo.rpc.Protocol$Adpative.export(Protocol$Adpative.java)
+	at com.alibaba.dubbo.config.ServiceConfig.doExportUrlsFor1Protocol(ServiceConfig.java:488)
+	at com.alibaba.dubbo.config.ServiceConfig.doExportUrls(ServiceConfig.java:284)
+	at com.alibaba.dubbo.config.ServiceConfig.doExport(ServiceConfig.java:245)
+	at com.alibaba.dubbo.config.ServiceConfig.export(ServiceConfig.java:144)
+	at com.alibaba.dubbo.config.spring.ServiceBean.onApplicationEvent(ServiceBean.java:109)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster$1.run(SimpleApplicationEventMulticaster.java:78)
+	at org.springframework.core.task.SyncTaskExecutor.execute(SyncTaskExecutor.java:49)
+	at org.springframework.context.event.SimpleApplicationEventMulticaster.multicastEvent(SimpleApplicationEventMulticaster.java:76)
+	at org.springframework.context.support.AbstractApplicationContext.publishEvent(AbstractApplicationContext.java:274)
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:736)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:383)
+	at org.springframework.context.support.ClassPathXmlApplicationContext.<init>(ClassPathXmlApplicationContext.java:139)
+	at org.springframework.context.support.ClassPathXmlApplicationContext.<init>(ClassPathXmlApplicationContext.java:93)
+	at com.alibaba.dubbo.container.spring.SpringContainer.start(SpringContainer.java:50)
+	at com.alibaba.dubbo.container.Main.main(Main.java:80)
+	at com.alibaba.dubbo.demo.provider.DemoProvider.main(DemoProvider.java:21)
+```
+
+### Consumer start process
+通观全部Dubbo代码，有两个很重要的对象就是Invoker和Exporter，Dubbo会根据用户配置的协议调用不同协议的Invoker，再通过ReferenceFonfig将Invoker的引用关联到Reference的ref属性上提供给消费端调用。当用户调用一个Service接口的一个方法后由于Dubbo使用javassist动态代理，会调用Invoker的Invoke方法从而初始化一个RPC调用访问请求访问服务端的Service返回结果
+Spring在初始化IOC容器时会利用这里注册的BeanDefinitionParser的parse方法获取对应的ReferenceBean的BeanDefinition实例，由于ReferenceBean实现了InitializingBean接口，在设置了bean的所有属性后会调用afterPropertiesSet方法
+com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler.init()
+com.alibaba.dubbo.config.spring.ReferenceBean.afterPropertiesSet()
+com.alibaba.dubbo.config.ReferenceConfig.init()
+com.alibaba.dubbo.config.ReferenceConfig.createProxy(Map<String, String>)
+
+### Invocation
+1. Invocation，一次具体的调用，包含方法名、参数类型、参数
+2. Result，一次调用结果，包含value和exception
+3. Invoker，调用者，对应一个服务接口，通过invoke方法执行调用，参数为Invocation，返回值为Result
+
+#### DubboInvoker
+通过ExchangeClient发送调用请求（Invocation）
+doInvoke()分为oneWay、async、sync调用
+对client的选择采用轮询的方式
+
+#### Exchanger
+[Source](http://gaofeihang.cn/archives/255)
+在一个框架中我们通常把负责数据交换和网络通信的组件叫做Exchanger。Dubbo中每个Invoker都维护了一个ExchangeClient的引用，并通过它和远程的Server进行通信。整个与ExchangeClient相关的类图如下
+![Dubbo-Exchanger](http://gaofeihang.cn/wp-content/uploads/2015/04/Dubbo-Exchanger.jpg "Dubbo-Exchanger") 
+1. ExchangeClient只有一个常用的实现类，HeaderExchangeClient
+2. 在Invoker需要发送数据时，单程发送使用的是ExchangeClient的send方法，需要返回结果的使用request方法
+3. 最终send方法传递到channel的send，而request方法则是通过构建ResponseFuture和调用send组合实现的。接下来的重点就是这个Channel参数如何来构建
+4. 它来自Transporters的connect方法，具体的Transporter来源于ExtensionLoader，默认为NettyTransporter，由它构建的是NettyClient。NettyClient再次维护了一个Channel引用，来自NettyChannel的getOrAddChannel()方法，创建的是NettyChannel。最终由基类AbstractClient实现的send方法调用了NettyChannel
+5. 执行Netty的channel.write()将数据真正发送出去，也可以由此看出boolean sent;参数的含义：是否去等待发送完成、是否执行超时的判断。
+
+本文主要以Client的角度对通信流程进行了介绍，Server端也可以遵循这样的路径去梳理，这里就不再赘述了。
+
+
+### Register process
+
+#### Provider
+Provider初始化时会调用doRegister方法向注册中心发起注册
+
+``` java
+ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114	
+ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
+RegistryProtocol.export(Invoker<T>) line: 117	
+ProtocolListenerWrapper.export(Invoker<T>) line: 54	
+ProtocolFilterWrapper.export(Invoker<T>) line: 53	
+Protocol$Adpative.export(Invoker) line: not available	
+ServiceBean<T>(ServiceConfig<T>).doExportUrlsFor1Protocol(ProtocolConfig, List<URL>) line: 488	
+ServiceBean<T>(ServiceConfig<T>).doExportUrls() line: 284	
+ServiceBean<T>(ServiceConfig<T>).doExport() line: 245	
+ServiceBean<T>(ServiceConfig<T>).export() line: 144	
+ServiceBean<T>.onApplicationEvent(ApplicationEvent) line: 109	
+SimpleApplicationEventMulticaster$1.run() line: 78	
+SyncTaskExecutor.execute(Runnable) line: 49	
+SimpleApplicationEventMulticaster.multicastEvent(ApplicationEvent) line: 76	
+ClassPathXmlApplicationContext(AbstractApplicationContext).publishEvent(ApplicationEvent) line: 274	
+ClassPathXmlApplicationContext(AbstractApplicationContext).finishRefresh() line: 736	
+ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 383	
+ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139	
+ClassPathXmlApplicationContext.<init>(String[]) line: 93	
+SpringContainer.start() line: 50	
+Main.main(String[]) line: 80	
+DemoProvider.main(String[]) line: 21	
+```
+
+#### Consumer
+Provider初始化时会调用doRegister方法向注册中心发起注册。那么客户端又是怎么subscribe在注册中心订阅服务的呢？答案是服务消费者在初始化ConsumerConfig时会调用RegistryProtocol的refer方法进一步调用RegistryDirectory的subscribe方法最终调用ZookeeperRegistry的subscribe方法向注册中心订阅服务。
+com.alibaba.dubbo.registry.support.FailBackRegistry的subscribe方法
+
+``` java
+ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114	
+ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
+RegistryDirectory<T>.subscribe(URL) line: 133	
+RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271	
+RegistryProtocol.refer(Class<T>, URL) line: 254	
+ProtocolListenerWrapper.refer(Class<T>, URL) line: 63	
+ProtocolFilterWrapper.refer(Class<T>, URL) line: 60	
+Protocol$Adpative.refer(Class, URL) line: not available	
+ReferenceBean<T>(ReferenceConfig<T>).createProxy(Map<String,String>) line: 392	
+ReferenceBean<T>(ReferenceConfig<T>).init() line: 300	
+ReferenceBean<T>(ReferenceConfig<T>).get() line: 138	
+ReferenceBean<T>.getObject() line: 65	
+FactoryBeanRegistrySupport$1.run() line: 121	
+AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]	
+DefaultListableBeanFactory(FactoryBeanRegistrySupport).doGetObjectFromFactoryBean(FactoryBean, String, boolean) line: 116	
+DefaultListableBeanFactory(FactoryBeanRegistrySupport).getObjectFromFactoryBean(FactoryBean, String, boolean) line: 91	
+DefaultListableBeanFactory(AbstractBeanFactory).getObjectForBeanInstance(Object, String, String, RootBeanDefinition) line: 1288	
+DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 275	
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185	
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164	
+BeanDefinitionValueResolver.resolveReference(Object, RuntimeBeanReference) line: 269	
+BeanDefinitionValueResolver.resolveValueIfNecessary(Object, Object) line: 104	
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).applyPropertyValues(String, BeanDefinition, BeanWrapper, PropertyValues) line: 1245	
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).populateBean(String, AbstractBeanDefinition, BeanWrapper) line: 1010	
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).doCreateBean(String, RootBeanDefinition, Object[]) line: 472	
+AbstractAutowireCapableBeanFactory$1.run() line: 409	
+AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]	
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).createBean(String, RootBeanDefinition, Object[]) line: 380	
+AbstractBeanFactory$1.getObject() line: 264	
+DefaultListableBeanFactory(DefaultSingletonBeanRegistry).getSingleton(String, ObjectFactory) line: 222	
+DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 261	
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185	
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164	
+DefaultListableBeanFactory.preInstantiateSingletons() line: 429	
+ClassPathXmlApplicationContext(AbstractApplicationContext).finishBeanFactoryInitialization(ConfigurableListableBeanFactory) line: 728	
+ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 380	
+ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139	
+ClassPathXmlApplicationContext.<init>(String[]) line: 93	
+SpringContainer.start() line: 50	
+Main.main(String[]) line: 80	
+DemoConsumer.main(String[]) line: 21	
+```
+
 ## Dubbo一些逻辑
 Dubbo分为注册中心、服务提供者(provider)、服务消费者(consumer)三个部分。
 
