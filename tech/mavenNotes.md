@@ -1,4 +1,13 @@
-Maven常用命令:
+#Maven常用命令
+
+[TOC]
+
+## Recent
+mvn dependency:list -e -U -X
+mvn eclipse:eclipse -DdownloadSources
+-Dmaven.test.skip
+
+## Basic
 create variable M2_REPO for workspace
 	mvn eclipse:configure-workspace -Declipse.workspace=C:\workspace
 首先通过cvs或svn下载代码到本机, 然后执行mvn eclipse:eclipse生成eclipse项目文件, 然后导入到eclipse就行了, 修改代码后执行mvn compile或mvn test检验, 也可以下载eclipse的maven插件. 
@@ -22,13 +31,15 @@ mvn site  生成项目相关信息的网站
 mvn exec:java -Dexec.mainClass=org.sonatype.mavenbook.weather.Main Exec 插件让我们能够在不往classpath载入适当的依赖的情况下, 运行这个程序
 mvn -Dtest=TestInsertWrongManage#testInsert test -pl moduleName  :run only single test in multi-module project
 
-add a jar, source and Javadoc to the local/remote Maven repository
+## Advanced
+### Add a jar, source and Javadoc to the local/remote Maven repository
 if want to download the sources jar the 2nd time, search and remove all "sources.jar-not-available"
 	DEFAULT_PARAMETER=-DgroupId=com.auxilii.msgparser -DartifactId=msgparser -Dversion=1.10 -Dpackaging=jar -Dfile=C:/msgparser-1.10.jar
 	mvn install:install-file ${DEFAULT_PARAMETER}
 	mvn deploy:deploy-file ${DEFAULT_PARAMETER} -Durl=file://path/to/your/repository
 		options: -Dclassifier add jar is the default value.	-Dclassifier=sources (add sources)		-Dclassifier=javadoc (add Java doc)
 
+### Command
 mvn -v	显示版本信息		-e 显示详细错误信息	-o	Work offline Running in Offline Mode
 mvn verify	运行任何检查, 验证包是否有效且达到质量标准
 mvn validate	验证工程是否正确, 所有需要的资源是否可用
@@ -63,10 +74,12 @@ LICENSE.txt Project's license
 NOTICE.txt Notices and attributions required by libraries that the project depends on
 README.txt Project's readme
 
-configuration:
+### configuration:
 setting.xml change local reponsitory
-  <localRepository>c:/sp/.m2/repository</localRepository>
-pom.xml
+  `<localRepository>c:/sp/.m2/repository</localRepository>`
+
+### pom.xml
+```
 1. configure build options <project><build>...</build></project>
 	<!-- change build target path -->
 	<build>
@@ -93,7 +106,9 @@ pom.xml
 				<target>1.5</target>
 			</configuration>
 		</plugin>
+```
 
+### Example springside
 springside define version in parent/pom.xml <dependencyManagement>
 那么经过验证，scope写在子项目中的<dependencies> 下的<dependency>中，或是写在父项目中的<dependencyManagement>中，都是可以的。
 但有一点需要注意，dependencies 和 dependencyManagement 的区别在于：

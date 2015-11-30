@@ -465,24 +465,23 @@ Alt+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 
 #### Example: tmux scripts:
 ``` shell
-#!/bin/bash
-SESSION=Redis
+	#!/bin/bash
+	SESSION=Redis
+	#Setup a session and setup a window for redis
+	tmux -2 new-session -d -s $SESSION -n $SESSION
+	tmux split-window -h
+	tmux select-pane -t 0
+	tmux send-keys "cd ~/opt/redis-sentinel" C-m
+	tmux send-keys "startRedisMaster6380.sh" C-m
+	tmux select-pane -t 1
+	tmux send-keys "cd ~/opt/redis-sentinel" C-m
+	tmux send-keys "startRedisSlave6381.sh" C-m
+	tmux split-window -v
+	tmux select-pane -t 2
+	tmux send-keys "cd ~/opt/redis-sentinel" C-m
+	tmux send-keys "startRedisSlave6382.sh" C-m
 
-## Setup a session and setup a window for redis
-tmux -2 new-session -d -s $SESSION -n $SESSION
-tmux split-window -h
-tmux select-pane -t 0
-tmux send-keys "cd ~/opt/redis-sentinel" C-m
-tmux send-keys "startRedisMaster6380.sh" C-m
-tmux select-pane -t 1
-tmux send-keys "cd ~/opt/redis-sentinel" C-m
-tmux send-keys "startRedisSlave6381.sh" C-m
-tmux split-window -v
-tmux select-pane -t 2
-tmux send-keys "cd ~/opt/redis-sentinel" C-m
-tmux send-keys "startRedisSlave6382.sh" C-m
-
-#tmux new-window -t $WINDOW2:1 -n $WINDOW2
+	#tmux new-window -t $WINDOW2:1 -n $WINDOW2
 ```
 
 ### screen 
@@ -629,6 +628,7 @@ If you want to add a custom launcher, create it in ~/.local/share/applications, 
 make it executable
 
 ## System
+`zdump -v /etc/localtime` examine the contents of the timezone files
 
 ### File
 

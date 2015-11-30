@@ -2,27 +2,37 @@
 
 [TOC]
 
-（1）com.alibaba.dubbo.container.Main 
-（2）java.util.ServiceLoader 
-（3）com.alibaba.dubbo.common.extension.ExtensionLoader 
-（4）com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper 
-（5）com.alibaba.dubbo.demo.consumer.DemoConsumer 
-（6）com.alibaba.dubbo.demo.provider.DemoProvider 
-（7）com.alibaba.dubbo.container.spring.SpringContainer 
-（8）com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler 
-（9）com.alibaba.dubbo.config.spring.schema.DubboBeanDefinitionParser 
-（A）com.alibaba.dubbo.config.spring.ServiceBean 
-（B）com.alibaba.dubbo.config.spring.ReferenceBean 
- （1）读代码第三招（debug）和一个心法（思路）。 （2）钩子 ShutdownHook，kill 和man的使用。 （3）守护线程 Thread.setDaemon(true) （4）同步块范围对象控制，CountDownLatch。 （5）SPI基本思想，DCL，动态编译，包装调用链。 （6）Dubbo RPC调用的实际动作。 （7）jenv（jevn.io）管理java环境。 （8）Spring的一点handler和listener知识
-
-CountDownLatch
+## Question
+1. dubbo 通信机制
+1) serialization bug?:  private entity id is missing if parent class id existing
+2) maybe it is better dubbo service API without spring 
+3) 去掉jetty端口配置 默认20880 <dubbo:protocol name="dubbo" port="20891" payload="209715200" /> log​?
+4) AbstractServer doOpen() twice, Address already bind Exception?
 
 ## Code Logic
+
+### Misc.
+(1)com.alibaba.dubbo.container.Main 
+(2)java.util.ServiceLoader 
+(3)com.alibaba.dubbo.common.extension.ExtensionLoader 
+(4)com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper 
+(5)com.alibaba.dubbo.demo.consumer.DemoConsumer 
+(6)com.alibaba.dubbo.demo.provider.DemoProvider 
+(7)com.alibaba.dubbo.container.spring.SpringContainer 
+(8)com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler 
+(9)com.alibaba.dubbo.config.spring.schema.DubboBeanDefinitionParser 
+(A)com.alibaba.dubbo.config.spring.ServiceBean 
+(B)com.alibaba.dubbo.config.spring.ReferenceBean 
+ (1)读代码第三招(debug)和一个心法(思路)。 (2)钩子 ShutdownHook，kill 和man的使用。 (3)守护线程 Thread.setDaemon(true) (4)同步块范围对象控制，CountDownLatch。 (5)SPI基本思想，DCL，动态编译，包装调用链。 (6)Dubbo RPC调用的实际动作。 (7)jenv(jevn.io)管理java环境。 (8)Spring的一点handler和listener知识
+
+CountDownLatch
 
 ### Provider start process
 com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler.init()
 实现了InitializingBean接口，在设置了bean的所有属性后会调用afterPropertiesSet方法
 org.springframework.beans.factory.InitializingBean.afterPropertiesSet()
+
+com.alibaba.dubbo.config.spring.ServiceBean
 
 ``` java
 [23/11/15 04:04:31:031 CST] main ERROR container.Main:  [DUBBO] Fail to start server(url: dubbo://172.27.2.27:20880/com.alibaba.dubbo.demo.DemoService?anyhost=true&application=demo-provider&channel.readonly.sent=true&codec=dubbo&dubbo=2.0.0&generic=false&heartbeat=60000&interface=com.alibaba.dubbo.demo.DemoService&loadbalance=roundrobin&methods=sayHello&owner=william&pid=24622&side=provider&timestamp=1448265869456) Failed to bind NettyServer on /172.27.2.27:20880, cause: Failed to bind to: /0.0.0.0:20880, dubbo version: 2.0.0, current host: 127.0.0.1
@@ -57,6 +67,8 @@ com.alibaba.dubbo.rpc.RpcException: Fail to start server(url: dubbo://172.27.2.2
 ```
 
 ### Consumer start process
+com.alibaba.dubbo.config.spring.ReferenceBean
+
 通观全部Dubbo代码，有两个很重要的对象就是Invoker和Exporter，Dubbo会根据用户配置的协议调用不同协议的Invoker，再通过ReferenceFonfig将Invoker的引用关联到Reference的ref属性上提供给消费端调用。当用户调用一个Service接口的一个方法后由于Dubbo使用javassist动态代理，会调用Invoker的Invoke方法从而初始化一个RPC调用访问请求访问服务端的Service返回结果
 Spring在初始化IOC容器时会利用这里注册的BeanDefinitionParser的parse方法获取对应的ReferenceBean的BeanDefinition实例，由于ReferenceBean实现了InitializingBean接口，在设置了bean的所有属性后会调用afterPropertiesSet方法
 com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler.init()
@@ -70,7 +82,7 @@ com.alibaba.dubbo.config.ReferenceConfig.createProxy(Map<String, String>)
 3. Invoker，调用者，对应一个服务接口，通过invoke方法执行调用，参数为Invocation，返回值为Result
 
 #### DubboInvoker
-通过ExchangeClient发送调用请求（Invocation）
+通过ExchangeClient发送调用请求(Invocation)
 doInvoke()分为oneWay、async、sync调用
 对client的选择采用轮询的方式
 
@@ -180,7 +192,7 @@ Dubbo缺省协议采用单一长连接和NIO异步通讯，适合于小数据量
 传输协议：TCP
 传输方式：NIO异步传输
 序列化：Hessian二进制序列化
-适用范围：传入传出参数数据包较小（建议小于100K），消费者比提供者个数多，单一消费者无法压满提供者，尽量不要用dubbo协议传输大文件或超大字符串。
+适用范围：传入传出参数数据包较小(建议小于100K)，消费者比提供者个数多，单一消费者无法压满提供者，尽量不要用dubbo协议传输大文件或超大字符串。
 适用场景：常规远程服务方法调用
 
 #### 通常，一个典型的同步远程调用应该是这样的：
@@ -188,7 +200,7 @@ Dubbo缺省协议采用单一长连接和NIO异步通讯，适合于小数据量
 2， 服务端接到客户端请求后，处理请求，将结果给客户端
 3， 客户端收到结果，然后当前线程继续往后执行
 
-Dubbo里使用到了Socket（采用Apache mina框架做底层调用）来建立长连接，发送、接收数据，底层使用Apache mina框架的IoSession进行发送消息。
+Dubbo里使用到了Socket(采用Apache mina框架做底层调用)来建立长连接，发送、接收数据，底层使用Apache mina框架的IoSession进行发送消息。
 
 查看Dubbo文档及源代码可知，Dubbo底层使用Socket发送消息的形式进行数据传递，结合了mina框架，使用IoSession.write()方法，这个方法调用后对于整个远程调用(从发出请求到接收到结果)来说是一个异步的，即对于当前线程来说，将请求发送出来，线程就可以往后执行了，至于服务端的结果，是服务端处理完成后，再以消息的形式发送给客户端的。
 
@@ -197,13 +209,13 @@ Dubbo里使用到了Socket（采用Apache mina框架做底层调用）来建立�
 2. 正如前面所说，Socket通信是一个全双工的方式，如果有多个线程同时进行远程方法调用，这时建立在client server之间的socket连接上会有很多双方发送的消息传递，前后顺序也可能是乱七八糟的，server处理完结果后，将结果消息发送给client，client收到很多消息，怎么知道哪个消息结果是原先哪个线程调用的？
 
 #### 分析源代码，基本原理如下：
-1. client一个线程调用远程接口，生成一个唯一的ID（比如一段随机字符串，UUID等），Dubbo是使用AtomicLong从0开始累计数字的
-2. 将打包的方法调用信息（如调用的接口名称，方法名称，参数值列表等），和处理结果的回调对象callback，全部封装在一起，组成一个对象object
+1. client一个线程调用远程接口，生成一个唯一的ID(比如一段随机字符串，UUID等)，Dubbo是使用AtomicLong从0开始累计数字的
+2. 将打包的方法调用信息(如调用的接口名称，方法名称，参数值列表等)，和处理结果的回调对象callback，全部封装在一起，组成一个对象object
 3. 向专门存放调用信息的全局ConcurrentHashMap里面put(ID, object)
 4. 将ID和打包的方法调用信息封装成一对象connRequest，使用IoSession.write(connRequest)异步发送出去
 5. 当前线程再使用callback的get()方法试图获取远程返回的结果，在get()内部，则使用synchronized获取回调对象callback的锁， 再先检测是否已经获取到结果，如果没有，然后调用callback的wait()方法，释放callback上的锁，让当前线程处于等待状态。
-6. 服务端接收到请求并处理后，将结果（此结果中包含了前面的ID，即回传）发送给客户端，客户端socket连接上专门监听消息的线程收到消息，分析结果，取到ID，再从前面的ConcurrentHashMap里面get(ID)，从而找到callback，将方法调用结果设置到callback对象里
-7. 监听线程接着使用synchronized获取回调对象callback的锁（因为前面调用过wait()，那个线程已释放callback的锁了），再notifyAll()，唤醒前面处于等待状态的线程继续执行（callback的get()方法继续执行就能拿到调用结果了），至此，整个过程结束。
+6. 服务端接收到请求并处理后，将结果(此结果中包含了前面的ID，即回传)发送给客户端，客户端socket连接上专门监听消息的线程收到消息，分析结果，取到ID，再从前面的ConcurrentHashMap里面get(ID)，从而找到callback，将方法调用结果设置到callback对象里
+7. 监听线程接着使用synchronized获取回调对象callback的锁(因为前面调用过wait()，那个线程已释放callback的锁了)，再notifyAll()，唤醒前面处于等待状态的线程继续执行(callback的get()方法继续执行就能拿到调用结果了)，至此，整个过程结束。
 
 这里还需要画一个大图来描述，后面再补了
 需要注意的是，这里的callback对象是每次调用产生一个新的，不能共享，否则会有问题；另外ID必需至少保证在一个Socket连接里面是唯一的。
@@ -224,9 +236,9 @@ Dubbo在使用上可以做到非常简单，不管是Provider还是Consumer都�
 #### 2、jdkspi扩展
 由于Dubbo是开源框架，必须要提供很多的可扩展点。Dubbo是通过扩展jdkspi机制来实现可扩展的。具体来说，就是在META-INF目录下，放置文件名为接口全称，文件中为key、value键值对，value为具体实现类的全类名，key为标志值。由于dubbo使用了url总线的设计，即很多参数通过URL对象来传递，在实际中，具体要用到哪个值，可以通过url中的参数值来指定。
 Dubbo对spi的扩展是通过ExtensionLoader来实现的，查看ExtensionLoader的源码，可以看到Dubbo对jdkspi做了三个方面的扩展：
-（1）jdkspi仅仅通过接口类名获取所有实现，而ExtensionLoader则通过接口类名和key值获取一个实现；
-（2）Adaptive实现，就是生成一个代理类，这样就可以根据实际调用时的一些参数动态决定要调用的类了。
-（3）自动包装实现，这种实现的类一般是自动激活的，常用于包装类，比如Protocol的两个实现类：ProtocolFilterWrapper、ProtocolListenerWrapper。
+(1)jdkspi仅仅通过接口类名获取所有实现，而ExtensionLoader则通过接口类名和key值获取一个实现；
+(2)Adaptive实现，就是生成一个代理类，这样就可以根据实际调用时的一些参数动态决定要调用的类了。
+(3)自动包装实现，这种实现的类一般是自动激活的，常用于包装类，比如Protocol的两个实现类：ProtocolFilterWrapper、ProtocolListenerWrapper。
 
 #### 3、url总线设计
 Dubbo为了使得各层解耦，采用了url总线的设计。我们通常的设计会把层与层之间的交互参数做成Model，这样层与层之间沟通成本比较大，扩展起来也比较麻烦。因此，Dubbo把各层之间的通信都采用url的形式。比如，注册中心启动时，参数的url为：
@@ -236,33 +248,33 @@ registry://0.0.0.0:9090?codec=registry&transporter=netty
 ### 1、注册中心启动过程
 注册中心的启动过程，主要看两个类：RegistrySynchronizer、RegistryReceiver，两个类的初始化方法都是start。
 RegistrySynchronizer的start方法：
-（1）把所有配置信息load到内存；
-（2）把当前注册中心信息保存到数据库；
-（3）启动5个定时器。
+(1)把所有配置信息load到内存；
+(2)把当前注册中心信息保存到数据库；
+(3)启动5个定时器。
 5个定时器的功能是：
-（1）AutoRedirectTask，自动重定向定时器。默认1小时运行1次。如果当前注册中心的连接数高于平均值的1.2倍，则将多出来的连接数重定向到其他注册中心上，以达到注册中心集群的连接数均衡。
-（2）DirtyCheckTask，脏数据检查定时器。作用是：分别检查缓存provider、数据库provider、缓存consumer、数据库consumer的数据，清除脏数据；清理不存活的provider和consumer数据；对于缓存中的存在的provider或consumer而数据库不存在，重新注册和订阅。
-（3）ChangedClearTask，changes变更表的定时清理任务。作用是读取changes表，清除过期数据。
-（4）AlivedCheckTask，注册中心存活状态定时检查，会定时更新registries表的expire字段，用以判断注册中心的存活状态。如果有新的注册中心，发送同步消息，将当前所有注册中心的地址通知到所有客户端。
-（5）ChangedCheckTask，变更检查定时器。检查changes表的变更，检查类型包括：参数覆盖变更、路由变更、服务消费者变更、权重变更、负载均衡变更。
+(1)AutoRedirectTask，自动重定向定时器。默认1小时运行1次。如果当前注册中心的连接数高于平均值的1.2倍，则将多出来的连接数重定向到其他注册中心上，以达到注册中心集群的连接数均衡。
+(2)DirtyCheckTask，脏数据检查定时器。作用是：分别检查缓存provider、数据库provider、缓存consumer、数据库consumer的数据，清除脏数据；清理不存活的provider和consumer数据；对于缓存中的存在的provider或consumer而数据库不存在，重新注册和订阅。
+(3)ChangedClearTask，changes变更表的定时清理任务。作用是读取changes表，清除过期数据。
+(4)AlivedCheckTask，注册中心存活状态定时检查，会定时更新registries表的expire字段，用以判断注册中心的存活状态。如果有新的注册中心，发送同步消息，将当前所有注册中心的地址通知到所有客户端。
+(5)ChangedCheckTask，变更检查定时器。检查changes表的变更，检查类型包括：参数覆盖变更、路由变更、服务消费者变更、权重变更、负载均衡变更。
 RegistryReceiver的start方法：启动注册中心服务。默认使用netty框架，绑定本机的9090端口。最后启动服务的过程是在NettyServer来完成的。接收消息时，抛开dubbo协议的解码器，调用类的顺序是
 1 NettyHandler-》NettyServer-》MultiMessageHandler-》HeartbeatHandler-》AllDispatcher-》
 2 DecodeHandler-》HeaderExchangeHandler-》RegistryReceiver-》RegistryValidator-》RegistryFailover-》RegistryExecutor。
 
 ### 2、provider启动过程
 provider的启动过程是从ServiceConfig的export方法开始进行的，具体步骤是：
-（1）进行本地jvm的暴露，不开放任何端口，以提供injvm这种形式的调用，这种调用只是本地调用，不涉及进程间通信。
-（2）调用RegistryProtocol的export。
-（3）调用DubboProtocol的export，默认开启20880端口，用以提供接收consumer的远程调用服务。
-（4）通过新建RemoteRegistry来建立与注册中心的连接。
-（5）将服务地址注册到注册中心。
-（6）去注册中心订阅自己的服务。
+(1)进行本地jvm的暴露，不开放任何端口，以提供injvm这种形式的调用，这种调用只是本地调用，不涉及进程间通信。
+(2)调用RegistryProtocol的export。
+(3)调用DubboProtocol的export，默认开启20880端口，用以提供接收consumer的远程调用服务。
+(4)通过新建RemoteRegistry来建立与注册中心的连接。
+(5)将服务地址注册到注册中心。
+(6)去注册中心订阅自己的服务。
 
 ### 3、consumer启动过程
 consumer的启动过程是通过ReferenceConfig的get方法进行的，具体步骤是：
-（1）通过新建RemoteRegistry来建立与注册中心的连接。
-（2）新建RegistryDirectory并向注册中心订阅服务，RegistryDirectory用以维护注册中心获取的服务相关信息。
-（3）创建代理类，发起consumer远程调用时，实际调用的是InvokerInvocationHandler。
+(1)通过新建RemoteRegistry来建立与注册中心的连接。
+(2)新建RegistryDirectory并向注册中心订阅服务，RegistryDirectory用以维护注册中心获取的服务相关信息。
+(3)创建代理类，发起consumer远程调用时，实际调用的是InvokerInvocationHandler。
 
 ### 实际调用过程
 1、consumer端发起调用时，实际调用经过的类是：
