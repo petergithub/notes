@@ -13,7 +13,8 @@ Contents
 java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -verbose:gc
 -Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-### tomcat build
+### Tomcat build
+#### Code
 Entry point is Bootstrap 
 set java_home=C:\ProgramFiles\Java\jdk1.6.0_45
 set java_home=C:\ProgramFiles\Java\jdk1.7.0_21
@@ -37,6 +38,13 @@ set java_home=C:\ProgramFiles\Java\jdk1.7.0_21
 	#org.apache.catalina.level=FINE
 	```
 
+#### Configuration
+URL with Chinese URIEncoding="UTF-8"
+```
+<Connector port="8080" protocol="HTTP/1.1" 
+           connectionTimeout="20000" 
+           redirectPort="8443" URIEncoding="UTF-8" />
+```
 ### Bug report for Tomcat
 ```
 +---------------------------------------------------------------------------+
@@ -137,3 +145,15 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 ### JavaMelody
 是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
 [Home](https://github.com/javamelody/javamelody/wiki)
+
+## Web Server
+### node
+npm install
+npm start
+nmp stop
+cp local-sample.js local.js
+npm install pm2 -g
+pm2 start bin/www
+pm2 stop bin/www
+pm2 list 
+pm2 delete id
