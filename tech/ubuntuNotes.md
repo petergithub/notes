@@ -1,13 +1,43 @@
 [TOC]
+
 学习系统结构的最好方法是自己做一个linux系统，再也没有什么能比自己做一个linux系统更能学习系统结构的了。LFS (linux from strach)可以教你从源代码自己编译一个系统。通过自己编译一个系统，你就可以了结linux系统结构，知道哪些文件是干什么用的，以及他们如何协调 工作。
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
+### Recent
 shortcuts:
 ^Z jobs fg(前台运行)， bg(后台运行)
 vimtutor: vim interactive guide
 Ctrl+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
+/usr/share/icons/ubuntu-mono-dark/mimes/16
+tweak get the theme ubuntu-mono-dark
+
+
+When a single program stops working: Alt+F2, type xkill
+When the mouse stops working: Alt+F2 and run gnome-terminal, If you just want to try restarting the GUI, run sudo service lightdm restart
+gnome-system-monitor
+restarting the GUI, run  sudo service lightdm restart
+    sudo stop lightdm
+    sudo start lightdm
+    sudo restart lightdm
+    unity --reset
+usbmux    1044     1  0 16:07 ?        00:00:00 /usr/sbin/usbmuxd -u -U usbmux
+sudo apt-get install -f fixed it.
+
+pgrep 和 pkill
+pgrep -l apache2
+ps -A -opid,stime,etime,args 查看进程的启动时间
+sort <file> | uniq -c
+
+libre office
+Ctrl+0 (zero) 	Apply Default paragraph style
+Ctrl+1 	Apply Heading 1 paragraph style
+Ctrl+Alt+PageDown: Navigating from comment to comment 
+Ctrl+Alt+c: create comment 
+Alt+Insert, and then press the up or down arrow key:  insert a new row in a table
+Alt+Delete, and then press the up or down arrow key.
+
 
 ## Basic Command
 ### VI
@@ -40,16 +70,16 @@ ga	显示光标下的字符在当前使用的encoding下的内码
 zoom in on your terminal with Ctrl+Shift++.
 Zoom out with Ctrl+-
 
-:x == :wq 当文件被修改时两个命令时相同的。但如果未被修改，使用 :x 不会更改文件的修改时间，而使用 :wq 会改变文件的修改时间
-:w !sudo tee %  在VIM中保存一个当前用户无权限修改的文件
-. 命令重复上次的修改。
-:! command allows you to enter the name of a shell command
+`:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用 :x 不会更改文件的修改时间，而使用 :wq 会改变文件的修改时间
+`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件
+`.` 命令重复上次的修改。
+`:!` command allows you to enter the name of a shell command
 修改在这里就是插入、删除或者替换文本。能够重复是一个非常强大的机制。如果你基于它来安排你的编辑，许多修改将变得只是敲.键。留意其间的其他修改，因为它会替代你原来要重复的修改。相反，你可以用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。
 重复修改一个单词。
-如果是在整个文件中，你可以使用:s（substitute）命令。如果只是几个地方需要修改，一种快速的方法是使用 * 命令去找到下一个出现的单词，使用cw命令修改它。然后输入n去找到下一个单词，输入英文逗点 . 去重复cw命令。
+如果是在整个文件中，你可以使用:`s`（substitute）命令。如果只是几个地方需要修改，一种快速的方法是使用`*`命令去找到下一个出现的单词，使用`cw`命令修改它。然后输入`n`去找到下一个单词，输入英文逗点 . 去重复`cw`命令。
 删除多行
-1. 如果要删除的段落的下一行是空行 一般用d} , 按两个键就可以了 多段的时候再按 .
-2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 d/fu 也就搞定了
+1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
+2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 `d/fu` 也就搞定了
 输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
 
 #### Vim: move around quickly inside of long line
@@ -317,6 +347,7 @@ sudo !!	以root的身份执行上一条命令
 echo !!:1	to call 1st arg
 echo !!:2	to call 2nd arg
 echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
+`sudo su -` change to root user
 
 友情提示：
    1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过 set -o emacs 设置。
@@ -334,9 +365,9 @@ undo 	C-/
 bash Startup Files: it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile
  You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.
 add  one line in .profile
-alias ls='ls --color=never'
+`alias ls='ls --color=never'` #调用`\ls`使用原本的ls命令而不是别名
 add one line in .bashrc
-.bashrc:  alias grep='grep --color=auto'
+.bashrc:  `alias grep='grep --color=auto'`
 
 #### file carriage
 在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL-V CTRL-M"生成，而不是直接键入"^M"。 
@@ -636,7 +667,7 @@ make it executable
 linux中除了常见的读（r）、写（w）、执行（x）权限以外，还有3个特殊的权限，分别是setuid、setgid和stick bit
 setuid、setgid实例，/usr/bin/passwd 与/etc/passwd文件的权限
 ```
-[root@MyLinux ~]# ls -l /usr/bin/passwd /etc/passwd
+# ls -l /usr/bin/passwd /etc/passwd
 -rw-r--r-- 1 root root  1549 08-19 13:54 /etc/passwd
 -rwsr-xr-x 1 root root 22984 2007-01-07 /usr/bin/passwd
 ```
@@ -644,7 +675,7 @@ setuid、setgid实例，/usr/bin/passwd 与/etc/passwd文件的权限
 
 stick bit （粘贴位） 实例，查看/tmp目录的权限
 ```
-[root@MyLinux ~]# ls -dl /tmp
+# ls -dl /tmp
 drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 ```
  tmp目录是所有用户共有的临时文件夹，所有用户都拥有读写权限，这就必然出现一个问题，A用户在/tmp里创建了文件a.file，此时B用户看了不爽，在/tmp里把它给删了（因为拥有读写权限），那肯定是不行的。实际上在/tmp目录中，只有文件的拥有者和root才能对其进行修改和删除，其他用户则不行，因为有特殊权限stick bit（粘贴位）权限，正如drwxrwxrwt中的最后一个t 
