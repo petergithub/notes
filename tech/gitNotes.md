@@ -39,13 +39,13 @@ Do the merge, and then pull the stash:
 git stash pop
 
 已通过http协议clone的工程，可以在项目根目录通过 git remote set-url 变更远程仓库地址， 如
-git remote set-url origin ssh://git@stash.lab.tclclouds.com:7999/os/developer-platform.git
+git remote set-url origin ssh://git@host:port/os/developer-platform.git
 批量修改为ssh协议
-find . -name config | grep .git | xargs sed -i 's#http://pu.shang@121.40.71.149:7990/scm#ssh://git@121.40.71.149:7999#g'
-ssh://git@121.40.71.149:7999/~pu.shang/storelocal.git
-http://pu.shang@121.40.71.149:7990/scm/~pu.shang/storelocal.git
-ssh://git@121.40.71.149:7999/ecc/aot-commerce-platform-membership.git
-http://pu.shang@121.40.71.149:7990/scm/ecc/aot-commerce-platform-membership.git
+find . -name config | grep .git | xargs sed -i 's#http://username@host:7990/scm#ssh://git@host:port#g'
+ssh://git@host:port/~username/project.git
+http://username@host:port/scm/~username/project.git
+ssh://git@host:port/ecc/project.git
+http://username@host:7990/scm/ecc/aot-commerce-platform-membership.git
 git remote add origin <server> 将你的仓库连接到某个远程服务器
 添加另一个仓库存储分支
 git remote add storeLocal URL
