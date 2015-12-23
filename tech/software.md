@@ -1,18 +1,7 @@
 
 [TOC]
-Contents
-	tomcat
-	lucene
-	spring
-	gradlew
-	bash
-	vim
 
-## Development
-### java run
-java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -verbose:gc
--Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
-
+## Project
 ### Tomcat build
 #### Code
 Entry point is Bootstrap 
@@ -76,7 +65,7 @@ For example, if you're iterating on changes in spring-webmvc,
 cd spring-webmvc 
 run ../gradlew -a build to tell gradle to evaluate and build only that subproject.
 
-### Spring artifact versioning
+#### Spring artifact versioning
 ```
 3.1.0.RELEASE
 | | | | - version type
@@ -93,7 +82,7 @@ run ../gradlew -a build to tell gradle to evaluate and build only that subprojec
 3.1.1.BUILD-SNAPSHOT - nightly snapshot of the 3.1.1 maintenance release
 3.1.1.RELEASE        - final GA release of 3.1.1 
 
-### Gradlew command:
+#### Gradle command:
 https://github.com/SpringSource/spring-framework/wiki/Gradle-build-and-release-FAQ
 set DEFAULT_JVM_OPTS=-Xms768m -Xmx1024m
 set GRADLE_OPTS= %GRADLE_OPTS%
@@ -132,22 +121,26 @@ https://pac.itzmx.com/abc.pac
 ### veracrypt
 https://veracrypt.codeplex.com
 
-## Monitor
-### Zabbix
-Zabbix is an open source monitoring software 
 
-### Java HeartBeat
-https://www.oschina.net/news/62034/java-heartbeat-0-4
-[git.oschina](http://git.oschina.net/mkk/HeartBeat)
-[下载链接](http://git.oschina.net/mkk/HeartBeat/raw/V-0.4/dist/HeartBeat-0.4.zip)
-[在线测试](http://andaily.com/hb)
+## Classify by Project Development Phase
+### 01 Project Management
+### 02 Requirements
+### 03 Design
+#### swagger 
+http://swagger.io
+A Powerful Interface to your API 
+https://github.com/swagger-api/swagger-ui
 
-### JavaMelody
-是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
-[Home](https://github.com/javamelody/javamelody/wiki)
+### 04 Build
+#### Java run
+java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -verbose:gc
+-Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
-## Web Server
-### node
+### 05 Test
+### 06 Deploy
+
+#### Web Server
+##### Node
 npm install
 npm start
 nmp stop
@@ -157,3 +150,18 @@ pm2 start bin/www
 pm2 stop bin/www
 pm2 list 
 pm2 delete id
+
+### 07 Support
+#### Monitor
+##### Zabbix
+Zabbix is an open source monitoring software 
+
+##### Java HeartBeat
+https://www.oschina.net/news/62034/java-heartbeat-0-4
+[git.oschina](http://git.oschina.net/mkk/HeartBeat)
+[下载链接](http://git.oschina.net/mkk/HeartBeat/raw/V-0.4/dist/HeartBeat-0.4.zip)
+[在线测试](http://andaily.com/hb)
+
+##### JavaMelody
+是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
+[Home](https://github.com/javamelody/javamelody/wiki)
