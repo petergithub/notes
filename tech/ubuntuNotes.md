@@ -25,6 +25,14 @@ restarting the GUI, run  sudo service lightdm restart
 usbmux    1044     1  0 16:07 ?        00:00:00 /usr/sbin/usbmuxd -u -U usbmux
 sudo apt-get install -f fixed it.
 
+Ubuntu 桌面死机后重启桌面方法
+`sudo restart lightdm`
+or
+`Alt+Ctrl+F1`进入命令行Console
+kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg
+缺点是：只是重新启动了Xorg的进程，而死机前原来正在运行的程序和数据无法恢复！
+
+
 pgrep 和 pkill
 pgrep -l apache2
 ps -A -opid,stime,etime,args 查看进程的启动时间
