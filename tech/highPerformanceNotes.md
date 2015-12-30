@@ -3,7 +3,7 @@
 #High performance Notes
 
 ## 如何应对并发
-
+转自　曹政 caoz的梦呓
 ### [如何应对并发(1) - 关于数据索引](http://mp.weixin.qq.com/s?__biz=MzI0MjA1Mjg2Ng==&mid=400470606&idx=1&sn=eff5350f80190ad6e32659f434aac970&scene=0#wechat_redirect)
 
 #### 经典案例1，大翻页问题
@@ -19,9 +19,9 @@ explain SQL
 ### [如何应对并发(2) - 请求合并及异步处理](http://mp.weixin.qq.com/s?__biz=MzI0MjA1Mjg2Ng==&mid=400480069&idx=1&sn=4119397d0e3b0444f04d25f76ecdfbe3&scene=0#wechat_redirect)
 
 #### 并不是查询请求缓存化了系统效率就会提升
-1、如果缓存命中率不高，可能反而是负担
-2、如果缓存设计不合理，系统开销只会更高
-3、雪崩效应的风险
+1、如果缓存命中率不高，可能反而是负担  
+2、如果缓存设计不合理，系统开销只会更高  
+3、雪崩效应的风险  
 
 #### 慢查询日志肯定是要看的
 第一，看查询和更新的比例。
