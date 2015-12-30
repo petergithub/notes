@@ -2,6 +2,11 @@
 [TOC]
 
 ## Project
+### Design
+#### API
+1. lower <, floor <=, ceiling >=, higher >
+2. 返回list时带上下一条,然后请求数据时带上第一条记录 查询用它做条件减少翻页
+
 ### Tomcat build
 #### Code
 Entry point is Bootstrap 
@@ -117,8 +122,9 @@ https://pac.itzmx.com/abc.pac
 ### SublimeLicense.md
 ----- BEGIN LICENSE ----- Andrew Weber Single User License EA7E-855605 813A03DD 5E4AD9E6 6C0EEB94 BC99798F 942194A6 02396E98 E62C9979 4BB979FE 91424C9D A45400BF F6747D88 2FB88078 90F5CC94 1CDC92DC 8457107A F151657B 1D22E383 A997F016 42397640 33F41CFC E1D0AE85 A0BBD039 0E9C8D55 E1B89D5D 5CDB7036 E56DE1C0 EFCC0840 650CD3A6 B98FC99C 8FAC73EE D2B95564 DF450523 ------ END LICENSE ------
 
-## Encrypt
-### veracrypt
+## Data Security
+### Encrypt
+#### veracrypt
 https://veracrypt.codeplex.com
 
 
@@ -138,6 +144,24 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 
 ### 05 Test
 ### 06 Deploy
+#### Data security 数据安全工具DRBD
+
+#### 高性能集群软件 Keepalived
+
+#### 高并发负载均衡软件 HAProxy
+
+#### 构建高性能的 MySQL 集群系统
+##### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
+##### 通过MMM构建Mysql高可用集群系统
+#####  MySQL读写分离解决方案
+通过amoeba 实现MySQL读写分离
+通过keepalived构建高可用的amoeba服务
+
+#### Distributed Configuration Management Platform(分布式配置管理平台) 
+https://github.com/knightliao/disconf
+
+#### Commons Configuration
+http://commons.apache.org/proper/commons-configuration/
 
 #### Web Server
 ##### Node
@@ -154,7 +178,11 @@ pm2 delete id
 ### 07 Support
 #### Monitor
 ##### Zabbix
-Zabbix is an open source monitoring software 
+Zabbix is an open source monitoring software
+
+##### Ganglia
+
+##### 基于 nagios 的分布式监控平台 centreon
 
 ##### Java HeartBeat
 https://www.oschina.net/news/62034/java-heartbeat-0-4

@@ -268,11 +268,14 @@ find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomAction
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
 ```
 
-#### 乱码文件名的文件处理
+#### 文件名乱码处理
 1. `ls -i` print the index number of each file(文件的i节点) 12345
 2. `find . -inum 12345 -print -exec rm {} -r \;` rm
 3. `find . -inum 12345 -exec mv {} NewName \;` mv
 命令中的"{}"表示find命令找到的文件，在-exec选项执行mv命令的时候，会利用按i节点号找到的文件名替换掉"{}"
+
+convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量转换
+转换文件名由GBK为UTF8 :  convmv -r -f cp936 -t utf8 --notest --nosmart *
 
 ### xargs
 xargs 工具的经典用法示例 
@@ -393,7 +396,6 @@ unzip -l gdms.war | grep jaxen
 unzip -l archive.zip lists the contents of a ZIP archive to ensure your file is inside.
 unzip -c archive.zip file1.txt file2.txt | less :Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
 unzip -O cp936 fix linux下文件解压乱码
-convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量转换
 zip -u gdms.war WEB-INF/lib/jaxen-core.jar update zip file
 zip -d gdms.war WEB-INF/lib/jaxen-core.jar
 
