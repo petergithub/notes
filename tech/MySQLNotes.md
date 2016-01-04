@@ -221,3 +221,28 @@ SELECT
 FROM prince
 	
 ```
+
+## MySQL线上常见故障剖析
+–活动进程(Process list)
+–日志文件(slow log, alert log, general query log, binlog)
+–Status variables（com_select, com_insert,.etc)
+–InnoDB(物理读、逻辑读、innodbstatus)
+–参数配置
+–Stack trace(plus source code)
+•SQL
+–执行计划，explain
+•OS
+–内存, SWAP, /proc/meminfo
+–CPU, load, ps
+–IO（磁盘、网络)
+•Iostat
+•Profile
+–Oprofile
+–gprof
+
+## 构建高性能的 MySQL 集群系统
+### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
+### 通过MMM构建Mysql高可用集群系统
+###  MySQL读写分离解决方案
+通过amoeba 实现MySQL读写分离
+通过keepalived构建高可用的amoeba服务

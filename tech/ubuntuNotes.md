@@ -5,7 +5,7 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
 ### Recent
 shortcuts:
-^Z jobs fg(前台运行)， bg(后台运行)
+CTRL+z jobs fg(前台运行)， bg(后台运行)
 vimtutor: vim interactive guide
 Ctrl+h: show hidden files
 nautilus: open your home folder
@@ -72,7 +72,7 @@ dt"  删除所有的内容，直到遇到"
 guw	光标下的单词变为小写
 gUw	光标下的单词变为大写
 ga	显示光标下的字符在当前使用的encoding下的内码
-`:sh`	暂时退出vi到系统下，结束时按Ctrl + d则回到vi
+`:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
 `:r!command`	将命令command的输出结果放到当前行【强大】
 
 zoom in on your terminal with Ctrl+Shift++.
@@ -88,7 +88,7 @@ Zoom out with Ctrl+-
 删除多行
 1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 `d/fu` 也就搞定了
-输入单词A的前几个字母，然后ctrl+N补全。<C-o><C-n> <C-o><C-p> 只是简单的上下文补全，还有<C-o><C-f> 用于对目录名进行补全
+输入单词A的前几个字母，然后ctrl+n补全。<CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全，还有<CTRL+o><CTRL+f> 用于对目录名进行补全
 
 #### Vim: move around quickly inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
@@ -101,13 +101,13 @@ vimdiff  FILE_LEFT  FILE_RIGHT
 :wqa (write, then quit all)
 :qa! (force to quit all)
 
-Ctrl-w K(把当前窗口移到最上边)
-Ctrl-w H(把当前窗口移到最左边)
-Ctrl-w J(把当前窗口移到最下边)
-Ctrl-w L(把当前窗口移到最右边)
-ctrl-w,r 交换上/下、左/右两个分隔窗口的位置
+CTRL+w K(把当前窗口移到最上边)
+CTRL+w H(把当前窗口移到最左边)
+CTRL+w J(把当前窗口移到最下边)
+CTRL+w L(把当前窗口移到最右边)
+CTRL+w,r 交换上/下、左/右两个分隔窗口的位置
 其中2和4两个操作会把窗口改成垂直分割方式。
-在两个文件之间来回跳转，可以用下列命令序列Ctrl-w, w
+在两个文件之间来回跳转，可以用下列命令序列CTRL+w, w
 可以使用快捷键在各个差异点之间快速移动。跳转到下一个差异点：]c. 反向跳转是：[c
 `> -`, `> +` 调整窗口大小
 
@@ -303,48 +303,48 @@ read -n 1 -p "Press any key to continue"
 sleep 2; echo 'end sleep 2 sec'
 
 ### bash
-^u remove line command
-^T It will reverse two characters
-^Q Windows vi region select
+CTRL+u remove line command
+CTRL+t It will reverse two characters
+CTRL+q Windows vi region select
 Add comments for mutillines
-	press Ctrl-V to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
+	press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 编辑命令
-    * Ctrl + a ：移到命令行首
-    * Ctrl + e ：移到命令行尾
-    * Alt + f ：按单词前移（右向）
-    * Alt + b ：按单词后移（左向）
-    * Ctrl + xx：在命令行首和光标之间移动
-    * Ctrl + u ：从光标处删除至命令行首
-    * Ctrl + k ：从光标处删除至命令行尾
-    * Ctrl + w ：从光标处删除至字首
-    * Alt + d ：从光标处删除至字尾
-    * Ctrl + d ：删除光标处的字符
-    * Ctrl + h ：删除光标前的字符
-    * Ctrl + y ：粘贴至光标后
-    * Alt + c ：从光标处更改为首字母大写的单词
-    * Alt + u ：从光标处更改为全部大写的单词
-    * Alt + l ：从光标处更改为全部小写的单词
-    * Ctrl + t ：交换光标处和之前的字符
-    * Alt + t ：交换光标处和之前的单词
-    * Alt + Backspace：与 Ctrl + w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
+    * CTRL+a ：移到命令行首
+    * CTRL+e ：移到命令行尾
+    * Alt+f ：按单词前移（右向）
+    * Alt+b ：按单词后移（左向）
+    * CTRL+xx：在命令行首和光标之间移动
+    * CTRL+u ：从光标处删除至命令行首
+    * CTRL+k ：从光标处删除至命令行尾
+    * CTRL+w ：从光标处删除至字首
+    * Alt+d ：从光标处删除至字尾
+    * CTRL+d ：删除光标处的字符
+    * CTRL+h ：删除光标前的字符
+    * CTRL+y ：粘贴至光标后
+    * Alt+c ：从光标处更改为首字母大写的单词
+    * Alt+u ：从光标处更改为全部大写的单词
+    * Alt+l ：从光标处更改为全部小写的单词
+    * CTRL+t ：交换光标处和之前的字符
+    * Alt+t ：交换光标处和之前的单词
+    * Alt+Backspace：与 CTRL+w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
 重新执行命令
-    * Ctrl + r：逆向搜索命令历史
-    * Ctrl + g：从历史搜索模式退出
-    * Ctrl + p：历史中的上一条命令
-    * Ctrl + n：历史中的下一条命令
-    * Alt + .：使用上一条命令的最后一个参数
+    * CTRL+r：逆向搜索命令历史
+    * CTRL+g：从历史搜索模式退出
+    * CTRL+p：历史中的上一条命令
+    * CTRL+n：历史中的下一条命令
+    * Alt+.：使用上一条命令的最后一个参数
 控制命令
-    * Ctrl + l：清屏
-    * Ctrl + o：执行当前命令，并选择上一条命令 循环执行历史命令
-    * Ctrl + s：阻止屏幕输出
-    * Ctrl + q：允许屏幕输出
-    * Ctrl + c：终止命令
-    * Ctrl + z：挂起命令
+    * CTRL+l：清屏
+    * CTRL+o：执行当前命令，并选择上一条命令 循环执行历史命令
+    * CTRL+s：阻止屏幕输出
+    * CTRL+q：允许屏幕输出
+    * CTRL+c：终止命令
+    * CTRL+z：挂起命令
 Bang (!) 命令
     * !!：执行上一条命令
     * !blah：执行最近的以 blah 开头的命令，如 !ls
     * !blah:p：仅打印输出，而不执行
-    * !$：上一条命令的最后一个参数，与 Alt + . 相同
+    * !$：上一条命令的最后一个参数，与 Alt+. 相同
     * !$:p：打印输出 !$ 的内容
     * !*：上一条命令的所有参数
     * !*:p：打印输出 !* 的内容
@@ -362,15 +362,16 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
 
 友情提示：
    1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过 set -o emacs 设置。
-   2. ^S、^Q、^C、^Z 是由终端设备处理的，可用 stty 命令设置。
-   3.  用C-p取出历史命令列表中某一个命令后, 按C-o可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用C-p取出命令A后, 再按C-o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. C-o有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入du -sh dir去执行, 但用C-o可以非常完美的解决这个问题, 方法就是:
+   2. CTRL+s、CTRL+q、CTRL+c、CTRL+z 是由终端设备处理的，可用 stty 命令设置。
+   3.  用CTRL+p取出历史命令列表中某一个命令后, 按CTRL+o可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用CTRL+p取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. CTRL+o有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入du -sh dir去执行, 但用CTRL+o可以非常完美的解决这个问题, 方法就是:
     输入du -sh dir, 按回车执行命令
-    C-p, C-o, 然后就可以不停的按C-o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
+    CTRL+p, CTRL+o, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
 	其实上面这个问题也可以用watch命令解决: watch -n 10 -d du -sh /app/data/nas/gdms/
-   4. 使用 Ctrl-r 而不是上下光标键来查找历史命令
+   4. 使用 CTRL+r 而不是上下光标键来查找历史命令
+   5. 在已经敲完的命令后按<CTRL+x CTRL+e>，会打开一个你指定的编辑器（比如vim，通过环境变量$EDITOR 指定）
 
 alt+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按alt+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用alt+0 alt+., 就是先输入alt+0, 再输入alt+.. 如果是上上条命令的第一个参数呢? 当然是alt+0 alt+. alt+.了.
-undo 	C-/
+undo 	CTRL+/
 
 #### bash profile
 bash Startup Files: it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile
@@ -381,7 +382,7 @@ add one line in .bashrc
 .bashrc:  `alias grep='grep --color=auto'`
 
 #### file carriage
-在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL-V CTRL-M"生成，而不是直接键入"^M"。 
+在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL+v CTRL+m"生成，而不是直接键入"^M"。 
 1. $ dos2unix myfile.txt
 2. vi :%s/^M$//g #去掉行尾的^M。
 	:%s/^M//g #去掉所有的^M。
@@ -428,6 +429,7 @@ find out which command shell executes and to print binary(command) file location
 `updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf 
 
 ### Other
+`history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令
 查看最后一个日志文件cat /app/dmfdev08/dba/log/0001d795/bp/`ls -tr /app/dmfdev08/dba/log/0001d795/bp | tail -1`
 sudo usermod -a -G vboxsf your_user_name	:add user to group vboxsf
 cat << EOF > test.txt
@@ -487,7 +489,7 @@ n(到达下一个窗口) p(到达上一个窗口)
 ```
 #if the window name keeps renaming, create file .tmux.conf with content below
 #reload tmux config .tmux.conf 
-#within tmux, by pressing Ctrl+B and then :source-file ~/.tmux.conf
+#within tmux, by pressing Ctrl+b and then :source-file ~/.tmux.conf
 #Or simply from a shell: tmux source-file ~/.tmux.conf
 set-option -g allow-rename off
 #set -g default-terminal "xterm-256color"
@@ -529,20 +531,20 @@ Alt+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 screen vi test.c
 screen -ls
 screen -r PID
-可以通过C-a ?来查看所有的键绑定，常用的键绑定有：
-C-a ?	显示所有键绑定信息
-C-a w	显示所有窗口列表
+可以通过CTRL+a ?来查看所有的键绑定，常用的键绑定有：
+CTRL+a ?	显示所有键绑定信息
+CTRL+a w	显示所有窗口列表
 Ctrl+a A	set window title
-C-a C-a	切换到之前显示的窗口
-C-a c	创建一个新的运行shell的窗口并切换到该窗口
-C-a n	切换到下一个窗口
-C-a p	切换到前一个窗口(与C-a n相对)
-C+a "	select window from list
-C-a 0..9	切换到窗口0..9
-C-a a	发送C-a到当前窗口 bash中到行首
-C-a d	暂时断开screen会话
-C-a k	杀掉当前窗口
-C-a [	进入拷贝/回滚模式
+CTRL+a CTRL+a	切换到之前显示的窗口
+CTRL+a c	创建一个新的运行shell的窗口并切换到该窗口
+CTRL+a n	切换到下一个窗口
+CTRL+a p	切换到前一个窗口(与CTRL+a n相对)
+CTRL+a "	select window from list
+CTRL+a 0..9	切换到窗口0..9
+CTRL+a a	发送CTRL+a到当前窗口 bash中到行首
+CTRL+a d	暂时断开screen会话
+CTRL+a k	杀掉当前窗口
+CTRL+a [	进入拷贝/回滚模式
 -c file	使用配置文件file，而不使用默认的$HOME/.screenrc
 screen -wipe命令清除死掉的会话
 
