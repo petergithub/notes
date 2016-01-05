@@ -49,11 +49,20 @@ Alt+Delete, and then press the up or down arrow key.
 
 ## Basic Command
 ### VI
+#### Configuration
 :set nu / :set nonu	(不)列出行号 (nu为行数)
 :set ic / :set noic	vi在查找过程中(不)区分大小写 :set ignorecase/:set noignorecase
-~	切换大小写
-:sp split window above and below
-dt"  删除所有的内容，直到遇到"
+
+#### Move
+`%`	move to the matching parenthesis
+
+#### Basic vi
+`~`	切换大小写
+`:sp`	split window above and below
+`:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
+`:r!command`	将命令command的输出结果放到当前行【强大】
+`:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用`:x`不会更改文件的修改时间，而使用`:wq`会改变文件的修改时间
+`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件。
 
 改变与替换操作命令 
 <r> 替换光标所在的字符 
@@ -68,18 +77,14 @@ dt"  删除所有的内容，直到遇到"
 `yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)
 `yiw`	不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
 `diw`	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
+`dt<LETTER>`	删除所有的内容，直到遇到<LETTER>
 `daw`	删除当前光标所在的word(包括空白字符)，意为Delete A Word
-guw	光标下的单词变为小写
-gUw	光标下的单词变为大写
-ga	显示光标下的字符在当前使用的encoding下的内码
-`:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
-`:r!command`	将命令command的输出结果放到当前行【强大】
+`guw`	光标下的单词变为小写
+`gUw`	光标下的单词变为大写
+`ga`	显示光标下的字符在当前使用的encoding下的内码
+`Ctrl+Shift++`	zoom in on your terminal
+`Ctrl+-`	Zoom out
 
-zoom in on your terminal with Ctrl+Shift++.
-Zoom out with Ctrl+-
-
-`:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用 :x 不会更改文件的修改时间，而使用 :wq 会改变文件的修改时间
-`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件
 `.` 命令重复上次的修改。
 `:!` command allows you to enter the name of a shell command
 修改在这里就是插入、删除或者替换文本。能够重复是一个非常强大的机制。如果你基于它来安排你的编辑，许多修改将变得只是敲.键。留意其间的其他修改，因为它会替代你原来要重复的修改。相反，你可以用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。
@@ -88,9 +93,9 @@ Zoom out with Ctrl+-
 删除多行
 1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 `d/fu` 也就搞定了
-输入单词A的前几个字母，然后ctrl+n补全。<CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全，还有<CTRL+o><CTRL+f> 用于对目录名进行补全
+输入单词A的前几个字母，然后CTRL+n补全。<CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全，还有<CTRL+o><CTRL+f> 用于对目录名进行补全
 
-#### Vim: move around quickly inside of long line
+#### Move around inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
 #### 文件对比 合并 多窗口
@@ -750,7 +755,7 @@ sudo service network-manager restart
 DEVICE   =   eth0   
 ONBOOT   =   yes   
 BOOTPROTO   =   static   
-BROADCAST=192.168. 230.255
+BROADCAST=192.168.230.255
 IPADDR=   192.168.230.160 (你需要的固定ip)   
 NETMASK=255.255.255.0
 NETWORK=192.168.1.0
@@ -762,6 +767,42 @@ ONBOOT   =   yes
 USERCTL   =   yes   
 BOOTPROTO   =   dhcp  
 重启网络服务service network restart
+
+#### Change system proxy settings from the command line using gsettings
+http://ask.xmodulo.com/change-system-proxy-settings-command-line-ubuntu-desktop.html
+**Question**: change system proxy settings on Ubuntu desktop: "System Settings" -> "Network" -> "Network proxy". Is there a more convenient way to change desktop's proxy settings from the command line?  
+To modify a DConf setting: `$ gsettings set <schema> <key> <value>`
+To read a DConf setting: `$ gsettings get <schema> <key>` 
+
+**Change System Proxy Setting to Manual from the Command Line**
+The following commands will change HTTP proxy setting to "my.proxy.com:8000" on Ubuntu desktop.
+`$ gsettings set org.gnome.system.proxy.http host 'my.proxy.com'`
+`$ gsettings set org.gnome.system.proxy.http port 8000`
+`$ gsettings set org.gnome.system.proxy mode 'manual'`
+
+If you want to change HTTPS/FTP proxy to manual as well, use these commands:
+`$ gsettings set org.gnome.system.proxy.https host 'my.proxy.com'`
+`$ gsettings set org.gnome.system.proxy.https port 8000`
+`$ gsettings set org.gnome.system.proxy.ftp host 'my.proxy.com'`
+`$ gsettings set org.gnome.system.proxy.ftp port 8000`
+
+To change Socks host settings to manual:
+`$ gsettings set org.gnome.system.proxy.socks host 'my.proxy.com'`
+`$ gsettings set org.gnome.system.proxy.socks port 8000`
+
+All these changes above are limited to the current Desktop user only. If you want to apply the proxy setting changes system-wide, prepend sudo to gsettings command. For example:
+`$ sudo gsettings set org.gnome.system.proxy.http host 'my.proxy.com'`
+`$ sudo gsettings set org.gnome.system.proxy.http port 8000`
+`$ sudo gsettings set org.gnome.system.proxy mode 'manual'`
+
+**Change System Proxy Setting to Automatic from the Command Line**
+If you are using proxy auto configuration (PAC), type the following commands to switch to PAC.
+`$ gsettings set org.gnome.system.proxy mode 'auto'`
+`$ gsettings set org.gnome.system.proxy autoconfig-url http://my.proxy.com/autoproxy.pac`
+Clear System Proxy Setting from the Command Line
+
+Finally, to remove manual/automatic proxy setting, and revert to no-proxy setting:
+`$ gsettings set org.gnome.system.proxy mode 'none' `
 
 #### SSH
 ssh user@host	以 user 用户身份连接到 host

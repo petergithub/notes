@@ -5,7 +5,6 @@
 ## Recent
 markdown转义: 句点前面加上反斜杠
 
-
 ## Basic syntax
 ### Text
 Sometimes it's useful to have different levels of headings to structure your documents. Start lines with a `#` to create headings. Multiple `##` in a row denote smaller heading sizes.
@@ -88,7 +87,7 @@ http://github.com - automatic!
 [GitHub](http://github.com)
 ```
 
-### Blockquotes
+### Block quotes
 As Kanye West said:
 > We're living the future so
 > the present is our past.
