@@ -12,9 +12,14 @@ explain sql query;
 MySQL 5.5 UTF8mb4支持emoj 
 HA: percona xtradb cluster, galera cluster 
 
-
-
-## Basic command
+`mysql>pager less`
+`nopager`   (\n) Disable pager, print to stdout.
+`pager`     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
+`pager less -n -i -S` 
+From `man less`:
+`-i` Causes searches to ignore case
+`-n` Suppresses line numbers
+`-S` Causes lines longer than the screen width to be chopped rather than folded.
 
 ### MySQL调优
 1.mysql嵌套子查询效率确实比较低
@@ -26,6 +31,7 @@ HA: percona xtradb cluster, galera cluster
 例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8
 mysql线上将采用一master多slave的方式来进行部署
 
+## Basic command
 
 ### Common command
 连接MYSQL mysql -h主机地址 -Pport -u用户名 －p用户密码 -S /data/mysql/mysql.sock
