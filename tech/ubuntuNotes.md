@@ -12,6 +12,7 @@ nautilus: open your home folder
 location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
+`ln -sfn` update a symbolic link
 
 
 When a single program stops working: Alt+F2, type xkill
