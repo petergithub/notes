@@ -13,6 +13,13 @@ location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
+date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+'groups username'	To find group memebership for username
+
+virtual box connect usb
+sudo adduser pu vboxusers
+
+gMTP connect to android from ubuntu
 
 
 When a single program stops working: Alt+F2, type xkill

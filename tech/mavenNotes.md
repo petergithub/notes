@@ -3,6 +3,7 @@
 [TOC]
 
 ## Recent
+`-U` (aka `--update-snapshots`): force maven update local repository
 mvn dependency:list -e -U -X
 mvn eclipse:eclipse -DdownloadSources
 -Dmaven.test.skip
