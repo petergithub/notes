@@ -7,6 +7,7 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 ### Most recent
 `git log -g branchName` show Git branch created time just for local fetch/create time
 `git log --name-only ` show changed file name only
+`git show <commit-id>` show difference for a commit 
 `git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
 `git log --follow [file]`	显示某个文件的版本历史，包括文件改名
 `git whatchanged [file]`	显示某个文件的版本历史，包括文件改名

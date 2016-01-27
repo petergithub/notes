@@ -38,7 +38,7 @@ echo "set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1" >
 echo "command W w !sudo tee % > /dev/null" >> .vimrc	## take W as a shortcut
 ## gvim fileName # open file with gvim
 ## update default editor from nano to vim when less/more
-echo 'export EDITOR=vim' >> ~/.bashrc_profile
+echo 'export EDITOR=vim' >> ~/.bash_profile
 source ~/.bashrc
 ########## Config GVim END ##########
 
@@ -51,7 +51,7 @@ sudo apt-get update
 sudo apt-get install nautilus-gksu
 nautilus -q
 sudo apt-get install trash-cli
-echo del='trash-put' >> ~/.bashrc_profile
+echo del='trash-put' >> ~/.bash_profile
 sudo apt-get install fcitx-table-wbpy ## install Chinese input
 #sudo apt-get install gconf-editor
 # install flash plugin for firefox
@@ -61,12 +61,21 @@ sudo apt-get -y install p7zip p7zip-full p7zip-rar
 
 ## put shortcut
 mkdir bin
-echo export PATH=.:~/bin:\$PATH >> ~/.bashrc_profile
+#echo export PATH=.:~/bin:\$PATH >> ~/.bash_profile
+echo "Download .bash_profile from https://github.com/petergithub/configuration/blob/master/.bash_profile"
 ########## tools END ##########
 
 ########## development tools BEGIN ##########
 sudo apt-get install git
 sudo apt-get install tmux
+
+## cheat for command
+apt-get install python-pip
+sudo pip install docopt pygments
+git clone https://github.com/chrisallenlane/cheat.git
+cd cheat
+sudo python setup.py install
+cheat -v
 ########## development tools END ##########
 
 ########## wine BEGIN ##########
@@ -99,9 +108,9 @@ sudo apt-get install maven
 #$ echo $JAVA_HOME
 #//show nothing
 #vim ~/.bashrc add lines or using >>
-echo export JAVA_HOME=~/opt/java/jdk >> ~/.bashrc_profile
-echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bashrc_profile
-echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bashrc_profile
+echo export JAVA_HOME=~/opt/java/jdk >> ~/.bash_profile
+echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bash_profile
+echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bash_profile
 ##restart terminal or source ~/.bashrc or . ~/.bashrc
 source ~/.bashrc
 

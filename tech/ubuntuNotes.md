@@ -311,9 +311,117 @@ xargs echo
 在bash的脚本中，你可以使用 set -x 来debug输出。使用 set -e 来当有错误发生的时候abort执行。考虑使用 set -o pipefail 来限制错误。还可以使用trap来截获信号（如截获ctrl+c）。
 在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
 
-read -p "Press enter to continue"
+read -p "Press [Enter] key to continue"
 read -n 1 -p "Press any key to continue"
 sleep 2; echo 'end sleep 2 sec'
+
+﻿$? 上一个命令的返回代码。0为true, 1为false
+$$进程标识号
+$*，该变量包含了所有输入的命令行参数值
+string string不为空 
+
+#### Common Bash comparisons
+Operator	Meaning	Example
+-z	Zero-length string	[ -z "$myvar" ]
+-z string string为空
+-n	Non-zero-length string	[ -n "$myvar" ]
+=	String equality	[ "abc" = "$myvar" ]
+!=	String inequality	[ "abc" != "$myvar" ]
+-eq	Numeric equality	[ 3 -eq "$myinteger" ]
+-ne	Numeric inequality	[ 3 -ne "$myinteger" ]
+-lt	Numeric strict less than	[ 3 -lt "$myinteger" ]
+-le	Numeric less than or equals	[ 3 -le "$myinteger" ]
+-gt	Numeric strict greater than	[ 3 -gt "$myinteger" ]
+-ge	Numeric greater than or equals	[ 3 -ge "$myinteger" ]
+-f	Exists and is regular file	[ -f "$myfile" ]
+[ -f "somefile" ] ：判断是否是一个文件
+-d	Exists and is directory	[ -d "$mydir" ]
+-d 是否是目录
+-nt	First file is newer than second one	[ "$myfile" -nt ~/.bashrc ]
+-ot	First file is older than second one	[ "$myfile" -ot ~/.bashrc ]
+[ -x "/bin/ls" ] ：判断/bin/ls是否存在并有可执行权限
+[ -n "$var" ] ：判断$var变量是否有值
+[ "$a" = "$b" ] ：判断$a和$b是否相等
+[ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
+[ ! ]
+
+#### example 
+
+``` shell
+if [ ! -f "./gdms_apply_security.config" ]; then
+    echo  "The config file for docbase and username doesn't exist, please check it"
+    exit 0
+fi
+if [ a || b && c ]; then
+　 ....
+elif ....; then
+　 ....
+else
+　 ....
+fi
+
+while [ -n "$binnum" ]; do
+　　...
+done
+
+
+for x in one two three four
+do
+    echo number $x
+done
+
+output:
+number one
+number two 
+number three 
+number four
+
+for myfile in /etc/r*
+do
+    if [ -d "$myfile" ] 
+    then
+      echo "$myfile (dir)"
+    else
+      echo "$myfile"
+    fi
+done
+
+
+	#! /bin/sh
+	#shell脚本控制jar的启动和停止
+	#启动方法
+	start(){
+	
+	        java -Xms128m -Xmx2048m -jar test1.jar 5 > log.log &
+	        java -Xms128m -Xmx2048m -jar test2.jar 5 > log.log &
+	        tail -f result.log
+	}
+	#停止方法
+	stop(){
+	        ps -ef|grep test|awk '{print $2}'|while read pid
+	        do
+	           kill -9 $pid
+	        done
+	}
+	
+	case "$1" in
+	start)
+	  start
+	  ;;
+	stop)
+	  stop
+	  ;;
+	restart)
+	  stop
+	  start
+	  ;;
+	*)
+	  printf 'Usage: %s {start|stop|restart}\n' "$prog"
+	  exit 1
+	  ;;
+	esac
+```
+
 
 ### bash
 CTRL+u remove line command

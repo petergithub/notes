@@ -176,6 +176,8 @@ pm2 list
 pm2 delete id
 
 ### 07 Support
+Django的出现让运维非常快速方便地开发部署自动化工具
+
 #### Monitor
 ##### Zabbix
 Zabbix is an open source monitoring software
@@ -193,3 +195,15 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 ##### JavaMelody
 是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
 [Home](https://github.com/javamelody/javamelody/wiki)
+
+#### 运维工具组合的进化
+##### 命令执行与配置管理 
+Ansible, SaltStack, Puppet  
+
+##### 持续交付与代码 
+Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
+##### ELK生态的成熟 
+提供日志收集，分析，和实时搜索，与可视化监控
+##### 应用监控 APM
+    
+##### 国内开源 open-falcon
