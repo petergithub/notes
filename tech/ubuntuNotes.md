@@ -21,6 +21,9 @@ sudo adduser pu vboxusers
 
 gMTP connect to android from ubuntu
 
+escape square brackets with backslash:   `grep "test\[1]" log.txt`
+ The sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+
 
 When a single program stops working: Alt+F2, type xkill
 When the mouse stops working: Alt+F2 and run gnome-terminal, If you just want to try restarting the GUI, run sudo service lightdm restart
