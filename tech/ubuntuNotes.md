@@ -16,6 +16,10 @@ tweak get the theme ubuntu-mono-dark
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
 'groups username'	To find group memebership for username
 
+Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
+`zless`,`zipgrep`,`zgrep`
+
+
 virtual box connect usb
 sudo adduser pu vboxusers
 
