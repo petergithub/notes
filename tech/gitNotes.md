@@ -13,6 +13,20 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 `git whatchanged [file]`	显示某个文件的版本历史，包括文件改名
 `git log -p [file]`	显示指定文件相关的每一次diff
 `git blame [file]`	显示指定文件是什么人在什么时间修改过
+`git commit -v`
+
+`git merge --no-ff <branchName>`	将分支合并到当前分支 `-no-ff`标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
+`git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit
+
+
+####tag
+`git tag -m "comment" <tagName>`
+`git tag -a <tagName> <commit-id>`
+`git show <tagName>`	查看相应标签的版本信息，并连同显示打标签时的提交对象
+`git push origin --tags`	一次性推送很多标签
+`git checkout -b <branchName> <tagName>`
+`git tag -d <tagname>`	刪除Tag
+`git push origin :refs/tags/<tagName>`	刪除Tag from remote Git repositories
 
 ### Basic commands
 HEAD指向最后一次commit的信息  
@@ -22,18 +36,12 @@ git cat-file -t [SHA-1]	输出数据对象的类型
 git log --stat -2 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
 git log --oneline
 
-把feature_branch上所有提交合并为一次提交到当前分支上再commit
-git merge --squash feature_branch
-git commit -v
-
 git commit --amend -m "Comment"
 git pull --rebase origin master合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
 git rebase -i HEAD~3 重写历史
 git rebase --onto master commitId 在非master分支上执行,在master上重复commitId之后的提交,开区间
 git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
 git cherry-pick 建议尽可能的使用cherry pick在各个分支间同步代码而不是merge
-git merge --no-ff myfeature 将feature 分支合并到当前分支
-	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
 git clean clean untracked files
 git branch -m <oldname> <newname>
 git branch -a: show all branch (remote and local)
@@ -63,7 +71,6 @@ git push remoteMachine localBranch:remoteBranch
 git push origin global:global
 git push --set-upstream origin develop1.0
 
-git tag -m "comment" tagName
 git push origin tagName
 git push origin --tags: 推送refs/tags/*
 git push -u origin master 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
@@ -78,14 +85,9 @@ git diff global origin/global: fetch后对比文件
 gitk: view commite graph
 
 ### Advanced Command
-把feature_branch上所有提交合并为一次提交到当前分支上再commit
-git merge --squash feature_branch
-git commit -v
-git pull --rebase origin master合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
-git rebase --onto master commitId 在非master分支上执行,在master上重复commitId之后的提交,开区间
-git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
-git merge --no-ff myfeature 将feature 分支合并到当前分支
-	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
+`git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
+`git rebase --onto master <commitId>` 在非master分支上执行,在master上重复commitId之后的提交,开区间
+`git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
 
 ## Git skills
 ### restore flies
