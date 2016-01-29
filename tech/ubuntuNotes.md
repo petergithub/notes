@@ -14,11 +14,11 @@ location: make a command can be call anywhere
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
-'groups username'	To find group memebership for username
+`groups username`	To find group memebership for username
 
 Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
 `zless`,`zipgrep`,`zgrep`
-
+replace a character by a newline in Vim: Use `\r` instead of `\n`.
 
 virtual box connect usb
 sudo adduser pu vboxusers
@@ -26,7 +26,7 @@ sudo adduser pu vboxusers
 gMTP connect to android from ubuntu
 
 escape square brackets with backslash:   `grep "test\[1]" log.txt`
- The sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
 
 When a single program stops working: Alt+F2, type xkill
