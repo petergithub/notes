@@ -175,6 +175,9 @@ sudo apt-get install dconf-editor
 #sudo apt-get install python-setuptools
 #sudo apt-get install python-dev
 
+## 安装ubuntu受限的额外的解码器
+sudo apt-get install ubuntu-restricted-extras
+
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
 #make >& LOG_make &
 #make install >& LOG_install &
