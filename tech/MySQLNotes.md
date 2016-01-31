@@ -21,6 +21,47 @@ From `man less`:
 `-n` Suppresses line numbers
 `-S` Causes lines longer than the screen width to be chopped rather than folded.
 
+### Transaction
+`begin`, `start transaction`, `set autocommit=0`
+`end`, `commit`, `rollback` 
+
+#### 事务隔离模式
+1. READ UNCOMMITED
+	SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。
+2. READ COMMITED
+    SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。
+3. REPEATABLE READ
+    SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。
+    但是这种方式又引发了幻想读的问题。因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。
+4. SERIALIZABLE
+    与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。
+
+脏读（dirty read）  
+不可重复读（unrepeatable read） 
+幻象读（phantom read） 
+幻象读和不可重复读是两个容易混淆的概念，前者是指读到了其他已经提交事务的新增数据，而后者是指读到了已经提交事务的更改数据（更改或删除），为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现） 
+
+`SELECT @@global.tx_isolation;`	查看InnoDB系统级别的事务隔离级别 
+`SELECT @@tx_isolation;`	查看InnoDB会话级别的事务隔离级别
+`SET global transaction isolation level read committed;`	修改InnoDB系统级别的事务隔离级别
+`SET session transaction isolation level read committed;`	修改InnoDB会话级别的事务隔离级别
+
+#### 锁机制
+1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写
+2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
+锁的范围:
+行锁: 对某行记录加上锁
+表锁: 对整个表加上锁
+共享锁(share mode), 排他锁(for update) 
+
+不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。
+`replace into`	相当于delete然后insert，会有对数据进行写的过程。
+`insert ignore`	会忽略已经存在主键或unique索引的数据，而不会有数据的修改  
+使用场景：
+    如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据  
+    如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间  
+
+
 ### MySQL调优
 1.mysql嵌套子查询效率确实比较低
 2.可以将其优化成连接查询
