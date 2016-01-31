@@ -741,13 +741,13 @@ Create an executable in your path:
 	sudo gedit /usr/bin/eclipse
 	Copy the following content and save the file:
 ```shell
-\#!/bin/bash
-export ECLIPSE_HOME="/home/peter/opt/eclipse"
-$ECLIPSE_HOME/eclipse $*
+	#!/bin/bash
+	export ECLIPSE_HOME="/home/peter/opt/eclipse"
+	$ECLIPSE_HOME/eclipse $*
 ```
 Let's also make eclipse executable everywhere by creating a symlink: 
-sudo ln -s /usr/bin/eclipse /bin/eclipse 
-Create the menu icon: sudo gedit /usr/share/applications/eclipse.desktop Type in this content and save:
+`sudo ln -s /usr/bin/eclipse /bin/eclipse` 
+Create the menu icon: `sudo gedit /usr/share/applications/eclipse.desktop` Type in this content and save:
 ```
 [Desktop Entry]
 Encoding=UTF-8
@@ -848,7 +848,7 @@ uptime
 
 #### 操作系统 `uname -a`
 Redhat/CentOS版本 : `cat /etc/redhat-release`
-`cat /etc/*-release` or `ll /etc/*-release`
+`cat /etc/*-release` or `ls /etc/*-release`
 
 #### 状态采集工具
 讲究点，要用来出报告的，用`Zabbix`之类。
