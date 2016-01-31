@@ -18,6 +18,16 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 `git merge --no-ff <branchName>`	将分支合并到当前分支 `-no-ff`标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
 `git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit
 
+git pull all the projects in the folder
+```bash
+for project in $(ls -1 .)
+do 
+    cd $project
+    pwd
+    git pull
+    cd -
+done 
+```
 
 ####tag
 `git tag -m "comment" <tagName>`
