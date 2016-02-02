@@ -34,6 +34,19 @@ From `man less`:
 `tee queries.log`	Logging to file 'queries.log'
 log to a file the statements you typed and their output, pretty much like the Unix `tee` command:
 
+### Example: 数据库插入数据时加锁 多线程(多job)重复insert
+1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`
+2. `select ... for update`, then insert
+it locks the whole table, other process will pending to get the lock when select the table, so no one can insert into it.
+3. `insert ignore`
+http://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html 
+`insert ignore`会忽略已经存在主键或unique索引的数据，而不会有数据的修改。
+http://www.chenyudong.com/archives/mysql-insert-ignore-different-replace-into.html 	
+`insert ignore into table_name(email,phone,user_id) values('test9@163.com','99999','9999')`,这样当有重复记
+录就会忽略,执行后返回数字0,还有个应用就是复制表,避免重复记录：
+`insert ignore into table(name)  select  name from table2`
+4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下
+
 ### Transaction
 `begin`, `start transaction`, `set autocommit=0`
 `end`, `commit`, `rollback` 
