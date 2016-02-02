@@ -12,14 +12,27 @@ explain sql query;
 MySQL 5.5 UTF8mb4支持emoj 
 HA: percona xtradb cluster, galera cluster 
 
-`mysql>pager less`
-`nopager`   (\n) Disable pager, print to stdout.
-`pager`     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
-`pager less -n -i -S` 
+`help` to get List of all MySQL commands
+http://linuxcommand.org/man_pages/mysql1.html
+```
+clear     (\c) Clear the current input statement.
+edit      (\e) Edit command with $EDITOR.
+ego       (\G) Send command to mysql server, display result vertically.
+nopager   (\n) Disable pager, print to stdout.
+pager     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
+tee       (\T) Set outfile [to_outfile]. Append everything into given outfile.
+system    (\!) Execute a system shell command.
+```
+`pager less`, `pager less -n -i -S` 
 From `man less`:
 `-i` Causes searches to ignore case
 `-n` Suppresses line numbers
 `-S` Causes lines longer than the screen width to be chopped rather than folded.
+
+`edit`	 it will open your default text editor with the text of the last query. The default text editor is vi, Or type `\e` to edit the statement in the buffer, like CTRL+X,E in bash
+
+`tee queries.log`	Logging to file 'queries.log'
+log to a file the statements you typed and their output, pretty much like the Unix `tee` command:
 
 ### Transaction
 `begin`, `start transaction`, `set autocommit=0`
