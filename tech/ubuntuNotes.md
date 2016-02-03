@@ -844,6 +844,10 @@ uptime
 * 再检查bonding，比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的，再留意其捆绑的网卡的速度。
 * 最后检查测试客户机与服务机之间的带宽，先简单`ping`或`traceroute` 一下得到RTT时间，`iperf`之类的可稍后。
 
+Linux查看网卡数据吞吐量方法
+1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘：`iptraf -d eth0`  
+2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`。
+
 `sar -n DEV 1`
 
 #### 操作系统 `uname -a`
