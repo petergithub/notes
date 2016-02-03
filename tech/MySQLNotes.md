@@ -35,11 +35,24 @@ From `man less`:
 log to a file the statements you typed and their output, pretty much like the Unix `tee` command:
 
 ### Transaction
+Using the Transaction Information Schema Tables
+https://dev.mysql.com/doc/innodb-plugin/1.0/en/innodb-information-schema-examples.html
 `begin`, `start transaction`, `set autocommit=0`
 `end`, `commit`, `rollback` 
 
+SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
+`SELECT @@global.tx_isolation;`	查看InnoDB系统级别的事务隔离级别 
+`SELECT @@tx_isolation;`	查看InnoDB会话级别的事务隔离级别
+`SET global transaction isolation level read committed;`	修改InnoDB系统级别的事务隔离级别
+`SET session transaction isolation level read committed;`	修改InnoDB会话级别的事务隔离级别
+`set innodb_lock_wait_timeout=100`
 `show variables like 'innodb_lock_wait_timeout';`
 `show engine innodb status`	 to get a list of all the actions currently pending inside the InnoDB engine
+
+#### FORCE UNLOCK for locked tables in MySQL
+`show open tables where in_use>0;`	get the list of locked tables
+`show processlist;`	get the list of the current processes, one of them is locking your table(s)
+`kill <put_process_id_here>;`	 Kill one of these processes
 
 #### 事务隔离模式
 1. READ UNCOMMITED
@@ -56,11 +69,6 @@ log to a file the statements you typed and their output, pretty much like the Un
 不可重复读（unrepeatable read） 
 幻象读（phantom read） 
 幻象读和不可重复读是两个容易混淆的概念，前者是指读到了其他已经提交事务的新增数据，而后者是指读到了已经提交事务的更改数据（更改或删除），为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现） 
-
-`SELECT @@global.tx_isolation;`	查看InnoDB系统级别的事务隔离级别 
-`SELECT @@tx_isolation;`	查看InnoDB会话级别的事务隔离级别
-`SET global transaction isolation level read committed;`	修改InnoDB系统级别的事务隔离级别
-`SET session transaction isolation level read committed;`	修改InnoDB会话级别的事务隔离级别
 
 #### 锁机制
 1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写
@@ -316,7 +324,8 @@ http://www.chenyudong.com/archives/mysql-insert-ignore-different-replace-into.ht
 `insert ignore into table(name)  select  name from table2`
 4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下
 
-reference: http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into
+#### reference
+http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into
 `SELECT ... FOR UPDATE` with UPDATE
 
 Using transactions with InnoDB (auto-commit turned off), a SELECT ... FOR UPDATE allows one session to temporarily lock down a particular record (or records) so that no other session can update it. Then, within the same transaction, the session can actually perform an UPDATE on the same record and commit or roll back the transaction. This would allow you to lock down the record so no other session could update it while perhaps you do some other business logic.
@@ -328,6 +337,32 @@ This is accomplished with locking. InnoDB utilizes indexes for locking records, 
 However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for a record that doesn't exist yet? If you are using the default isolation level of REPEATABLE READ, InnoDB will also utilize gap locks. As long as you know the id (or even range of ids) to lock, then InnoDB can lock the gap so no other record can be inserted in that gap until we're done with it.
 
 If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn't know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.
+
+#### test case
+```
+CREATE TABLE `test_sql_type` (
+  `id` bigint(32) NOT NULL AUTO_INCREMENT,
+  `orderId` int(8) DEFAULT NULL COMMENT 'another int',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8 COMMENT='测试类型表';
+```
+
+console 1:
+```
+begin;
+select * from test_sql_type where orderId = 41 for update;
+```
+orderId 41 is not a existing row.
+it gets the lock of the whole table;
+
+console 2:
+```
+begin;
+select * from test_sql_type where orderId = 41 for update;
+**pending**
+```
+It pending to get the lock.
+
 
 ## 构建高性能的 MySQL 集群系统
 ### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
