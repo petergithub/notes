@@ -3,11 +3,10 @@
 学习系统结构的最好方法是自己做一个linux系统，再也没有什么能比自己做一个linux系统更能学习系统结构的了。LFS (linux from strach)可以教你从源代码自己编译一个系统。通过自己编译一个系统，你就可以了结linux系统结构，知道哪些文件是干什么用的，以及他们如何协调 工作。
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
-### Recent
+## Recent
 为了方便地键入长命令，在设置你的编辑器后（例如 export EDITOR=vim），键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令。在 vi 模式下则键入 escape-v 实现相同的功能。
-CTRL+z jobs fg(前台运行)， bg(后台运行)
 vimtutor: vim interactive guide
-Ctrl+h: show hidden files
+CTRL+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
@@ -15,51 +14,23 @@ tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
 `groups username`	To find group memebership for username
-
-Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
-`zless`,`zipgrep`,`zgrep`
-replace a character by a newline in Vim: Use `\r` instead of `\n`.
-
-virtual box connect usb
-sudo adduser pu vboxusers
-
-gMTP connect to android from ubuntu
-
-escape square brackets with backslash:   `grep "test\[1]" log.txt`
-for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
-
-
-When a single program stops working: Alt+F2, type xkill
-When the mouse stops working: Alt+F2 and run gnome-terminal, If you just want to try restarting the GUI, run sudo service lightdm restart
-gnome-system-monitor
-restarting the GUI, run  sudo service lightdm restart
-    sudo stop lightdm
-    sudo start lightdm
-    sudo restart lightdm
-    unity --reset
-usbmux    1044     1  0 16:07 ?        00:00:00 /usr/sbin/usbmuxd -u -U usbmux
 sudo apt-get install -f fixed it.
-
-Ubuntu 桌面死机后重启桌面方法
-`sudo restart lightdm`
-or
-`Alt+Ctrl+F1`进入命令行Console
-kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg
-缺点是：只是重新启动了Xorg的进程，而死机前原来正在运行的程序和数据无法恢复！
-
 
 pgrep 和 pkill
 pgrep -l apache2
 ps -A -opid,stime,etime,args 查看进程的启动时间
 sort <file> | uniq -c
 
-libre office
-Ctrl+0 (zero) 	Apply Default paragraph style
-Ctrl+1 	Apply Heading 1 paragraph style
-Ctrl+Alt+PageDown: Navigating from comment to comment 
-Ctrl+Alt+c: create comment 
-Alt+Insert, and then press the up or down arrow key:  insert a new row in a table
-Alt+Delete, and then press the up or down arrow key.
+escape square brackets with backslash:   `grep "test\[1]" log.txt`
+for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+
+### LibreOffice
+CTRL+0 (zero) 	Apply Default paragraph style
+CTRL+1 	Apply Heading 1 paragraph style
+CTRL+ALT+PageDown: Navigating from comment to comment 
+CTRL+ALT+c: create comment 
+ALT+Insert, and then press the up or down arrow key:  insert a new row in a table
+ALT+Delete, and then press the up or down arrow key.
 
 
 ## Basic Command
@@ -77,7 +48,8 @@ Alt+Delete, and then press the up or down arrow key.
 `:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
 `:r!command`	将命令command的输出结果放到当前行【强大】
 `:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用`:x`不会更改文件的修改时间，而使用`:wq`会改变文件的修改时间
-`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件。
+`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件  
+replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
 改变与替换操作命令 
 <r> 替换光标所在的字符 
@@ -97,8 +69,8 @@ Alt+Delete, and then press the up or down arrow key.
 `guw`	光标下的单词变为小写
 `gUw`	光标下的单词变为大写
 `ga`	显示光标下的字符在当前使用的encoding下的内码
-`Ctrl+Shift++`	zoom in on your terminal
-`Ctrl+-`	Zoom out
+`CTRL+SHIFT++`	zoom in on your terminal
+`CTRL+-`	Zoom out
 
 `.` 命令重复上次的修改。
 `:!` command allows you to enter the name of a shell command
@@ -210,8 +182,8 @@ $ 	匹配行尾
 
 ### find grep sed
 ```
-grep pattern files – 搜索 files 中匹配 pattern 的内容
-grep -r pattern dir – 递归搜索 dir 中匹配 pattern 的内容
+grep pattern files - 搜索 files 中匹配 pattern 的内容
+grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
 grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
 sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
@@ -439,28 +411,28 @@ Add comments for mutillines
 编辑命令
     * CTRL+a ：移到命令行首
     * CTRL+e ：移到命令行尾
-    * Alt+f ：按单词前移（右向）
-    * Alt+b ：按单词后移（左向）
+    * ALT+f ：按单词前移（右向）
+    * ALT+b ：按单词后移（左向）
     * CTRL+xx：在命令行首和光标之间移动
     * CTRL+u ：从光标处删除至命令行首
     * CTRL+k ：从光标处删除至命令行尾
     * CTRL+w ：从光标处删除至字首
-    * Alt+d ：从光标处删除至字尾
+    * ALT+d ：从光标处删除至字尾
     * CTRL+d ：删除光标处的字符
     * CTRL+h ：删除光标前的字符
     * CTRL+y ：粘贴至光标后
-    * Alt+c ：从光标处更改为首字母大写的单词
-    * Alt+u ：从光标处更改为全部大写的单词
-    * Alt+l ：从光标处更改为全部小写的单词
+    * ALT+c ：从光标处更改为首字母大写的单词
+    * ALT+u ：从光标处更改为全部大写的单词
+    * ALT+l ：从光标处更改为全部小写的单词
     * CTRL+t ：交换光标处和之前的字符
-    * Alt+t ：交换光标处和之前的单词
-    * Alt+Backspace：与 CTRL+w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
+    * ALT+t ：交换光标处和之前的单词
+    * ALT+Backspace：与 CTRL+w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
 重新执行命令
     * CTRL+r：逆向搜索命令历史
     * CTRL+g：从历史搜索模式退出
     * CTRL+p：历史中的上一条命令
     * CTRL+n：历史中的下一条命令
-    * Alt+.：使用上一条命令的最后一个参数
+    * ALT+.：使用上一条命令的最后一个参数
 控制命令
     * CTRL+l：清屏
     * CTRL+o：执行当前命令，并选择上一条命令 循环执行历史命令
@@ -472,7 +444,7 @@ Bang (!) 命令
     * !!：执行上一条命令
     * !blah：执行最近的以 blah 开头的命令，如 !ls
     * !blah:p：仅打印输出，而不执行
-    * !$：上一条命令的最后一个参数，与 Alt+. 相同
+    * !$：上一条命令的最后一个参数，与 ALT+. 相同
     * !$:p：打印输出 !$ 的内容
     * !*：上一条命令的所有参数
     * !*:p：打印输出 !* 的内容
@@ -498,7 +470,7 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
    4. 使用 CTRL+r 而不是上下光标键来查找历史命令
    5. 在已经敲完的命令后按<CTRL+x CTRL+e>，会打开一个你指定的编辑器（比如vim，通过环境变量$EDITOR 指定）
 
-alt+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按alt+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用alt+0 alt+., 就是先输入alt+0, 再输入alt+.. 如果是上上条命令的第一个参数呢? 当然是alt+0 alt+. alt+.了.
+ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
 undo 	CTRL+/
 
 #### bash profile
@@ -528,6 +500,9 @@ unzip -O cp936 fix linux下文件解压乱码
 zip -u gdms.war WEB-INF/lib/jaxen-core.jar update zip file
 zip -d gdms.war WEB-INF/lib/jaxen-core.jar
 
+Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
+`zless`,`zipgrep`,`zgrep`
+
 jar tvf <filename>.jar to find the content of the file without extracting.
 jar tvf classes.zip | grep DctmUtil
 extract the class files in the jar
@@ -549,7 +524,7 @@ mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip username@gmail.com < /tmp/msg	send 
 sendmail user@example.com  < /tmp/email.txt
 
 ### help
-help命令用来描述不同的内置Bash命令help –s printf
+help命令用来描述不同的内置Bash命令help -s printf
 open another terminal: gnome-terminal
 man -k or apropos: key words search for command
 find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
@@ -559,36 +534,23 @@ find out which command shell executes and to print binary(command) file location
 ### Other
 `history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令
 查看最后一个日志文件cat /app/dmfdev08/dba/log/0001d795/bp/`ls -tr /app/dmfdev08/dba/log/0001d795/bp | tail -1`
-sudo usermod -a -G vboxsf your_user_name	:add user to group vboxsf
 cat << EOF > test.txt
 ABC
 DEF
 EOF
 tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/ -C 选项提取文件到指定目录
-cd - 切换回上一个目录
-wget是linux最常用的下载命令
-tnsping MDATADEV.PFIZER.COM
-使用一个命令来定义复杂的目录树mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}
-ps aux or ps -ef | grep
-ps aux | sort -nk +4 | tail	列出头十个最耗内存的进程
-top - Process Activity Command
-vmstat - System Activity, Hardware and System Information
-w - Find Out Who Is Logged on And What They Are Doing
-uptime - Tell How Long The System Has Been Running
-free - Memory Usage
-iostat - Average CPU Load, Disk Activity
-sar - Collect and Report System Activity
-pmap - Process Memory Usage
 watch -d -n 1 'df; ls -FlAt /path' 实时某个目录下查看最新改动过的文件
 watch -n 3 ls 以3秒钟执行一个ls命令
 du -sh dirname 查看目录的大小
 du -h --max-depth=1 显示当前目录中所有子目录的大小
 du -s * | sort -n | tail	列出当前目录里最大的10个文件。
+cd - 切换回上一个目录
 source .profile 使profile改动生效
+wget是linux最常用的下载命令
+tnsping MDATADEV.PFIZER.COM
+使用一个命令来定义复杂的目录树	mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}
 ntsysv 就会*出图形界面给你选择(有的则显示在里面)，如果在文本界面就用ntsysv命令
-less /etc/*-release: find system version
-uname -a	find out kernel versiontree directory
-常见的场景是由于某种原因 ls 无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做*扩展，所以我们可以用 `echo * == ls`
+常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展，所以我们可以用 `echo * == ls`
 
 ## Advanced command
 ### Tmux 
@@ -617,7 +579,7 @@ n(到达下一个窗口) p(到达上一个窗口)
 
 If the window name keeps renaming, create file `.tmux.conf` with content below
 `set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"`
-Reload tmux config `.tmux.conf` within tmux, by pressing `Ctrl+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`
+Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`
 
 #### panel operation
 " 将当前面板上下分屏"
@@ -625,10 +587,10 @@ Reload tmux config `.tmux.conf` within tmux, by pressing `Ctrl+b` and then `:sou
 x 关闭当前面板
 <光标键> 移动光标选择对应面板
 ! 将当前面板置于新窗口,即新建一个窗口,其中仅包含当前面板
-Ctrl+b+o交换两个panel位置
+CTRL+b+o交换两个panel位置
 space 调整panel摆放方式
-Ctrl+方向键 	以1个单元格为单位移动边缘以调整当前面板大小
-Alt+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
+CTRL+方向键 	以1个单元格为单位移动边缘以调整当前面板大小
+ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 
 #### Example: tmux scripts:
 ``` shell
@@ -658,7 +620,7 @@ screen -r PID
 可以通过CTRL+a ?来查看所有的键绑定，常用的键绑定有：
 CTRL+a ?	显示所有键绑定信息
 CTRL+a w	显示所有窗口列表
-Ctrl+a A	set window title
+CTRL+a A	set window title
 CTRL+a CTRL+a	切换到之前显示的窗口
 CTRL+a c	创建一个新的运行shell的窗口并切换到该窗口
 CTRL+a n	切换到下一个窗口
@@ -721,7 +683,7 @@ http://www.5dmail.net/html/2013-5-7/201357111547.htm
 1.6. 让系统使用我们安装的JDK。
 	sudo update-alternatives --config java
 1.7. 验证安装JDK是否成功。
-	java –version
+	java -version
 
 ### eclipse installation
 To install eclipse on ubuntu you need to download it first from http://www.eclipse.org/downloads/ Extract the downloaded file by right click on it and extract here or running the following:
@@ -794,6 +756,14 @@ Globally in /usr/share/applications, locally in ~/.local/share/applications.
 If you want to add a custom launcher, create it in ~/.local/share/applications, make it executable, drag and drop it on the launcher*, and finally pin it (right-click on the launcher item → Keep In Launcher).
 make it executable
 
+### Android connect to Ubuntu
+gMTP connect to android from Ubuntu
+
+### Ubuntu死机
+1. 重启桌面方法
+`sudo restart lightdm`restarting the GUI gnome-system-monitor or `ALT+CTRL+F1`进入命令行Console, kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg, 缺点是重新启动了Xorg的进程，死机前原来正在运行的程序和数据无法恢复！
+2. When a single program stops working: ALT+F2, type xkill
+
 ## System
 `zdump -v /etc/localtime` examine the contents of the timezone files
 
@@ -812,10 +782,15 @@ uptime
 
 #### CPU `cat /proc/cpuinfo`
 `uptime`, `top`, `pidstat -l 2 10`
+ps aux | sort -nk +4 | tail	列出头十个最耗内存的进程
+w - Find Out Who Is Logged on And What They Are Doing
+uptime - Tell How Long The System Has Been Running
+top - Process Activity Command
 
 `top`命令包含了前面好几个命令的检查的内容。比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，`top`命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。
 
 #### Memory `free -h`
+pmap - Process Memory Usage
 
 #### Disk 
 `df -hT`	查看大小、分区、文件系统类型
@@ -851,11 +826,12 @@ Linux查看网卡数据吞吐量方法
 `sar -n DEV 1`
 
 #### 操作系统 `uname -a`
+find out system version: `cat /etc/*-release` or `ls /etc/*-release`
 Redhat/CentOS版本 : `cat /etc/redhat-release`
-`cat /etc/*-release` or `ls /etc/*-release`
 
 #### 状态采集工具
 讲究点，要用来出报告的，用`Zabbix`之类。
+
 ##### `dstat`
 实时观察的，我喜欢`dstat`，比`vmstat`，`iostat`, `sar`们都好用，起码对得够齐，单位能自动转换。不过`dstat`需要安装(`yum install dstat`，如果装不上，就要将就着用`vmstat`，`sar`了)
     dstat：默认，已有足够信息
@@ -868,6 +844,7 @@ Redhat/CentOS版本 : `cat /etc/redhat-release`
     5 5秒的间隔
 
 ##### `vmstat 1`
+vmstat - System Activity, Hardware and System Information
 ```
 $ vmstat 1
 procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
@@ -889,6 +866,7 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。
 
 #####  `iostat-xz 1`
+iostat - Average CPU Load, Disk Activity
 `iostat`命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：
 `r/s, w/s, rkB/s, wkB/s`：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。
 `await`：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。
@@ -897,6 +875,7 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。
 
 ##### `sar -n DEV 1`, `sar -n TCP,ETCP 1`
+sar - Collect and Report System Activity
 ```
 $ sar -n DEV 1
 Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)
@@ -1235,11 +1214,6 @@ vi /etc/hosts
 /etc/resolvconf/resolv.conf.d/head 
 sudo resolvconf -u
 cat /etc/resolv.conf
-
-### set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
-sudo vi /etc/default/grub
-update seconds: GRUB_HIDDEN_TIMEOUT=1
-sudo update-grub
 
 ### mount disk
 用mount挂载你的windows分区，事先以root权限用fdisk -l查看。你就知道该挂载哪个了

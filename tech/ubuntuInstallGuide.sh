@@ -175,6 +175,15 @@ sudo apt-get install dconf-editor
 #sudo apt-get install python-setuptools
 #sudo apt-get install python-dev
 
+########### virtual box
+#virtual box connect usb:	`sudo adduser <user> vboxusers`
+#add user to group vboxsf:	`sudo usermod -a -G vboxsf <user>`
+
+########### set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
+#sudo vi /etc/default/grub
+#update seconds: GRUB_HIDDEN_TIMEOUT=1
+#sudo update-grub
+
 ## 安装ubuntu受限的额外的解码器
 sudo apt-get install ubuntu-restricted-extras
 
