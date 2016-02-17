@@ -339,6 +339,9 @@ However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for 
 If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn't know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.
 
 #### test case
+select nonexistent orderId, which is not a index column, it will lock the whole table;
+select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
+
 ```
 CREATE TABLE `test_sql_type` (
   `id` bigint(32) NOT NULL AUTO_INCREMENT,

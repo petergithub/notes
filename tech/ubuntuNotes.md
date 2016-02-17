@@ -20,9 +20,32 @@ pgrep 和 pkill
 pgrep -l apache2
 ps -A -opid,stime,etime,args 查看进程的启动时间
 sort <file> | uniq -c
+du -s * | sort -n | tail	列出当前目录里最大的10个文件。
 
 escape square brackets with backslash:   `grep "test\[1]" log.txt`
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+
+### Move Running Process to Background 
+#### ALREADY RUNNING PROCESS INTO BACKGROUND
+1. CTRL+z
+2. jobs
+or alternate method which lists the PID (note the PID is not the jobnum, the job number is shell specific to the current bash session): jobs -l
+3. bg %jobnum
+or alternate method %jobnum & for example for the first job %1 &
+
+To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.
+Show the status of all background and suspended jobs: jobs
+Bring a job back into the foreground: fg %jobnumber
+Bring a job back into the background: bg %jobnumber
+
+#### ALREADY RUNNING PROCESS INTO NOHUP
+0. Run some SOMECOMMAND
+1. ctrl+z to stop (pause) the program and get back to the shell
+2. bg to run it in the background
+3. disown -h so that the process isn't killed when the terminal closes
+4. Type exit to get out of the shell because now your good to go as the operation will run in the background in it own process so its not tied to a shell
+
+This process is the equivalent of running nohup SOMECOMMAND
 
 ### LibreOffice
 CTRL+0 (zero) 	Apply Default paragraph style
@@ -543,7 +566,6 @@ watch -d -n 1 'df; ls -FlAt /path' 实时某个目录下查看最新改动过的
 watch -n 3 ls 以3秒钟执行一个ls命令
 du -sh dirname 查看目录的大小
 du -h --max-depth=1 显示当前目录中所有子目录的大小
-du -s * | sort -n | tail	列出当前目录里最大的10个文件。
 cd - 切换回上一个目录
 source .profile 使profile改动生效
 wget是linux最常用的下载命令
@@ -745,7 +767,7 @@ Listeningfor transport dt_socket at address: 8000
 4.under "input method",add Chinese input method
 5.auto start it: system->administrator->language support->Keyboard input method system, choose ibus
 
-## Misc.
+## Miscellaneous
 
 ### Missing clock menu bar fix:
 killall unity-panel-service
