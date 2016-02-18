@@ -283,14 +283,31 @@ find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomAction
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
 ```
 
-#### 文件名乱码处理
+#### 文件及文件名乱码处理
 1. `ls -i` print the index number of each file(文件的i节点) 12345
 2. `find . -inum 12345 -print -exec rm {} -r \;` rm
 3. `find . -inum 12345 -exec mv {} NewName \;` mv
 命令中的"{}"表示find命令找到的文件，在-exec选项执行mv命令的时候，会利用按i节点号找到的文件名替换掉"{}"
 
+##### 文件名编码转换
 convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量转换
 转换文件名由GBK为UTF8 :  convmv -r -f cp936 -t utf8 --notest --nosmart *
+
+##### 查看文件编码
+在Vim 中可以直接查看 文件 编码
+:set fileencoding
+
+##### 文件编码转换
+1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式
+:set fileencoding=utf-8
+
+2. enconv 转换文件 编码 ，比如要将一个GBK编码 的文件 转换成UTF-8编码 ，操作如下
+enconv -L zh_CN -x UTF-8 filename
+
+3. iconv 转换，iconv的命令格式如下：
+iconv -f encoding -t encoding inputfile
+比如将一个UTF-8 编码 的文件 转换成GBK编码
+iconv -f GBK -t UTF-8 file1 -o file2
 
 ### xargs
 xargs 工具的经典用法示例 
