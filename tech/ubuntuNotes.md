@@ -28,15 +28,15 @@ for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?
 ### Move Running Process to Background 
 #### ALREADY RUNNING PROCESS INTO BACKGROUND
 1. CTRL+z
-2. jobs
+2. `jobs`
 or alternate method which lists the PID (note the PID is not the jobnum, the job number is shell specific to the current bash session): jobs -l
-3. bg %jobnum
+3. `bg %jobnum`
 or alternate method %jobnum & for example for the first job %1 &
 
 To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.
 Show the status of all background and suspended jobs: jobs
-Bring a job back into the foreground: fg %jobnumber
-Bring a job back into the background: bg %jobnumber
+Bring a job back into the foreground: `fg %jobnumber`
+Bring a job back into the background: `bg %jobnumber`
 
 #### ALREADY RUNNING PROCESS INTO NOHUP
 0. Run some SOMECOMMAND
@@ -69,7 +69,7 @@ ALT+Delete, and then press the up or down arrow key.
 `~`	切换大小写
 `:sp`	split window above and below
 `:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
-`:r!command`	将命令command的输出结果放到当前行【强大】
+`:r!command`	将命令command的输出结果放到当前行 如`:r!ls -ltr`
 `:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用`:x`不会更改文件的修改时间，而使用`:wq`会改变文件的修改时间
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
@@ -338,6 +338,8 @@ sleep 2; echo 'end sleep 2 sec'
 $$进程标识号
 $*，该变量包含了所有输入的命令行参数值
 string string不为空 
+
+`cat /etc/shells`	get all available shells
 
 #### Common Bash comparisons
 Operator	Meaning	Example
