@@ -6,9 +6,23 @@
 对象的内置锁?
 每个对象都有一个内置锁?
 `java.util.concurrent.CopyOnWriteArrayList`
-先检查后执行操作
+`AtomicInteger`底层实现机制
+
+主内存,
+寄存器是编译时存?不是运行时?
 
 ## Concurrency
+
+synchronization:
+1. Mutual Exclusion or Atomic or Critical Section临界区
+2. Memory Visibility
+同步: 原子性Atomic,内存可见性
+重排序Reordering, Happens-Before	排序
+
+易错情形:
+竞态条件Race Condition
+读取-修改-写入read-modify-write
+先检查后执行操作Check-Then-Act
 
 ### ThreadLocal
 是local variable（线程局部变量）。
@@ -19,6 +33,17 @@ To keep state with a thread (user-id, transaction-id, logging-id)
 To cache objects which you need frequently
 
 主要由四个方法组成initialValue()，get()，set(T)，remove()，其中值得注意的是initialValue()，该方法是一个protected的方法，显然是为了子类重写而特意实现的。该方法返回当前线程在该线程局部变量的初始值，这个方法是一个延迟调用方法，在一个线程第1次调用get()或者set(Object)时才执行，并且仅执行1次。ThreadLocal中的实现直接返回一个null。
+
+### java.util.concurrent.locks类结构
+基于AQS(AbstractQueuedSynchronizer) 构建的Synchronizer包括ReentrantLock,Semaphore,CountDownLatch, ReetrantRead WriteLock,FutureTask等，这些Synchronizer实际上最基本的东西就是原子状态的获取和释放，只是条件不一样而已。
+
+**ReentrantLock**：需要记录当前线程获取原子状态的次数，如果次数为零，那么就说明这个线程放弃了锁（也有可能其他线程占据着锁从而需要等待），如果次数大于1，也就是获得了重进入的效果，而其他线程只能被park住，直到这个线程重进入锁次数变成0而释放原子状态
+
+**Semaphore**：则是要记录当前还有多少次许可可以使用，到0，就需要等待，也就实现并发量的控制，Semaphore一开始设置许可数为1，实际上就是一把互斥锁
+
+**CountDownLatch**：闭锁则要保持其状态，在这个状态到达终止态之前，所有线程都会被park住，闭锁可以设定初始值，这个值的含义就是这个闭锁需要被countDown()几次，因为每次CountDown是sync.releaseShared(1),而一开始初始值为10的话，那么这个闭锁需要被countDown()十次，才能够将这个初始值减到0，从而释放原子状态，让等待的所有线程通过。
+
+**FutureTask**：需要记录任务的执行状态，当调用其实例的get方法时,内部类Sync会去调用AQS的acquireSharedInterruptibly()方法，而这个方法会反向调用Sync实现的tryAcquireShared()方法，即让具体实现类决定是否让当前线程继续还是park,而FutureTask的tryAcquireShared方法所做的唯一事情就是检查状态，如果是RUNNING状态那么让当前线程park。而跑任务的线程会在任务结束时调用FutureTask 实例的set方法（与等待线程持相同的实例），设定执行结果，并且通过unpark唤醒正在等待的线程，返回结果。
 
 ### Java高级-多线程机制详解
 #### 二、线程的运行机制
@@ -61,6 +86,11 @@ JVM的线程调度器负责管理线程，调度器把线程的优先级分为10
 当一个线程使用的同步方法中用到某个变量，而此变量又需要其他线程修改后才能符合本线程需要，那么可以在同步方法中使用wait()方法。中断方法的执行，使本线程等待，暂时让出CPU资源，并允许其他线程使用这个同步方法。其他线程如果在使用这个同步方法时不需要等待，那么它使用完这个同步方法时应当用notifyAll()方法通知所有由于使用这个同步方法而处于等待的线程结束等待。曾中断的线程就会从中断处继续执行，并遵循"先中断先继续"的原则。如果用的notify()方法，那么只是通知等待中的线程中某一个结束等待。
 
 ### Java Concurrency in Practice
+Chapter 2 and 3 are useful
+
+#### 1.3.2 活跃性问题
+死锁,饥饿,活锁
+
 The most common type of race condition is check-then-act, where a potentially stale observation is used to make a decision on what to do next.
 
 `AtomicLong`, `AtomicReference`
@@ -70,6 +100,12 @@ The most common type of race condition is check-then-act, where a potentially st
 intrinsic locks are *reentrant*
 
 #### Chapter 2. Thread Safety
+
+##### 2.3.2. Reentrancy
+重入意味着获取锁操作的粒度是"线程",而不是"调用"
+Reentrancy means that locks are acquired on a per-thread rather than per-invocation basis.
+
+##### 2.4 Guarding State with Locks
 if synchronization is used to coordinate access to a variable, it is **needed everywhere that variable is accessed**. Further, when using locks to coordinate access to a variable, the same lock must be used wherever that variable is accessed.  
 It is a common mistake to assume that synchronization needs to be used only when writing to
 shared variables; this is simply not true. (The reasons for this will become clearer in Section 3.1.)
