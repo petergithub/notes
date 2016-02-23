@@ -1,4 +1,10 @@
-## 常规操作命令
+# Redis Notes
+[TOC]
+
+## Command
+./redis-server redis_6379.conf
+
+### 常规操作命令
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)
 01  exits key              //测试指定key是否存在，返回1表示存在，0不存在  
 02  del key1 key2 ....keyN //删除给定key,返回删除key的数目，0表示给定key都不存在  
@@ -15,7 +21,7 @@
 13  flushdb                //删除当前数据库中所有key,此方法不会失败。慎用  
 14  flushall               //删除所有数据库中的所有key，此方法不会失败。更加慎用  
    
-## string 类型数据操作命令  
+### string 类型数据操作命令  
 01  set key value         //设置key对应的值为string类型的value,返回1表示成功，0失败  
 02  setnx key value       //同上，如果key已经存在，返回0 。nx 是not exist的意思  
 03  get key               //获取key对应的string值,如果key不存在返回nil  
@@ -30,7 +36,7 @@
 12  append key value      //给指定key的字符串值追加value,返回新字符串值的长度。下面给个例子  
 13  substr key start end  //返回截取过的key的字符串值,注意并不修改key的值。下标是从0开始的，接着上面例子  
    
-## list 类型数据操作命令  
+### list 类型数据操作命令  
 01  lpush key string          //在key对应list的头部添加字符串元素，返回1表示成功，0表示key存在且不是list类型  
 02  rpush key string          //同上，在尾部添加  
 03  llen key                  //返回key对应list的长度，key不存在返回0,如果key对应类型不是list返回错误  
@@ -44,7 +50,7 @@
 11  brpop                     //同blpop，一个是从头部删除一个是从尾部删除  
 12  rpoplpush srckey destkey  //从srckey对应list的尾部移除元素并添加到destkey对应list的头部,最后返回被移除的元素值，整个操作是原子的.如果srckey是空或者不存在返回nil  
    
-## set 类型数据操作命令  
+### set 类型数据操作命令  
 01  sadd key member                //添加一个string元素到,key对应的set集合中，成功返回1,如果元素以及在集合中返回0,key对应的set不存在返回错误  
 02  srem key member                //从key对应set中移除给定元素，成功返回1，如果member在集合中不存在或者key不存在返回0，如果key对应的不是set类型的值返回错误  
 03  spop key                       //删除并返回key对应set中随机的一个元素,如果set是空或者key不存在返回nil  
@@ -60,7 +66,7 @@
 13  sdiffstore dstkey key1...keyN  //同sdiff，并同时保存差集到dstkey下  
 14  smembers key                   //返回key对应set的所有元素，结果是无序的  
    
-## sorted set 类型数据操作命令  
+### sorted set 类型数据操作命令  
 01  zadd key score member        //添加元素到集合，元素在集合中存在则更新对应score  
 02  zrem key member              //删除指定元素，1表示成功，如果元素不存在返回0  
 03  zincrby key incr member      //增加对应member的score值，然后移动元素并保持skip list保持有序。返回更新后的score值  
@@ -75,7 +81,7 @@
 12  zremrangebyrank key min max  //删除集合中排名在给定区间的元素  
 13  zremrangebyscore key min max //删除集合中score在给定区间的元素  
    
-## hash 类型数据操作命令  
+### hash 类型数据操作命令  
 01  hset key field value       //设置hash field为指定值，如果key不存在，则先创建  
 02  hget key field             //获取指定的hash field  
 03  hmget key filed1....fieldN //获取全部指定的hash filed  
