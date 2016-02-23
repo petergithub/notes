@@ -18,9 +18,10 @@ sudo apt-get install -f fixed it.
 
 pgrep 和 pkill
 pgrep -l apache2
-ps -A -opid,stime,etime,args 查看进程的启动时间
-sort <file> | uniq -c
-du -s * | sort -n | tail	列出当前目录里最大的10个文件。
+`ps -A -opid,stime,etime,args` 查看进程的启动时间
+`sort <file> | uniq -c`
+`du -s * | sort -n | tail`	列出当前目录里最大的10个文件。
+`last`	To find out when a particular user last logged in to the Linux or Unix server.
 
 escape square brackets with backslash:   `grep "test\[1]" log.txt`
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
