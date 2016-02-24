@@ -116,11 +116,12 @@ SHOW CREATE TABLE
 用文本方式将数据装入数据表中： LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名;
 导入.sql文件命令： SOURCE d:/mysql.sql;
 
+`./mysqld_safe` start MySQL server
 显示当前的user： SELECT USER();
 来查看数据库版本 SELECT VERSION();
 显示use的数据库名： SELECT DATABASE();
 
-#### 修改密码。
+#### 修改密码
 格式：mysqladmin -u用户名 -p旧密码 password 新密码
 1、给root加个密码ab12。首先在DOS下进入目录mysql\bin，然后键入以下命令
 mysqladmin -u root -password ab12

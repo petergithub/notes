@@ -533,7 +533,7 @@ add one line in .bashrc
  sed -i 's/^M//n/g' myfile.txt // replace
 
 
-### zip/jar 
+### zip jar tar
 ps -ef | grep gdms | grep jboss
 unzip gdms.war WEB-INF/lib/gdms.jar only unzip the jar from the war
 unzip -l gdms.war | grep jaxen
@@ -544,7 +544,10 @@ zip -u gdms.war WEB-INF/lib/jaxen-core.jar update zip file
 zip -d gdms.war WEB-INF/lib/jaxen-core.jar
 
 Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
-`zless`,`zipgrep`,`zgrep`
+`zless`,`zipgrep`,`zgrep`,`zcat`
+
+`tar -tf filename.tar.gz`	List files inside the tar.gz file
+`vim filename.tar.gz` List files and open file inside it with `Enter`
 
 jar tvf <filename>.jar to find the content of the file without extracting.
 jar tvf classes.zip | grep DctmUtil
