@@ -8,8 +8,41 @@
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
 
-主内存,
-寄存器是编译时存?不是运行时?
+concurrent: 主内存.寄存器是是运行时?
+
+## JVM
+深入理解Java虚拟机-JVM高级特性与最佳实践 周志明
+
+### 内存区域分析
+运行时数据区分两部分
+所有线程共享: 方法区(Method Area), 堆(Heap)
+线程隔离:		虚拟机栈(JVM Stack), 本地方法栈(Native Method Stack), 程序计数器(Program Counter Register)
+
+Java堆:		存放对象实例
+方法区:		存储被虚拟机加载的类信息,常量,静态变量等.
+程序计数器: 	当前线程所执行的字节码行号指示器,线程切换时可以快速切换位置
+			当前执行的如果是 1.Java方法,则保存虚拟机字节码指令地址; 2,Native方法,为空(Undefined)
+虚拟机栈: 	创建栈桢用于存储局部变量表,操作数栈,动态链接,方法出口等信息. 局部变量表
+本地方法栈:	同虚拟机栈
+
+### 垃圾收集器
+#### 判断对象是否在使用
+##### 引用计数算法 Reference Counting
+##### 可达性分析算法 Reachability Analysis
+
+#### 垃圾收集算法
+##### 标记-清除算法 Mark-Sweep
+##### 复制算法 Copying
+##### 标记整理算法 Mark-Compact
+##### 分代收集 Generational Collection
+
+### 第七章 虚拟机类加载机制
+7个阶段: 
+加载 Loading,  
+验证 Verification,准备 Preparation,解析 Resolution,  
+初始化 Initialization,使用 Using,卸载 Unloading
+
+其中,验证,准备,解析三个部分称为连接Linking
 
 ## Concurrency
 
