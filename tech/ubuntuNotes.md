@@ -5,6 +5,7 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
 ## Recent
 为了方便地键入长命令，在设置你的编辑器后（例如 export EDITOR=vim），键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令。在 vi 模式下则键入 escape-v 实现相同的功能。
+`man readline` to get the introduction to the combination of keys
 vimtutor: vim interactive guide
 CTRL+h: show hidden files
 nautilus: open your home folder
@@ -446,10 +447,13 @@ done
 
 
 ### bash
+`man readline` to get the introduction to the combination of keys
+The `M-` sequence means the `Alt` key
+
 CTRL+u remove line command
 CTRL+t It will reverse two characters
 CTRL+q Windows vi region select
-Add comments for mutillines
+Add comments for multi-lines
 	press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 编辑命令
     * CTRL+a ：移到命令行首
@@ -471,7 +475,8 @@ Add comments for mutillines
     * ALT+t ：交换光标处和之前的单词
     * ALT+Backspace：与 CTRL+w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
 重新执行命令
-    * CTRL+r：逆向搜索命令历史
+    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
     * CTRL+g：从历史搜索模式退出
     * CTRL+p：历史中的上一条命令
     * CTRL+n：历史中的下一条命令
@@ -504,13 +509,20 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
 `sudo su -` change to root user
 
 友情提示：
-   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过 set -o emacs 设置。
-   2. CTRL+s、CTRL+q、CTRL+c、CTRL+z 是由终端设备处理的，可用 stty 命令设置。
-   3.  用CTRL+p取出历史命令列表中某一个命令后, 按CTRL+o可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用CTRL+p取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. CTRL+o有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入du -sh dir去执行, 但用CTRL+o可以非常完美的解决这个问题, 方法就是:
-    输入du -sh dir, 按回车执行命令
-    CTRL+p, CTRL+o, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
-	其实上面这个问题也可以用watch命令解决: watch -n 10 -d du -sh /app/data/nas/gdms/
-   4. 使用 CTRL+r 而不是上下光标键来查找历史命令
+   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过`set -o emacs`设置。
+   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
+    输入`du -sh dir`, 按回车执行命令
+    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
+	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/gdms/`
+   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g：从历史搜索模式退出
+   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的，可用`stty`命令设置。
+   	  CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J` 
+	or remove it altogether with `stty stop undef`. 
+	or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
+	After that `C-s` would work in the given terminal. 
+	Set it in ~/.bashrc to make it work in every terminal.
+    	refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr
    5. 在已经敲完的命令后按<CTRL+x CTRL+e>，会打开一个你指定的编辑器（比如vim，通过环境变量$EDITOR 指定）
 
 ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
