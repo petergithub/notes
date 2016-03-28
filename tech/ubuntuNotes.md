@@ -16,6 +16,8 @@ tweak get the theme ubuntu-mono-dark
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
 `groups username`	To find group memebership for username
 sudo apt-get install -f fixed it.
+    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 
 pgrep 和 pkill
 pgrep -l apache2
@@ -1095,27 +1097,30 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `$ gsettings set org.gnome.system.proxy mode 'none' `
 
 #### SSH
-ssh user@host	以 user 用户身份连接到 host
-ssh -p port user@host	在端口 port 以 user 用户身份连接到 host
--f ssh将在后台运行 
--N 不执行命令，仅转发端口 
--C 压缩传送的数据 
--i 使用指定的密钥登录 
+`ssh user@host`	以 user 用户身份连接到 host
+`ssh -p port user@host`	在端口 port 以 user 用户身份连接到 host
+`-f` ssh将在后台运行 
+`-N` 不执行命令，仅转发端口 
+`-C` 压缩传送的数据 
+`-i` 使用指定的密钥登录 
+	It is required that your private key files are NOT accessible by others
+	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa 
 
 escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;
-~^Z	suspends the connection
-fg reconnect
+`~^Z`	suspends the connection
+`fg` reconnect
 
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"	#Creates a new ssh key, using the provided email as a label #Generating public/private rsa key pair.
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`	#Creates a new ssh key, using the provided email as a label #Generating public/private rsa key pair.
+`ssh-keygen -p` change the passphrase for an existing private key without regenerating the keypair
 
-ssh-copy-id user@host	将公钥添加到 host 以实现无密码登录
-ssh-copy-id -i ~/.ssh/id_rsa.pub username@IP
-cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
-ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'
+`ssh-copy-id user@host`	将公钥添加到 host 以实现无密码登录
+`ssh-copy-id -i ~/.ssh/id_rsa.pub username@IP`
+`cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
+`ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'`
 
-cd && tar czv src | ssh user@host 'tar xz'	将$HOME/src/目录下面的所有文件，复制到远程主机的$HOME/src/目录
-ssh user@host 'tar cz src' | tar xzv	将远程主机$HOME/src/目录下面的所有文件，复制到用户的当前目录
-ssh user@host 'ps ax | grep [h]ttpd'	查看远程主机是否运行进程httpd
+`cd && tar czv src | ssh user@host 'tar xz'`	将$HOME/src/目录下面的所有文件，复制到远程主机的$HOME/src/目录
+`ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件，复制到用户的当前目录
+`ssh user@host 'ps ax | grep [h]ttpd'`	查看远程主机是否运行进程httpd
 
 yes | pv | ssh $host "cat > /dev/null"	实时SSH网络吞吐量测试 通过SSH连接到主机，显示实时的传输速度，将所有传输数据指向/dev/null，需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
 yes | pv | cat > /dev/null
