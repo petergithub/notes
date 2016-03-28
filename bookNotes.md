@@ -185,3 +185,12 @@ A 重要，那有什么比它更重要？
 A 是最重要的吗？如果不是，那什么最重要？
 既然 A 是最重要的，那么你有多少决定是真的把它放在首位的呢？
 A 过去很重要，到了现在，时过境迁，它依然重要吗？如果是，为什么？
+
+## Links
+### Wikipedia from Li Xiaolai
+[Cognitive bias](http://en.wikipedia.org/wiki/Cognitive_bias )
+[List of cognitive biases](http://en.wikipedia.org/wiki/List_of_cognitive_biases )
+[Critical thinking](http://en.wikipedia.org/wiki/Critical_thinking )
+[Time Management](http://en.wikipedia.org/wiki/Time_Management )
+[History of Science](http://en.wikipedia.org/wiki/History_of_Science )
+[Learning theories](http://en.wikipedia.org/wiki/Learning_theories )
