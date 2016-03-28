@@ -14,7 +14,17 @@ location: make a command can be call anywhere
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+
+`passwd <username>`	update password
+`id <username>`	get the user
+`id -nG <username>`	Find out user group identity
+`less /etc/group`	Get all groups in system
+`groupadd <groupName>`	Add a new group
+`useradd -g <groupName> <username>`	Add a new user to primary group
+`useradd -G <groupName> <username>`	Add a new user to secondary group
+`usermod -G {groupname1,groupname2,...} <username>`	Remove user from group which is not list in the command
 `groups username`	To find group memebership for username
+
 sudo apt-get install -f fixed it.
     * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
     * CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
@@ -1127,6 +1137,9 @@ yes | pv | cat > /dev/null
 
 ssh host -l user "`cat cmd.txt`"	通过SSH运行复杂的远程shell命令
 mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"	通过SSH将MySQL数据库复制到新服务器
+
+##### Bad owner or permissions on .ssh/config
+chmod 600 .ssh/config
 
 ##### SSH端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术
