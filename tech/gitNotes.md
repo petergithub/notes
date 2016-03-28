@@ -5,6 +5,11 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 
 ## Commands
 ### Most recent
+Final release version
+`git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交
+`git tag -m "comment" <tagName>`
+`git push origin --tags`	一次性推送很多标签
+
 `git log -g branchName` show Git branch created time just for local fetch/create time
 `git log --name-only ` show changed file name only
 `git show <commit-id>` show difference for a commit 
