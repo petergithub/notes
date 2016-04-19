@@ -39,6 +39,9 @@ URL with Chinese URIEncoding="UTF-8"
            connectionTimeout="20000" 
            redirectPort="8443" URIEncoding="UTF-8" />
 ```
+for tomcat 7 set Xmx
+echo 'export JAVA_OPTS="-Xms1024M -Xmx2048M"' > $CATALINA_HOME/bin/setenv.sh
+
 ### Bug report for Tomcat
 ```
 +---------------------------------------------------------------------------+
@@ -130,6 +133,8 @@ https://veracrypt.codeplex.com
 
 ## Classify by Project Development Phase
 ### 01 Project Management
+develop, test, staging, production environment
+
 ### 02 Requirements
 ### 03 Design
 #### swagger 
@@ -143,6 +148,8 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 -Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
 ### 05 Test
+
+UAT: User Acceptance Test
 ### 06 Deploy
 #### Data security 数据安全工具DRBD
 
@@ -162,6 +169,8 @@ https://github.com/knightliao/disconf
 
 #### Commons Configuration
 http://commons.apache.org/proper/commons-configuration/
+配置管理和部署使用chef/puppet/ansible，密码放在加密的data bag里（如chef）
+密码管理通用服务vault和keywhiz, vault是用golang写的，github上的like比java写的keywhiz多些，同时它又是consul的东家hashicorp做
 
 #### Web Server
 ##### Node
