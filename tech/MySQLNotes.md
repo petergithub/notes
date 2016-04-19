@@ -6,6 +6,8 @@
 mysqlreport --user root --password 
 /etc/mysql/my.cnf ~/.my.cnf
 
+updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`
+
 show full processlist;
 explain sql query;
 
@@ -120,6 +122,9 @@ SHOW CREATE TABLE
 显示当前的user： SELECT USER();
 来查看数据库版本 SELECT VERSION();
 显示use的数据库名： SELECT DATABASE();
+find the mysql data directory by `grep datadir /etc/my.cnf` or  
+`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`
+`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 #### 修改密码
 格式：mysqladmin -u用户名 -p旧密码 password 新密码
@@ -243,6 +248,26 @@ mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
 --single-transaction	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. . It is useful only with transactional tables such as InnoDB
 
 --lock-tables=false , -l	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, --single-transaction is a much better option, because it does not need to lock the tables at all.
+```
+
+#### MySQL Export Table to CSV 
+[Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)
+`mysql -uroot -proot -D account -s -e "select id,username from user_0 limit 10 INTO OUTFILE '/tmp/user.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'"`
+`mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`
+
+``` mysql
+	
+	SELECT 
+	    orderNumber, status, orderDate, requiredDate, comments
+	FROM
+	    orders
+	WHERE
+	    status = 'Cancelled' 
+	INTO OUTFILE 'C:/tmp/cancelled_orders.csv' 
+	FIELDS ENCLOSED BY '"' 
+	TERMINATED BY ',' 
+	ESCAPED BY '"' 
+	LINES TERMINATED BY '\r\n';
 ```
 
 #### Import/Restore
