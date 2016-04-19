@@ -14,6 +14,8 @@ location: make a command can be call anywhere
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
 date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+M-1 is meta-1 (Alt-1 in Ubuntu)
+C-1 is control-1
 
 `passwd <username>`	update password
 `id <username>`	get the user
@@ -38,6 +40,12 @@ pgrep -l apache2
 
 escape square brackets with backslash:   `grep "test\[1]" log.txt`
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+
+
+Keyboard problems, setting 3rd level chooser and Meta key in Unity
+http://ubuntuforums.org/showthread.php?t=2220062
+If you're not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
+less /usr/share/X11/xkb/symbols/us
 
 ### Move Running Process to Background 
 #### ALREADY RUNNING PROCESS INTO BACKGROUND
@@ -308,6 +316,7 @@ convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量�
 转换文件名由GBK为UTF8 :  convmv -r -f cp936 -t utf8 --notest --nosmart *
 
 ##### 查看文件编码
+`file <fileName>`
 在Vim 中可以直接查看 文件 编码
 :set fileencoding
 
@@ -319,8 +328,8 @@ convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量�
 enconv -L zh_CN -x UTF-8 filename
 
 3. iconv 转换，iconv的命令格式如下：
-iconv -f encoding -t encoding inputfile
-比如将一个UTF-8 编码 的文件 转换成GBK编码
+iconv -f fromEncoding -t toEncoding inputfile
+比如将一个GBK编码 的文件 转换成 UTF-8 编码
 iconv -f GBK -t UTF-8 file1 -o file2
 
 ### xargs
@@ -663,10 +672,12 @@ ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 
 #### Example: tmux scripts:
 ``` shell
+
 	#!/bin/bash
-	SESSION=Redis
+	SESSION_NAME=session0
+	WINDOW_NAME=win0
 	#Setup a session and setup a window for redis
-	tmux -2 new-session -d -s $SESSION -n $SESSION
+	tmux -2 new-session -d -s $SESSION_NAME -n $WINDOW_NAME
 	tmux split-window -h
 	tmux select-pane -t 0
 	tmux send-keys "cd ~/opt/redis-sentinel" C-m
@@ -679,7 +690,7 @@ ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 	tmux send-keys "cd ~/opt/redis-sentinel" C-m
 	tmux send-keys "startRedisSlave6382.sh" C-m
 
-	#tmux new-window -t $WINDOW2:1 -n $WINDOW2
+	tmux new-window -t $SESSION_NAME:1 -n $WINDOW_NAME
 ```
 
 ### screen 
@@ -897,6 +908,7 @@ Linux查看网卡数据吞吐量方法
 #### 操作系统 `uname -a`
 find out system version: `cat /etc/*-release` or `ls /etc/*-release`
 Redhat/CentOS版本 : `cat /etc/redhat-release`
+lsb_release -a
 
 #### 状态采集工具
 讲究点，要用来出报告的，用`Zabbix`之类。
