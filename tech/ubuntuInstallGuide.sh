@@ -4,6 +4,12 @@
 #3、系统分区: / 　　　装系统和软件，我这里给力10G的空间
 #4、个人文件分区：/home　你想多大就多大，类似windows的“我的文档” 13G
 
+# Windows 10 install Ubuntu with EasyBCD 添加新条目-neogrub-安装-配置 
+#title Install Ubuntu
+#root (hd0,0)
+#kernel (hd0,0)/vmlinuz boot=casper iso->scan/filename=(hd0,0)/ubuntu-14.04.2-desktop-i386.iso ro quiet >splash locale=en_US.UTF-8 
+#initrd (hd0,0)/initrd.lz
+
 # dpkg -i AdbeRdr*.deb	# install
 ## installed programs: /usr/share/applications/ or ~/.local/share/applications
 ## make it available in "Open with other Application" add %f at the end of line "Exec=command" in /usr/share/applications/pdfedit.desktop
