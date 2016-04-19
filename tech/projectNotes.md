@@ -95,3 +95,25 @@ For each phase, we’ll use the STOP / START / CONTINUE method to guide our less
 
 ## Design
 返回list时带上下一条ID, 然后请求数据时带上ID 查询用ID做条件减少翻页
+
+## Process
+### Handover process 
+Project Management
+	1. 有几个功能模块
+	2. 已有用户,主要用户联系人
+	3. 目前的困难
+	4. 未来的发展计划
+Requirement
+	包括哪些主要功能?
+Design
+	相关设计文档
+Build
+	1. 开发环境:本地可以直接连的
+Test
+	1. 如何测试
+Deploy
+	1. 几个环境需要部署 各部署的哪个分支
+	2. 部署步骤
+Support
+	1. 新接一个应用的接入步骤
+	2. 已知问题

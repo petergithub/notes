@@ -8,7 +8,7 @@ Dubbo管理控制台 except dubbo-admin
 
 1) hessian serialization bug?:  private entity id is missing if parent class id existing
 
-TCP粘包英文 tcp skick package/unpacking 
+TCP粘包英文 tcp stick package/unpacking 
 Netty FixedLengthFrameDecoder
 Fragmentation should be transparent to a TCP application. Keep in mind that TCP is a stream protocol: you get a stream of data, not packets! If you are building your application based on the idea of complete data packets then you will have problems unless you add an abstraction layer to assemble whole packets from the stream and then pass the packets up to the application.
 A the "application layer" a TCP packet (well, segment really; TCP at its own layer doesn't know from packets) is never fragmented, since it doesn't exist. The application layer is where you see the data as a stream of bytes, delivered reliably and in order.
