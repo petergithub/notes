@@ -3,6 +3,7 @@
 
 ## Command
 ./redis-server redis_6379.conf
+src/redis-cli -h 127.0.0.1 -p 6379 -a mysupersecretpassword
 
 ### 常规操作命令
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)

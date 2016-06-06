@@ -109,6 +109,11 @@ type: Windows Displays the contents of a text file or files.
 nslookup http://wsyc.lqwang.com/
 tracert http://haijia.bjxueche.net/
 
+### Ubuntu
+Visio like: Dia, yEd Graph Editor
+Video player: VLC can play stream
+
+
 ## Network tools
 ### putty显示中文
 在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.

@@ -17,6 +17,68 @@ date_str=`date +%Y%m%d%H%M%S`;echo $date_str
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
 
+`dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件
+if(input file)告诉dd从哪个文件读取数据，参数 of(output file)告诉dd读出的数据写入哪个文件中
+bs=1M表示每一次读写1M数据，count=50表示读写 50次，这样就指定了生成文件的大小为50M
+dd做的只是文件拷贝工作
+
+`dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
+
+sort的-t选项 设定间隔符 
+-k选项 指定列数
+
+awk $NF the last column
+
+查看网页源码 `curl www.sina.com`
+	保存网页`curl -o [文件名] www.sina.com`
+自动跳转重定向 `curl -L www.sina.com`
+显示http header 
+	显示http response的头信息，连同网页代码一起 `curl -i www.sina.com`
+	`-I`参数则是只显示http response的头信息。
+显示通信过程
+	`curl -v www.sina.com`
+	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
+HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动词。
+	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
+HTTP认证	`curl --user name:password example.com`
+	
+	`curl -w "TCP handshake: %{time_connect}, SSL handshake: %{time_appconnect}\n" -so /dev/null https://www.baidu.com`
+	
+提交表单并设置header
+`curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
+
+Timing Details With cURL
+https://josephscott.org/archives/2011/10/timing-details-with-curl/
+Step one: create a new file, curl-format.txt, and paste in:
+
+	\n
+            time_namelookup:  %{time_namelookup}\n
+               time_connect:  %{time_connect}\n
+            time_appconnect:  %{time_appconnect}\n
+           time_pretransfer:  %{time_pretransfer}\n
+              time_redirect:  %{time_redirect}\n
+         time_starttransfer:  %{time_starttransfer}\n
+                            ----------\n
+                 time_total:  %{time_total}\n
+	\n
+Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
+`-w "@curl-format.txt"` tells cURL to use our format file
+`-o /dev/null` redirects the output of the request to /dev/null
+`-s` tells cURL not to show a progress meter
+
+And here is what you get back:
+
+	time_namelookup:  0.001
+	      time_connect:  0.037
+	   time_appconnect:  0.000
+	  time_pretransfer:  0.037
+	     time_redirect:  0.000
+	time_starttransfer:  0.092
+	                   ----------
+	        time_total:  0.164
+	
+get the MD5 hash `echo -n Welcome | md5sum`
+
 `passwd <username>`	update password
 `id <username>`	get the user
 `id -nG <username>`	Find out user group identity
@@ -229,6 +291,16 @@ $ 	匹配行尾
 ```
 grep pattern files - 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
+
+grep for multiple patterns
+	`grep 'word1\|word2\|word3' /path/to/file`
+	`grep -E 'word1|word2' *.doc`
+    Use single quotes in the pattern: `grep 'pattern*' file1 file2`
+    Use extended regular expressions: `egrep 'pattern1|pattern2' *.py`
+    Use this syntax on older Unix shells: `grep -e pattern1 -e pattern2 *.pl`
+On Linux, you can also type `egrep` instead of `grep -E`
+
+
 grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
 sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
@@ -388,47 +460,54 @@ Operator	Meaning	Example
 [ "$a" = "$b" ] ：判断$a和$b是否相等
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
+-e file 	Check if file exists. Is true even if file is a directory but exists. 	[ -e $file ] is true.
 
 #### example 
 
 ``` shell
-if [ ! -f "./gdms_apply_security.config" ]; then
-    echo  "The config file for docbase and username doesn't exist, please check it"
-    exit 0
-fi
-if [ a || b && c ]; then
-　 ....
-elif ....; then
-　 ....
-else
-　 ....
-fi
 
-while [ -n "$binnum" ]; do
-　　...
-done
-
-
-for x in one two three four
-do
-    echo number $x
-done
-
-output:
-number one
-number two 
-number three 
-number four
-
-for myfile in /etc/r*
-do
-    if [ -d "$myfile" ] 
-    then
-      echo "$myfile (dir)"
-    else
-      echo "$myfile"
-    fi
-done
+	if [ ! -f "./gdms_apply_security.config" ]; then
+	    echo  "The config file for docbase and username doesn't exist, please check it"
+	    exit 0
+	fi
+	if [ a || b && c ]; then
+	　 ....
+	elif ....; then
+	　 ....
+	else
+	　 ....
+	fi
+	
+	while [ -n "$binnum" ]; do
+	　　...
+	done
+	
+	
+	for x in one two three four
+	do
+	    echo number $x
+	done
+	
+	output:
+	number one
+	number two 
+	number three 
+	number four
+	
+	for myfile in /etc/r*
+	do
+	    if [ -d "$myfile" ] 
+	    then
+	      echo "$myfile (dir)"
+	    else
+	      echo "$myfile"
+	    fi
+	done
+	
+	for((i=0;i<3;i++))
+	do
+		echo $i	
+	done
 
 
 	#! /bin/sh
@@ -557,24 +636,42 @@ add  one line in .profile
 add one line in .bashrc
 .bashrc:  `alias grep='grep --color=auto'`
 
-#### file carriage
+#### file carriage 换行
+两个字符：一个字符<Return>来移到第一列，另一个字符<Line feed>来新增一行
+UNIX人认为在到达一行的结尾时新增一行<Line feed> (LF)，而Mac人则认同<Return> (CR)的解决办法，MS则坚持古老的<Return><Line feed> (CRLF)
 在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL+v CTRL+m"生成，而不是直接键入"^M"。 
 1. $ dos2unix myfile.txt
-2. vi :%s/^M$//g #去掉行尾的^M。
-	:%s/^M//g #去掉所有的^M。
-3. sed -e 's/^M//n/g' myfile.txt // evluate
- sed -i 's/^M//n/g' myfile.txt // replace
+2. vi `:%s/^M$//g` #去掉行尾的^M。
+	`:%s/^M//g` #去掉所有的^M。
+3. `sed -e 's/^M//n/g' myfile.txt` // evluate
+ `sed -i 's/^M//n/g' myfile.txt` // replace
 
+显示换行 `:set list` 进入<list mode>，可以看到以`$`表示的换行符和以`^I`表示的制表符。
+vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望
+退出<list mode> `:set nolist`
+
+删除换行
+可以用以下命令删除换行符： `:%s/\n//g`
+可以用以下命令删除DOS文件中的回车符“^M”：`:%s/\r//g`
+可以用以下命令转换DOS回车符“^M”为真正的换行符：`:%s/\r/\r/g`
+
+`fileformats`选项，用于处理文件格式问题  
+`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择，而将MS-DOS的文件格式做为第二选择
+`:set fileformat?` 检测到的文件格式会被存放在fileformat选项中
+`:set fileformat=unix` 将文件转换为UNIX格式的文件
+
+在默认情况下，Vim认为文件是由行组成的，并且文件最后一行是以<EOL>为结束符的  
+`:set endofline` 设置文件以<EOL>结束符结尾
+`:set noendofline` 设置文件不以<EOL>结束符来结尾
 
 ### zip jar tar
-ps -ef | grep gdms | grep jboss
-unzip gdms.war WEB-INF/lib/gdms.jar only unzip the jar from the war
-unzip -l gdms.war | grep jaxen
-unzip -l archive.zip lists the contents of a ZIP archive to ensure your file is inside.
-unzip -c archive.zip file1.txt file2.txt | less :Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
-unzip -O cp936 fix linux下文件解压乱码
-zip -u gdms.war WEB-INF/lib/jaxen-core.jar update zip file
-zip -d gdms.war WEB-INF/lib/jaxen-core.jar
+`unzip project.war WEB-INF/lib/project.jar` only unzip the jar from the war
+`-q` perform operations quietly
+`-l` lists the contents of a ZIP archive to ensure your file is inside.
+`-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
+`unzip -O cp936` fix linux下文件解压乱码
+`zip -u project.war WEB-INF/lib/jaxen-core.jar` update zip file
+`zip -d project.war WEB-INF/lib/jaxen-core.jar`
 
 Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
 `zless`,`zipgrep`,`zgrep`,`zcat`
@@ -583,7 +680,6 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 `vim filename.tar.gz` List files and open file inside it with `Enter`
 
 jar tvf <filename>.jar to find the content of the file without extracting.
-jar tvf classes.zip | grep DctmUtil
 extract the class files in the jar
 jar xvf <jar name>.jar [class name]
 jar xvf gdmsSM.jar com/vdm/Method.class

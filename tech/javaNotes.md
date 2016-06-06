@@ -20,6 +20,137 @@ concurrent: 主内存.寄存器是是运行时?
 	    /      \
 	>-------------->>
 
+## Java Mermory check
+
+### 高CPU占用分析
+http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
+一个应用占用CPU很高，除了确实是计算密集型应用之外，通常原因都是出现了死循环  
+1. top -H
+2. 找到具体是CPU高占用的线程 `ps -mp <PID> -o THREAD,tid,time,rss,size,%mem` 
+3. 将需要的线程ID转换为16进制格式 `printf "%x\n" tid`
+4. 打印线程的堆栈信息 `jstack pid |grep tid -A 30`  
+
+### 检查步骤
+查看java线程在内存增长时线程数 `jstack pid |grep 'java.lang.Thread.State' |wc -l` 或者 `cat /proc/pid/status |grep Thread`
+
+用pmap查看进程内的内存情况，观察java的heap和stack大小 `pmap -x pid |less`
+
+使用gdb观察内存块里的内容，发现里面有一些接口的返回值、mc的返回值、还有一些类名等等 `gdb: dump memory /tmp/memory.bin 0x7f6b38000000 0x7f6b38000000+65535000`
+`hexdump -C /tmp/memory.bin` 或 `strings /tmp/memory.bin |less`
+
+用strace和ltrace查找malloc调用
+
+### Linux tool
+
+#### top
+这个是Linux自带的命令，查看系统资源消耗情况，可以看看CPU、内存、SWAP、I/O的消耗情况，需要特别注意的有几个值：
+* ni，这个值如果特别高说明线程上下文切换开销较大，看看是不是开了太多的线程导致的。
+* res，这个代表了进程实际占用的内存
+* swap，内存不足就会占用swap空间，这个时候一般应用的性能会急剧下降，需要特别关注
+`pstack` Linux命令。可以查看某个进程的当前线程栈运行情况。 
+
+#### iostat
+如果目标服务是磁盘I/O较重的程序，则用【iostat -d 1】，检查磁盘I/O情况。若“目标服务对应的磁盘”读写量在预估之内（预估要注意cache机制的影响）
+
+### 虚拟机监控工具
+http://www.oracle.com/technetwork/java/javase/memleaks-137499.html#gdysp
+jps: 虚拟机进程状况工具  (Java Virtual Machine Process Status Tool)
+jstat: 虚拟机统计信息工具  (Java Virtual Machine Statistics Monitoring Tool)
+jinfo: Java配置信息工具  
+jmap: Java内存映像工具  (Memory Map)
+jhat: 虚拟机堆转储快照分析工具  (Java Heap Analysis Tool)
+jstack: Java堆栈跟踪工具  (Stack Trace)
+HSDIS: JIT生成代码反汇编  
+
+#### jmap
+排查GC问题必然会用到的工具，jmap可以告诉你当前JVM内存堆中的对象分布及其关系，当你dump堆之后可以用MAT分析，看看有哪些大对象，或者哪些类的实例特别多。
+
+常用用法：
+强制FGC：-histo:live
+dump堆：-dump:[live],format=b,file=dump.bin
+
+查看各代内存占用情况：-heap
+* `jmap [pid]`
+* `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小
+* `jmap -dump:live,format=b,file=jmap_pid.dump.bin [pid]` 可以将当前Java进程的内存占用情况导出来，用内存分析工具（例如：Eclipse Memory Analyzer Tool（MAT））来分析。
+* `jmap -dump:format=b,file=/tmp/java_pid.hprof pid` dump出来的堆文件信息可以用MAT、VisualVM、jhat、jprofile等工具查看
+
+#### jstack
+jstack可以告诉你当前所有JVM线程正在做什么，包括用户线程和虚拟机线程，你可以用它来查看线程栈，并且结合Lock信息来检测是否发生了死锁和死锁的线程。  
+另外在用top -H看到占用CPU非常高的pid时，可以转换成16进制后在jstack dump出来的文件中搜索，看看到底是什么线程占用了CPU。
+
+#### jhat
+`jhat -port 8080 /tmp/java_11211.hprof` 服务启动后，访问http://localhost:8080/
+
+#### jstat
+可以告诉你当前的GC情况，包括GC次数、时间，具体的GC还可以结合gc.log文件去分析。
+`jstat -gc pid 250 10`
+根据JVM的内存布局
+* 堆内存 = 年轻代 + 年老代 + 永久代
+* 年轻代 = Eden区 + 两个Survivor区（From和To）
+
+以上统计数据各列的含义为
+    S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）
+    EC、EU：Eden区容量和使用量
+    OC、OU：年老代容量和使用量
+    PC、PU：永久代容量和使用量
+    YGC、YGT：年轻代GC次数和GC耗时
+    FGC、FGCT：Full GC次数和Full GC耗时
+    GCT：GC总耗时
+
+
+#### Interpretation of FieldType characters
+http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3
+[Z = boolean
+[B = byte
+[S = short
+[I = int
+[J = long
+[F = float
+[D = double
+[C = char
+[L = any non-primitives(Object)
+
+### JVM内存分配
+在Java虚拟机中，内存分为三个代：新生代（New）、老生代（Old）、永久代（Perm）。
+（1）新生代New：新建的对象都存放这里
+（2）老生代Old：存放从新生代New中迁移过来的生命周期较久的对象。新生代New和老生代Old共同组成了堆内存。
+（3）永久代Perm：是非堆内存的组成部分。主要存放加载的Class类级对象如class本身，method，field等等。
+* 堆内存 = 年轻代 + 年老代 + 永久代
+* 年轻代 = Eden区 + 两个Survivor区（From和To）
+
+如果出现java.lang.OutOfMemoryError: Java heap space异常，说明Java虚拟机的堆内存不够。原因有二：
+（1）Java虚拟机的堆内存设置不够，可以通过参数-Xms、-Xmx来调整。
+（2）代码中创建了大量大对象，并且长时间不能被垃圾收集器收集（存在被引用）。
+
+如果出现java.lang.OutOfMemoryError: PermGen space，说明是Java虚拟机对永久代Perm内存设置不够。
+一般出现这种情况，都是程序启动需要加载大量的第三方jar包。例如：在一个Tomcat下部署了太多的应用。
+
+从代码的角度，软件开发人员主要关注java.lang.OutOfMemoryError: Java heap space异常，减少不必要的对象创建，同时避免内存泄漏。
+
+### Other tools
+#### HouseMD
+一个类似于BTrace的工具，用于对JVM运行时的状态进行追踪和诊断，作者是中间件团队的聚石。
+
+通常我们排查问题很多时候都在代码中加个日志，看看方法的参数、返回值是不是我们期望的，然后编译打包部署重启应用，十几分钟就过去了。HouseMD可以直接让你可以追踪到方法的返回值和参数，以及调用次数、调用平均rt、调用栈。甚至是类的成员变量的值、Class加载的路径、对应的ClassLoader，都可以用一行命令给你展现出来，堪称神器。
+
+更多的用法可以参考详细的WiKi：https://github.com/CSUG/HouseMD
+
+再偷偷告诉你，因为HouseMD是基于字节码分析来做的，所以理论上运行在JVM的语言都可以用它，包括Groovy，Clojure都可以。
+
+#### TBJMap
+通过jmap和MAT我们可以知道整个JVM堆的对象分布情况，但是有时候我们需要知道young/old/perm区分别有哪些对象的时候，就要用到TBJMap这个神器了。作者是中间件团队的叔同。
+
+他可以告诉你各个分代区各个Class的实例数、占用的空间，以及DirectMemory占用的空间等。
+
+用法很简单，一行命令即可。WiKi：https://github.com/alibaba/TBJMap
+
+#### tsar
+目前tsar已经开源：http://tsar.taobao.org/
+sar是淘宝的采集工具，主要用来收集服务器的系统信息（如cpu，io，mem，tcp等）以及应用数据（如squid haproxy nginx等），tsar支持t实时查看和历史查看，方便了解应用和服务器的信息。
+用不同的参数可以看到历史和实时信息，CPU、Load、内存、网络、QPS、rt等等你想要的监控数据几乎都能看到。
+
+
 ## JVM
 摘自: 周志明 深入理解Java虚拟机-JVM高级特性与最佳实践 
 

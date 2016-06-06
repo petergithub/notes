@@ -3,7 +3,7 @@
 # MySQL Notes
 
 ## Recent
-mysqlreport --user root --password 
+mysqlreport --user root --password
 /etc/mysql/my.cnf ~/.my.cnf
 
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`
@@ -14,6 +14,39 @@ explain sql query;
 MySQL 5.5 UTF8mb4支持emoj 
 HA: percona xtradb cluster, galera cluster 
 
+
+mysql query escape %前面加两个反斜杠，比如
+`select count(*) from tableName where column like '%关键字\\%前面的是一个百分号%'`
+
+### datetime query
+	
+``` mysql	
+	
+	mysql> SELECT UNIX_TIMESTAMP('2005-03-27 02:00:00');
+	+---------------------------------------+
+	| UNIX_TIMESTAMP('2005-03-27 02:00:00') |
+	+---------------------------------------+
+	|                            1111885200 |
+	+---------------------------------------+
+	mysql> SELECT FROM_UNIXTIME(1111885200);
+	+---------------------------+
+	| FROM_UNIXTIME(1111885200) |
+	+---------------------------+
+	| 2005-03-27 03:00:00       |
+	+---------------------------+
+```
+
+### case-sensitive
+make a case-sensitive query 
+`SELECT *  FROM table WHERE BINARY column = 'value'`,
+`select * from t1 where name = binary 'YOU'` 
+
+设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下： 
+*_bin: 表示的是binary case sensitive collation，也就是说是区分大小写的 
+*_cs: case sensitive collation，区分大小写 
+*_ci: case insensitive collation，不区分大小写 
+
+### MySQL help
 `help` to get List of all MySQL commands
 http://linuxcommand.org/man_pages/mysql1.html
 ```
@@ -140,7 +173,7 @@ grant all on dbName.* to USERNAME@host identified by 'pwd';
 grant all on aotmobile_global.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';
 grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;
 show grants for USERNAME@IP; 查看用户权限
- select * from mysql.user where user='cactiuser' \G  
+select * from mysql.user where user='cactiuser' \G  
 SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user; 查看MYSQL数据库中所有用户
 CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON * . * TO 'newuser'@'localhost';
@@ -233,8 +266,8 @@ mysql -uroot -p密码 < c:\\school.sql
 （2）或者进入命令行后使用 mysql> source c:\\school.sql; 也可以将school.sql文件导入数据库中。
 
 #### Export/Backup database mysqldump
-MySQL 5.7 Reference Manual [mysqldump — A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)
-导出整个数据库(–hex-blob 为有blob数据做的,防止乱码和导入失败用)
+MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)
+导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)
 备份文件中的“--”字符开头的行为注释语句；以“/*!”开头、以“*/”结尾的语句为可执行的mysql注释，这些语句可以被mysql执行
 ``` sql
 mysqldump -u USERNAME -p database_name > outfile_name.sql
@@ -249,6 +282,14 @@ mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
 
 --lock-tables=false , -l	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, --single-transaction is a much better option, because it does not need to lock the tables at all.
 ```
+
+#### Import/Restore
+mysql> USE 数据库名;
+mysql> SOURCE d:/mysql.sql;
+or
+mysql -uroot -p dbName < dbName.sql
+// or
+mysql -uroot -p dbName -e "source /path/to/dbName.sql"
 
 #### MySQL Export Table to CSV 
 [Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)
@@ -269,15 +310,6 @@ mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
 	ESCAPED BY '"' 
 	LINES TERMINATED BY '\r\n';
 ```
-
-#### Import/Restore
-mysql> USE 数据库名;
-mysql> SOURCE d:/mysql.sql;
-or
-mysql -uroot -p dbName < dbName.sql
-// or
-mysql -uroot -p dbName -e "source /path/to/dbName.sql"
-
 
 ### MySQL Workbench update shortcut Auto-complete 
 D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
