@@ -3,7 +3,7 @@ This is my notes, which is edit by [GitBook](https://www.gitbook.com) with [my p
 
 ## 如何学习
 ### [如何快速学习一门新技术](https://codingstyle.cn/topics/3)
-Author: hkliya (Seaborn Lee) 
+Author: hkliya (Seaborn Lee)
 
 1. 是什么  
  1.1 定义  
@@ -36,7 +36,7 @@ Author Judas.n http://code.youmeek.com/ judas.n@qq.com
  1.5 学习前提/依赖: 要有Java基础
 2. 为什么会出现   
  Google search: why use maven, what does maven do, why should we use maven
-3. 那些人不喜欢它 
+3. 那些人不喜欢它
  Google search: Why I don't use maven
 4. 为什么学习它  
   接近工作问题, 提高效率, 知识储备
@@ -54,4 +54,17 @@ Author Judas.n http://code.youmeek.com/ judas.n@qq.com
  6.2 分享: 博客, Github demo  
 7. 过程细节 Google搜索必备  
 	* `Maven site:www.youmeek.com`  
-	* `Maven link:www.youmeek.com` 返回所有链接到youmeek.com的网页 
+	* `Maven link:www.youmeek.com` 返回所有链接到youmeek.com的网页
+
+## 思考问题的一个思维提纲
+
+1. 核心问题是什么？（只能有一个，如果有很多，找到最重要的那个）
+2. 这个问题的背景是什么？（来龙去脉，历史原因）
+3. 和现在这个问题有关的人物和因素有哪些？（记住MECE法则，用归纳法，一一并列出来）
+4. 哪些是导致这个问题的关键原因？
+5. 哪些是次要原因？
+6. 解决这个问题有哪些方法？（用归纳法，写出所有可能。用演绎法，找到每种方法实施的具体步骤）
+7. 解决这个问题，你现在欠缺哪些条件或者资源？
+8. 如何去弥补这些条件上的欠缺？
+9. 你的时间规划是怎样的，先做什么，再做什么，然后做什么？
+10. 最后一步，just do it.
