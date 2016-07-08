@@ -148,11 +148,16 @@ https://help.github.com/articles/remove-sensitive-data/
 git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
 git gc --aggressive --prune
 git push origin --force --all
+
+### git hooks
+Add hooks for `git merge` and `git checkout`
+1. create `.git/hooks/post-checkout` and `.git/hooks/post-merge` (for `git pull` also)
+2. `chmod ug+x .git/hooks/post-checkout .git/hooks/post-merge`
 	
 ## Git configuration
 
 ### git auto complete　自动补全
-download git-completion.bash from souce code
+download git-completion.bash from souce code and load it from .bashrc
 wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 if [ -f ~/.git-completion.bash ]; then
         . ~/.git-completion.bash

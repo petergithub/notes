@@ -58,7 +58,6 @@ sudo apt-get install nautilus-gksu
 nautilus -q
 sudo apt-get install trash-cli
 echo del='trash-put' >> ~/.bash_profile
-sudo apt-get install fcitx-table-wbpy ## install Chinese input
 #sudo apt-get install gconf-editor
 # install flash plugin for firefox
 #sudo apt-get install flashplugin-nonfree
@@ -68,7 +67,7 @@ sudo apt-get -y install p7zip p7zip-full p7zip-rar
 ## put shortcut
 mkdir bin
 #echo export PATH=.:~/bin:\$PATH >> ~/.bash_profile
-echo "Download .bash_profile from https://github.com/petergithub/configuration/blob/master/.bash_profile"
+#echo "Download .bash_profile from https://github.com/petergithub/configuration/blob/master/.bash_profile"
 ########## tools END ##########
 
 ########## development tools BEGIN ##########
@@ -77,6 +76,7 @@ sudo apt-get install tmux
 
 ## cheat for command
 sudo apt-get install python-pip
+## pip install --install-option="--prefix=/path/to/install" package_name
 sudo pip install docopt pygments
 git clone https://github.com/chrisallenlane/cheat.git
 cd cheat
@@ -90,12 +90,15 @@ sudo apt-get install atom
 ########## development tools END ##########
 
 ########## wine BEGIN ##########
-sudo add-apt-repository ppa:ubuntu-wine/ppa
+## https://wiki.winehq.org/Ubuntu
+sudo add-apt-repository ppa:wine/wine-builds
 sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
 # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys PUBKEY
-sudo apt-get install wine1.7
+## sudo apt-get install wine1.7
+sudo apt-get install --install-recommends winehq-staging
 # install mfc42.dll to start windows application
+sudo apt-get install winetricks
 winetricks mfc42
 ########## wine END ##########
 
@@ -106,9 +109,9 @@ sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
 #sudo apt-get install oracle-java7-installer
 sudo apt-get install oracle-java8-installer
-mkdir -p {/home/share,~/opt/java}
-ln -s /usr/lib/jvm/java-8-oracle/ /home/share/java-8-oracle
-ln -s /home/share/java-8-oracle ~/opt/java/jdk
+sudo mkdir -p {/home/share,~/opt/}
+ln -s /usr/lib/jvm/java-8-oracle /home/share/java-8-oracle
+ln -s /home/share/java-8-oracle ~/opt/java
 sudo apt-get install maven
 
 #Managing Java
@@ -119,7 +122,7 @@ sudo apt-get install maven
 #$ echo $JAVA_HOME
 #//show nothing
 #vim ~/.bashrc add lines or using >>
-echo export JAVA_HOME=~/opt/java/jdk >> ~/.bash_profile
+echo export JAVA_HOME=~/opt/java >> ~/.bash_profile
 echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bash_profile
 echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bash_profile
 ##restart terminal or source ~/.bashrc or . ~/.bashrc
@@ -145,6 +148,17 @@ sudo apt-get install mysql-server-5.6
 sudo apt-get install unity-tweak-tool
 sudo apt-get install ccsm
 
+###### Chinese input #######
+## sudo apt-get install fcitx-table-wbpy ## install Chinese input
+
+## download from http://pinyin.sogou.com/linux/ and config Ctrl + space for sogou
+## 1. System Settings -> Language Support -> Keyboard input method system: iBus
+## 2. System Settings -> Keyboard -> Text Entry -> Switch to next source using: empty
+## 3. System Settings -> Language Support -> Keyboard input method system: fcitx
+## 4. Dash -> Fcitx Configuration -> Global Config
+## 5. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
+## 6. Disable "C-semicolon": Dash -> Fcitx Configuration -> Tab "Addon" -> Double click ClipBoard -> "Trigger key for ClipBoard history list" -> hit "Esc" -> OK
+
 # Linux字体渲染
 # 一条命令搞定Linux字体渲染——Ubuntu系发行版微软雅黑+宋体终极解决方案【原创推荐】 http://www.lulinux.com/archives/278
 
@@ -167,7 +181,7 @@ sudo apt-get install acroread --force-yes -y
 sudo /var/cache/apt/archives/acrobat7_cn/INSTALL
 #第一问题问你是否继续安装，直接回车；
 #第二个问题问你是否接受协议，键入accept后回车；
-#第三个问题要你定义Acrobat的安装目录，输入/usr/lib/Adobe/Acrobat7.0后回车。
+#第三个问题要你定义Acrobat的安装目录，输入/usr/lib/Adobe/Acrobat7.0 or /opt/Adobe/Reader9 后回车。
 
 ########### gedit config
 ## Ubuntu gedit recent files dconf set max recents to something like 40
@@ -199,6 +213,6 @@ sudo apt-get install dconf-editor
 sudo apt-get install ubuntu-restricted-extras
 
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
-#make >& LOG_make &
-#make install >& LOG_install &
+#make PREFIX=/path/to/target >& make.log &
+#make PREFIX=/path/to/target install >& make.install.log &
 #用于保存安装信息日志，这样需要卸载的时候方便查看哪些文件安装在了系统目录中，例如/usr/lib下的库文件

@@ -13,9 +13,22 @@ location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
-date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+
+split file into small files `split -b bigFile.txt 100M`
+
+
+Get Unix timestamp 	`date +%s`
+Convert Unix timestamp to Date `date -d @1467540501`
+Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
+
+	date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+
+
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
+
+`foo > stdout.txt 2> stderr.txt` use 2> to redirect to stderr
+`foo > allout.txt 2>&1` all output redirect to the same file
 
 `dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件
 if(input file)告诉dd从哪个文件读取数据，参数 of(output file)告诉dd读出的数据写入哪个文件中
@@ -24,7 +37,7 @@ dd做的只是文件拷贝工作
 
 `dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
 
-sort的-t选项 设定间隔符 
+sort的-t选项 设定间隔符
 -k选项 指定列数
 
 awk $NF the last column
@@ -32,7 +45,7 @@ awk $NF the last column
 查看网页源码 `curl www.sina.com`
 	保存网页`curl -o [文件名] www.sina.com`
 自动跳转重定向 `curl -L www.sina.com`
-显示http header 
+显示http header
 	显示http response的头信息，连同网页代码一起 `curl -i www.sina.com`
 	`-I`参数则是只显示http response的头信息。
 显示通信过程
@@ -41,9 +54,9 @@ awk $NF the last column
 HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动词。
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
 HTTP认证	`curl --user name:password example.com`
-	
+
 	`curl -w "TCP handshake: %{time_connect}, SSL handshake: %{time_appconnect}\n" -so /dev/null https://www.baidu.com`
-	
+
 提交表单并设置header
 `curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
 
@@ -76,7 +89,7 @@ And here is what you get back:
 	time_starttransfer:  0.092
 	                   ----------
 	        time_total:  0.164
-	
+
 get the MD5 hash `echo -n Welcome | md5sum`
 
 `passwd <username>`	update password
@@ -100,7 +113,7 @@ pgrep -l apache2
 `du -s * | sort -n | tail`	列出当前目录里最大的10个文件。
 `last`	To find out when a particular user last logged in to the Linux or Unix server.
 
-escape square brackets with backslash:   `grep "test\[1]" log.txt`
+
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
 
@@ -109,7 +122,7 @@ http://ubuntuforums.org/showthread.php?t=2220062
 If you're not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
 less /usr/share/X11/xkb/symbols/us
 
-### Move Running Process to Background 
+### Move Running Process to Background
 #### ALREADY RUNNING PROCESS INTO BACKGROUND
 1. CTRL+z
 2. `jobs`
@@ -134,8 +147,8 @@ This process is the equivalent of running nohup SOMECOMMAND
 ### LibreOffice
 CTRL+0 (zero) 	Apply Default paragraph style
 CTRL+1 	Apply Heading 1 paragraph style
-CTRL+ALT+PageDown: Navigating from comment to comment 
-CTRL+ALT+c: create comment 
+CTRL+ALT+PageDown: Navigating from comment to comment
+CTRL+ALT+c: create comment
 ALT+Insert, and then press the up or down arrow key:  insert a new row in a table
 ALT+Delete, and then press the up or down arrow key.
 
@@ -158,14 +171,14 @@ ALT+Delete, and then press the up or down arrow key.
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
-改变与替换操作命令 
-<r> 替换光标所在的字符 
-<R> 替换字符序列 
-<cw> 替换一个单词 
-<ce> 同<cw> 
-<cb> 替换光标所在的前一字符 
-<c$> 替换自光标位置至行尾的所有字符 
-<C> 同<c$> 
+改变与替换操作命令
+<r> 替换光标所在的字符
+<R> 替换字符序列
+<cw> 替换一个单词
+<ce> 同<cw>
+<cb> 替换光标所在的前一字符
+<c$> 替换自光标位置至行尾的所有字符
+<C> 同<c$>
 <cc> 替换当前行
 
 `yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)
@@ -239,7 +252,7 @@ pattern [^0-9]*,	matches string start with non-number until to (,)
 `inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim
 `nnoremap j VipJ`
 `:map`	列出当前已定义的映射
- 
+
 
 #### VI正则表达式
 元字符 	说明
@@ -300,8 +313,16 @@ grep for multiple patterns
     Use this syntax on older Unix shells: `grep -e pattern1 -e pattern2 *.pl`
 On Linux, you can also type `egrep` instead of `grep -E`
 
+escape double quote with backslash `echo "\"member\":\"time\"" |grep -e "member\""` or with single quote `echo '"member":"time"' |grep -e 'member"'`
+escape square brackets with backslash:   `grep "test\[1]" log.txt`
 
-grep -l old *.htm | xargs sed -n "/old/p"  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
+
+`grep -l old *.htm | xargs sed -n "/old/p"`  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
+
+把web文件下所有文件中的//old.example.com替换为//new.example.com:
+	
+	sed -i 's/\/\/new.example.com/\/\/old.example.com/g' `grep -rl '//static.tclclouds.com' web/*`
+	
 sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
 sed -i 's#../../gxt#../../gxt2#g' */*.html
@@ -404,15 +425,113 @@ iconv -f fromEncoding -t toEncoding inputfile
 比如将一个GBK编码 的文件 转换成 UTF-8 编码
 iconv -f GBK -t UTF-8 file1 -o file2
 
+### awk
+awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.
+语法格式 `awk 'pattern {action}' filename`
+    特例:
+    `awk 'pattern' filename`   显示所有符合模式pattern的行
+    `awk '{action}' filename`   对所有行执行操作action
+    `awk '{action}'`           从命令行输入数据
+awk还支持命令文件 `awk  -f   awk_file   data_file`
+
+Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
+Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十分类似.
+例如: awk的 I/O指令 : print, printf( ), 
+	getline var < file 一次读取一行 变量 var(var省略时,表示置于$0)
+	 awk的 流程控制指令 : if(...){..} else{..}, while(...){...}... 
+
+awk 如何处理 Pattern { Actions } ?
+awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions. 
+
+#### 
+`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses
+
+#### 变量
+内建的字段变量
+$0 一字符串, 其内容为目前 awk 所读入的数据行.
+$1 $0上第一个字段的数据
+$2 $0上第二个字段的数据
+
+内建变量(Built-in Variables) 
+NF (Number of Fields) 	整数, 其值表$0上所存在的字段数目
+NR (Number of Records)	整数, 其值表awk已读入的数据行数目
+FILENAME				awk正在处理的数据文件文件名
+RS (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
+
+awk的工作流程
+执行awk时, 它会反复进行下列四步骤.
+
+    自动从指定的数据文件中读取一个数据行.
+    自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...
+    依次执行程序中 所有 的 Pattern { Actions } 指令.
+    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4. 
+
+awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop). 
+
+#### Pattern
+awk 中提供下列 关系运算符(Relation Operator)
+
+	运算符 含意
+	> 大于
+	< 小于
+	>= 大于或等于
+	<= 小于或等于
+	== 等于
+	!= 不等于
+	~ match
+	!~ not match
+	上列关系运算符除~(match)与!~(not match)外与 C 语言中之含意一致.
+	~(match) 与!~(match) 在 awk 之含意简述如下 :
+	A为字符串, B为正则表达式.
+	A ~B 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
+	A !~B 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串. 
+例如 :
+`$0 ~ /program[0-9]+\.c/ { print $0 }`
+`$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
+
+当Pattern 中被用来比对的字符串为$0时, 可省略$0, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E ) 
+
+#### Actions
+
+	Actions 是由下列指令(statement)所组成 :
+    表达式 ( function calls, assignments..)
+    print 表达式列表
+    printf( 格式化字符串, 表达式列表)
+    if( 表达式 ) 语句 [else 语句]
+    while( 表达式 ) 语句
+    do 语句 while( 表达式)
+    for( 表达式; 表达式; 表达式) 语句
+    for( variable in array) 语句
+    delete
+    break
+    continue
+    next
+    exit [表达式]
+    语句 
+
+awk 中大部分指令与 C 语言中的用法一致
+
+#### awk 的内建函数(Built-in Functions)
+1. index( 原字串, 找寻的子字串 )
+2. length( 字串 ) : 返回该字串的长度
+3. match( 原字串, 用以找寻比对的正则表达式 ):
+4. split( 原字串, 数组名称, 分隔字符 ):
+5. sprintf(格式字符串, 项1, 项2, ...)
+6. sub( 比对用的正则表达式, 将替换的新字串, 原字串 )
+7. substr( 字串,起始位置 [,长度] )	返回从起始位置起,指定长度的子字串. 若未指定长度,则返回起始位置到字串末尾的子字串.
+
 ### xargs
-xargs 工具的经典用法示例 
+xargs 工具的经典用法示例
 ```
 find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments
 kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
 kill $(ps -aef | grep java | grep apache-tomcat-7.0.27 | awk '{print $2}')
 kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 ```
-awk <pattern> '{print <stuff>}' <file> 可以用来删掉所有空行
+
+`-L` Use at most max-lines nonblank input  lines  per  command  line.  每行使用的非空字符串最大个数
+
+`awk <pattern> '{print <stuff>}' <file>` 可以用来删掉所有空行
 Print every line that has at least one field: awk 'NF > 0' data
 其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
 过滤记录
@@ -432,7 +551,7 @@ sleep 2; echo 'end sleep 2 sec'
 ﻿$? 上一个命令的返回代码。0为true, 1为false
 $$进程标识号
 $*，该变量包含了所有输入的命令行参数值
-string string不为空 
+string string不为空
 
 `cat /etc/shells`	get all available shells
 
@@ -462,11 +581,11 @@ Operator	Meaning	Example
 [ ! ]
 -e file 	Check if file exists. Is true even if file is a directory but exists. 	[ -e $file ] is true.
 
-#### example 
+#### example
 
 ``` shell
 
-	if [ ! -f "./gdms_apply_security.config" ]; then
+	if [ ! -f "./config" ]; then
 	    echo  "The config file for docbase and username doesn't exist, please check it"
 	    exit 0
 	fi
@@ -477,36 +596,36 @@ Operator	Meaning	Example
 	else
 	　 ....
 	fi
-	
+
 	while [ -n "$binnum" ]; do
 	　　...
 	done
-	
-	
+
+
 	for x in one two three four
 	do
 	    echo number $x
 	done
-	
+
 	output:
 	number one
-	number two 
-	number three 
+	number two
+	number three
 	number four
-	
+
 	for myfile in /etc/r*
 	do
-	    if [ -d "$myfile" ] 
+	    if [ -d "$myfile" ]
 	    then
 	      echo "$myfile (dir)"
 	    else
 	      echo "$myfile"
 	    fi
 	done
-	
+
 	for((i=0;i<3;i++))
 	do
-		echo $i	
+		echo $i
 	done
 
 
@@ -514,7 +633,7 @@ Operator	Meaning	Example
 	#shell脚本控制jar的启动和停止
 	#启动方法
 	start(){
-	
+
 	        java -Xms128m -Xmx2048m -jar test1.jar 5 > log.log &
 	        java -Xms128m -Xmx2048m -jar test2.jar 5 > log.log &
 	        tail -f result.log
@@ -526,7 +645,7 @@ Operator	Meaning	Example
 	           kill -9 $pid
 	        done
 	}
-	
+
 	case "$1" in
 	start)
 	  start
@@ -617,10 +736,10 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
    3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g：从历史搜索模式退出
    4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的，可用`stty`命令设置。
    	  CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J` 
-	or remove it altogether with `stty stop undef`. 
+	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
+	or remove it altogether with `stty stop undef`.
 	or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
-	After that `C-s` would work in the given terminal. 
+	After that `C-s` would work in the given terminal.
 	Set it in ~/.bashrc to make it work in every terminal.
     	refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr
    5. 在已经敲完的命令后按<CTRL+x CTRL+e>，会打开一个你指定的编辑器（比如vim，通过环境变量$EDITOR 指定）
@@ -639,7 +758,7 @@ add one line in .bashrc
 #### file carriage 换行
 两个字符：一个字符<Return>来移到第一列，另一个字符<Line feed>来新增一行
 UNIX人认为在到达一行的结尾时新增一行<Line feed> (LF)，而Mac人则认同<Return> (CR)的解决办法，MS则坚持古老的<Return><Line feed> (CRLF)
-在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL+v CTRL+m"生成，而不是直接键入"^M"。 
+在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL+v CTRL+m"生成，而不是直接键入"^M"。
 1. $ dos2unix myfile.txt
 2. vi `:%s/^M$//g` #去掉行尾的^M。
 	`:%s/^M//g` #去掉所有的^M。
@@ -682,11 +801,11 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 jar tvf <filename>.jar to find the content of the file without extracting.
 extract the class files in the jar
 jar xvf <jar name>.jar [class name]
-jar xvf gdmsSM.jar com/vdm/Method.class
+jar xvf package.jar com/vdm/Method.class
 update files
-cd C:\sp\Workspace\gdms\gdmsSMr4p5\bin\classes
-jar uvf C:\gdmsSM.jar com\vdm\Method.class com\vdm\UtilsG.class
-jar uvf C:\gdmsSM.jar -C backup config.properties; add config.properties without backup folder path into jar
+cd C:\sp\Workspace\gdms\packager4p5\bin\classes
+jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class
+jar uvf C:\package.jar -C backup config.properties; add config.properties without backup folder path into jar
 java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
 java命令引入jar时可以-cp参数，但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar)，通常的jar都在同一目录，且多于1个
 如：java -Djava.ext.dirs=lib MyClass
@@ -704,7 +823,7 @@ open another terminal: gnome-terminal
 man -k or apropos: key words search for command
 find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
 `locate indexserverconfig.xml`	find file based on index /var/lib/mlocate/mlocate.db
-`updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf 
+`updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf
 
 ### Other
 `history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令
@@ -727,7 +846,7 @@ ntsysv 就会*出图形界面给你选择(有的则显示在里面)，如果在�
 常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展，所以我们可以用 `echo * == ls`
 
 ## Advanced command
-### Tmux 
+### Tmux
 tmux	CRTL-b
 tmux使用C/S模型构建，主要包括以下单元模块：
     server服务器。输入tmux命令时就开启了一个服务器。
@@ -789,7 +908,7 @@ ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 	tmux new-window -t $SESSION_NAME:1 -n $WINDOW_NAME
 ```
 
-### screen 
+### screen
 screen vi test.c
 screen -ls
 screen -r PID
@@ -883,8 +1002,8 @@ Create an executable in your path:
 	export ECLIPSE_HOME="/home/peter/opt/eclipse"
 	$ECLIPSE_HOME/eclipse $*
 ```
-Let's also make eclipse executable everywhere by creating a symlink: 
-`sudo ln -s /usr/bin/eclipse /bin/eclipse` 
+Let's also make eclipse executable everywhere by creating a symlink:
+`sudo ln -s /usr/bin/eclipse /bin/eclipse`
 Create the menu icon: `sudo gedit /usr/share/applications/eclipse.desktop` Type in this content and save:
 ```
 [Desktop Entry]
@@ -914,7 +1033,7 @@ catalina.sh jpda start
 java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n -jar remoting-debug.jar
 Listeningfor transport dt_socket at address: 8000
 
-### Chinese input installation 
+### Chinese input installation
 1.click dash home, search for "language support"
 2.click "install/remove language" and add Chinese
 3.click dash home, search for "keyboard input method"
@@ -943,7 +1062,7 @@ gMTP connect to android from Ubuntu
 ## System
 `zdump -v /etc/localtime` examine the contents of the timezone files
 
-### Performance 
+### Performance
 
 `uptime`
 ```
@@ -951,7 +1070,7 @@ uptime
 23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02
 ```
 命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况。通过这三个数据，可以了解服务器负载是在趋于紧张还是区域缓解。如果1分钟平均负载很高，而15分钟平均负载很低，说明服务器正在命令高负载情况，需要进一步排查CPU资源都消耗在了哪里。反之，如果15分钟平均负载很高，1分钟平均负载较低，则有可能是CPU资源紧张时刻已经过去。  
-上面例子中的输出，可以看见最近1分钟的平均负载非常高，且远高于最近15分钟负载，因此我们需要继续排查当前系统中有什么进程消耗了大量的资源。可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查。 
+上面例子中的输出，可以看见最近1分钟的平均负载非常高，且远高于最近15分钟负载，因此我们需要继续排查当前系统中有什么进程消耗了大量的资源。可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查。
 
 `dmesg | tail`	输出系统日志的最后10行
 `vmstat 1`, `iostat-xz 1`
@@ -968,7 +1087,7 @@ top - Process Activity Command
 #### Memory `free -h`
 pmap - Process Memory Usage
 
-#### Disk 
+#### Disk
 `df -hT`	查看大小、分区、文件系统类型
 硬盘是否SCSI：/dev/sd<X>就是scsi的，hd<X>就是普通的。
 `cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD，1是传统硬盘  
@@ -976,7 +1095,7 @@ pmap - Process Memory Usage
 ##### 硬盘写速度
 普通硬盘的写速度大概100M/s，RAID级别的查看不方便，SSD的速度也不定，所以用dd测一下最靠谱:
 `dd if=/dev/zero of=dd.file bs=8k count=128k conv=fdatasync`
-`dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync` 
+`dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync`
 上面命令测试了分别以每次8k和1g的大小，写入1g文件的速度。
 `if`：输入文件名， /dev/zero 设备无穷尽地提供0
 `of`：输出文件名
@@ -987,7 +1106,7 @@ pmap - Process Memory Usage
 ##### 硬盘读速度
 硬盘读速度的测试同理，不过要先清理缓存，否则直接从Page Cache读了。
 `sh -c "sync && echo 3 > /proc/sys/vm/drop_caches”`
-`dd if=./dd.file of=/dev/null bs=8k` 
+`dd if=./dd.file of=/dev/null bs=8k`
 
 #### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding。bonding是个很棒的东西，可以把多块网卡绑起来，突破单块网卡的带宽限制
@@ -1105,7 +1224,7 @@ stick bit （粘贴位） 实例，查看/tmp目录的权限
 sudo ls -dl /tmp
 drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 ```
- tmp目录是所有用户共有的临时文件夹，所有用户都拥有读写权限，这就必然出现一个问题，A用户在/tmp里创建了文件a.file，此时B用户看了不爽，在/tmp里把它给删了（因为拥有读写权限），那肯定是不行的。实际上在/tmp目录中，只有文件的拥有者和root才能对其进行修改和删除，其他用户则不行，因为有特殊权限stick bit（粘贴位）权限，正如drwxrwxrwt中的最后一个t 
+ tmp目录是所有用户共有的临时文件夹，所有用户都拥有读写权限，这就必然出现一个问题，A用户在/tmp里创建了文件a.file，此时B用户看了不爽，在/tmp里把它给删了（因为拥有读写权限），那肯定是不行的。实际上在/tmp目录中，只有文件的拥有者和root才能对其进行修改和删除，其他用户则不行，因为有特殊权限stick bit（粘贴位）权限，正如drwxrwxrwt中的最后一个t
 
 ##### 特殊位作用
 - SUID:对一个可执行文件，不是以发起者身份来获取资源，而是以可执行文件的属主身份来执行。
@@ -1128,23 +1247,20 @@ stick bit:chmod 1755 xxx
 
 ### Kernel
 Find Out If Running Kernel Is 32 Or 64 Bit (find out if my Linux server CPU can run a 64 bit kernel version (apps) or not)
-	uname -a	print system information: 
+	uname -a	print system information:
 Find Out CPU is 32bit or 64bit?
-	grep flags /proc/cpuinfo 
+	grep flags /proc/cpuinfo
 	CPU Modes:
 		lm flag means Long mode cpu - 64 bit CPU
 		Real mode 16 bit CPU
 		Protected Mode is 32-bit CPU
 
 ### Network
-设定 DNS 的 IP：/etc/resolv.conf
-nameserver 192.168.1.1
-
 netstat
--t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接; 
--a标记，还会显示出等待连接（也就是说处于监听模式）的套接字; 
+-t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接;
+-a标记，还会显示出等待连接（也就是说处于监听模式）的套接字;
 -l 显示正在被监听(listen)的端口
--n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名; 
+-n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
 -p选项表示列出监听的程序
 --numeric , -n
        Show numerical addresses instead of trying to determine symbolic  host,
@@ -1182,7 +1298,7 @@ BOOTPROTO   =   dhcp
 http://ask.xmodulo.com/change-system-proxy-settings-command-line-ubuntu-desktop.html
 **Question**: change system proxy settings on Ubuntu desktop: "System Settings" -> "Network" -> "Network proxy". Is there a more convenient way to change desktop's proxy settings from the command line?  
 To modify a DConf setting: `$ gsettings set <schema> <key> <value>`
-To read a DConf setting: `$ gsettings get <schema> <key>` 
+To read a DConf setting: `$ gsettings get <schema> <key>`
 
 **Change System Proxy Setting to Manual from the Command Line**
 The following commands will change HTTP proxy setting to "my.proxy.com:8000" on Ubuntu desktop.
@@ -1217,12 +1333,12 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 #### SSH
 `ssh user@host`	以 user 用户身份连接到 host
 `ssh -p port user@host`	在端口 port 以 user 用户身份连接到 host
-`-f` ssh将在后台运行 
-`-N` 不执行命令，仅转发端口 
-`-C` 压缩传送的数据 
-`-i` 使用指定的密钥登录 
+`-f` ssh将在后台运行
+`-N` 不执行命令，仅转发端口
+`-C` 压缩传送的数据
+`-i` 使用指定的密钥登录
 	It is required that your private key files are NOT accessible by others
-	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa 
+	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
 
 escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;
 `~^Z`	suspends the connection
@@ -1248,6 +1364,13 @@ mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSE
 
 ##### Bad owner or permissions on .ssh/config
 chmod 600 .ssh/config
+
+##### 不让SSH失联
+源头发力的办法就是，让ssh一直尝试与服务器通信，不让其空闲下来，间隔时间与服务器发keepalive的心跳包，通过简单的ssh设置就能做到这一点
+vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
+ServerAliveInterval <X>
+ServerAliveCountMax <Y>
+上面的X表示，两次心跳指令的发送间隔秒数，Y则代表发送指令的最大数量，你可以根据你要离开的时间，灵活的做出调整。或者你也可以不对最大发送指令数量，做限制，只给出一个间隔时间，保持心跳包接受顺畅就好
 
 ##### SSH端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术
@@ -1284,12 +1407,12 @@ A configuration like this will allow you to proxy through HOST A.
 ```
 $ cat .ssh/config
 Host host-a
-  User your_username
   Hostname 10.0.0.5
+  User your_username
 
 Host host_b
-  User your_username
   Hostname 192.168.0.1
+  User your_username
   Port 22
   ProxyCommand ssh -q -W %h:%p host-a
 ```
@@ -1315,6 +1438,7 @@ quit
 
 alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@IP1 -t 'ssh IP2;bash -l'"
 ssh root@MachineB 'bash -s' < local_script.sh	#run local shell script on a remote machine
+trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 
 #### SCP
 scp client_file user@server:filepath	上传文件到服务器端
@@ -1338,7 +1462,7 @@ abort installation or recover from failed installing by apt-get
 sudo dpkg -r <package name>
 
 uninstall qq
-1. find the name: dpkg -l | grep package 
+1. find the name: dpkg -l | grep package
 2. sudo dpkg -r qq-for-wine 或 sudo dpkg -P qq-for-wine
 sudo apt-get remove acroread;sudo apt-get autoremove  #uninstall
 
@@ -1355,7 +1479,7 @@ apt-cache pkgnames packageName	#To find and list down all the packages starting 
 apt-cache search packageName	#To find out the package name and with it description before installing
 apt-cache show packageName	#check information of package along with it short description say (version number, check sums, size, installed size, category etc)
 
-apt-get install 
+apt-get install
 apt-get install packageName --only-upgrade	#do not install new packages but it only upgrade the already installed packages and disables new installation of packages
 apt-get install vsftpd=2.3.5-3ubuntu1	#Install Specific Package Version
 
@@ -1394,9 +1518,11 @@ vi /etc/hosts
 202.141.162.123 ajax.googleapis.com
 
 ### 设置主DNS
-/etc/resolvconf/resolv.conf.d/head 
+/etc/resolvconf/resolv.conf.d/head
 sudo resolvconf -u
 cat /etc/resolv.conf
+
+nameserver 192.168.1.1
 
 ### mount disk
 用mount挂载你的windows分区，事先以root权限用fdisk -l查看。你就知道该挂载哪个了
@@ -1453,12 +1579,12 @@ Here, only the most important directories in the system will be presented.
 /tmp is a place for temporary files used by applications.
 /usr contains the majority of user utilities and applications, and partly replicates the root directory structure, containing for instance, among others, /usr/bin/ and /usr/lib.
 /var is dedicated variable data that potentially changes rapidly; a notable directory it contains is /var/log where system log files are kept.
-通常情况下，linux会这样放软件的组件： 
+通常情况下，linux会这样放软件的组件：
 程序的文档->/usr/share/doc; /usr/local/share/doc
 程序->/usr/share; /usr/local/share
 程序的启动项->/usr/share/apps; /usr/local/share
 程序的语言包->/usr/share/locale; /usr/local/share/locale
 可执行文件->/usr/bin; /usr/local/bin
-而有的软件为了和系统组件分隔开，选择栖息于 /opt，但目录结构往往是一样的，把/usr或/usr/local 替换为了/opt/"软件名" 
+而有的软件为了和系统组件分隔开，选择栖息于 /opt，但目录结构往往是一样的，把/usr或/usr/local 替换为了/opt/"软件名"
 ~/share all softwares
 ~/opt soft links to specify version of ~/share softwares

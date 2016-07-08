@@ -2,8 +2,33 @@
 [TOC]
 
 ## Command
-./redis-server redis_6379.conf
-src/redis-cli -h 127.0.0.1 -p 6379 -a mysupersecretpassword
+`./redis-server redis_6379.conf`
+`src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>`
+`-r` 4: repeat 4 times
+`-i` 2: 2 seconds sleep between each PING command
+
+
+用于分析 Redis 性能的一些命令
+`redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
+用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
+
+`SCAN cursor [MATCH pattern] [COUNT count]`
+`redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
+
+`client list`
+`--bigkeys`
+`--latency`, 用来测试 Redis 服务端的响应延迟
+`--latency-history`
+`redis-cli -h <host> -p <port> -a <pwd> -n <db> info memory`
+`redis-cli --scan | head -10`
+`redis-cli --scan --pattern '*-11*' | xargs -L 100 redis-cli DEL`
+
+`info memory`
+`info keyspace`
+`info commandstats` 输出中包含处理过的每一种命令的调用次数、消耗的总 CPU 时间(单位 ms)以及平均 CPU 耗时，这对了解自己的程序所使用的 Redis 操作情况非常有用。
+
+数据分布[Redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)
+sudo pip install redis
 
 ### 常规操作命令
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)

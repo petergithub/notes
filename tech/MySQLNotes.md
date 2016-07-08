@@ -7,6 +7,9 @@ mysqlreport --user root --password
 /etc/mysql/my.cnf ~/.my.cnf
 
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`
+SELECT UNIX_TIMESTAMP(NOW());
+SELECT FROM_UNIXTIME(1467542031);
+select SUBSTRING(1456958130210,1,10);
 
 show full processlist;
 explain sql query;
@@ -14,7 +17,8 @@ explain sql query;
 MySQL 5.5 UTF8mb4支持emoj 
 HA: percona xtradb cluster, galera cluster 
 
-
+To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`
+To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`
 mysql query escape %前面加两个反斜杠，比如
 `select count(*) from tableName where column like '%关键字\\%前面的是一个百分号%'`
 
@@ -281,6 +285,8 @@ mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
 --single-transaction	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. . It is useful only with transactional tables such as InnoDB
 
 --lock-tables=false , -l	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, --single-transaction is a much better option, because it does not need to lock the tables at all.
+
+--where/-w `mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
 ```
 
 #### Import/Restore
