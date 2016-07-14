@@ -1,6 +1,15 @@
 [TOC]
 
-# Nginx offical
+# Nginx
+
+## Recent
+https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
+`$upstream_response_time` 格式会变成2部分 xxxx, xxxx ，可能是什么原因？被拆分的字段代表什么含义？
+这是 `ngx_http_upstream` 的 fail-over 机制在起作用。当 nginx
+尝试了第一个后端节点出现错误时（比如超时），它会自动尝试同一个 upstream {}
+分组中的下一个节点。每个节点的访问时间会以逗号分隔。所以尝试了两个节点便是“xxxx, xxxx”。
+
+## Nginx offical
 [nginx documentation](http://nginx.org/en/docs/)
 
 NGINX (发音为 “engine X”)
