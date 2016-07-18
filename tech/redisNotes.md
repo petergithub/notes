@@ -7,6 +7,8 @@
 `-r` 4: repeat 4 times
 `-i` 2: 2 seconds sleep between each PING command
 
+redis log file: `less  /etc/redis/redis.conf | grep logfile`
+get all config `config get *`
 
 用于分析 Redis 性能的一些命令
 `redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
@@ -29,6 +31,21 @@
 
 数据分布[Redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)
 sudo pip install redis
+
+### Setup redis server
+
+1. vi redis.conf
+daemonize yes
+dbfilename dump_6379.rdb
+logfile "/data/log/redis_6379.log"
+dir "/data/software/redis-account"
+
+2. 
+`redis-server redis.master6379.conf --daemonize yes`  redis-server in background as a daemon thread 
+`redis-server sentinel.26379.conf --sentinel --daemonize yes` or `redis-sentinel sentinel.26379.conf --daemonize yes`
+
+shutdown: `redis-cli shutdown` or `redis-server stop`
+restart: `redis-server restart`
 
 ### 常规操作命令
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)

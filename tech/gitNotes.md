@@ -7,6 +7,7 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 ### Most recent
 Final release version
 `git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交
+`git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit
 `git tag <tagName> -m "comment"`
 `git push origin --tags`	一次性推送很多标签
 `git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
@@ -21,8 +22,8 @@ Final release version
 `git blame [file]`	显示指定文件是什么人在什么时间修改过
 `git commit -v`
 
-`git merge --no-ff <branchName>`	将分支合并到当前分支 `--no-ff`标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
-`git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit
+`git ls-files` List all tracked files
+`git checkout anotherBranch -- path/to/file` Copy file from another branch
 
 Replace master branch entirely from another latestBranch:
 

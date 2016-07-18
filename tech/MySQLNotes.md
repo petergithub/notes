@@ -290,12 +290,10 @@ mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
 ```
 
 #### Import/Restore
-mysql> USE 数据库名;
-mysql> SOURCE d:/mysql.sql;
-or
-mysql -uroot -p dbName < dbName.sql
-// or
-mysql -uroot -p dbName -e "source /path/to/dbName.sql"
+`mysql> USE 数据库名;`
+`mysql> SOURCE d:/mysql.sql;` or
+`mysql -uroot -p dbName < dbName.sql` or 
+`mysql -uroot -p dbName -e "source /path/to/dbName.sql"`
 
 #### MySQL Export Table to CSV 
 [Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)
@@ -326,9 +324,10 @@ D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
 
 ### Backup script 
 ``` bash
-date_str=`date +%Y%m%d%H%M%S`
-cd /data2/backup
-mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
+
+	date_str=`date +%Y%m%d%H%M%S`
+	cd /data2/backup
+	mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
 ```
 
 ### MySQL忘记root密码

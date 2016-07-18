@@ -55,24 +55,36 @@ HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
 HTTP认证	`curl --user name:password example.com`
 
-	`curl -w "TCP handshake: %{time_connect}, SSL handshake: %{time_appconnect}\n" -so /dev/null https://www.baidu.com`
-
 提交表单并设置header
 `curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
+
+`-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`
+
+	`curl -w "TCP handshake: %{time_connect}\ SSL handshake: %{time_appconnect}\n" -so /dev/null https://www.baidu.com`
+	
+	curl -w "
+	Domain lookup: %{time_namelookup} 
+	TCP handshake: %{time_connect} 
+	SSL handshake: %{time_appconnect} 
+	time_pretransfer:  %{time_pretransfer} 
+	Redirection  :  %{time_redirect} 
+	time_starttransfer:  %{time_starttransfer} 
+	---------- 
+	time_total:  %{time_total}\n" -so /dev/null https://www.baidu.com
 
 Timing Details With cURL
 https://josephscott.org/archives/2011/10/timing-details-with-curl/
 Step one: create a new file, curl-format.txt, and paste in:
 
 	\n
-            time_namelookup:  %{time_namelookup}\n
-               time_connect:  %{time_connect}\n
-            time_appconnect:  %{time_appconnect}\n
-           time_pretransfer:  %{time_pretransfer}\n
-              time_redirect:  %{time_redirect}\n
-         time_starttransfer:  %{time_starttransfer}\n
-                            ----------\n
-                 time_total:  %{time_total}\n
+        time_namelookup:  %{time_namelookup}\n
+           time_connect:  %{time_connect}\n
+        time_appconnect:  %{time_appconnect}\n
+       time_pretransfer:  %{time_pretransfer}\n
+          time_redirect:  %{time_redirect}\n
+     time_starttransfer:  %{time_starttransfer}\n
+                        ----------\n
+             time_total:  %{time_total}\n
 	\n
 Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
 `-w "@curl-format.txt"` tells cURL to use our format file
@@ -81,7 +93,7 @@ Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://exa
 
 And here is what you get back:
 
-	time_namelookup:  0.001
+	   time_namelookup:  0.001
 	      time_connect:  0.037
 	   time_appconnect:  0.000
 	  time_pretransfer:  0.037
@@ -233,21 +245,6 @@ zc (folding close)重新折叠
 :n next file :p previous file
 :bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
 
-#### Replace
-/可以用#代替
-:g/old			查找old，并打印出现它的每一行
-:s/old/new		替换当前行第一个old
-:s/old/new/gc	当前行old全替换并需要确认
-:n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line
-:%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束
-:%s/^ *//gc		去掉所有的行首空格
-:s：等同于 :s//~/，即会重复上一次替换
-:& repeat last :s command
-:g/^\s*$/d	delete the blank lines
-:%s/\s\s/\t/gc	convert two space(\s\s) to tab(\t)
-:%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
-pattern [^0-9]*,	matches string start with non-number until to (,)
-
 #### custom keyboard shortcut
 `inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim
 `nnoremap j VipJ`
@@ -299,16 +296,46 @@ $ 	匹配行尾
 \< 	匹配单词词首
 \> 	匹配单词词尾
 
+`\s` space
+`\n`,`\r\n` new line
+`\t` tab
+pattern `[^0-9]*,`	matches string start with non-number until to (,)
+
+#### Replace
+`/`可以用`#`代替
+`:s`, `:&` repeat last :s command
+:g/old			查找old，并打印出现它的每一行
+:s/old/new		替换当前行第一个old
+:s/old/new/gc	当前行old全替换并需要确认
+:n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line
+:%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束
+:%s/^ *//gc		去掉所有的行首空格
+:g/^\s*$/d	delete the blank lines
+:%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
 
 ### find grep sed
 ```
 grep pattern files - 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
+`-l`	只列出匹配的文件名
+`-L`	列出不匹配的文件名
+`-w`	匹配整个单词
+`-A`, `-B`, `-C`	print context lines
+`-i`, --ignore-case不区分大小写地搜索。默认情况区分大小写， 
+`-n`, --line-number
+`-c`, --count
+`-r`, --recursive
+`-v`, --invert-match
+`-E`, --extended-regexp
+`-e`, PATTERN, --regexp=PATTERN
+Use PATTERN as the pattern; useful to protect patterns beginning with -.
 
+grep pattern1 | pattern2 files	显示匹配 pattern1 或 pattern2 的行
+grep pattern1 files | grep pattern2	显示既匹配 pattern1 又匹配 pattern2 的行
 grep for multiple patterns
 	`grep 'word1\|word2\|word3' /path/to/file`
 	`grep -E 'word1|word2' *.doc`
-    Use single quotes in the pattern: `grep 'pattern*' file1 file2`
+    Use single quotes in the pattern: `grep 'pattern*' file1 file2`, `grep 'AB.*DEF'`
     Use extended regular expressions: `egrep 'pattern1|pattern2' *.py`
     Use this syntax on older Unix shells: `grep -e pattern1 -e pattern2 *.pl`
 On Linux, you can also type `egrep` instead of `grep -E`
@@ -428,12 +455,39 @@ iconv -f GBK -t UTF-8 file1 -o file2
 ### awk
 awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.
 语法格式 `awk 'pattern {action}' filename`
-    特例:
     `awk 'pattern' filename`   显示所有符合模式pattern的行
     `awk '{action}' filename`   对所有行执行操作action
     `awk '{action}'`           从命令行输入数据
-awk还支持命令文件 `awk  -f   awk_file   data_file`
+awk还支持命令文件 `awk -f awk_file data_file`
 
+#### 变量
+内建的字段变量
+$0 一字符串, 其内容为目前 awk 所读入的数据行.
+$1 $0上第一个字段的数据
+$2 $0上第二个字段的数据
+`awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`	print the whole line matched the pattern
+
+内建变量(Built-in Variables) 
+`NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目
+`NR` (Number of Records)	整数, 其值表awk已读入的数据行数目
+`FILENAME`				awk正在处理的数据文件文件名
+`FS` (field seporator)	FS default as space and tab. FS="\n" take "\n" as seporator, `-F\t` take tab as seporator
+`RS` (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
+`awk -v RS=""`
+
+
+#### 例子
+`w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0
+`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root
+`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format
+`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number
+`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses
+`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
+`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS
+`echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
+
+
+#### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
 Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十分类似.
 例如: awk的 I/O指令 : print, printf( ), 
@@ -443,22 +497,6 @@ Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十�
 awk 如何处理 Pattern { Actions } ?
 awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions. 
 
-#### 
-`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses
-
-#### 变量
-内建的字段变量
-$0 一字符串, 其内容为目前 awk 所读入的数据行.
-$1 $0上第一个字段的数据
-$2 $0上第二个字段的数据
-
-内建变量(Built-in Variables) 
-NF (Number of Fields) 	整数, 其值表$0上所存在的字段数目
-NR (Number of Records)	整数, 其值表awk已读入的数据行数目
-FILENAME				awk正在处理的数据文件文件名
-RS (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
-
-awk的工作流程
 执行awk时, 它会反复进行下列四步骤.
 
     自动从指定的数据文件中读取一个数据行.
@@ -485,6 +523,8 @@ awk 中提供下列 关系运算符(Relation Operator)
 	A为字符串, B为正则表达式.
 	A ~B 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
 	A !~B 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串. 
+
+	|| or, && and, ! not
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`
 `$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
@@ -798,6 +838,12 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 `tar -tf filename.tar.gz`	List files inside the tar.gz file
 `vim filename.tar.gz` List files and open file inside it with `Enter`
 
+
+Extract multiple .tar.gz files with a single tar call
+`ls *.tar | xargs -i tar xf {}` or `cat *.tar | tar -xvf - -i`
+The `-i` option ignores the EOF at the end of the tar archives, from the man page:
+`-i, --ignore-zeros` ignore blocks of zeros in archive (normally mean EOF)
+
 jar tvf <filename>.jar to find the content of the file without extracting.
 extract the class files in the jar
 jar xvf <jar name>.jar [class name]
@@ -1060,39 +1106,183 @@ gMTP connect to android from Ubuntu
 2. When a single program stops working: ALT+F2, type xkill
 
 ## System
-`zdump -v /etc/localtime` examine the contents of the timezone files
+`zdump -v /etc/localtime` examine the contents of the time zone files
 
 ### Performance
-
-`uptime`
-```
-uptime
-23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02
-```
-命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况。通过这三个数据，可以了解服务器负载是在趋于紧张还是区域缓解。如果1分钟平均负载很高，而15分钟平均负载很低，说明服务器正在命令高负载情况，需要进一步排查CPU资源都消耗在了哪里。反之，如果15分钟平均负载很高，1分钟平均负载较低，则有可能是CPU资源紧张时刻已经过去。  
-上面例子中的输出，可以看见最近1分钟的平均负载非常高，且远高于最近15分钟负载，因此我们需要继续排查当前系统中有什么进程消耗了大量的资源。可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查。
-
 `dmesg | tail`	输出系统日志的最后10行
 `vmstat 1`, `iostat-xz 1`
 
-#### CPU `cat /proc/cpuinfo`
-`uptime`, `top`, `pidstat -l 2 10`
-ps aux | sort -nk +4 | tail	列出头十个最耗内存的进程
-w - Find Out Who Is Logged on And What They Are Doing
-uptime - Tell How Long The System Has Been Running
-top - Process Activity Command
+sysstat工具与负载历史回放
+sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和内存使用记录，便于历史数据的回放
+1. sar命令查看CPU、内存和磁盘记录
+　　默认情况下，sar命令显示当天的统计信息  
+`sar` CPU统计信息  
+`sar -r`显示收集的内存记录  
+`sar -b`显示磁盘I/O
 
-`top`命令包含了前面好几个命令的检查的内容。比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，`top`命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。
+2. 使用sar查看指定时间、指定日期的历史记录
+参数-s和-e限定查看的时间
+`sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
+`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录，每天的记录以saN为文件名保存在相应的日志目录中
+`sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
-#### Memory `free -h`
-pmap - Process Memory Usage
+### CPU 
+`cat /proc/cpuinfo`
+`pidstat -l 2 10`
+`ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程
+`w` - Find Out Who Is Logged on And What They Are Doing
 
-#### Disk
+`top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，`top`命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。
+
+1. `uptime`
+`23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02`
+命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况。通过这三个数据，可以了解服务器负载是在趋于紧张还是区域缓解。如果1分钟平均负载很高，而15分钟平均负载很低，说明服务器正在命令高负载情况，需要进一步排查CPU资源都消耗在了哪里。反之，如果15分钟平均负载很高，1分钟平均负载较低，则有可能是CPU资源紧张时刻已经过去。  
+上面例子中的输出，可以看见最近1分钟的平均负载非常高，且远高于最近15分钟负载，因此我们需要继续排查当前系统中有什么进程消耗了大量的资源。可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查。  
+判断一个系统负载是否偏高需要计算单核CPU的平均负载，等于这里uptime命令显示的系统平均负载 / CPU核数，一般以0.7为比较合适的值。偏高说明有比较多的进程在等待使用CPU资源  
+
+2. `top`
+第3行：当前的CPU运行情况：  
+　　　　us：非nice用户进程占用CPU的比率  
+　　　　sy：内核、内核进程占用CPU的比率；  
+　　　　ni：如果一些用户进程修改过优先级，这里显示这些进程占用CPU时间的比率；  
+　　　　id：CPU空闲比率，如果系统缓慢而这个值很高，说明系统慢的原因不是CPU负载高；  
+　　　　wa：CPU等待执行I/O操作的时间比率，该指标可以用来排查磁盘I/O的问题，通常结合wa和id判断  
+　　　　hi：CPU处理硬件终端所占时间的比率；  
+　　　　si：CPU处理软件终端所占时间的比率；  
+　　　　st：流逝的时间，虚拟机中的其他任务所占CPU时间的比率；  
+
+　用户进程占比高，wa低，说明系统缓慢的原因在于进程占用大量CPU，通常还会伴有教低的id，说明CPU空转时间很少；  
+　　wa低，id高，可以排除CPU资源瓶颈的可能  
+　　wa高，说明I/O占用了大量的CPU时间，需要检查交换空间的使用，交换空间位于磁盘上，性能远低于内存，当内存耗尽开始使用交换空间时，将会给性能带来严重影响，所以对于性能要求较高的服务器，一般建议关闭交换空间。另一方面，如果内存充足，但wa很高，说明需要检查哪个进程占用了大量的I/O资源。
+
+### Memory troubleshooting
+[Linux系统排查1——内存篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4685629.html)
+Steps:
+　　1. 内存的使用率如何查看，使用率真的很高吗
+　　2. 内存用在哪里了
+　　3. 内存优化可以有哪些手段
+1. 内存硬件查看 `dmidecode -t memory`: 通过dmidecode工具可以查看很多硬件相关的数据
+2. 内存的大体使用情况 `free -h`
+
+	~$ free -h
+           		total      used       free     shared    buffers     cached
+	Mem:          7.5G       7.4G       175M       327M        25M       527M
+	-/+ buffers/cache:       6.8G       729M
+	Swap:         1.9G       1.9G         0B
+free 命令下面有一行“-/+ buffers/cache”，该行显示的used是上一行“used”的值减去buffers和cached的值(7.4G - 327M - 25M)，同时该行的free是上一行的free加上buffers和cached的值(175M + 327M + 25M)
+
+3. 哪些进程消耗内存比较多 `top`
+top命令中，按下 f 键，进入选择排序列的界面, 按%MEM排序. RES是常驻内存，是进程切实使用的物理内存量，free命令中看到的used列下面的值，就包括常驻内存的加总，但不是虚拟内存的加总
+
+4. 交换空间
+`# swapon`
+`# swapoff`
+`# mkswap`
+
+　　使用free命令可以查看内存的总体使用，显示的内容也包括交换分区的大小，可以使用swapon，swapoff，命令开启或关闭交换空间，交换空间是磁盘上的文件，并不是真正的内存空间.  
+系统的可用内存一般等于物理内存 + 交换分区。交换分区在磁盘上， 因此速度比内存读写要慢得多。交换分区实际上就是磁盘上的文件，可以通过mkswap命令来创建交换空间
+
+5. 内核态内存占用 `# slabtop`  
+　　slab系统用来处理系统中比较小的元数据，如文件描述符等，进而组织内核态的内存分配。  
+　　一个slab包含多个object，例如dentry这些数据结构就是object，可以通过slabtop命令查看系统中活动的object的数量与内存占用情况，从而了解哪些数据结构最占用内核态的内存空间。  
+通常关注1. 哪些数据结构的内存占用最大，2. 哪些类型的数据结构对应的object最多，比如inode多代表文件系统被大量引用等
+
+6. 查看内存使用的动态变化
+`# vmstat N` 每隔N秒更新一次数据		
+
+7. dstat
+8. 查看共享内存空间 `pmap`
+`pmap pid` - Process Memory Usage 查看pid进程使用的共享内存，包括使用的库，所在堆栈空间等。
+
+9. 查看系统内存历史记录`# sar`
+　　用`sar`查看一个月以内的内存使用情况。
+
+#### 如何清理内存使用
+1. 释放占用的缓存空间
+`# sync     //先将内存刷出，避免数据丢失`
+`# echo 1 > /proc/sys/vm/drop_caches //释放pagecache`
+`# echo 2 > /proc/sys/vm/drop_caches //释放dentry和inode`
+`# echo 3 > /proc/sys/vm/drop_caches //释放pagecache、dentry和inode`
+
+2. 终止进程
+与Linux内存相关的文件系统文件
+内存信息 `/proc/meminfo`  
+进程状态信息 `/proc/$pid/status`  
+进程物理内存信息 `/proc/$pid/statm`  
+slab的分布状况 `/proc/slabinfo`  
+虚拟内存信息 `/proc/vmstat`
+
+3. 降低swap的使用率 查看当前swap的使用 `# sysctl -a | grep swappiness`
+
+4. 限制其他用户的内存使用
+`# vim /etc/security/limits.conf`
+ 
+`user1 hard as 1000` （用户user1所有累加起来，内存不超过1000kiB）
+`user1 soft as 800` （用户user1一次运行，内存不超过800kiB）　　
+
+5. 大量连续内存数据：
+`# vim /etc/sysctl.conf`
+ 
+`vm.nr_hugepage=20`
+
+6. 调节page cache（大量一样的请求 调大page cache）  
+`vm.lowmem_reserve_ratio = 256 256 32` （保留多少内存作为pagecache 当前 最大 最小）
+`vm.vfs_cache_pressure=100` （大于100，回收pagecache）
+`vm.page.cluster=3`（一次性从swap写入内存的量为2的3次方页）
+`vm.zone_reclaim_mode=0/1`（当内存危机时，是否尽量回收内存 0:尽量回收 1:尽量不回收）
+`min_free_kbytes`：该文件表示强制Linux VM最低保留多少空闲内存（Kbytes）。
+
+7. 脏页
+ 　　脏页是指已经更改但尚未刷到硬盘的内存页，由pdflush往硬盘上面刷。  
+`vm.dirty_background_radio=10` （当脏页占内存10%，pdflush工作）
+`vm.dirty_radio=40` （当进程自身脏页占内存40%，进程自己处理脏页，将其写入磁盘）
+`vm.dirty_expire_centisecs=3000` （脏页老化时间为30秒 3000/100=30秒）
+`vm.dirty_writeback_centisecs=500` （每隔5秒，pdflush监控一次内存数量 500/100=5秒）
+
+### Disk & I/O
 `df -hT`	查看大小、分区、文件系统类型
 硬盘是否SCSI：/dev/sd<X>就是scsi的，hd<X>就是普通的。
 `cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD，1是传统硬盘  
+　
+#### 当磁盘无法写入的时候，一般有以下可能：
+[Linux系统排查3——I/O篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4700386.html)
+* 文件系统只读
+* 磁盘已满
+* I节点使用完
 
-##### 硬盘写速度
+##### 遇到只读的文件系统
+`# mount -o remount, rw /home`  重新挂载改变/home分区的读写属性, remount是指重新挂载指定文件系统，rw指定重新挂载时的读写属性，该命令不改变挂载点，只是改变指定分区的读写属性。
+
+##### 磁盘满
+`df -h` 查看当前已挂载的所有分区及使用情况
+`tune2fs -l /dev/sda2 | grep -i "block"`查看系统保留块
+`du` 查看目录的大小
+`du -ckx /path/to/file | sort -n > /tmp/dir_space`, `tail /tmp/dir_space`得到根文件系统下最大的10个目录
+
+##### I节点不足
+`df -i` 查看I节点的使用情况
+一旦遇到I节点用光的情形，有以下几种选择：  
+　　1. 删除大量文件  
+　　2. 将大量文件移动到其他的文件系统中；  
+　　3. 将大量的文件压缩成一个文件；  
+　　4. 备份当前文件系统中的所有文件，重新格式化之前的硬盘，获得更多的I节点，再将文件复制回去。
+
+#### I/O
+1. `iostat` 查看系统分区的IO使用情况
+在第2行系统发行版本下面的第4、5行，可以看到与top命令中CPU使用情况类似的信息，  
+　　第7行，可以看到一些IO指标：  
+　　　　tps: 每秒I/O传输请求量；  
+　　　　kB_read/s：每秒读取多少KB；  
+　　　　kB_wrtn/s：每秒写多少KB；  
+　　　　kB_read：一共读了多少KB；  
+　　　　kB_wrtn：一共写了多少KB。  
+　　iostat命令属于sysstat工具包，由于我们的机器只挂载了一块硬盘，因此不能体现不同设备的I/O区别。
+
+2. `iotop`
+　　iotop命令类似于top命令，但是显示的是各个进程的I/O情况，对于定位I/O操作较重的进程有比较大的作用。
+
+
+#### 硬盘写速度
 普通硬盘的写速度大概100M/s，RAID级别的查看不方便，SSD的速度也不定，所以用dd测一下最靠谱:
 `dd if=/dev/zero of=dd.file bs=8k count=128k conv=fdatasync`
 `dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync`
@@ -1103,11 +1293,29 @@ pmap - Process Memory Usage
 `count`：次数
 `conv=fdatasync` ：实际写盘，而不是写入Page Cache
 
-##### 硬盘读速度
+#### 硬盘读速度
 硬盘读速度的测试同理，不过要先清理缓存，否则直接从Page Cache读了。
 `sh -c "sync && echo 3 > /proc/sys/vm/drop_caches”`
 `dd if=./dd.file of=/dev/null bs=8k`
 
+### Network troubleshooting
+`netstat`
+-t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接;
+-a标记，还会显示出等待连接（也就是说处于监听模式）的套接字;
+-l 显示正在被监听(listen)的端口
+-n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
+-p选项表示列出监听的程序
+--numeric , -n
+       Show numerical addresses instead of trying to determine symbolic  host,
+       port or user names.
+
+Listening open ports: netstat -anp | grep PORT
+netstat -antup 查看已建立的连接进程，所占用的端口
+$ netstat -anp | less: Finding the PID of the process using a specific port
+Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
+tcp        0      0 *:pssc                      *:*                         LISTEN      -       
+
+lsof -i
 #### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding。bonding是个很棒的东西，可以把多块网卡绑起来，突破单块网卡的带宽限制
 * 然后检查每块网卡的速度，比如`ethtool eth0`。
@@ -1120,15 +1328,66 @@ Linux查看网卡数据吞吐量方法
 
 `sar -n DEV 1`
 
-#### 操作系统 `uname -a`
+#### Network troubleshooting
+[Linux系统排查4——网络篇 - 王智愚 - 博客园](www.cnblogs.com/Security-Darren/p/4700387.html)
+[Quick HOWTO : Ch04 : Simple Network Troubleshooting](http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch04_:_Simple_Network_Troubleshooting#.V4rx8p7hJz0)
+
+
+网络排查一般是有一定的思路和顺序的，其实排查的思路就是根据具体的问题逐段排除故障可能发生的地方，最终确定问题。
+
+网络问题是什么，是不通，还是慢？  
+1. 如果是网络不通，要定位具体的问题，一般是不断尝试排除不可能故障的地方，最终定位问题根源。一般需要查看  
+	链路是否连通: `ethtool eth0`  
+		`Speed: 1000Mb/s`显示了当前网卡的速度，`Duplex: Full`显示了当前网络支持全双工, `Link detected: yes`显示当前网卡和网络的物理连接正常  
+	网卡是否正常启用: `ifconfig eth0`  
+		第3行显示了对该网卡的配置，包括IP，子网掩码等，这里可以检查是否出现错配，如果这一行显示不正确，那一定是网卡没有正确配置开启。  
+	本地网络是否连接:  用route 命令查看内核路由表 `route -n`得到网关, 之后就可以尝试ping 网关，排查与网关之间的连接  
+	DNS工作状况: `nslookup`, `dig` 如果这里nslookup命令无法解析目标域名，则很有可能是DNS配置不当  
+	能否路由到目标主机:  
+        1. based on ICMP: `ping IP`, `traceroute IP`  
+        	ping得通，说明路由工作正常, ping不通可能是因为网络不通或者某个网关限制了ICMP协议包  
+        2. `sudo tcptraceroute 113.106.202.46`  
+	远程端口是否开放  
+        1. 使用telnet检测远程主机的端口开放情况 `telnet IP PORT`,   
+        	telnet无法连接包含两种可能：1是端口确实没有开放，2是防火墙过滤了连接。  
+        2. `nmap HOST`, `nmap -p PORT IP` 可以了解端口无法连接的原因是端口关闭还是防火墙过滤了  
+      本地端口 `# netstat -lnp | grep PORT`  
+      查看防火墙规则: `iptables -L`  
+
+2. 如果是网络速度慢，一般有以下几个方式定位问题源：
+	DNS是否是问题的源头:
+        1. `traceroute`不仅可以查看路由的正确性，还可以查看网络中每一跳的延时，从而定位延时最高的网络区段
+        2. `iftop`命令类似于`top`命令，查看哪些网络连接占用的带宽较多
+        3. `tcpdump`是常用的抓包工具
+	查看路由过程中哪些节点是瓶颈
+	查看带宽的使用情况
+	
+##### iftop
+查看哪些网络连接占用的带宽较多, 按照带宽占用高低排序，可以确定那些占用带宽的网络连接  
+最上方的一行刻度是整个网络的带宽比例，下面第1列是源IP，第2列是目标IP，箭头表示了二者之间是否在传输数据，以及传输的方向。最后三列分别是2s、10s、40s时两个主机之间的数据传输速率。
+　　最下方的TX、RX分别代表发送、接收数据的统计，TOTAL则是数据传输总量。
+在进入iftop的非交互界面后，按 `p` 键可以打开或关闭显示端口，按 `s` 键可以显示或隐藏源主机，而按 `d` 键则可以显示或隐藏目标主机。
+
+`-n` 选项直接显示连接的IP  
+`-i` 选项可以指定要查看的网卡，默认情况下，iftop会显示自己找到的第一个网卡；
+
+##### `tcpdump`常用选项
+`# tcpdump -n port N`    //只捕捉特定端口的流量
+`# tcpdump -n port N1 or port N2`    //捕获多个端口的流量
+`3 # tcpdump -w output.pcap`    //数据包转储，将原始数据包保留到output.pcap
+`# tcpdump -C 10 -w output.pcap`    //限制每个转储文件的上限，达到上限后将文件分卷(以MB为单位)
+`# tcpdump -C 10 -W 5 -w output.pcap`    //不仅限制每个卷的上限，而且限制卷的总数
+`# tcpdump -r output.pcap`    //重播已经保存的数据包记录
+
+### 操作系统 `uname -a`
 find out system version: `cat /etc/*-release` or `ls /etc/*-release`
 Redhat/CentOS版本 : `cat /etc/redhat-release`
 lsb_release -a
 
-#### 状态采集工具
+### 状态采集工具
 讲究点，要用来出报告的，用`Zabbix`之类。
 
-##### `dstat`
+#### `dstat`
 实时观察的，我喜欢`dstat`，比`vmstat`，`iostat`, `sar`们都好用，起码对得够齐，单位能自动转换。不过`dstat`需要安装(`yum install dstat`，如果装不上，就要将就着用`vmstat`，`sar`了)
     dstat：默认，已有足够信息
     dstat -am：再多一个memory信息
@@ -1139,7 +1398,7 @@ lsb_release -a
     -m 以m为单位，而不以block原始size
     5 5秒的间隔
 
-##### `vmstat 1`
+#### `vmstat 1`
 vmstat - System Activity, Hardware and System Information
 ```
 $ vmstat 1
@@ -1161,7 +1420,7 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。
 示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。
 
-#####  `iostat-xz 1`
+####  `iostat-xz 1`
 iostat - Average CPU Load, Disk Activity
 `iostat`命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：
 `r/s, w/s, rkB/s, wkB/s`：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。
@@ -1170,7 +1429,7 @@ iostat - Average CPU Load, Disk Activity
 `%util`：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。
 如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。
 
-##### `sar -n DEV 1`, `sar -n TCP,ETCP 1`
+#### `sar -n DEV 1`, `sar -n TCP,ETCP 1`
 sar - Collect and Report System Activity
 ```
 $ sar -n DEV 1
@@ -1209,6 +1468,7 @@ TCP连接数可以用来判断性能问题是否由于建立了过多的连接�
 
 ### File
 
+To easily display all the permissions on a path, you can use `namei -om /path/to/check`
 #### 文件特殊权限 SUID、SGID、STICKY简介
 linux中除了常见的读（r）、写（w）、执行（x）权限以外，还有3个特殊的权限，分别是setuid、setgid和stick bit
 setuid、setgid实例，/usr/bin/passwd 与/etc/passwd文件的权限
@@ -1247,35 +1507,24 @@ stick bit:chmod 1755 xxx
 
 ### Kernel
 Find Out If Running Kernel Is 32 Or 64 Bit (find out if my Linux server CPU can run a 64 bit kernel version (apps) or not)
-	uname -a	print system information:
+	`uname -a`	print system information:
 Find Out CPU is 32bit or 64bit?
-	grep flags /proc/cpuinfo
+	`grep flags /proc/cpuinfo`
 	CPU Modes:
 		lm flag means Long mode cpu - 64 bit CPU
 		Real mode 16 bit CPU
 		Protected Mode is 32-bit CPU
 
 ### Network
-netstat
--t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接;
--a标记，还会显示出等待连接（也就是说处于监听模式）的套接字;
--l 显示正在被监听(listen)的端口
--n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
--p选项表示列出监听的程序
---numeric , -n
-       Show numerical addresses instead of trying to determine symbolic  host,
-       port or user names.
 
-Listening open ports: netstat -anp | grep PORT
-netstat -antup 查看已建立的连接进程，所占用的端口
-$ netstat -anp | less: Finding the PID of the process using a specific port
-Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
-tcp        0      0 *:pssc                      *:*                         LISTEN      -       
+`nmap -A -T4 IP` scan all open ports from the IP
 
-lsof -i
+`ip addr` = `ip a`
+`ip addr show eth0`
+`sudo dhclient -4`
 
 #### Restart network
-sudo service network-manager restart
+`sudo service network-manager restart`
 
 #### vi /etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE   =   eth0   

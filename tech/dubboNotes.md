@@ -13,6 +13,11 @@ Netty FixedLengthFrameDecoder
 Fragmentation should be transparent to a TCP application. Keep in mind that TCP is a stream protocol: you get a stream of data, not packets! If you are building your application based on the idea of complete data packets then you will have problems unless you add an abstraction layer to assemble whole packets from the stream and then pass the packets up to the application.
 A the "application layer" a TCP packet (well, segment really; TCP at its own layer doesn't know from packets) is never fragmented, since it doesn't exist. The application layer is where you see the data as a stream of bytes, delivered reliably and in order.
 
+在启动脚本里面添加配置如下,以防止多个应用启动lock同一个文件dubbo-registry-zookeeper1.cache
+`-Ddubbo.registry.file=/home/work/.dubbo/dubbo-registry-zookeeper1-<PROJECT>.cache`
+Warn:
+`Failed to save registry store file, cause: Can not lock the registry cache file /home/work/.dubbo/dubbo-registry-zookeeper1.cache, ignore and retry later, maybe multi java process use the file, please config: dubbo.registry.file=xxx.properties`
+
 ###
 分布式架构下系统间交互的5种通信模式
 1. request/response模式（同步模式）：客户端发起请求一直阻塞到服务端返回请求为止。
