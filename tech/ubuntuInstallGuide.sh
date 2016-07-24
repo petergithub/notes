@@ -190,11 +190,15 @@ gsettings set org.gnome.gedit.preferences.ui max-recents "uint32 40"
 gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8', 'CURRENT', 'GB18030', 'ISO-8859-15', 'UTF-16']"
 #gsettings set org.gnome.gedit.preferences.encodings auto-detected "['GB18030', 'GB2312', 'GBK', 'UTF-8', 'BIG5', 'CURRENT', 'UTF-16']"
 
+# dconf-editor - Graphical editor for dconf
 sudo apt-get install dconf-editor
-## under org > gnome > gedit > preferences > ui
 #mkdir -p ~/.local/share/gedit/plugins
 ## plugin to restore tabs opened last time
 ## https://github.com/raelgc/gedit-restore-tabs
+
+########### Disable auto-opening nautilus window after auto-mount USB
+gsettings set org.gnome.desktop.media-handling automount-open false
+
 
 ########### CacheBrowser https://cachebrowser.info/#/download
 #sudo apt-get install python-setuptools

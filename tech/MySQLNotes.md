@@ -14,13 +14,39 @@ select SUBSTRING(1456958130210,1,10);
 show full processlist;
 explain sql query;
 
-MySQL 5.5 UTF8mb4支持emoj 
+MySQL 5.5.3+ UTF8mb4支持emoji
 HA: percona xtradb cluster, galera cluster 
 
 To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`
 To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`
 mysql query escape %前面加两个反斜杠，比如
 `select count(*) from tableName where column like '%关键字\\%前面的是一个百分号%'`
+
+查看支持的字符集和排序方式: `show character set`, `show collation`
+查看数据库字符集
+`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`
+查看表字符集
+`select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;`
+查看列字符集
+`select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;`
+
+
+创建表的时候指定CHARSET为utf8mb4
+```
+	
+	CREATE TABLE IF NOT EXISTS table_name (
+	...
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+```
+update database character: 
+`ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
+
+update table character: 
+`ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;` 
+`ALTER TABLE table_name modify column_name text charset utf8mb4;`
+
+update column character:
+`ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 
 ### datetime query
 	

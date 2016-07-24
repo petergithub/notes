@@ -13,19 +13,32 @@ location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
+`sort` `-t`设定间隔符 `-k`指定列数
+`split -b bigFile.txt 100M` split file into small files 
+M-1 is meta-1 (Alt-1 in Ubuntu)
+C-1 is control-1
 
-split file into small files `split -b bigFile.txt 100M`
-
+`rsync -avPz src/ dest` Copy contents of `src/` to destination
+`-a`  等于 `-rlptgoD`
+        `-r` 是递归 
+        `-l` 是链接文件，意思是拷贝链接文件；
+        `-p` 表示保持文件原有权限
+        `-t` 保持文件原有时间；
+        `-g` 保持文件原有用户组
+        `-o` 保持文件原有属主；
+        `-D` 相当于块设备文件
+`-z` 传输时压缩；
+`-P` 等于 `--partial --progress`
+       `--partial` 保留那些因故没有完全传输的文件，以是加快随后的再次传输
+       `--progress` 进度       
+`-v` 详细输出信息
+`-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
 
 Get Unix timestamp 	`date +%s`
 Convert Unix timestamp to Date `date -d @1467540501`
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 
 	date_str=`date +%Y%m%d%H%M%S`;echo $date_str
-
-
-M-1 is meta-1 (Alt-1 in Ubuntu)
-C-1 is control-1
 
 `foo > stdout.txt 2> stderr.txt` use 2> to redirect to stderr
 `foo > allout.txt 2>&1` all output redirect to the same file
@@ -36,11 +49,6 @@ bs=1M表示每一次读写1M数据，count=50表示读写 50次，这样就指�
 dd做的只是文件拷贝工作
 
 `dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
-
-sort的-t选项 设定间隔符
--k选项 指定列数
-
-awk $NF the last column
 
 查看网页源码 `curl www.sina.com`
 	保存网页`curl -o [文件名] www.sina.com`
@@ -116,7 +124,7 @@ get the MD5 hash `echo -n Welcome | md5sum`
 
 sudo apt-get install -f fixed it.
     * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
-    * CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+    * CTRL+s or C-S-r：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 
 pgrep 和 pkill
 pgrep -l apache2
@@ -213,6 +221,9 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 `d/fu` 也就搞定了
 输入单词A的前几个字母，然后CTRL+n补全。<CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全，还有<CTRL+o><CTRL+f> 用于对目录名进行补全
+
+记录功能: 命令模式下按q，再按一个字母做名字，就进入了记录模式，再按q停止记录。
+回放记录: 在命令模式下按@，再按下记录名字a。连续回放可以在@前加次数
 
 #### Move around inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
@@ -351,7 +362,7 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 	sed -i 's/\/\/new.example.com/\/\/old.example.com/g' `grep -rl '//static.tclclouds.com' web/*`
 	
 sed -n '/old/p' `grep -l old *.htm`
-sed -i 's/package com.pfizer.gdms.tools;//g' ../*/ExportGtcConfigFile.java
+sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java
 sed -i 's#../../gxt#../../gxt2#g' */*.html
 
 :%s#":.*$#gc   "
@@ -772,7 +783,7 @@ echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
    2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
     输入`du -sh dir`, 按回车执行命令
     `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
-	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/gdms/`
+	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
    3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g：从历史搜索模式退出
    4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的，可用`stty`命令设置。
    	  CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
@@ -849,7 +860,7 @@ extract the class files in the jar
 jar xvf <jar name>.jar [class name]
 jar xvf package.jar com/vdm/Method.class
 update files
-cd C:\sp\Workspace\gdms\packager4p5\bin\classes
+cd C:\sp\Workspace\packager4p5\bin\classes
 jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class
 jar uvf C:\package.jar -C backup config.properties; add config.properties without backup folder path into jar
 java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
@@ -886,7 +897,7 @@ du -h --max-depth=1 显示当前目录中所有子目录的大小
 cd - 切换回上一个目录
 source .profile 使profile改动生效
 wget是linux最常用的下载命令
-tnsping MDATADEV.PFIZER.COM
+tnsping MDATADEV.DOMAIN.COM
 使用一个命令来定义复杂的目录树	mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}
 ntsysv 就会*出图形界面给你选择(有的则显示在里面)，如果在文本界面就用ntsysv命令
 常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展，所以我们可以用 `echo * == ls`
@@ -1109,8 +1120,24 @@ gMTP connect to android from Ubuntu
 `zdump -v /etc/localtime` examine the contents of the time zone files
 
 ### Performance
+http://www.brendangregg.com/linuxperf.html
+
+#### Linux Perf Analysis in 60s checklist
+http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
+1	uptime ⟶ load averages
+2	dmesg -T | tail ⟶ kernel errors
+3	vmstat 1 ⟶ overall stats by time
+4	mpstat -P ALL 1 ⟶ CPU balance
+5	pidstat 1 ⟶ process usage
+6	iostat -xz 1 ⟶ disk I/O
+7	free -m ⟶ memory usage
+8	sar -n DEV 1 ⟶ network I/O
+9	sar -n TCP,ETCP 1 ⟶ TCP stats
+10	top ⟶ check overview
+
 `dmesg | tail`	输出系统日志的最后10行
 `vmstat 1`, `iostat-xz 1`
+
 
 sysstat工具与负载历史回放
 sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和内存使用记录，便于历史数据的回放
@@ -1132,6 +1159,18 @@ sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和�
 `ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程
 `w` - Find Out Who Is Logged on And What They Are Doing
 
+#### Linux CPU Checklist
+http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
+1	uptime ⟶ load averages
+2	vmstat 1 ⟶ system-wide utilization, run q length
+3	mpstat -P ALL 1 ⟶ CPU balance
+4	pidstat 1 ⟶ per-process CPU
+5	CPU flame graph ⟶ CPU profiling
+6	CPU subsecond offset heat map ⟶ look for gaps
+7	perf stat -a -- sleep 10 ⟶ IPC, LLC hit ratio
+htop can do 1-4
+
+#### top, uptime
 `top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，`top`命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。
 
 1. `uptime`
@@ -1243,6 +1282,19 @@ slab的分布状况 `/proc/slabinfo`
 `df -hT`	查看大小、分区、文件系统类型
 硬盘是否SCSI：/dev/sd<X>就是scsi的，hd<X>就是普通的。
 `cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD，1是传统硬盘  
+
+#### Linux Disk Checklist
+http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
+1	iostat –xnz 1 ⟶ any disk I/O? if not, stop looking
+2	vmstat 1 ⟶ is this swapping? or, high sys time?
+3	df -h ⟶ are file systems nearly full?
+4	ext4slower 10 ⟶ (zfs*, xfs*, etc.) slow file system I/O?
+5	bioslower 10 ⟶ if so, check disks
+6	ext4dist 1 ⟶ check distribution and rate
+7	biolatency 1 ⟶ if interesting, check disks
+8	cat /sys/devices/…/ioerr_cnt ⟶ (if available) errors
+9	smartctl -l error /dev/sda1 ⟶ (if available) errors
+
 　
 #### 当磁盘无法写入的时候，一般有以下可能：
 [Linux系统排查3——I/O篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4700386.html)
@@ -1316,6 +1368,21 @@ Proto Recv-Q Send-Q Local Address               Foreign Address             Stat
 tcp        0      0 *:pssc                      *:*                         LISTEN      -       
 
 lsof -i
+
+#### Linux Network Checklist
+http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
+1	sar -n DEV,EDEV 1 ⟶ at interface limits? or use nicstat
+2	sar -n TCP,ETCP 1 ⟶ active/passive load, retransmit rate
+3	cat /etc/resolv.conf ⟶ it's always DNS
+4	mpstat -P ALL 1 ⟶ high kernel time? single hot CPU?
+5	tcpretrans ⟶ what are the retransmits? state?
+6	tcpconnect ⟶ connecting to anything unexpected?
+7	tcpaccept ⟶ unexpected workload?
+8	netstat -rnv ⟶ any inefficient routes?
+9	check firewall config ⟶ anything blocking/throttling?
+10	netstat -s ⟶ play 252 metric pickup
+tcp*, are from bcc/BPF tools.
+
 #### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding。bonding是个很棒的东西，可以把多块网卡绑起来，突破单块网卡的带宽限制
 * 然后检查每块网卡的速度，比如`ethtool eth0`。

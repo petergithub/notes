@@ -1,5 +1,9 @@
 [TOC]
 
+## Recent
+MongoDB单文档大小限制是16M
+MongoDB limits the data size of individual BSON objects/documents. At the time of this writing the limit is 16MB.并不是技术上的限制，只是一个规定而已
+
 ## Commands
 ### Basic Commands
 show dbs
