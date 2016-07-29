@@ -1664,7 +1664,7 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `ssh-keygen -p` change the passphrase for an existing private key without regenerating the keypair
 
 `ssh-copy-id user@host`	将公钥添加到 host 以实现无密码登录
-`ssh-copy-id -i ~/.ssh/id_rsa.pub username@IP`
+`ssh-copy-id -i ~/.ssh/id_rsa.pub username@host`
 `cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
 `ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'`
 
@@ -1672,21 +1672,29 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件，复制到用户的当前目录
 `ssh user@host 'ps ax | grep [h]ttpd'`	查看远程主机是否运行进程httpd
 
-yes | pv | ssh $host "cat > /dev/null"	实时SSH网络吞吐量测试 通过SSH连接到主机，显示实时的传输速度，将所有传输数据指向/dev/null，需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
-yes | pv | cat > /dev/null
+`yes | pv | ssh $host "cat > /dev/null"`	实时SSH网络吞吐量测试 通过SSH连接到主机，显示实时的传输速度，将所有传输数据指向/dev/null，需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
+`yes | pv | cat > /dev/null`
 
-ssh host -l user "`cat cmd.txt`"	通过SSH运行复杂的远程shell命令
-mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"	通过SSH将MySQL数据库复制到新服务器
+`ssh host -l user "cat cmd.txt"`	通过SSH运行复杂的远程shell命令
+`mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"`	通过SSH将MySQL数据库复制到新服务器
 
 ##### Bad owner or permissions on .ssh/config
 chmod 600 .ssh/config
 
-##### 不让SSH失联
+##### Keep SSH Sessions Alive 保持SSH连接不断线
+1. client: ssh -o ServerAliveInterval=60 username@host
+2. update .ssh/config 
 源头发力的办法就是，让ssh一直尝试与服务器通信，不让其空闲下来，间隔时间与服务器发keepalive的心跳包，通过简单的ssh设置就能做到这一点
 vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 ServerAliveInterval <X>
 ServerAliveCountMax <Y>
 上面的X表示，两次心跳指令的发送间隔秒数，Y则代表发送指令的最大数量，你可以根据你要离开的时间，灵活的做出调整。或者你也可以不对最大发送指令数量，做限制，只给出一个间隔时间，保持心跳包接受顺畅就好
+
+> ServerAliveInterval: number of seconds that the client will wait before sending a null packet to the server (to keep the connection alive).
+
+> ClientAliveInterval: number of seconds that the server will wait before sending a null packet to the client (to keep the connection alive).
+
+> Setting a value of 0 (the default) will disable these features so your connection could drop if it is idle for too long.
 
 ##### SSH端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术
@@ -1752,15 +1760,15 @@ wkt username.keytab
 quit
 ```
 
-alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@IP1 -t 'ssh IP2;bash -l'"
+alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@host1 -t 'ssh host2;bash -l'"
 ssh root@MachineB 'bash -s' < local_script.sh	#run local shell script on a remote machine
 trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 
 #### SCP
-scp client_file user@server:filepath	上传文件到服务器端
-scp user@server:server_files client_file_path	下载文件
+`scp client_file user@host:filepath`	上传文件到服务器端
+`scp user@host:server_files client_file_path`	下载文件
 client_file 待上传的文件，可以有多个，多个文件之间用空格隔开。也可以用*.filetype上传某个类型的全部文件
-user 服务端登录用户名, server 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
+user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
 
 #### Windows putty plink pscp
 pscp.exe -pw pwd filename username@host:directory/subdirectory
