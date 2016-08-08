@@ -25,6 +25,9 @@
 # mirrors.aliyun.com is the fast
 sudo apt-get update # This is very important step to update system first.
 
+## In Ubuntu, /bin/sh is link to Dash default. Change it to /bin/bash
+# sudo dpkg-reconfigure dash
+
 ########## Config GVim BEGIN ##########
 sudo apt-get install vim-gnome
 ## update configuration to make cut/copy/paste like Windows
