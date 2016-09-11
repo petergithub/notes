@@ -9,6 +9,11 @@ mvn eclipse:eclipse -DdownloadSources
 -Dmaven.test.skip
 mvn test -Dtest=TestPaypal -Plocal
 
+pom.xml
+`scope`：是用来指定当前包的依赖范围，maven的依赖范围
+`compile`编译范围, `provided`已提供范围(在当JDK或者一个容器已提供该依赖之后才使用), `runtime`运行时范围(在运行和测试系统的时候需要，但在编译的时候不需要), `test`测试范围(编译和运行时都不需要，在测试编译和测试时使用), `system`系统范围(必须显式的提供一个对于本地系统中JAR文件的路径)
+`optional`:设置指依赖是否可选，默认为false,即子项目默认都继承，为true,则子项目必需显示的引入，与dependencyManagement里定义的依赖类似 。
+
 ## Basic
 create variable M2_REPO for workspace
 	mvn eclipse:configure-workspace -Declipse.workspace=C:\workspace

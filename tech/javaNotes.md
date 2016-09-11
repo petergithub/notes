@@ -120,7 +120,7 @@ http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3
 * 年轻代 = Eden区 + 两个Survivor区（From和To）
 
 如果出现java.lang.OutOfMemoryError: Java heap space异常，说明Java虚拟机的堆内存不够。原因有二：
-（1）Java虚拟机的堆内存设置不够，可以通过参数-Xms、-Xmx来调整。
+（1）Java虚拟机的堆内存设置不够，可以通过参数-Xms1g、-Xmx2g来调整。
 （2）代码中创建了大量大对象，并且长时间不能被垃圾收集器收集（存在被引用）。
 
 如果出现java.lang.OutOfMemoryError: PermGen space，说明是Java虚拟机对永久代Perm内存设置不够。

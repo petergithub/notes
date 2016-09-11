@@ -6,6 +6,12 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 ## Recent
 为了方便地键入长命令，在设置你的编辑器后（例如 export EDITOR=vim），键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令。在 vi 模式下则键入 escape-v 实现相同的功能。
 `man readline` to get the introduction to the combination of keys
+
+man readline to get more information:
+Question: Cancel failed reverse-i-search in bash but keep what I typed in
+
+    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+s or C-S-r：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 vimtutor: vim interactive guide
 CTRL+h: show hidden files
 nautilus: open your home folder
@@ -13,14 +19,81 @@ location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
-`sort` `-t`设定间隔符 `-k`指定列数
-`split -b bigFile.txt 100M` split file into small files 
+
+`split -b bigFile.txt 100M` split file into small files
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
 
+execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
+
+Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  
+`iperf`:
+`-u` use UDP mode
+
+TCP Clients & Servers
+1. `iperf -s` to launch Iperf in server mode
+2. `iperf -c <SERVER_IP>` to connect to the first server
+
+UDP Clients & Servers
+1. `iperf -s -u` to Start a UDP Iperf server
+2. `iperf -c <SERVER_IP> -u` to Connect your client to your Iperf UDP server
+
+`crontab`
+`-l` 列出crontab文件
+`-e` 编辑当前的crontab文件
+`-r` 删除当前的crontab文件
+crontab特殊的符号说明：
+1. "*"代表所有的取值范围内的数字
+2. "/"代表每的意思，如"*/5"表示每5个单位
+3. "-"代表从某个数字到某个数字
+4. ","分散的数字
+
+log path: /var/log/messages or /var/log/cron*
+
+发现Ubuntu下没有自动打开cron的日志服务功能，解决方法如下
+cron的日志功能使用syslogd服务，不同版本linux可能装了不同的软件，这里介绍常见的两种：
+sysklogd>>>>>>
+1. 编辑 /etc/syslog.conf，并且打开以cron.*开始的那行注释。
+2. 运行 /etc/init.d/sysklogd restart 。
+3. 运行 /etc/init.d/cron restart 。
+
+rsyslog>>>>>>
+1. 修改rsyslog文件，将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉；
+2. 重启rsyslog服务service rsyslog restart
+3. 重启cron服务service cron restart
+
+`sort` `-t`设定间隔符 `-k`指定列数
+`sort [-fbMnrtuk] [file or stdin]`
+`-n`  ：使用『纯数字』进行排序(默认是以文字型态来排序的)；
+`-r`  ：反向排序；
+`-t`  ：分隔符，默认是用 [tab] 键来分隔；
+`-k`  ：以那个区间 (field) 来进行排序的意思
+/etc/passwd 内容是以 : 来分隔的，以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
+默认是以字符串来排序的，如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
+如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序，再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
+
+`uniq [-icu]`
+uniq 去除排序过的文件中的重复行，因此uniq经常和sort合用。也就是说，为了使uniq起作用，所有的重复行必须是相邻的。
+`-i`  ：忽略大小写字符的不同；
+`-c`  ：进行计数
+`-u`  ：只显示唯一的行
+
+cut命令可以从一个文本文件或者文本流中提取文本列
+`cut -d '分隔字符' -f fields` 用于有特定分隔字符
+`-d`  ：后面接分隔字符。与 -f 一起使用；
+`-f`  ：依据 -d 的分隔字符将一段信息分割成为数段，用 -f 取出第几段的意思；
+`-c`  ：以字符 (characters) 的单位取出固定字符区间；
+
+操作PATH变量
+找出第五个路径 `echo $PATH | cut -d ':' -f 5`
+找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
+找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
+找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
+找出第一到第三，还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+
 `rsync -avPz src/ dest` Copy contents of `src/` to destination
 `-a`  等于 `-rlptgoD`
-        `-r` 是递归 
+        `-r` 是递归
         `-l` 是链接文件，意思是拷贝链接文件；
         `-p` 表示保持文件原有权限
         `-t` 保持文件原有时间；
@@ -68,17 +141,25 @@ HTTP认证	`curl --user name:password example.com`
 
 `-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`
 
-	`curl -w "TCP handshake: %{time_connect}\ SSL handshake: %{time_appconnect}\n" -so /dev/null https://www.baidu.com`
-	
+Print 10 times: `seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`
+
+	curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
+
+Time to domain lookup: `time_namelookup`
+TCP handshake: `time_connect`
+SSL handshake: `time_appconnect`
+Time to first byte: `time_starttransfer`
+Total time: `time_total`
+
 	curl -w "
-	Domain lookup: %{time_namelookup} 
-	TCP handshake: %{time_connect} 
-	SSL handshake: %{time_appconnect} 
-	time_pretransfer:  %{time_pretransfer} 
-	Redirection  :  %{time_redirect} 
-	time_starttransfer:  %{time_starttransfer} 
-	---------- 
-	time_total:  %{time_total}\n" -so /dev/null https://www.baidu.com
+	namelookup: %{time_namelookup}
+	tcp:        %{time_connect}
+	ssl:        %{time_appconnect}
+	pretransfer:%{time_pretransfer}
+	redirect  : %{time_redirect}
+	starttransfer:%{time_starttransfer}
+	----------
+	time_total: %{time_total}\n" -so /dev/null https://www.baidu.com
 
 Timing Details With cURL
 https://josephscott.org/archives/2011/10/timing-details-with-curl/
@@ -123,13 +204,10 @@ get the MD5 hash `echo -n Welcome | md5sum`
 `groups username`	To find group memebership for username
 
 sudo apt-get install -f fixed it.
-    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
-    * CTRL+s or C-S-r：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 
 pgrep 和 pkill
 pgrep -l apache2
 `ps -A -opid,stime,etime,args` 查看进程的启动时间
-`sort <file> | uniq -c`
 `du -s * | sort -n | tail`	列出当前目录里最大的10个文件。
 `last`	To find out when a particular user last logged in to the Linux or Unix server.
 
@@ -332,7 +410,7 @@ grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
 `-L`	列出不匹配的文件名
 `-w`	匹配整个单词
 `-A`, `-B`, `-C`	print context lines
-`-i`, --ignore-case不区分大小写地搜索。默认情况区分大小写， 
+`-i`, --ignore-case不区分大小写地搜索。默认情况区分大小写，
 `-n`, --line-number
 `-c`, --count
 `-r`, --recursive
@@ -358,9 +436,9 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 `grep -l old *.htm | xargs sed -n "/old/p"`  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
 
 把web文件下所有文件中的//old.example.com替换为//new.example.com:
-	
-	sed -i 's/\/\/new.example.com/\/\/old.example.com/g' `grep -rl '//static.tclclouds.com' web/*`
-	
+
+	sed -i 's/\/\/new.example.com/\/\/old.example.com/g' `grep -rl '//old.example.com' web/*`
+
 sed -n '/old/p' `grep -l old *.htm`
 sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java
 sed -i 's#../../gxt#../../gxt2#g' */*.html
@@ -436,7 +514,7 @@ find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomAction
 find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
 ```
 
-#### 文件及文件名乱码处理
+#### 文件及文件名乱码处理 删除文件名乱码文件
 1. `ls -i` print the index number of each file(文件的i节点) 12345
 2. `find . -inum 12345 -print -exec rm {} -r \;` rm
 3. `find . -inum 12345 -exec mv {} NewName \;` mv
@@ -470,6 +548,7 @@ awk扫描filename中的每一行, 对符合模式pattern的行执行操作action
     `awk '{action}' filename`   对所有行执行操作action
     `awk '{action}'`           从命令行输入数据
 awk还支持命令文件 `awk -f awk_file data_file`
+`awk -v RS="?" filename`
 
 #### 变量
 内建的字段变量
@@ -478,14 +557,17 @@ $1 $0上第一个字段的数据
 $2 $0上第二个字段的数据
 `awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`	print the whole line matched the pattern
 
-内建变量(Built-in Variables) 
+内建变量(Built-in Variables)
 `NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目
 `NR` (Number of Records)	整数, 其值表awk已读入的数据行数目
 `FILENAME`				awk正在处理的数据文件文件名
 `FS` (field seporator)	FS default as space and tab. FS="\n" take "\n" as seporator, `-F\t` take tab as seporator
 `RS` (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
-`awk -v RS=""`
+`awk -v RS=""` 按空白行切分文件成Records
+`awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records
 
+`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者
+`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number
 
 #### 例子
 `w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0
@@ -501,21 +583,21 @@ $2 $0上第二个字段的数据
 #### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
 Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十分类似.
-例如: awk的 I/O指令 : print, printf( ), 
+例如: awk的 I/O指令 : print, printf( ),
 	getline var < file 一次读取一行 变量 var(var省略时,表示置于$0)
-	 awk的 流程控制指令 : if(...){..} else{..}, while(...){...}... 
+	 awk的 流程控制指令 : if(...){..} else{..}, while(...){...}...
 
 awk 如何处理 Pattern { Actions } ?
-awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions. 
+awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions.
 
 执行awk时, 它会反复进行下列四步骤.
 
     自动从指定的数据文件中读取一个数据行.
     自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...
     依次执行程序中 所有 的 Pattern { Actions } 指令.
-    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4. 
+    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4.
 
-awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop). 
+awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop).
 
 #### Pattern
 awk 中提供下列 关系运算符(Relation Operator)
@@ -533,14 +615,14 @@ awk 中提供下列 关系运算符(Relation Operator)
 	~(match) 与!~(match) 在 awk 之含意简述如下 :
 	A为字符串, B为正则表达式.
 	A ~B 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
-	A !~B 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串. 
+	A !~B 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.
 
 	|| or, && and, ! not
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`
 `$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
 
-当Pattern 中被用来比对的字符串为$0时, 可省略$0, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E ) 
+当Pattern 中被用来比对的字符串为$0时, 可省略$0, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E )
 
 #### Actions
 
@@ -558,7 +640,7 @@ awk 中提供下列 关系运算符(Relation Operator)
     continue
     next
     exit [表达式]
-    语句 
+    语句
 
 awk 中大部分指令与 C 语言中的用法一致
 
@@ -590,7 +672,9 @@ awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的"=="为比较运算符。其�
 如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
 
 ### shell
+[Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)
 
+`cat /etc/shells`	get all available shells
 xargs echo
 在bash的脚本中，你可以使用 set -x 来debug输出。使用 set -e 来当有错误发生的时候abort执行。考虑使用 set -o pipefail 来限制错误。还可以使用trap来截获信号（如截获ctrl+c）。
 在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
@@ -602,11 +686,26 @@ sleep 2; echo 'end sleep 2 sec'
 ﻿$? 上一个命令的返回代码。0为true, 1为false
 $$进程标识号
 $*，该变量包含了所有输入的命令行参数值
-string string不为空
 
-`cat /etc/shells`	get all available shells
+
+#### `dirname $0`
+在命令行状态下单纯执行 $ cd `dirname $0` 是毫无意义的。因为他返回当前路径的"."。
+这个命令写在脚本文件里才有作用，他返回这个脚本文件放置的目录，并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）。
+在/home/admin/test/下新建test.sh内容如下：
+
+   cd `dirname $0`
+   echo `pwd`
+
+然后返回到/home/admin/执行 `sh test/test.sh` 运行结果: `/home/admin/test`
+这样就可以知道一些和脚本一起部署的文件的位置了，只要知道相对位置就可以根据这个目录来定位，而可以不用关心绝对位置。这样脚本的可移植性就提高了，扔到任何一台服务器，（如果是部署脚本）都可以执行。
+
+#### `pwd`, `PWD`
+`pwd`命令用于显示当前工作目录。
+环境变量`OLDPWD`表示前一次的工作目录，
+环境变量`PWD`表示当前的工作目录。
 
 #### Common Bash comparisons
+
 Operator	Meaning	Example
 -z	Zero-length string	[ -z "$myvar" ]
 -z string string为空
@@ -632,14 +731,97 @@ Operator	Meaning	Example
 [ ! ]
 -e file 	Check if file exists. Is true even if file is a directory but exists. 	[ -e $file ] is true.
 
-#### example
+#### for
+the  for  command  executes  list once for each positional parameter that is set
+positional parameter: space, line return
+`for VAR in LIST; do CMD; done;`
+`for VAR in *.zip; do CMD; done;`
+`for file in $(ls); do echo $file; done;`
+`for i in 1 2 3 4 5; do echo $i; done;`
+`for i in $(seq 1 5); do echo $i; done`
+`for i in {01..10}; do echo $i; done`
 
-``` shell
+`for (( EXP1; EXP2; EXP3 )); do command1;	command2;	command3; done;`
+`for (( i = 0; i < 5; i++)); do echo $i; done;`
 
-	if [ ! -f "./config" ]; then
-	    echo  "The config file for docbase and username doesn't exist, please check it"
-	    exit 0
+`IFS=- read -r x y z <<< foo-bar-baz; echo $x, $y, $z` 按变量IFS分割字符串并存到单独变量中
+`IFS=- read -ra parts <<< foo-bar-baz; echo $parts, ${parts[0]}, ${parts[1]}` 按变量IFS分割字符串并存到数组parts中
+
+
+##### Script
+1. `var_name=value` 变量名和等号之间不能有空格
+2. `echo ${var_name}` 变量名外面的花括号是为了帮助解释器识别变量的边界, 非必须
+
+双引号 " 
+1. 双引号里的变量会进行替换. 
+2. $、\、'、和"这几个字符是特殊字符 (shell 引号嵌套 使用转义 \" \')
+
+单引号 ' 
+1. 单引号里的任何字符都会原样输出, 单引号字符串中的变量是无效的
+2. 单引号字串中不能出现单引号（对单引号使用转义符后也不行）
+
+反引号 ` 
+1. 反引号括起来的字符串被shell解释为命令行，在执行时，shell首先执行该命令行，并以它的标准输出结果取代整个反引号（包括两个反引号）部分
+2. 反引号和$()是对等的, $()能够内嵌使用，而且避免了转义符的麻烦
+
+[ ] 两边要加空格
+`if [ $a=$b ]`才是对的. 注意: 这里的[]是test命令的一种形式, [是系统的一个内置命令,存在路径是/bin/[,它是调用test命令的标识, 右中括号是关闭条件判断的标识, 因此与测试语句`if test $a=$b`是等效的
+
+获得字符串长度 `${#string}` or `expr length $string`
+`string="abcd"; echo ${#string}` #输出：4
+截取字符串 
+`str="hello shell"; echo ${str:2}`  #输出: llo shell
+`str="hello shell"; echo ${str:1:3}`  #输出: ell
+
+查找子字符串第一个字母的位置
+Numerical position in $string of first character in $substring that matches.
+`expr index $string $substring`
+
+向脚本传递参数
+
+	#! /bin/sh
+	# test.sh
+	echo "$# parameters"; # count of parameters
+	echo "$@"; # all parameters
+	echo "$0"; # shell script name, the zero
+	echo "$1"; # the first parameter
+
+input:	test.sh 11 22
+output:
+
+	2 parameters
+	11 22
+	test.sh
+	11
+
+if/else流程控制
+	
+	if condition
+	then 
+	     do something
+	elif condition
+	then 
+	    do something
+	elif condition
+	then 
+	    do something
+	else
+	    do something
 	fi
+
+switch流程控制
+
+	case expression in
+	    pattern1)
+	        do something... ;;
+	    pattern2)
+	        do something... ;;
+	    pattern2)
+	        do something... ;;
+	    ...
+	esac
+
+
 	if [ a || b && c ]; then
 	　 ....
 	elif ....; then
@@ -713,6 +895,23 @@ Operator	Meaning	Example
 	  exit 1
 	  ;;
 	esac
+```
+
+#### example
+
+##### read each line from file
+1. while: `while read line;do echo $line; done < filename`
+2. cat | while: `cat filename | while read line; do echo $line; done;`
+3. for: `for line in $(cat filename); do echo $line; done;`
+
+##### 加减乘除
+
+```shell
+
+	for x in ` seq 1 10 `
+	do
+	    echo $x "   "  $((${x} + 10)) " " $(($x * 10))
+	done
 ```
 
 
@@ -967,8 +1166,11 @@ ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
 
 ### screen
 screen vi test.c
-screen -ls
-screen -r PID
+`-S sessionname`	When  creating a new session
+`screen -ls`
+`screen -r <PID>`	Reattach a session
+`-x <name>`   Attach to a not detached screen  session
+
 可以通过CTRL+a ?来查看所有的键绑定，常用的键绑定有：
 CTRL+a ?	显示所有键绑定信息
 CTRL+a w	显示所有窗口列表
@@ -1153,7 +1355,7 @@ sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和�
 `-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录，每天的记录以saN为文件名保存在相应的日志目录中
 `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
-### CPU 
+### CPU
 `cat /proc/cpuinfo`
 `pidstat -l 2 10`
 `ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程
@@ -1255,13 +1457,13 @@ slab的分布状况 `/proc/slabinfo`
 
 4. 限制其他用户的内存使用
 `# vim /etc/security/limits.conf`
- 
+
 `user1 hard as 1000` （用户user1所有累加起来，内存不超过1000kiB）
 `user1 soft as 800` （用户user1一次运行，内存不超过800kiB）　　
 
 5. 大量连续内存数据：
 `# vim /etc/sysctl.conf`
- 
+
 `vm.nr_hugepage=20`
 
 6. 调节page cache（大量一样的请求 调大page cache）  
@@ -1428,7 +1630,7 @@ Linux查看网卡数据吞吐量方法
         3. `tcpdump`是常用的抓包工具
 	查看路由过程中哪些节点是瓶颈
 	查看带宽的使用情况
-	
+
 ##### iftop
 查看哪些网络连接占用的带宽较多, 按照带宽占用高低排序，可以确定那些占用带宽的网络连接  
 最上方的一行刻度是整个网络的带宽比例，下面第1列是源IP，第2列是目标IP，箭头表示了二者之间是否在传输数据，以及传输的方向。最后三列分别是2s、10s、40s时两个主机之间的数据传输速率。
@@ -1657,6 +1859,7 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
 
 escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;
+`~.`	close the connection
 `~^Z`	suspends the connection
 `fg` reconnect
 
@@ -1678,12 +1881,16 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `ssh host -l user "cat cmd.txt"`	通过SSH运行复杂的远程shell命令
 `mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"`	通过SSH将MySQL数据库复制到新服务器
 
+`ssh -oStrictHostKeyChecking=no user@host` you will not be prompted to accept a host key but with some waring sometimes.
+`ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null` you will not be prompted to accept a host key and makes warnings disappear
+
+
 ##### Bad owner or permissions on .ssh/config
 chmod 600 .ssh/config
 
 ##### Keep SSH Sessions Alive 保持SSH连接不断线
 1. client: ssh -o ServerAliveInterval=60 username@host
-2. update .ssh/config 
+2. update .ssh/config
 源头发力的办法就是，让ssh一直尝试与服务器通信，不让其空闲下来，间隔时间与服务器发keepalive的心跳包，通过简单的ssh设置就能做到这一点
 vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 ServerAliveInterval <X>
@@ -1696,25 +1903,28 @@ ServerAliveCountMax <Y>
 
 > Setting a value of 0 (the default) will disable these features so your connection could drop if it is idle for too long.
 
-##### SSH端口转发(Port Forwarding)
+##### SSH隧道 端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术
-[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html )
-``` bash
-ssh -L 9090:remoteSecret:8080 remoteHost 本地端口转发Local forwarding:connect remoteSecret through remoteHost
-ssh -L <local port>:<remote host>:<remote port> <SSH hostname>
-ssh -R <local port>:<remote host>:<remote port> <SSH hostname> 远程端口转发remote forwarding
-ssh -D <local port> <SSH Server>	动态转发 如果SSH Server是境外服务器，则该SOCKS代理实际上具备了翻墙功能
-```
+[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html)
 
-[实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward/ )
-[实战 SSH 端口转发 evernote copy](https://www.evernote.com/shard/s45/sh/659cae7f-4264-40f6-a05d-0fed2cfb5361/e1d88e29a968d3905789c94c98f5ae23 )
-本地端口转发例子: 在实验室里有一台 LDAP 服务器（LdapServerHost），但是限制了只有本机上部署的应用才能直接连接此 LDAP 服务器。如果我们由于调试或者测试的需要想临时从远程机器（LdapClientHost）直接连接到这个 LDAP 服务器
-在 LdapClientHost 上执行如下命令即可建立一个 SSH 的本地端口转发，例如：
-`$ ssh -L 7001:localhost:389 LdapServerHost`
+动态转发:
+`ssh -D <local port> <SSH Server>`	动态转发 如果SSH Server是境外服务器，则该SOCKS代理实际上具备了翻墙功能
 
-远程端口转发例子:　假设由于网络或防火墙的原因我们不能用 SSH 直接从 LdapClientHost 连接到 LDAP 服务器（LdapServertHost），但是反向连接却是被允许的。那此时我们的选择自然就是远程端口转发了。
-在 LDAP 服务器（LdapServertHost）端执行如下命令：
-`$ ssh -R 7001:localhost:389 LdapClientHost`
+本地端口转发:
+localhost连不上remoteSecret, remoteHost可以连通localhost和remoteSecret, 通过remoteHost连上remoteSecret
+`ssh -L localPort:remoteSecret:remoteSecretPort remoteHost`	#在本机执行本地端口转发Local forwarding:connect remoteSecret through remoteHost
+`ssh -L <local port>:<remote host>:<remote port> <SSH hostname>`
+example: 通过host3的端口转发，ssh登录host2
+1. `ssh -L 9001:host2:22 host3` 在本机执行
+2. `ssh -p 9001 localhost` ssh登录本机的9001端口，相当于连接host2的22端口
+
+远程端口转发:
+localhost与remoteSecret之间无法连通，必须借助remoteHost转发, 不过remoteHost是一台内网机器，它可以连接外网的localhost，但是反过来就不行，外网的localhost连不上内网的remoteHost. 
+解决办法:从remoteHost上建立与localhost的SSH连接，然后在localhost上使用这条连接
+1. `ssh -R localPort:remoteSecret:remoteSecretPort localhost`	#在remoteHost执行
+2. `ssh -p localPort localhost`	#在localhost上SSH本机localPort, 即连接上了remoteSecret
+
+`ssh -R <local port>:<remote host>:<remote port> <SSH hostname>`	#远程端口转发remote forwarding
 
 ##### Jumphost
 [How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/)
@@ -1842,7 +2052,7 @@ vi /etc/hosts
 202.141.162.123 ajax.googleapis.com
 
 ### 设置主DNS
-/etc/resolvconf/resolv.conf.d/head
+sudo vi /etc/resolvconf/resolv.conf.d/head
 sudo resolvconf -u
 cat /etc/resolv.conf
 

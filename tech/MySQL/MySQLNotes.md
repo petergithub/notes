@@ -14,8 +14,15 @@ select SUBSTRING(1456958130210,1,10);
 show full processlist;
 explain sql query;
 
+MySQL压力测试
+1. mysqlslap的介绍及使用
+2. sysbench
+3. tpcc-mysql
+
 MySQL 5.5.3+ UTF8mb4支持emoji
 HA: percona xtradb cluster, galera cluster 
+
+append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`
 
 To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`
 To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`

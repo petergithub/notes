@@ -9,13 +9,19 @@ https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
 尝试了第一个后端节点出现错误时（比如超时），它会自动尝试同一个 upstream {}
 分组中的下一个节点。每个节点的访问时间会以逗号分隔。所以尝试了两个节点便是“xxxx, xxxx”。
 
+### timeout 配置
+`proxy_connect_timeout` :后端服务器连接的超时时间_发起握手等候响应超时时间  
+`proxy_read_timeout`:连接成功后_等候后端服务器响应时间_其实已经进入后端的排队之中等候处理（也可以说是后端服务器处理请求的时间）  
+`proxy_send_timeout` :后端服务器数据回传时间_就是在规定时间之内后端服务器必须传完所有的数据
+
+
 ## Nginx offical
 [nginx documentation](http://nginx.org/en/docs/)
 
 NGINX (发音为 “engine X”)
-cd /data/softwares/tengine-2.1/sbin 
+cd /data/softwares/tengine-2.1/sbin
 `./sbin/nginx -s <signal>`
-Where signal may be one of the following: 
+Where signal may be one of the following:
     `stop` — fast shutdown
     `quit` — graceful shutdown
     `reload` — reloading the configuration file
@@ -48,52 +54,52 @@ location optional_modifier location_match {
 ```
 location  = / {
   # 精确匹配 / ，主机名后面不能带任何字符串
-  [ configuration A ] 
+  [ configuration A ]
 }
 
 location  / {
   # 因为所有的地址都以 / 开头，所以这条规则将匹配到所有请求
   # 但是正则和最长字符串会优先匹配
-  [ configuration B ] 
+  [ configuration B ]
 }
 
 location /documents/ {
   # 匹配任何以 /documents/ 开头的地址，匹配符合以后，还要继续往下搜索
   # 只有后面的正则表达式没有匹配到时，这一条才会采用这一条
-  [ configuration C ] 
+  [ configuration C ]
 }
 
 location ~ /documents/Abc {
   # 匹配任何以 /documents/ 开头的地址，匹配符合以后，还要继续往下搜索
   # 只有后面的正则表达式没有匹配到时，这一条才会采用这一条
-  [ configuration CC ] 
+  [ configuration CC ]
 }
 
 location ^~ /images/ {
   # 匹配任何以 /images/ 开头的地址，匹配符合以后，停止往下搜索正则，采用这一条。
-  [ configuration D ] 
+  [ configuration D ]
 }
 
 location ~* \.(gif|jpg|jpeg)$ {
   # 匹配所有以 gif,jpg或jpeg 结尾的请求
   # 然而，所有请求 /images/ 下的图片会被 config D 处理，因为 ^~ 到达不了这一条正则
-  [ configuration E ] 
+  [ configuration E ]
 }
 
 location /images/ {
   # 字符匹配到 /images/，继续往下，会发现 ^~ 存在
-  [ configuration F ] 
+  [ configuration F ]
 }
 
 location /images/abc {
   # 最长字符匹配到 /images/abc，继续往下，会发现 ^~ 存在
   # F与G的放置顺序是没有关系的
-  [ configuration G ] 
+  [ configuration G ]
 }
 
 location ~ /images/abc/ {
   # 只有去掉 config D 才有效：先最长匹配 config G 开头的地址，继续往下搜索，匹配到这一条正则，采用
-    [ configuration H ] 
+    [ configuration H ]
 }
 
 location ~* /js/.*/\.js
@@ -141,7 +147,7 @@ location ~* /js/.*/\.js
 	}
 ```
 
-## Sample: Location ends with slash 
+## Sample: Location ends with slash
 ### rule
 #### location [doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)
 If a location is defined by a prefix string that ends with the slash character, and requests are processed by one of proxy_pass, fastcgi_pass, uwsgi_pass, scgi_pass, or memcached_pass, then the special processing is performed. In response to a request with URI equal to this string, but without the trailing slash, a permanent redirect with the code 301 will be returned to the requested URI with the slash appended. If this is not desired, an exact match of the URI and location could be defined like this:
@@ -170,7 +176,7 @@ or as a UNIX-domain socket path specified after the word “unix” and enclosed
 
 If a domain name resolves to several addresses, all of them will be used in a round-robin fashion. In addition, an address can be specified as a server group.
 
-A request URI is passed to the server as follows: 
+A request URI is passed to the server as follows:
 
 - If the proxy_pass directive is specified **with a URI**, then when a request is passed to the server, the part of a normalized request URI matching the location is replaced by a URI specified in the directive:
 ```
@@ -178,7 +184,7 @@ A request URI is passed to the server as follows:
             proxy_pass http://127.0.0.1/remote/;
         }
 ```
-	
+
 - If proxy_pass is specified **without a URI**, the request URI is passed to the server in the same form as sent by a client when the original request is processed, or the full normalized request URI is passed when processing the changed URI:  
 ```
         location /some/path/ {
@@ -209,7 +215,7 @@ URL: http://localhost/webProject
 Nginx log:
 ```
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/ HTTP/1.1" 302 114 "-"
-[16/Oct/2015:11:30:17 +0800] "GET /webProject/login?rurl=%2F HTTP/1.1" 304 0 "-" 
+[16/Oct/2015:11:30:17 +0800] "GET /webProject/login?rurl=%2F HTTP/1.1" 304 0 "-"
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/css/jquery-ui.min.css HTTP/1.1" 304 0 "http://localhost/webProject/login?rurl=%2F"
 ```
 Node log:

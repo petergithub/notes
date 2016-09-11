@@ -1,6 +1,10 @@
 # Redis Notes
 [TOC]
 
+## Recent
+通过系统当前时间-lru时间，得到键多久没有被访问的秒数: `object idletime <key>`. object idletime命令访问键时，不会改变键的lru属性，即不会影响键的访问时间
+通过`info stats`的`expired_keys`指标记录累计删除的过期键数量
+
 ## Command
 `./redis-server redis_6379.conf`
 `src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>`

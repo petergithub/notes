@@ -2,6 +2,17 @@
 
 [TOC]
 
+## Recent
+Dubbo 网络传输协议: netty, mina, grizzly.
+
+	<dubbo:protocol server="netty"/> netty.jar 
+    如果<dubbo:protocol server="mina"/>或<dubbo:protocol server="grizzly"/>，则换成mina.jar或grizzly.jar。
+    如果<protocol name="rmi"/>，则不需要。
+
+Dubbo协议 	Stable 	采用NIO复用单一长连接，并使用线程池并发处理请求，减少握手和加大并发效率，性能较好（推荐使用） 	在大文件传输时，单一连接会成为瓶颈 	可用于生产环境 	Alibaba
+Rmi协议 	Stable 	可与原生RMI互操作，基于TCP协议 	偶尔会连接失败，需重建Stub 	可用于生产环境 	Alibaba
+Hessian协议 	Stable 	可与原生Hessian互操作，基于HTTP协议 	需hessian.jar支持，http短连接的开销大 	可用于生产环境 	 
+
 ## Question
 DefaultFuture
 Dubbo管理控制台 except dubbo-admin
