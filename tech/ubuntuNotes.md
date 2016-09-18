@@ -23,8 +23,17 @@ tweak get the theme ubuntu-mono-dark
 `split -b bigFile.txt 100M` split file into small files
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
+`yum provides /usr/bin/ab`  discover which package contains the program `ab`
+
+send 100 requests with a concurency of 50 requests to an URL 
+`ab -n 100 -c 50 http://www.example.com/`
+
+send requests during 30 seconds with a concurency of 50 requests to an URL 
+`ab -t 30 -c 50 URL http://www.example.com/`
+
 
 execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
+`$((1 + RANDOM % 1000))` random number between 1 and 1000
 
 Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  
 `iperf`:
@@ -90,6 +99,59 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
 找出第一到第三，还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+
+`lsof`
+
+```
+
+	$ lsof
+	COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
+	init       1       root  cwd       DIR        8,1      4096          2 /
+	init       1       root  txt       REG        8,1    124704     917562 /sbin/init
+	init       1       root    0u      CHR        1,3       0t0       4369 /dev/null
+	init       1       root    3r     FIFO        0,8       0t0       6323 pipe
+```
+FD – Represents the file descriptor. Some of the values of FDs are,
+
+    cwd – Current Working Directory
+    txt – Text file
+    mem – Memory mapped file
+    mmap – Memory mapped device
+    NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.
+
+TYPE – Specifies the type of the file. Some of the values of TYPEs are,
+
+    REG – Regular File
+    DIR – Directory
+    FIFO – First In First Out
+    CHR – Character special file
+
+Parameters:
+`+D` will recurse
+`+d` will not recurse
+`-c` based on process names starting with
+`-u` specific user
+`-p` specific process
+`-t` list the process id
+`-r` repeat until interrupt
+`+r` repeat until no open files found
+`-i` network 
+
+Samples:
+List processes which opened a specific file: `lsof /var/log/syslog`
+List opened files under a directory: `lsof +D /var/log/`
+List opened files based on process names starting with: `lsof -c ssh -c init`
+can give multiple -c switch on a single command line.
+List processes using a mount point: `lsof /home`, `lsof +D /home/`
+List files opened by a specific user: `lsof -u username`
+Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`
+List all open files by a specific process: `lsof -p 1753`
+Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
+Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
+
+List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
+List processes which are listening on a particular port: `lsof -i :25`
+List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
 
 `rsync -avPz src/ dest` Copy contents of `src/` to destination
 `-a`  等于 `-rlptgoD`
@@ -579,6 +641,12 @@ $2 $0上第二个字段的数据
 `awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS
 `echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
 
+按时间段查询: `cat maillog | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
+
+按时间区间查询: 
+`awk '{if ($1>startTime && $1<endTime) print $0}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log` 
+`awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
+
 
 #### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
@@ -914,6 +982,29 @@ switch流程控制
 	done
 ```
 
+##### 时间比较
+[Shell比较两个日期的大小](http://www.linuxsong.org/2010/09/shell-date-compare/)
+在Shell中我们可以利用date命令比较两个日期的大小，方法是先把日期转换成时间戳格式，再进行比较。
+date 的+%s可以将日期转换成时间戳格式,看下面的例子：
+
+``` shell
+
+	#!/bin/bash
+	 
+	date1="2008-4-09 12:00:00"
+	date2="2008-4-10 15:00:00"
+	 
+	t1=`date -d "$date1" +%s`
+	t2=`date -d "$date2" +%s`
+	 
+	if [ $t1 -gt $t2 ]; then
+	    echo "$date1 > $date2"
+	elif [ $t1 -eq $t2 ]; then
+	    echo "$date1 == $date2"
+	else
+	    echo "$date1 < $date2"
+	fi
+```
 
 ### bash
 `man readline` to get the introduction to the combination of keys
