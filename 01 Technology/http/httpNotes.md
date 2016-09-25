@@ -18,3 +18,11 @@ HTTP1.1规定了默认保持长连接（HTTP persistent connection ，也有翻�
 TCP的keep alive是检查当前TCP连接是否活着；HTTP的Keep-alive是要让一个TCP连接活久点
 
 TCP keep alive的表现：当一个连接“一段时间”没有数据通讯时，一方会发出一个心跳包（Keep Alive包），如果对方有回包则表明当前连接有效，继续监控
+
+## HTTPS
+https CDN方式, 私钥不需要提供给CDN,
+1. Keyless SSL
+2. 网宿推出无证书https加速方案 http://www.chinanetcenter.com/Home/News/420
+https SSL增加的时间大概多少 time(ssl) = 3 * time(tcp)
+HTTP耗时 = TCP握手(三个包)
+HTTPs耗时 = TCP握手(三个包) + SSL握手(需要9个包)

@@ -23,13 +23,6 @@ tweak get the theme ubuntu-mono-dark
 `pstack` Linux命令查看某个进程的当前线程栈运行情况
 `ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
 
-`split -b bigFile.txt 100M` split file into small files
-`head -n 10 | tail -n 5` print 5 up to 10 line
-
-`sed -n '2p' < file.txt` print the 2nd line
-`sed -n '10,33p' < file.txt` print 10 up to 33 line
-`sed -n '1p;3p' < file.txt` print 1st and 3rd line
-
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`
@@ -43,18 +36,6 @@ send requests during 30 seconds with a concurency of 50 requests to an URL
 
 execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
 `$((1 + RANDOM % 1000))` random number between 1 and 1000
-
-Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  
-`iperf`:
-`-u` use UDP mode
-
-TCP Clients & Servers
-1. `iperf -s` to launch Iperf in server mode
-2. `iperf -c <SERVER_IP>` to connect to the first server
-
-UDP Clients & Servers
-1. `iperf -s -u` to Start a UDP Iperf server
-2. `iperf -c <SERVER_IP> -u` to Connect your client to your Iperf UDP server
 
 `crontab`
 `-l` 列出crontab文件
@@ -79,35 +60,6 @@ rsyslog>>>>>>
 1. 修改rsyslog文件，将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉；
 2. 重启rsyslog服务service rsyslog restart
 3. 重启cron服务service cron restart
-
-`sort` `-t`设定间隔符 `-k`指定列数
-`sort [-fbMnrtuk] [file or stdin]`
-`-n`  ：使用『纯数字』进行排序(默认是以文字型态来排序的)；
-`-r`  ：反向排序；
-`-t`  ：分隔符，默认是用 [tab] 键来分隔；
-`-k`  ：以那个区间 (field) 来进行排序的意思
-/etc/passwd 内容是以 : 来分隔的，以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
-默认是以字符串来排序的，如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
-如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序，再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
-
-`uniq [-icu]`
-uniq 去除排序过的文件中的重复行，因此uniq经常和sort合用。也就是说，为了使uniq起作用，所有的重复行必须是相邻的。
-`-i`  ：忽略大小写字符的不同；
-`-c`  ：进行计数
-`-u`  ：只显示唯一的行
-
-cut命令可以从一个文本文件或者文本流中提取文本列
-`cut -d '分隔字符' -f fields` 用于有特定分隔字符
-`-d`  ：后面接分隔字符。与 -f 一起使用；
-`-f`  ：依据 -d 的分隔字符将一段信息分割成为数段，用 -f 取出第几段的意思；
-`-c`  ：以字符 (characters) 的单位取出固定字符区间；
-
-操作PATH变量
-找出第五个路径 `echo $PATH | cut -d ':' -f 5`
-找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
-找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
-找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
-找出第一到第三，还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
 
 `lsof`
 
@@ -162,22 +114,6 @@ List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` o
 List processes which are listening on a particular port: `lsof -i :25`
 List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
 
-`rsync -avPz src/ dest` Copy contents of `src/` to destination
-`-a`  等于 `-rlptgoD`
-        `-r` 是递归
-        `-l` 是链接文件，意思是拷贝链接文件；
-        `-p` 表示保持文件原有权限
-        `-t` 保持文件原有时间；
-        `-g` 保持文件原有用户组
-        `-o` 保持文件原有属主；
-        `-D` 相当于块设备文件
-`-z` 传输时压缩；
-`-P` 等于 `--partial --progress`
-       `--partial` 保留那些因故没有完全传输的文件，以是加快随后的再次传输
-       `--progress` 进度       
-`-v` 详细输出信息
-`-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
-
 Get Unix timestamp 	`date +%s`
 Convert Unix timestamp to Date `date -d @1467540501`
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
@@ -193,74 +129,6 @@ bs=1M表示每一次读写1M数据，count=50表示读写 50次，这样就指�
 dd做的只是文件拷贝工作
 
 `dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
-
-查看网页源码 `curl www.sina.com`
-	保存网页`curl -o [文件名] www.sina.com`
-自动跳转重定向 `curl -L www.sina.com`
-显示http header
-	显示http response的头信息，连同网页代码一起 `curl -i www.sina.com`
-	`-I`参数则是只显示http response的头信息。
-显示通信过程
-	`curl -v www.sina.com`
-	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
-HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动词。
-	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
-HTTP认证	`curl --user name:password example.com`
-
-提交表单并设置header
-`curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
-
-`-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`
-
-Print 10 times: `seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`
-
-	curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
-
-Time to domain lookup: `time_namelookup`
-TCP handshake: `time_connect`
-SSL handshake: `time_appconnect`
-Time to first byte: `time_starttransfer`
-Total time: `time_total`
-
-	curl -w "
-	namelookup: %{time_namelookup}
-	tcp:        %{time_connect}
-	ssl:        %{time_appconnect}
-	pretransfer:%{time_pretransfer}
-	redirect  : %{time_redirect}
-	starttransfer:%{time_starttransfer}
-	----------
-	time_total: %{time_total}\n" -so /dev/null https://www.baidu.com
-
-Timing Details With cURL
-https://josephscott.org/archives/2011/10/timing-details-with-curl/
-Step one: create a new file, curl-format.txt, and paste in:
-
-	\n
-        time_namelookup:  %{time_namelookup}\n
-           time_connect:  %{time_connect}\n
-        time_appconnect:  %{time_appconnect}\n
-       time_pretransfer:  %{time_pretransfer}\n
-          time_redirect:  %{time_redirect}\n
-     time_starttransfer:  %{time_starttransfer}\n
-                        ----------\n
-             time_total:  %{time_total}\n
-	\n
-Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
-`-w "@curl-format.txt"` tells cURL to use our format file
-`-o /dev/null` redirects the output of the request to /dev/null
-`-s` tells cURL not to show a progress meter
-
-And here is what you get back:
-
-	   time_namelookup:  0.001
-	      time_connect:  0.037
-	   time_appconnect:  0.000
-	  time_pretransfer:  0.037
-	     time_redirect:  0.000
-	time_starttransfer:  0.092
-	                   ----------
-	        time_total:  0.164
 
 get the MD5 hash `echo -n Welcome | md5sum`
 
@@ -601,13 +469,12 @@ find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JA
 命令中的"{}"表示find命令找到的文件，在-exec选项执行mv命令的时候，会利用按i节点号找到的文件名替换掉"{}"
 
 ##### 文件名编码转换
-convmv -f 源编码 -t 新编码 [选项] 文件名 #linux文件名编码批量转换
-转换文件名由GBK为UTF8 :  convmv -r -f cp936 -t utf8 --notest --nosmart *
+`convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换
+转换文件名由GBK为UTF8 :  `convmv -r -f cp936 -t utf8 --notest --nosmart *`
 
 ##### 查看文件编码
 `file <fileName>`
-在Vim 中可以直接查看 文件 编码
-:set fileencoding
+Vim中查看文件编码 `:set fileencoding`
 
 ##### 文件编码转换
 1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式
@@ -667,6 +534,12 @@ $2 $0上第二个字段的数据
 
 awk求和
 `echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
+
+删掉所有空行 `awk <pattern> '{print <stuff>}' <file>` 可以用来
+Print every line that has at least one field: `awk 'NF > 0' data`
+
+过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符：==, !=, >, <, >=, <=
+保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
 #### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
@@ -741,8 +614,7 @@ awk 中大部分指令与 C 语言中的用法一致
 6. sub( 比对用的正则表达式, 将替换的新字串, 原字串 )
 7. substr( 字串,起始位置 [,长度] )	返回从起始位置起,指定长度的子字串. 若未指定长度,则返回起始位置到字串末尾的子字串.
 
-### xargs
-xargs 工具的经典用法示例
+### xargs 工具的经典用法示例
 ```
 find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments
 kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`
@@ -752,12 +624,10 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
 `-L` Use at most max-lines nonblank input  lines  per  command  line.  每行使用的非空字符串最大个数
 
-`awk <pattern> '{print <stuff>}' <file>` 可以用来删掉所有空行
-Print every line that has at least one field: awk 'NF > 0' data
-其中单引号中的被大括号括着的就是awk的语句，注意，其只能被单引号包含。其中的$1..$n表示第几例。注：$0表示整个行。
-过滤记录
-awk '$3==0 && $6=="LISTEN" ' netstat.txt 其中的"=="为比较运算符。其他比较运算符：!=, >, <, >=, <=
-如果我们需要表头的话，我们可以引入内建变量NR：awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt
+控制每行参数个数`-L`和最大并行数`-P`。如果你不确定它们是否会按你想的那样工作，先使用 xargs echo 查看一下。此外，使用 -I{} 会很方便。例如：
+
+  `find . -name '*.py' | xargs grep some_function`
+  `cat hosts | xargs -I {} ssh root@{} hostname`
 
 ### shell
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)
@@ -1177,6 +1047,123 @@ java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
 java命令引入jar时可以-cp参数，但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar)，通常的jar都在同一目录，且多于1个
 如：java -Djava.ext.dirs=lib MyClass
 
+
+### sort uniq cut
+`sort` `-t`设定间隔符 `-k`指定列数
+`sort [-fbMnrtuk] [file or stdin]`
+`-n`  ：使用『纯数字』进行排序(默认是以文字型态来排序的)；
+`-r`  ：反向排序；
+`-t`  ：分隔符，默认是用 [tab] 键来分隔；
+`-k`  ：以那个区间 (field) 来进行排序的意思
+/etc/passwd 内容是以 : 来分隔的，以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
+默认是以字符串来排序的，如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
+如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序，再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
+
+`uniq [-icu]`
+uniq 去除排序过的文件中的重复行，因此uniq经常和sort合用。也就是说，为了使uniq起作用，所有的重复行必须是相邻的。
+`-i`  ：忽略大小写字符的不同；
+`-c`  ：进行计数
+`-u`  ：只显示唯一的行
+
+cut命令可以从一个文本文件或者文本流中提取文本列
+`cut -d '分隔字符' -f fields` 用于有特定分隔字符
+`-d`  ：后面接分隔字符。与 -f 一起使用；
+`-f`  ：依据 -d 的分隔字符将一段信息分割成为数段，用 -f 取出第几段的意思；
+`-c`  ：以字符 (characters) 的单位取出固定字符区间；
+
+操作PATH变量
+找出第五个路径 `echo $PATH | cut -d ':' -f 5`
+找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
+找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
+找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
+找出第一到第三，还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+
+### curl
+查看网页源码 `curl www.sina.com`
+	保存网页`curl -o [文件名] www.sina.com`
+自动跳转重定向 `curl -L www.sina.com`
+显示http header
+	显示http response的头信息，连同网页代码一起 `curl -i www.sina.com`
+	`-I`参数则是只显示http response的头信息。
+显示通信过程
+	`curl -v www.sina.com`
+	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
+HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动词。
+	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
+HTTP认证	`curl --user name:password example.com`
+
+提交表单并设置header
+`curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
+
+`-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`
+
+Print 10 times: `seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`
+
+	curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
+
+Time to domain lookup: `time_namelookup`
+TCP handshake: `time_connect`
+SSL handshake: `time_appconnect`
+Time to first byte: `time_starttransfer`
+Total time: `time_total`
+
+	curl -w "
+	namelookup: %{time_namelookup}
+	tcp:        %{time_connect}
+	ssl:        %{time_appconnect}
+	pretransfer:%{time_pretransfer}
+	redirect  : %{time_redirect}
+	starttransfer:%{time_starttransfer}
+	----------
+	time_total: %{time_total}\n" -so /dev/null https://www.baidu.com
+
+Timing Details With cURL
+https://josephscott.org/archives/2011/10/timing-details-with-curl/
+Step one: create a new file, curl-format.txt, and paste in:
+
+	\n
+        time_namelookup:  %{time_namelookup}\n
+           time_connect:  %{time_connect}\n
+        time_appconnect:  %{time_appconnect}\n
+       time_pretransfer:  %{time_pretransfer}\n
+          time_redirect:  %{time_redirect}\n
+     time_starttransfer:  %{time_starttransfer}\n
+                        ----------\n
+             time_total:  %{time_total}\n
+	\n
+Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
+`-w "@curl-format.txt"` tells cURL to use our format file
+`-o /dev/null` redirects the output of the request to /dev/null
+`-s` tells cURL not to show a progress meter
+
+And here is what you get back:
+
+	   time_namelookup:  0.001
+	      time_connect:  0.037
+	   time_appconnect:  0.000
+	  time_pretransfer:  0.037
+	     time_redirect:  0.000
+	time_starttransfer:  0.092
+	                   ----------
+	        time_total:  0.164
+
+### rsync
+`rsync -avPz src/ dest` Copy contents of `src/` to destination
+`-a`  等于 `-rlptgoD`
+        `-r` 是递归
+        `-l` 是链接文件，意思是拷贝链接文件；
+        `-p` 表示保持文件原有权限
+        `-t` 保持文件原有时间；
+        `-g` 保持文件原有用户组
+        `-o` 保持文件原有属主；
+        `-D` 相当于块设备文件
+`-z` 传输时压缩；
+`-P` 等于 `--partial --progress`
+       `--partial` 保留那些因故没有完全传输的文件，以是加快随后的再次传输
+       `--progress` 进度       
+`-v` 详细输出信息
+`-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
+
 ### mail
 mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null
 mail -s "Got permission" username@gmail.com < /dev/null
@@ -1412,6 +1399,18 @@ Listeningfor transport dt_socket at address: 8000
 
 ## Miscellaneous
 
+### Split file 分割文件
+1. split
+2. head | tail
+3. sed
+4. awk
+`split -b bigFile.txt 100M` split file into small files
+`head -n 10 | tail -n 5` print 5 up to 10 line
+
+`sed -n '2p' < file.txt` print the 2nd line
+`sed -n '10,33p' < file.txt` print 10 up to 33 line
+`sed -n '1p;3p' < file.txt` print 1st and 3rd line
+
 ### Missing clock menu bar fix:
 killall unity-panel-service
 
@@ -1493,6 +1492,7 @@ htop can do 1-4
 判断一个系统负载是否偏高需要计算单核CPU的平均负载，等于这里uptime命令显示的系统平均负载 / CPU核数，一般以0.7为比较合适的值。偏高说明有比较多的进程在等待使用CPU资源  
 
 2. `top`
+top命令中，按 `f` 键，进入选择排序列的界面, 按 `k` 键，并输入想要终止的PID，就可以直接杀死指定进程
 第3行：当前的CPU运行情况：  
 　　　　us：非nice用户进程占用CPU的比率  
 　　　　sy：内核、内核进程占用CPU的比率；  
@@ -1708,6 +1708,8 @@ Linux查看网卡数据吞吐量方法
 1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘：`iptraf -d eth0`  
 2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`。
 3. `sar -n DEV 1` 每一秒钟取一次值，取四次
+4. `iperf` Diagnosing network speed
+
 
 #### Network troubleshooting
 [Linux系统排查4——网络篇 - 王智愚 - 博客园](www.cnblogs.com/Security-Darren/p/4700387.html)
@@ -1749,8 +1751,21 @@ Linux查看网卡数据吞吐量方法
 　　最下方的TX、RX分别代表发送、接收数据的统计，TOTAL则是数据传输总量。
 在进入iftop的非交互界面后，按 `p` 键可以打开或关闭显示端口，按 `s` 键可以显示或隐藏源主机，而按 `d` 键则可以显示或隐藏目标主机。
 
-`-n` 选项直接显示连接的IP  
 `-i` 选项可以指定要查看的网卡，默认情况下，iftop会显示自己找到的第一个网卡；
+`-n` 选项直接显示连接的IP, Don't do hostname lookups 
+
+##### iperf
+Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  
+`iperf`:
+`-u` use UDP mode
+
+TCP Clients & Servers
+1. `iperf -s` to launch Iperf in server mode
+2. `iperf -c <SERVER_IP>` to connect to the first server
+
+UDP Clients & Servers
+1. `iperf -s -u` to Start a UDP Iperf server
+2. `iperf -c <SERVER_IP> -u` to Connect your client to your Iperf UDP server
 
 ##### `tcpdump`常用选项
 `# tcpdump -n port N`    //只捕捉特定端口的流量
