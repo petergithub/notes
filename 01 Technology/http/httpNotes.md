@@ -1,4 +1,10 @@
 
+## Recent
+跨域资源共享（CORS）:Access-Control-Allow-Origin就是所谓的资源共享了，它的值*表示允许任意网站向这个接口请求数据，也可以设置成指定的域名，如：
+response.writeHead(200, { "Access-Control-Allow-Origin": "http://yoursite.com"});
+configure Access-Control-Allow-Origin to avoid unknown domain visit
+在开发RESTful API时，要注意CORS功能的实现，直接拿现有的轮子来用即可
+
 ## HTTP长连接
 ### 是什么
 HTTP1.1规定了默认保持长连接（HTTP persistent connection ，也有翻译为持久连接），数据传输完成了保持TCP连接不断开（不发RST包、不四次握手），等待在同域名下继续用这个通道传输数据；相反的就是短连接

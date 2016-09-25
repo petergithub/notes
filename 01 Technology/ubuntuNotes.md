@@ -5,20 +5,25 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
 ## Recent
 为了方便地键入长命令，在设置你的编辑器后（例如 export EDITOR=vim），键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令。在 vi 模式下则键入 escape-v 实现相同的功能。
+vimtutor: vim interactive guide
 `man readline` to get the introduction to the combination of keys
+
+ssh连接变得无响应了，让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话。
+其原理是，~符号是ssh命令中的转义字符，就像我们平时编程中使用的\一样。通过在ssh连接中输入~?，你可以看到完整的命令帮助。
+`reset` 恢复出现问题的屏幕
 
 man readline to get more information:
 Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
     * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
     * CTRL+s or C-S-r：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-vimtutor: vim interactive guide
 CTRL+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
+`strace ls a`
 
 `pstack` Linux命令查看某个进程的当前线程栈运行情况
 `ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
@@ -26,6 +31,14 @@ tweak get the theme ubuntu-mono-dark
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`
+
+
+`ls /fake/directory > peanuts.txt 2>&1` 2>&1 是将标准出错重定向到标准输出
+redirect both stdout and stderr to a file: ``$ ls /fake/directory &> peanuts.txt`
+man top
+`fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
+sudo service network-manager start
+http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb
 
 send 100 requests with a concurency of 50 requests to an URL
 `ab -n 100 -c 50 http://www.example.com/`
@@ -38,6 +51,7 @@ execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
 `$((1 + RANDOM % 1000))` random number between 1 and 1000
 
 `crontab`
+To create a cronjob, just edit the crontab file: `crontab -e`
 `-l` 列出crontab文件
 `-e` 编辑当前的crontab文件
 `-r` 删除当前的crontab文件
@@ -61,7 +75,7 @@ rsyslog>>>>>>
 2. 重启rsyslog服务service rsyslog restart
 3. 重启cron服务service cron restart
 
-`lsof`
+`lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.
 
 ```
 
@@ -1466,7 +1480,7 @@ sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和�
 `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
 ### CPU
-`cat /proc/cpuinfo`
+`cat /proc/cpuinfo` view the amount of cores
 `pidstat -l 2 10`
 `ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程
 `w` - Find Out Who Is Logged on And What They Are Doing
@@ -1709,6 +1723,7 @@ Linux查看网卡数据吞吐量方法
 2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`。
 3. `sar -n DEV 1` 每一秒钟取一次值，取四次
 4. `iperf` Diagnosing network speed
+5. 带宽监控 `nload`, https://linux.cn/article-2871-1.html
 
 
 #### Network troubleshooting
