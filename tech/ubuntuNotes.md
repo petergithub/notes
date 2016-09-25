@@ -20,15 +20,24 @@ location: make a command can be call anywhere
 tweak get the theme ubuntu-mono-dark
 `ln -sfn` update a symbolic link
 
+`pstack` Linux命令查看某个进程的当前线程栈运行情况
+`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
+
 `split -b bigFile.txt 100M` split file into small files
+`head -n 10 | tail -n 5` print 5 up to 10 line
+
+`sed -n '2p' < file.txt` print the 2nd line
+`sed -n '10,33p' < file.txt` print 10 up to 33 line
+`sed -n '1p;3p' < file.txt` print 1st and 3rd line
+
 M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`
 
-send 100 requests with a concurency of 50 requests to an URL 
+send 100 requests with a concurency of 50 requests to an URL
 `ab -n 100 -c 50 http://www.example.com/`
 
-send requests during 30 seconds with a concurency of 50 requests to an URL 
+send requests during 30 seconds with a concurency of 50 requests to an URL
 `ab -t 30 -c 50 URL http://www.example.com/`
 
 
@@ -135,7 +144,7 @@ Parameters:
 `-t` list the process id
 `-r` repeat until interrupt
 `+r` repeat until no open files found
-`-i` network 
+`-i` network
 
 Samples:
 List processes which opened a specific file: `lsof /var/log/syslog`
@@ -273,8 +282,6 @@ pgrep -l apache2
 `du -s * | sort -n | tail`	列出当前目录里最大的10个文件。
 `last`	To find out when a particular user last logged in to the Linux or Unix server.
 
-
-for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
 
 Keyboard problems, setting 3rd level chooser and Meta key in Unity
@@ -464,6 +471,17 @@ pattern `[^0-9]*,`	matches string start with non-number until to (,)
 :g/^\s*$/d	delete the blank lines
 :%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
 
+
+### less
+for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
+
+less `&pattern` is like grep in less
+Display only lines which match the pattern; lines which do not match the pattern are not displayed.  If pattern is empty (if you type & immediately followed by ENTER), any filtering is turned off, and all lines are displayed
+`&eth[01]`  will display lines containing eth0 or eth1
+`&arp.*eth0` will display lines containing arp followed by eth0
+`&arp|dns`  will display lines containing arp or dns
+`!` can invert any of the above: `&!event`
+
 ### find grep sed
 ```
 grep pattern files - 搜索 files 中匹配 pattern 的内容
@@ -643,10 +661,12 @@ $2 $0上第二个字段的数据
 
 按时间段查询: `cat maillog | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
 
-按时间区间查询: 
-`awk '{if ($1>startTime && $1<endTime) print $0}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log` 
+按时间区间查询:
+`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
 `awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
 
+awk求和
+`echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
 
 #### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
@@ -820,15 +840,15 @@ positional parameter: space, line return
 1. `var_name=value` 变量名和等号之间不能有空格
 2. `echo ${var_name}` 变量名外面的花括号是为了帮助解释器识别变量的边界, 非必须
 
-双引号 " 
-1. 双引号里的变量会进行替换. 
+双引号 "
+1. 双引号里的变量会进行替换.
 2. $、\、'、和"这几个字符是特殊字符 (shell 引号嵌套 使用转义 \" \')
 
-单引号 ' 
+单引号 '
 1. 单引号里的任何字符都会原样输出, 单引号字符串中的变量是无效的
 2. 单引号字串中不能出现单引号（对单引号使用转义符后也不行）
 
-反引号 ` 
+反引号 `
 1. 反引号括起来的字符串被shell解释为命令行，在执行时，shell首先执行该命令行，并以它的标准输出结果取代整个反引号（包括两个反引号）部分
 2. 反引号和$()是对等的, $()能够内嵌使用，而且避免了转义符的麻烦
 
@@ -837,7 +857,7 @@ positional parameter: space, line return
 
 获得字符串长度 `${#string}` or `expr length $string`
 `string="abcd"; echo ${#string}` #输出：4
-截取字符串 
+截取字符串
 `str="hello shell"; echo ${str:2}`  #输出: llo shell
 `str="hello shell"; echo ${str:1:3}`  #输出: ell
 
@@ -863,15 +883,15 @@ output:
 	11
 
 if/else流程控制
-	
+
 	if condition
-	then 
+	then
 	     do something
 	elif condition
-	then 
+	then
 	    do something
 	elif condition
-	then 
+	then
 	    do something
 	else
 	    do something
@@ -990,13 +1010,13 @@ date 的+%s可以将日期转换成时间戳格式,看下面的例子：
 ``` shell
 
 	#!/bin/bash
-	 
+
 	date1="2008-4-09 12:00:00"
 	date2="2008-4-10 15:00:00"
-	 
+
 	t1=`date -d "$date1" +%s`
 	t2=`date -d "$date2" +%s`
-	 
+
 	if [ $t1 -gt $t2 ]; then
 	    echo "$date1 > $date2"
 	elif [ $t1 -eq $t2 ]; then
@@ -1664,17 +1684,19 @@ lsof -i
 
 #### Linux Network Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1	sar -n DEV,EDEV 1 ⟶ at interface limits? or use nicstat
-2	sar -n TCP,ETCP 1 ⟶ active/passive load, retransmit rate
-3	cat /etc/resolv.conf ⟶ it's always DNS
-4	mpstat -P ALL 1 ⟶ high kernel time? single hot CPU?
-5	tcpretrans ⟶ what are the retransmits? state?
-6	tcpconnect ⟶ connecting to anything unexpected?
-7	tcpaccept ⟶ unexpected workload?
-8	netstat -rnv ⟶ any inefficient routes?
+1	`sar -n DEV,EDEV 1` ⟶ at interface limits? or use nicstat
+2	`sar -n TCP,ETCP 1` ⟶ active/passive load, retransmit rate
+3	`cat /etc/resolv.conf` ⟶ it's always DNS
+4	`mpstat -P ALL 1` ⟶ high kernel time? single hot CPU?
+5	`tcpretrans` ⟶ what are the retransmits? state?
+6	`tcpconnect` ⟶ connecting to anything unexpected?
+7	`tcpaccept` ⟶ unexpected workload?
+8	`netstat -rnv` ⟶ any inefficient routes?
 9	check firewall config ⟶ anything blocking/throttling?
-10	netstat -s ⟶ play 252 metric pickup
+10	`netstat -s` ⟶ play 252 metric pickup
 tcp*, are from bcc/BPF tools.
+
+11 `iftop`
 
 #### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding。bonding是个很棒的东西，可以把多块网卡绑起来，突破单块网卡的带宽限制
@@ -1685,8 +1707,7 @@ tcp*, are from bcc/BPF tools.
 Linux查看网卡数据吞吐量方法
 1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘：`iptraf -d eth0`  
 2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`。
-
-`sar -n DEV 1`
+3. `sar -n DEV 1` 每一秒钟取一次值，取四次
 
 #### Network troubleshooting
 [Linux系统排查4——网络篇 - 王智愚 - 博客园](www.cnblogs.com/Security-Darren/p/4700387.html)
@@ -1790,6 +1811,16 @@ iostat - Average CPU Load, Disk Activity
 如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。
 
 #### `sar -n DEV 1`, `sar -n TCP,ETCP 1`
+`-n`参数很有用，他有6个不同的开关：DEV | EDEV | NFS | NFSD | SOCK | ALL 。DEV显示网络接口信息，EDEV显示关于网络错误的统计数据，NFS统计活动的NFS客户端的信息，NFSD统计NFS服务器的信息，SOCK显示套 接字信息，ALL显示所有5个开关。它们可以单独或者一起使用。我们现在要用的就是`-n DEV`了
+	IFACE：LAN接口
+	rxpck/s：每秒钟接收的数据包
+	txpck/s：每秒钟发送的数据包
+	rxbyt/s：每秒钟接收的字节数
+	txbyt/s：每秒钟发送的字节数
+	rxcmp/s：每秒钟接收的压缩数据包
+	txcmp/s：每秒钟发送的压缩数据包
+	rxmcst/s：每秒钟接收的多播数据包
+
 sar - Collect and Report System Activity
 ```
 $ sar -n DEV 1
@@ -2010,7 +2041,7 @@ example: 通过host3的端口转发，ssh登录host2
 2. `ssh -p 9001 localhost` ssh登录本机的9001端口，相当于连接host2的22端口
 
 远程端口转发:
-localhost与remoteSecret之间无法连通，必须借助remoteHost转发, 不过remoteHost是一台内网机器，它可以连接外网的localhost，但是反过来就不行，外网的localhost连不上内网的remoteHost. 
+localhost与remoteSecret之间无法连通，必须借助remoteHost转发, 不过remoteHost是一台内网机器，它可以连接外网的localhost，但是反过来就不行，外网的localhost连不上内网的remoteHost.
 解决办法:从remoteHost上建立与localhost的SSH连接，然后在localhost上使用这条连接
 1. `ssh -R localPort:remoteSecret:remoteSecretPort localhost`	#在remoteHost执行
 2. `ssh -p localPort localhost`	#在localhost上SSH本机localPort, 即连接上了remoteSecret
