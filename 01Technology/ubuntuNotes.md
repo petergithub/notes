@@ -455,6 +455,14 @@ find . -name dfc.properties
 delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xargs rm
 ```
 
+#### 文件个数 count files in directory recursively
+`find . -type f | wc -l`  
+`la -lR | grep "^-" | wc -l`
+#### 文件夹个数 count directories in directory recursively
+`find -mindepth 1 -type d | wc -l`
+`ls -lR | grep "^d" | wc -l`  
+
+
 #### 替换多文件中的内容
 `find . -name '*.htm' | xargs sed -n '/old/p'`  (查询个数)
 `find . -name '*.htm' | xargs sed -i 's/old/new/g'` (替换或者 s#old#new#g)
@@ -531,28 +539,28 @@ $2 $0上第二个字段的数据
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number
 
 #### 例子
-`w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0
-`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root
-`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format
-`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number
-`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses
-`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
-`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS
+`w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0  
+`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root  
+`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format  
+`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number  
+`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses  
+`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件  
+`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS  
 `echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
 
 按时间段查询: `cat maillog | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
 
 按时间区间查询:
-`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
+`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`  
 `awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
 
-awk求和
+awk求和 sum
 `echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
 
-删掉所有空行 `awk <pattern> '{print <stuff>}' <file>` 可以用来
+删掉所有空行 `awk <pattern> '{print <stuff>}' <file>`  
 Print every line that has at least one field: `awk 'NF > 0' data`
 
-过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符：==, !=, >, <, >=, <=
+过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符：==, !=, >, <, >=, <=  
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
 #### awk的工作流程
@@ -1450,16 +1458,16 @@ http://www.brendangregg.com/linuxperf.html
 
 #### Linux Perf Analysis in 60s checklist
 http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
-1	uptime ⟶ load averages
-2	dmesg -T | tail ⟶ kernel errors
-3	vmstat 1 ⟶ overall stats by time
-4	mpstat -P ALL 1 ⟶ CPU balance
-5	pidstat 1 ⟶ process usage
-6	iostat -xz 1 ⟶ disk I/O
-7	free -m ⟶ memory usage
-8	sar -n DEV 1 ⟶ network I/O
-9	sar -n TCP,ETCP 1 ⟶ TCP stats
-10	top ⟶ check overview
+1.	`uptime` ⟶ load averages
+2.	`dmesg -T | tail` ⟶ kernel errors
+3.	`vmstat 1` ⟶ overall stats by time
+4.	`mpstat -P ALL 1` ⟶ CPU balance
+5.	`pidstat 1` ⟶ process usage
+6.	`iostat -xz 1` ⟶ disk I/O
+7.	`free -m` ⟶ memory usage
+8.	`sar -n DEV 1` ⟶ network I/O
+9.	`sar -n TCP,ETCP 1` ⟶ TCP stats
+10.	`top` ⟶ check overview
 
 `dmesg | tail`	输出系统日志的最后10行
 `vmstat 1`, `iostat-xz 1`
@@ -1487,13 +1495,13 @@ sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和�
 
 #### Linux CPU Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1	uptime ⟶ load averages
-2	vmstat 1 ⟶ system-wide utilization, run q length
-3	mpstat -P ALL 1 ⟶ CPU balance
-4	pidstat 1 ⟶ per-process CPU
-5	CPU flame graph ⟶ CPU profiling
-6	CPU subsecond offset heat map ⟶ look for gaps
-7	perf stat -a -- sleep 10 ⟶ IPC, LLC hit ratio
+1.	`uptime` ⟶ load averages
+2.	`vmstat 1` ⟶ system-wide utilization, run q length
+3.	`mpstat -P ALL 1` ⟶ CPU balance
+4.	`pidstat 1` ⟶ per-process CPU
+5.	CPU flame graph ⟶ CPU profiling
+6.	CPU subsecond offset heat map ⟶ look for gaps
+7.	`perf stat -a` -- sleep 10 ⟶ IPC, LLC hit ratio
 htop can do 1-4
 
 #### top, uptime
@@ -1612,15 +1620,15 @@ slab的分布状况 `/proc/slabinfo`
 
 #### Linux Disk Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1	iostat –xnz 1 ⟶ any disk I/O? if not, stop looking
-2	vmstat 1 ⟶ is this swapping? or, high sys time?
-3	df -h ⟶ are file systems nearly full?
-4	ext4slower 10 ⟶ (zfs*, xfs*, etc.) slow file system I/O?
-5	bioslower 10 ⟶ if so, check disks
-6	ext4dist 1 ⟶ check distribution and rate
-7	biolatency 1 ⟶ if interesting, check disks
-8	cat /sys/devices/…/ioerr_cnt ⟶ (if available) errors
-9	smartctl -l error /dev/sda1 ⟶ (if available) errors
+1.	`iostat –xnz 1` ⟶ any disk I/O? if not, stop looking
+2.	`vmstat 1` ⟶ is this swapping? or, high sys time?
+3.	`df -h` ⟶ are file systems nearly full?
+4.	`ext4slower 10` ⟶ (zfs*, xfs*, etc.) slow file system I/O?
+5.	`bioslower 10` ⟶ if so, check disks
+6.	`ext4dist 1` ⟶ check distribution and rate
+7.	`biolatency 1` ⟶ if interesting, check disks
+8.	`cat /sys/devices/…/ioerr_cnt` ⟶ (if available) errors
+9.	`smartctl -l error /dev/sda1` ⟶ (if available) errors
 
 　
 #### 当磁盘无法写入的时候，一般有以下可能：
@@ -1688,13 +1696,13 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
        Show numerical addresses instead of trying to determine symbolic  host,
        port or user names.
 
-Listening open ports: netstat -anp | grep PORT
-netstat -antup 查看已建立的连接进程，所占用的端口
+Listening open ports: `netstat -anp | grep PORT`  
+`netstat -antup` 查看已建立的连接进程，所占用的端口 
 $ netstat -anp | less: Finding the PID of the process using a specific port
 Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
 tcp        0      0 *:pssc                      *:*                         LISTEN      -       
 
-lsof -i
+`lsof -i`
 
 #### Linux Network Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
@@ -1767,7 +1775,7 @@ Linux查看网卡数据吞吐量方法
 在进入iftop的非交互界面后，按 `p` 键可以打开或关闭显示端口，按 `s` 键可以显示或隐藏源主机，而按 `d` 键则可以显示或隐藏目标主机。
 
 `-i` 选项可以指定要查看的网卡，默认情况下，iftop会显示自己找到的第一个网卡；
-`-n` 选项直接显示连接的IP, Don't do hostname lookups 
+`-n` 选项直接显示连接的IP, Don't do hostname lookups
 
 ##### iperf
 Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  

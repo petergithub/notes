@@ -1,64 +1,66 @@
 [TOC]
 
-git://github.com/petergithub/helloworld.git
-git push https://github.com/petergithub/eclipsePluginOpen.git master
+git://github.com/petergithub/helloworld.git  
+git push https://github.com/petergithub/eclipsePluginOpen.git master 
 
 ## Commands
 ### Most recent
-Final release version
-`git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交
-`git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit
-`git tag <tagName> -m "comment"`
-`git push origin --tags`	一次性推送很多标签
-`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
+Final release version  
+`git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交  
+`git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit  
+`git tag <tagName> -m "comment"`  
+`git push origin --tags`	一次性推送很多标签  
+`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag  
 
-`git log -g branchName` show Git branch created time just for local fetch/create time
-`git log --name-only ` show changed file name only
-`git show <commit-id>` show difference for a commit 
-`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
-`git log --follow [file]`	显示某个文件的版本历史，包括文件改名
-`git whatchanged [file]`	显示某个文件的版本历史，包括文件改名
-`git log -p [file]`	显示指定文件相关的每一次diff
-`git blame [file]`	显示指定文件是什么人在什么时间修改过
-`git commit -v`
+`git log -g branchName` show Git branch created time just for local fetch/create time  
+`git log --name-only ` show changed file name only  
+`git show <commit-id>` show difference for a commit   
+`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git  
+`git log --follow [file]`	显示某个文件的版本历史，包括文件改名  
+`git whatchanged [file]`	显示某个文件的版本历史，包括文件改名  
+`git log -p [file]`	显示指定文件相关的每一次diff  
+`git blame [file]`	显示指定文件是什么人在什么时间修改过  
+`git commit -v`  
 
-`git ls-files` List all tracked files
-`git checkout anotherBranch -- path/to/file` Copy file from another branch
+`git ls-files` List all tracked files  
+`git checkout anotherBranch -- path/to/file` Copy file from another branch  
 
 Replace master branch entirely from another latestBranch:
 
-	git checkout latestBranch
-	git merge -s ours master
-	git checkout master
-	git merge latestBranch
+	git checkout latestBranch  
+	git merge -s ours master  
+	git checkout master  
+	git merge latestBranch  
 
-git pull all the projects in the folder
+git pull all the projects in the folder  
+
 ```bash
-for project in $(ls -1 .)
-do 
-    cd $project
-    pwd
-    git pull
-    cd -
-done 
+
+	for project in $(ls -1 .)
+	do 
+	    cd $project
+	    pwd
+	    git pull
+	    cd -
+	done 
 ```
 
 ####tag
-`git tag -m "comment" <tagName>`
-`git tag -a <tagName> <commit-id>`
-`git show <tagName>`	查看相应标签的版本信息，并连同显示打标签时的提交对象
-`git push origin --tags`	一次性推送很多标签
-`git checkout -b <branchName> <tagName>`
-`git tag -d <tagname>`	刪除Tag
-`git push origin :refs/tags/<tagName>`	刪除Tag from remote Git repositories
+`git tag -m "comment" <tagName>`  
+`git tag -a <tagName> <commit-id>`  
+`git show <tagName>`	查看相应标签的版本信息，并连同显示打标签时的提交对象  
+`git push origin --tags`	一次性推送很多标签  
+`git checkout -b <branchName> <tagName>`  
+`git tag -d <tagname>`	刪除Tag  
+`git push origin :refs/tags/<tagName>`	刪除Tag from remote Git repositories  
 
 ### Basic commands
-HEAD指向最后一次commit的信息  
-git cat-file -p [SHA-1]	输出数据内容
-git cat-file -t [SHA-1]	输出数据对象的类型
+HEAD指向最后一次commit的信息   
+git cat-file -p [SHA-1]	输出数据内容  
+git cat-file -t [SHA-1]	输出数据对象的类型  
 
-git log --stat -2 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
-git log --oneline
+git log --stat -2 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改  
+git log --oneline  
 
 git commit --amend -m "Comment"
 git pull --rebase origin master合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
