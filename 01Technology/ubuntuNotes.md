@@ -1,22 +1,22 @@
 [TOC]
 
-学习系统结构的最好方法是自己做一个linux系统，再也没有什么能比自己做一个linux系统更能学习系统结构的了。LFS (linux from strach)可以教你从源代码自己编译一个系统。通过自己编译一个系统，你就可以了结linux系统结构，知道哪些文件是干什么用的，以及他们如何协调 工作。
+学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from strach)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
 ## Recent
-为了方便地键入长命令，在设置你的编辑器后（例如 export EDITOR=vim），键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令。在 vi 模式下则键入 escape-v 实现相同的功能。
+为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.
 vimtutor: vim interactive guide
 `man readline` to get the introduction to the combination of keys
 
-ssh连接变得无响应了，让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话。
-其原理是，~符号是ssh命令中的转义字符，就像我们平时编程中使用的\一样。通过在ssh连接中输入~?，你可以看到完整的命令帮助。
+ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.
+其原理是, ~符号是ssh命令中的转义字符, 就像我们平时编程中使用的\一样. 通过在ssh连接中输入~?, 你可以看到完整的命令帮助.
 `reset` 恢复出现问题的屏幕
 
 man readline to get more information:
 Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
-    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
-    * CTRL+s or C-S-r：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+s or C-S-r: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 CTRL+h: show hidden files
 nautilus: open your home folder
 location: make a command can be call anywhere
@@ -55,23 +55,23 @@ To create a cronjob, just edit the crontab file: `crontab -e`
 `-l` 列出crontab文件
 `-e` 编辑当前的crontab文件
 `-r` 删除当前的crontab文件
-crontab特殊的符号说明：
+crontab特殊的符号说明:
 1. "*"代表所有的取值范围内的数字
-2. "/"代表每的意思，如"*/5"表示每5个单位
+2. "/"代表每的意思, 如"*/5"表示每5个单位
 3. "-"代表从某个数字到某个数字
 4. ","分散的数字
 
 log path: /var/log/messages or /var/log/cron*
 
-发现Ubuntu下没有自动打开cron的日志服务功能，解决方法如下
-cron的日志功能使用syslogd服务，不同版本linux可能装了不同的软件，这里介绍常见的两种：
+发现Ubuntu下没有自动打开cron的日志服务功能, 解决方法如下
+cron的日志功能使用syslogd服务, 不同版本linux可能装了不同的软件, 这里介绍常见的两种:
 sysklogd>>>>>>
-1. 编辑 /etc/syslog.conf，并且打开以cron.*开始的那行注释。
-2. 运行 /etc/init.d/sysklogd restart 。
-3. 运行 /etc/init.d/cron restart 。
+1. 编辑 /etc/syslog.conf, 并且打开以cron.*开始的那行注释.
+2. 运行 /etc/init.d/sysklogd restart .
+3. 运行 /etc/init.d/cron restart .
 
 rsyslog>>>>>>
-1. 修改rsyslog文件，将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉；
+1. 修改rsyslog文件, 将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉;
 2. 重启rsyslog服务service rsyslog restart
 3. 重启cron服务service cron restart
 
@@ -138,8 +138,8 @@ Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 `foo > allout.txt 2>&1` all output redirect to the same file
 
 `dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件
-if(input file)告诉dd从哪个文件读取数据，参数 of(output file)告诉dd读出的数据写入哪个文件中
-bs=1M表示每一次读写1M数据，count=50表示读写 50次，这样就指定了生成文件的大小为50M
+if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中
+bs=1M表示每一次读写1M数据, count=50表示读写 50次, 这样就指定了生成文件的大小为50M
 dd做的只是文件拷贝工作
 
 `dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
@@ -161,7 +161,7 @@ sudo apt-get install -f fixed it.
 pgrep 和 pkill
 pgrep -l apache2
 `ps -A -opid,stime,etime,args` 查看进程的启动时间
-`du -s * | sort -n | tail`	列出当前目录里最大的10个文件。
+`du -s * | sort -n | tail`	列出当前目录里最大的10个文件.
 `last`	To find out when a particular user last logged in to the Linux or Unix server.
 
 
@@ -214,10 +214,10 @@ ALT+Delete, and then press the up or down arrow key.
 #### Basic vi
 `~`	切换大小写
 `:sp`	split window above and below
-`:sh`	暂时退出vi到系统下，结束时按CTRL+d则回到vi
+`:sh`	暂时退出vi到系统下, 结束时按CTRL+d则回到vi
 `:r!command`	将命令command的输出结果放到当前行 如`:r!ls -ltr`
-`:x` == `:wq` 当文件被修改时两个命令时相同的。但如果未被修改，使用`:x`不会更改文件的修改时间，而使用`:wq`会改变文件的修改时间
-`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w），会提到命令:w!{cmd}，让vim执行一个外部命令{cmd}，然后把当前缓冲区的内容从stdin传入。tee是一个把stdin保存到文件的小工具。而%，是vim当中一个只读寄存器的名字，总保存着当前编辑文件的文件路径。所以执行这个命令，就相当于从vim外部修改了当前编辑的文件  
+`:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间
+`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w）, 会提到命令:w!{cmd}, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. tee是一个把stdin保存到文件的小工具. 而%, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
 改变与替换操作命令
@@ -231,28 +231,28 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 <cc> 替换当前行
 
 `yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)
-`yiw`	不管当前光标处于单词的哪个字母，都是复制整个单词(不包括末尾的空格)
-`diw`	删除当前光标所在的word(不包括空白字符)，意为Delete Inner Word 两个符号之间的单词
-`dt<LETTER>`	删除所有的内容，直到遇到<LETTER>
-`daw`	删除当前光标所在的word(包括空白字符)，意为Delete A Word
+`yiw`	不管当前光标处于单词的哪个字母, 都是复制整个单词(不包括末尾的空格)
+`diw`	删除当前光标所在的word(不包括空白字符), 意为Delete Inner Word 两个符号之间的单词
+`dt<LETTER>`	删除所有的内容, 直到遇到<LETTER>
+`daw`	删除当前光标所在的word(包括空白字符), 意为Delete A Word
 `guw`	光标下的单词变为小写
 `gUw`	光标下的单词变为大写
 `ga`	显示光标下的字符在当前使用的encoding下的内码
 `CTRL+SHIFT++`	zoom in on your terminal
 `CTRL+-`	Zoom out
 
-`.` 命令重复上次的修改。
+`.` 命令重复上次的修改.
 `:!` command allows you to enter the name of a shell command
-修改在这里就是插入、删除或者替换文本。能够重复是一个非常强大的机制。如果你基于它来安排你的编辑，许多修改将变得只是敲.键。留意其间的其他修改，因为它会替代你原来要重复的修改。相反，你可以用m命令先标记这个位置，继续重复你的修改，稍后再返回到这个位置。
-重复修改一个单词。
-如果是在整个文件中，你可以使用:`s`（substitute）命令。如果只是几个地方需要修改，一种快速的方法是使用`*`命令去找到下一个出现的单词，使用`cw`命令修改它。然后输入`n`去找到下一个单词，输入英文逗点 . 去重复`cw`命令。
+修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.
+重复修改一个单词.
+如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.
 删除多行
 1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
-2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式， 如该行存在function字串 一般 `d/fu` 也就搞定了
-输入单词A的前几个字母，然后CTRL+n补全。<CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全，还有<CTRL+o><CTRL+f> 用于对目录名进行补全
+2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式,  如该行存在function字串 一般 `d/fu` 也就搞定了
+输入单词A的前几个字母, 然后CTRL+n补全. <CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全, 还有<CTRL+o><CTRL+f> 用于对目录名进行补全
 
-记录功能: 命令模式下按q，再按一个字母做名字，就进入了记录模式，再按q停止记录。
-回放记录: 在命令模式下按@，再按下记录名字a。连续回放可以在@前加次数
+记录功能: 命令模式下按q, 再按一个字母做名字, 就进入了记录模式, 再按q停止记录.
+回放记录: 在命令模式下按@, 再按下记录名字a. 连续回放可以在@前加次数
 
 #### Move around inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
@@ -270,20 +270,20 @@ CTRL+w H(把当前窗口移到最左边)
 CTRL+w J(把当前窗口移到最下边)
 CTRL+w L(把当前窗口移到最右边)
 CTRL+w,r 交换上/下、左/右两个分隔窗口的位置
-其中2和4两个操作会把窗口改成垂直分割方式。
-在两个文件之间来回跳转，可以用下列命令序列CTRL+w, w
-可以使用快捷键在各个差异点之间快速移动。跳转到下一个差异点：]c. 反向跳转是：[c
+其中2和4两个操作会把窗口改成垂直分割方式.
+在两个文件之间来回跳转, 可以用下列命令序列CTRL+w, w
+可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: ]c. 反向跳转是: [c
 `> -`, `> +` 调整窗口大小
 
 dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
-do (diff "get"，之所以不用dg，是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
-:diffu[pdate] #更新diff 修改文件后，vimdiff会试图自动来重新比较文件，来实时反映比较结果。但是也会有处理失败的情况，这个时候需要手工来刷新比较结果：
-zo (folding open，之所以用z这个字母，是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
+do (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
+:diffu[pdate] #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
+zo (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
 zc (folding close)重新折叠
 
 #### Mutiple tab
 :n next file :p previous file
-:bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件。（陈皓注：我喜欢使用:n到下一个文件）
+:bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件. （陈皓注: 我喜欢使用:n到下一个文件）
 
 #### custom keyboard shortcut
 `inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim
@@ -294,21 +294,21 @@ zc (folding close)重新折叠
 #### VI正则表达式
 元字符 	说明
 . 	匹配任意字符
-[abc] 	匹配方括号中的任意一个字符，可用-表示字符范围。如[a-z0-9]匹配小写字母和数字
+[abc] 	匹配方括号中的任意一个字符, 可用-表示字符范围. 如[a-z0-9]匹配小写字母和数字
 [^abc] 	匹配除方括号中字符之外的任意字符
-\d 	匹配阿拉伯数字，等同于[0-9]
-\D 	匹配阿拉伯数字之外的任意字符，等同于[^0-9]
-\x 	匹配十六进制数字，等同于[0-9A-Fa-f]
-\X 	匹配十六进制数字之外的任意字符，等同于[^0-9A-Fa-f]
+\d 	匹配阿拉伯数字, 等同于[0-9]
+\D 	匹配阿拉伯数字之外的任意字符, 等同于[^0-9]
+\x 	匹配十六进制数字, 等同于[0-9A-Fa-f]
+\X 	匹配十六进制数字之外的任意字符, 等同于[^0-9A-Fa-f]
 \l 	匹配[a-z]
 \L 	匹配[^a-z]
 \u 	匹配[A-Z]
 \U 	匹配[^A-Z]
-\w 	匹配单词字母，等同于[0-9A-Za-z_]
-\W 	匹配单词字母之外的任意字符，等同于[^0-9A-Za-z_]
+\w 	匹配单词字母, 等同于[0-9A-Za-z_]
+\W 	匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]
 \t 	匹配<TAB>字符
-\s 	匹配空白字符，等同于[\t]
-\S 	匹配非空白字符，等同于[^\t]
+\s 	匹配空白字符, 等同于[\t]
+\S 	匹配非空白字符, 等同于[^\t]
 
 一些普通字符需转意
 元字符 	说明
@@ -344,7 +344,7 @@ pattern `[^0-9]*,`	matches string start with non-number until to (,)
 #### Replace
 `/`可以用`#`代替
 `:s`, `:&` repeat last :s command
-:g/old			查找old，并打印出现它的每一行
+:g/old			查找old, 并打印出现它的每一行
 :s/old/new		替换当前行第一个old
 :s/old/new/gc	当前行old全替换并需要确认
 :n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line
@@ -372,7 +372,7 @@ grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
 `-L`	列出不匹配的文件名
 `-w`	匹配整个单词
 `-A`, `-B`, `-C`	print context lines
-`-i`, --ignore-case不区分大小写地搜索。默认情况区分大小写，
+`-i`, --ignore-case不区分大小写地搜索. 默认情况区分大小写, 
 `-n`, --line-number
 `-c`, --count
 `-r`, --recursive
@@ -418,12 +418,12 @@ sed -i "s#,##g" test
 sed -i 's/_[a-z]/\U&\E/g' test
 sed -i 's/_//g' test
 
-删除行尾空格：:%s/\s+$//g
-删除行首多余空格：%s/^\s*// 或者 %s/^ *//
-删除沒有內容的空行：%s/^$// 或者 g/^$/d
-删除包含有空格组成的空行：%s/^\s*$// 或者 g/^\s*$/d
-删除以空格或TAB开头到结尾的空行：%s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
-替换变量:在正则式中以\(和\)括起来的正则表达式，在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容。
+删除行尾空格: :%s/\s+$//g
+删除行首多余空格: %s/^\s*// 或者 %s/^ *//
+删除沒有內容的空行: %s/^$// 或者 g/^$/d
+删除包含有空格组成的空行: %s/^\s*$// 或者 g/^\s*$/d
+删除以空格或TAB开头到结尾的空行: %s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
+替换变量:在正则式中以\(和\)括起来的正则表达式, 在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容.
 把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法
     :%s/abc\(.*\)xyz/xyz\1abc/g
     :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
@@ -436,9 +436,9 @@ sed -i 's/_//g' test
 
     echo "ab_c" | sed 's/_[a-z]/\u&/g'
     echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
-	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格，用一个空格代替
+	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格, 用一个空格代替
 	‘s/^[ ][ ] *//g’ 删除行首空格
-	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格，代之以一个空格
+	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格, 代之以一个空格
 	‘s/\ . $//g’ 删除以句点结尾行
 	‘-e/abcd/d’ 删除包含a b c d的行
 	‘/^ $/d’ 删除空行
@@ -450,7 +450,7 @@ sed -i 's/_//g' test
 	‘s/[TAB] *//g’ 删除所有tab键
 
 find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
-find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件，并找出包含"ERROR"的行
+find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
 find . -name dfc.properties
 delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xargs rm
 ```
@@ -488,7 +488,7 @@ find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JA
 1. `ls -i` print the index number of each file(文件的i节点) 12345
 2. `find . -inum 12345 -print -exec rm {} -r \;` rm
 3. `find . -inum 12345 -exec mv {} NewName \;` mv
-命令中的"{}"表示find命令找到的文件，在-exec选项执行mv命令的时候，会利用按i节点号找到的文件名替换掉"{}"
+命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
 ##### 文件名编码转换
 `convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换
@@ -502,10 +502,10 @@ Vim中查看文件编码 `:set fileencoding`
 1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式
 :set fileencoding=utf-8
 
-2. enconv 转换文件 编码 ，比如要将一个GBK编码 的文件 转换成UTF-8编码 ，操作如下
+2. enconv 转换文件 编码 , 比如要将一个GBK编码 的文件 转换成UTF-8编码 , 操作如下
 enconv -L zh_CN -x UTF-8 filename
 
-3. iconv 转换，iconv的命令格式如下：
+3. iconv 转换, iconv的命令格式如下:
 iconv -f fromEncoding -t toEncoding inputfile
 比如将一个GBK编码 的文件 转换成 UTF-8 编码
 iconv -f GBK -t UTF-8 file1 -o file2
@@ -560,7 +560,7 @@ awk求和 sum
 删掉所有空行 `awk <pattern> '{print <stuff>}' <file>`  
 Print every line that has at least one field: `awk 'NF > 0' data`
 
-过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符：==, !=, >, <, >=, <=  
+过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
 #### awk的工作流程
@@ -646,7 +646,7 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
 `-L` Use at most max-lines nonblank input  lines  per  command  line.  每行使用的非空字符串最大个数
 
-控制每行参数个数`-L`和最大并行数`-P`。如果你不确定它们是否会按你想的那样工作，先使用 xargs echo 查看一下。此外，使用 -I{} 会很方便。例如：
+控制每行参数个数`-L`和最大并行数`-P`. 如果你不确定它们是否会按你想的那样工作, 先使用 xargs echo 查看一下. 此外, 使用 -I{} 会很方便. 例如:
 
   `find . -name '*.py' | xargs grep some_function`
   `cat hosts | xargs -I {} ssh root@{} hostname`
@@ -656,33 +656,33 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
 `cat /etc/shells`	get all available shells
 xargs echo
-在bash的脚本中，你可以使用 set -x 来debug输出。使用 set -e 来当有错误发生的时候abort执行。考虑使用 set -o pipefail 来限制错误。还可以使用trap来截获信号（如截获ctrl+c）。
-在bash 脚本中，subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令。一个常用的例子是临时地到另一个目录中
+在bash的脚本中, 你可以使用 set -x 来debug输出. 使用 set -e 来当有错误发生的时候abort执行. 考虑使用 set -o pipefail 来限制错误. 还可以使用trap来截获信号（如截获ctrl+c）.
+在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中
 
 read -p "Press [Enter] key to continue"
 read -n 1 -p "Press any key to continue"
 sleep 2; echo 'end sleep 2 sec'
 
-﻿$? 上一个命令的返回代码。0为true, 1为false
+﻿$? 上一个命令的返回代码. 0为true, 1为false
 $$进程标识号
-$*，该变量包含了所有输入的命令行参数值
+$*, 该变量包含了所有输入的命令行参数值
 
 
 #### `dirname $0`
-在命令行状态下单纯执行 $ cd `dirname $0` 是毫无意义的。因为他返回当前路径的"."。
-这个命令写在脚本文件里才有作用，他返回这个脚本文件放置的目录，并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）。
-在/home/admin/test/下新建test.sh内容如下：
+在命令行状态下单纯执行 $ cd `dirname $0` 是毫无意义的. 因为他返回当前路径的".".
+这个命令写在脚本文件里才有作用, 他返回这个脚本文件放置的目录, 并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）.
+在/home/admin/test/下新建test.sh内容如下:
 
    cd `dirname $0`
    echo `pwd`
 
 然后返回到/home/admin/执行 `sh test/test.sh` 运行结果: `/home/admin/test`
-这样就可以知道一些和脚本一起部署的文件的位置了，只要知道相对位置就可以根据这个目录来定位，而可以不用关心绝对位置。这样脚本的可移植性就提高了，扔到任何一台服务器，（如果是部署脚本）都可以执行。
+这样就可以知道一些和脚本一起部署的文件的位置了, 只要知道相对位置就可以根据这个目录来定位, 而可以不用关心绝对位置. 这样脚本的可移植性就提高了, 扔到任何一台服务器, （如果是部署脚本）都可以执行.
 
 #### `pwd`, `PWD`
-`pwd`命令用于显示当前工作目录。
-环境变量`OLDPWD`表示前一次的工作目录，
-环境变量`PWD`表示当前的工作目录。
+`pwd`命令用于显示当前工作目录.
+环境变量`OLDPWD`表示前一次的工作目录, 
+环境变量`PWD`表示当前的工作目录.
 
 #### Common Bash comparisons
 
@@ -699,14 +699,14 @@ Operator	Meaning	Example
 -gt	Numeric strict greater than	[ 3 -gt "$myinteger" ]
 -ge	Numeric greater than or equals	[ 3 -ge "$myinteger" ]
 -f	Exists and is regular file	[ -f "$myfile" ]
-[ -f "somefile" ] ：判断是否是一个文件
+[ -f "somefile" ] : 判断是否是一个文件
 -d	Exists and is directory	[ -d "$mydir" ]
 -d 是否是目录
 -nt	First file is newer than second one	[ "$myfile" -nt ~/.bashrc ]
 -ot	First file is older than second one	[ "$myfile" -ot ~/.bashrc ]
-[ -x "/bin/ls" ] ：判断/bin/ls是否存在并有可执行权限
-[ -n "$var" ] ：判断$var变量是否有值
-[ "$a" = "$b" ] ：判断$a和$b是否相等
+[ -x "/bin/ls" ] : 判断/bin/ls是否存在并有可执行权限
+[ -n "$var" ] : 判断$var变量是否有值
+[ "$a" = "$b" ] : 判断$a和$b是否相等
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
 -e file 	Check if file exists. Is true even if file is a directory but exists. 	[ -e $file ] is true.
@@ -741,14 +741,14 @@ positional parameter: space, line return
 2. 单引号字串中不能出现单引号（对单引号使用转义符后也不行）
 
 反引号 `
-1. 反引号括起来的字符串被shell解释为命令行，在执行时，shell首先执行该命令行，并以它的标准输出结果取代整个反引号（包括两个反引号）部分
-2. 反引号和$()是对等的, $()能够内嵌使用，而且避免了转义符的麻烦
+1. 反引号括起来的字符串被shell解释为命令行, 在执行时, shell首先执行该命令行, 并以它的标准输出结果取代整个反引号（包括两个反引号）部分
+2. 反引号和$()是对等的, $()能够内嵌使用, 而且避免了转义符的麻烦
 
 [ ] 两边要加空格
 `if [ $a=$b ]`才是对的. 注意: 这里的[]是test命令的一种形式, [是系统的一个内置命令,存在路径是/bin/[,它是调用test命令的标识, 右中括号是关闭条件判断的标识, 因此与测试语句`if test $a=$b`是等效的
 
 获得字符串长度 `${#string}` or `expr length $string`
-`string="abcd"; echo ${#string}` #输出：4
+`string="abcd"; echo ${#string}` #输出: 4
 截取字符串
 `str="hello shell"; echo ${str:2}`  #输出: llo shell
 `str="hello shell"; echo ${str:1:3}`  #输出: ell
@@ -896,8 +896,8 @@ switch流程控制
 
 ##### 时间比较
 [Shell比较两个日期的大小](http://www.linuxsong.org/2010/09/shell-date-compare/)
-在Shell中我们可以利用date命令比较两个日期的大小，方法是先把日期转换成时间戳格式，再进行比较。
-date 的+%s可以将日期转换成时间戳格式,看下面的例子：
+在Shell中我们可以利用date命令比较两个日期的大小, 方法是先把日期转换成时间戳格式, 再进行比较.
+date 的+%s可以将日期转换成时间戳格式,看下面的例子:
 
 ``` shell
 
@@ -928,74 +928,74 @@ CTRL+q Windows vi region select
 Add comments for multi-lines
 	press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 编辑命令
-    * CTRL+a ：移到命令行首
-    * CTRL+e ：移到命令行尾
-    * ALT+f ：按单词前移（右向）
-    * ALT+b ：按单词后移（左向）
-    * CTRL+xx：在命令行首和光标之间移动
-    * CTRL+u ：从光标处删除至命令行首
-    * CTRL+k ：从光标处删除至命令行尾
-    * CTRL+w ：从光标处删除至字首
-    * ALT+d ：从光标处删除至字尾
-    * CTRL+d ：删除光标处的字符
-    * CTRL+h ：删除光标前的字符
-    * CTRL+y ：粘贴至光标后
-    * ALT+c ：从光标处更改为首字母大写的单词
-    * ALT+u ：从光标处更改为全部大写的单词
-    * ALT+l ：从光标处更改为全部小写的单词
-    * CTRL+t ：交换光标处和之前的字符
-    * ALT+t ：交换光标处和之前的单词
-    * ALT+Backspace：与 CTRL+w 相同类似，分隔符有些差别 [感谢 rezilla 指正]
+    * CTRL+a : 移到命令行首
+    * CTRL+e : 移到命令行尾
+    * ALT+f : 按单词前移（右向）
+    * ALT+b : 按单词后移（左向）
+    * CTRL+xx: 在命令行首和光标之间移动
+    * CTRL+u : 从光标处删除至命令行首
+    * CTRL+k : 从光标处删除至命令行尾
+    * CTRL+w : 从光标处删除至字首
+    * ALT+d : 从光标处删除至字尾
+    * CTRL+d : 删除光标处的字符
+    * CTRL+h : 删除光标前的字符
+    * CTRL+y : 粘贴至光标后
+    * ALT+c : 从光标处更改为首字母大写的单词
+    * ALT+u : 从光标处更改为全部大写的单词
+    * ALT+l : 从光标处更改为全部小写的单词
+    * CTRL+t : 交换光标处和之前的字符
+    * ALT+t : 交换光标处和之前的单词
+    * ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
 重新执行命令
-    * CTRL+r：逆向搜索命令历史 reverse-i-search in bash
-    * CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-    * CTRL+g：从历史搜索模式退出
-    * CTRL+p：历史中的上一条命令
-    * CTRL+n：历史中的下一条命令
-    * ALT+.：使用上一条命令的最后一个参数
+    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+    * CTRL+g: 从历史搜索模式退出
+    * CTRL+p: 历史中的上一条命令
+    * CTRL+n: 历史中的下一条命令
+    * ALT+.: 使用上一条命令的最后一个参数
 控制命令
-    * CTRL+l：清屏
-    * CTRL+o：执行当前命令，并选择上一条命令 循环执行历史命令
-    * CTRL+s：阻止屏幕输出
-    * CTRL+q：允许屏幕输出
-    * CTRL+c：终止命令
-    * CTRL+z：挂起命令
+    * CTRL+l: 清屏
+    * CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令
+    * CTRL+s: 阻止屏幕输出
+    * CTRL+q: 允许屏幕输出
+    * CTRL+c: 终止命令
+    * CTRL+z: 挂起命令
 Bang (!) 命令
-    * !!：执行上一条命令
-    * !blah：执行最近的以 blah 开头的命令，如 !ls
-    * !blah:p：仅打印输出，而不执行
-    * !$：上一条命令的最后一个参数，与 ALT+. 相同
-    * !$:p：打印输出 !$ 的内容
-    * !*：上一条命令的所有参数
-    * !*:p：打印输出 !* 的内容
-    * ^blah：删除上一条命令中的 blah
-    * ^blah^foo：将上一条命令中的 blah 替换为 foo
-    * ^blah^foo^：将上一条命令中所有的 blah 都替换为 foo
+    * !!: 执行上一条命令
+    * !blah: 执行最近的以 blah 开头的命令, 如 !ls
+    * !blah:p: 仅打印输出, 而不执行
+    * !$: 上一条命令的最后一个参数, 与 ALT+. 相同
+    * !$:p: 打印输出 !$ 的内容
+    * !*: 上一条命令的所有参数
+    * !*:p: 打印输出 !* 的内容
+    * ^blah: 删除上一条命令中的 blah
+    * ^blah^foo: 将上一条命令中的 blah 替换为 foo
+    * ^blah^foo^: 将上一条命令中所有的 blah 都替换为 foo
 $ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new
-!$	是一个特殊的环境变量，它代表了上一个命令的最后一个字符串
+!$	是一个特殊的环境变量, 它代表了上一个命令的最后一个字符串
 !!	Run the last command-name
 sudo !!	以root的身份执行上一条命令
 echo !!:1	to call 1st arg
 echo !!:2	to call 2nd arg
-echo $?	获取上一次命令执行的结果，0表示成功，非0表示失败
+echo $?	获取上一次命令执行的结果, 0表示成功, 非0表示失败
 `sudo su -` change to root user
 
-友情提示：
-   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效，若你将 Bash 配置为 vi 编辑模式，那将遵循 vi 的按键绑定。Bash 默认为 emacs 编辑模式。如果你的 Bash 不在 emacs 编辑模式，可通过`set -o emacs`设置。
+友情提示:
+   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
    2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
     输入`du -sh dir`, 按回车执行命令
     `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
 	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
-   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g：从历史搜索模式退出
-   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的，可用`stty`命令设置。
-   	  CTRL+s：forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
+   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
+   	  CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
 	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
 	or remove it altogether with `stty stop undef`.
 	or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
 	After that `C-s` would work in the given terminal.
 	Set it in ~/.bashrc to make it work in every terminal.
     	refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr
-   5. 在已经敲完的命令后按<CTRL+x CTRL+e>，会打开一个你指定的编辑器（比如vim，通过环境变量$EDITOR 指定）
+   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）
 
 ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
 undo 	CTRL+/
@@ -1009,30 +1009,30 @@ add one line in .bashrc
 .bashrc:  `alias grep='grep --color=auto'`
 
 #### file carriage 换行
-两个字符：一个字符<Return>来移到第一列，另一个字符<Line feed>来新增一行
-UNIX人认为在到达一行的结尾时新增一行<Line feed> (LF)，而Mac人则认同<Return> (CR)的解决办法，MS则坚持古老的<Return><Line feed> (CRLF)
-在Linux下使用vi来查看一些在Windows下创建的文本文件，有时会发现在行尾有一些"^M"。有几种方法可以处理,注意：这里的"^M"要使用"CTRL+v CTRL+m"生成，而不是直接键入"^M"。
+两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行
+UNIX人认为在到达一行的结尾时新增一行<Line feed> (LF), 而Mac人则认同<Return> (CR)的解决办法, MS则坚持古老的<Return><Line feed> (CRLF)
+在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".
 1. $ dos2unix myfile.txt
-2. vi `:%s/^M$//g` #去掉行尾的^M。
-	`:%s/^M//g` #去掉所有的^M。
+2. vi `:%s/^M$//g` #去掉行尾的^M.
+	`:%s/^M//g` #去掉所有的^M.
 3. `sed -e 's/^M//n/g' myfile.txt` // evluate
  `sed -i 's/^M//n/g' myfile.txt` // replace
 
-显示换行 `:set list` 进入<list mode>，可以看到以`$`表示的换行符和以`^I`表示的制表符。
+显示换行 `:set list` 进入<list mode>, 可以看到以`$`表示的换行符和以`^I`表示的制表符.
 vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望
 退出<list mode> `:set nolist`
 
 删除换行
-可以用以下命令删除换行符： `:%s/\n//g`
-可以用以下命令删除DOS文件中的回车符“^M”：`:%s/\r//g`
-可以用以下命令转换DOS回车符“^M”为真正的换行符：`:%s/\r/\r/g`
+可以用以下命令删除换行符:  `:%s/\n//g`
+可以用以下命令删除DOS文件中的回车符“^M”: `:%s/\r//g`
+可以用以下命令转换DOS回车符“^M”为真正的换行符: `:%s/\r/\r/g`
 
-`fileformats`选项，用于处理文件格式问题  
-`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择，而将MS-DOS的文件格式做为第二选择
+`fileformats`选项, 用于处理文件格式问题  
+`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择, 而将MS-DOS的文件格式做为第二选择
 `:set fileformat?` 检测到的文件格式会被存放在fileformat选项中
 `:set fileformat=unix` 将文件转换为UNIX格式的文件
 
-在默认情况下，Vim认为文件是由行组成的，并且文件最后一行是以<EOL>为结束符的  
+在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以<EOL>为结束符的  
 `:set endofline` 设置文件以<EOL>结束符结尾
 `:set noendofline` 设置文件不以<EOL>结束符来结尾
 
@@ -1066,51 +1066,51 @@ cd C:\sp\Workspace\packager4p5\bin\classes
 jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class
 jar uvf C:\package.jar -C backup config.properties; add config.properties without backup folder path into jar
 java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
-java命令引入jar时可以-cp参数，但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar)，通常的jar都在同一目录，且多于1个
-如：java -Djava.ext.dirs=lib MyClass
+java命令引入jar时可以-cp参数, 但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar), 通常的jar都在同一目录, 且多于1个
+如: java -Djava.ext.dirs=lib MyClass
 
 
 ### sort uniq cut
 `sort` `-t`设定间隔符 `-k`指定列数
 `sort [-fbMnrtuk] [file or stdin]`
-`-n`  ：使用『纯数字』进行排序(默认是以文字型态来排序的)；
-`-r`  ：反向排序；
-`-t`  ：分隔符，默认是用 [tab] 键来分隔；
-`-k`  ：以那个区间 (field) 来进行排序的意思
-/etc/passwd 内容是以 : 来分隔的，以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
-默认是以字符串来排序的，如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
-如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序，再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
+`-n`  : 使用『纯数字』进行排序(默认是以文字型态来排序的);
+`-r`  : 反向排序;
+`-t`  : 分隔符, 默认是用 [tab] 键来分隔;
+`-k`  : 以那个区间 (field) 来进行排序的意思
+/etc/passwd 内容是以 : 来分隔的, 以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
+默认是以字符串来排序的, 如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
+如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序, 再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
 
 `uniq [-icu]`
-uniq 去除排序过的文件中的重复行，因此uniq经常和sort合用。也就是说，为了使uniq起作用，所有的重复行必须是相邻的。
-`-i`  ：忽略大小写字符的不同；
-`-c`  ：进行计数
-`-u`  ：只显示唯一的行
+uniq 去除排序过的文件中的重复行, 因此uniq经常和sort合用. 也就是说, 为了使uniq起作用, 所有的重复行必须是相邻的.
+`-i`  : 忽略大小写字符的不同;
+`-c`  : 进行计数
+`-u`  : 只显示唯一的行
 
 cut命令可以从一个文本文件或者文本流中提取文本列
 `cut -d '分隔字符' -f fields` 用于有特定分隔字符
-`-d`  ：后面接分隔字符。与 -f 一起使用；
-`-f`  ：依据 -d 的分隔字符将一段信息分割成为数段，用 -f 取出第几段的意思；
-`-c`  ：以字符 (characters) 的单位取出固定字符区间；
+`-d`  : 后面接分隔字符. 与 -f 一起使用;
+`-f`  : 依据 -d 的分隔字符将一段信息分割成为数段, 用 -f 取出第几段的意思;
+`-c`  : 以字符 (characters) 的单位取出固定字符区间;
 
 操作PATH变量
 找出第五个路径 `echo $PATH | cut -d ':' -f 5`
 找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
-找出第一到第三，还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
 
 ### curl
 查看网页源码 `curl www.sina.com`
 	保存网页`curl -o [文件名] www.sina.com`
 自动跳转重定向 `curl -L www.sina.com`
 显示http header
-	显示http response的头信息，连同网页代码一起 `curl -i www.sina.com`
-	`-I`参数则是只显示http response的头信息。
+	显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`
+	`-I`参数则是只显示http response的头信息.
 显示通信过程
 	`curl -v www.sina.com`
 	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
-HTTP动词 curl默认的HTTP动词是GET，使用`-X`参数可以支持其他动词。
+HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
 HTTP认证	`curl --user name:password example.com`
 
@@ -1173,15 +1173,15 @@ And here is what you get back:
 `rsync -avPz src/ dest` Copy contents of `src/` to destination
 `-a`  等于 `-rlptgoD`
         `-r` 是递归
-        `-l` 是链接文件，意思是拷贝链接文件；
+        `-l` 是链接文件, 意思是拷贝链接文件;
         `-p` 表示保持文件原有权限
-        `-t` 保持文件原有时间；
+        `-t` 保持文件原有时间;
         `-g` 保持文件原有用户组
-        `-o` 保持文件原有属主；
+        `-o` 保持文件原有属主;
         `-D` 相当于块设备文件
-`-z` 传输时压缩；
+`-z` 传输时压缩;
 `-P` 等于 `--partial --progress`
-       `--partial` 保留那些因故没有完全传输的文件，以是加快随后的再次传输
+       `--partial` 保留那些因故没有完全传输的文件, 以是加快随后的再次传输
        `--progress` 进度       
 `-v` 详细输出信息
 `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
@@ -1218,32 +1218,32 @@ source .profile 使profile改动生效
 wget是linux最常用的下载命令
 tnsping MDATADEV.DOMAIN.COM
 使用一个命令来定义复杂的目录树	mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}
-ntsysv 就会*出图形界面给你选择(有的则显示在里面)，如果在文本界面就用ntsysv命令
-常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展，所以我们可以用 `echo * == ls`
+ntsysv 就会*出图形界面给你选择(有的则显示在里面), 如果在文本界面就用ntsysv命令
+常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展, 所以我们可以用 `echo * == ls`
 
 ## Advanced command
 ### Tmux
 tmux	CRTL-b
-tmux使用C/S模型构建，主要包括以下单元模块：
-    server服务器。输入tmux命令时就开启了一个服务器。
-    session会话。一个服务器可以包含多个会话
-    window窗口。一个会话可以包含多个窗口。
-    pane面板。一个窗口可以包含多个面板。
+tmux使用C/S模型构建, 主要包括以下单元模块:
+    server服务器. 输入tmux命令时就开启了一个服务器.
+    session会话. 一个服务器可以包含多个会话
+    window窗口. 一个会话可以包含多个窗口.
+    pane面板. 一个窗口可以包含多个面板.
 tmux ls #列出会话
 tmux a[ttach] -t session
 
-#### session operation：
+#### session operation:
 :new	create new session(:new -s sessionName)
-? 列出所有快捷键；按q返回
-d 脱离当前会话,可暂时返回Shell界面，输入tmux a[ttach]能够重新进入之前会话
-s 选择并切换会话；在同时开启了多个会话时使用
+? 列出所有快捷键; 按q返回
+d 脱离当前会话,可暂时返回Shell界面, 输入tmux a[ttach]能够重新进入之前会话
+s 选择并切换会话; 在同时开启了多个会话时使用
 $ Rename the current session
 
 #### window operation
 c 创建一个新的窗口
 w 以菜单方式显示及选择窗口
 n(到达下一个窗口) p(到达上一个窗口)
-& 关掉当前窗口，也可以输入 exit
+& 关掉当前窗口, 也可以输入 exit
 , Rename the current window
 
 If the window name keeps renaming, create file `.tmux.conf` with content below
@@ -1291,7 +1291,7 @@ screen vi test.c
 `screen -r <PID>`	Reattach a session
 `-x <name>`   Attach to a not detached screen  session
 
-可以通过CTRL+a ?来查看所有的键绑定，常用的键绑定有：
+可以通过CTRL+a ?来查看所有的键绑定, 常用的键绑定有:
 CTRL+a ?	显示所有键绑定信息
 CTRL+a w	显示所有窗口列表
 CTRL+a A	set window title
@@ -1305,7 +1305,7 @@ CTRL+a a	发送CTRL+a到当前窗口 bash中到行首
 CTRL+a d	暂时断开screen会话
 CTRL+a k	杀掉当前窗口
 CTRL+a [	进入拷贝/回滚模式
--c file	使用配置文件file，而不使用默认的$HOME/.screenrc
+-c file	使用配置文件file, 而不使用默认的$HOME/.screenrc
 screen -wipe命令清除死掉的会话
 
 ### Python
@@ -1331,32 +1331,32 @@ http://www.5dmail.net/html/2013-5-7/201357111547.htm
 0.2 unzip: tar xzf jdk-8u5-linux-i586.tar.gz
 0.3 check version: jdk1.8.0_05/bin/java -version
 
-1.1. 下载Linux x86 jdk-6u26-linux-i586.bin：
+1.1. 下载Linux x86 jdk-6u26-linux-i586.bin:
 	sudo cp Downloads/jdk-6u26-linux-i586.bin /opt
 	cd /opt
 	sudo chmod +x jdk-6u26-linux-i586.bin
 1.2. 解压缩安装包进行安装sudo ./jdk-6u26-linux-i586.bin
-1.3. 接下来要配置环境变量，修改profile文件。
+1.3. 接下来要配置环境变量, 修改profile文件.
 	sudo gedit /etc/profile
-	在文本中添加以下代码：
+	在文本中添加以下代码:
 	#Sun JDK profile
 	export JAVA_HOME=/opt/jdk1.6.0_26
 	export JRE_HOME=/opt/jdk1.6.0_26/jre
 	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
 	export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOME/bin
-1.4. 还要修改另外一个文件environment：
+1.4. 还要修改另外一个文件environment:
 	sudo gedit /etc/environment
-	在文本中添加以下代码：
+	在文本中添加以下代码:
 	#Sun JDK environment
 	export JAVA_HOME=/opt/jdk1.6.0_26
 	export JRE_Home=/opt/jdk1.6.0_26/jre
 	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib
-1.5. 手动配置JDK。
+1.5. 手动配置JDK.
 	sudo update-alternatives --install /usr/bin/java java /opt/jdk1.6.0_26/bin/java 300
 	sudo update-alternatives --install /usr/bin/javac javac /opt/jdk1.6.0_26/bin/javac 300
-1.6. 让系统使用我们安装的JDK。
+1.6. 让系统使用我们安装的JDK.
 	sudo update-alternatives --config java
-1.7. 验证安装JDK是否成功。
+1.7. 验证安装JDK是否成功.
 	java -version
 
 ### eclipse installation
@@ -1447,7 +1447,7 @@ gMTP connect to android from Ubuntu
 
 ### Ubuntu死机
 1. 重启桌面方法
-`sudo restart lightdm`restarting the GUI gnome-system-monitor or `ALT+CTRL+F1`进入命令行Console, kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg, 缺点是重新启动了Xorg的进程，死机前原来正在运行的程序和数据无法恢复！
+`sudo restart lightdm`restarting the GUI gnome-system-monitor or `ALT+CTRL+F1`进入命令行Console, kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg, 缺点是重新启动了Xorg的进程, 死机前原来正在运行的程序和数据无法恢复！
 2. When a single program stops working: ALT+F2, type xkill
 
 ## System
@@ -1474,9 +1474,9 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 
 
 sysstat工具与负载历史回放
-sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和内存使用记录，便于历史数据的回放
+sar命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放
 1. sar命令查看CPU、内存和磁盘记录
-　　默认情况下，sar命令显示当天的统计信息  
+　　默认情况下, sar命令显示当天的统计信息  
 `sar` CPU统计信息  
 `sar -r`显示收集的内存记录  
 `sar -b`显示磁盘I/O
@@ -1484,10 +1484,11 @@ sar命令来自sysstat工具包，可以记录系统的CPU负载、I/O状况和�
 2. 使用sar查看指定时间、指定日期的历史记录
 参数-s和-e限定查看的时间
 `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
-`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录，每天的记录以saN为文件名保存在相应的日志目录中
+`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
 `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
 ### CPU
+`lscpu` display information on CPU architecture
 `cat /proc/cpuinfo` view the amount of cores
 `pidstat -l 2 10`
 `ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程
@@ -1505,34 +1506,35 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 htop can do 1-4
 
 #### top, uptime
-`top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等。因此通过这个命令，可以相对全面的查看系统负载的来源。同时，`top`命令支持排序，可以按照不同的列排序，方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等。
+`top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等. 因此通过这个命令, 可以相对全面的查看系统负载的来源. 同时, `top`命令支持排序, 可以按照不同的列排序, 方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等.
 
 1. `uptime`
 `23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02`
-命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况。通过这三个数据，可以了解服务器负载是在趋于紧张还是区域缓解。如果1分钟平均负载很高，而15分钟平均负载很低，说明服务器正在命令高负载情况，需要进一步排查CPU资源都消耗在了哪里。反之，如果15分钟平均负载很高，1分钟平均负载较低，则有可能是CPU资源紧张时刻已经过去。  
-上面例子中的输出，可以看见最近1分钟的平均负载非常高，且远高于最近15分钟负载，因此我们需要继续排查当前系统中有什么进程消耗了大量的资源。可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查。  
-判断一个系统负载是否偏高需要计算单核CPU的平均负载，等于这里uptime命令显示的系统平均负载 / CPU核数，一般以0.7为比较合适的值。偏高说明有比较多的进程在等待使用CPU资源  
+命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况. 通过这三个数据, 可以了解服务器负载是在趋于紧张还是区域缓解. 如果1分钟平均负载很高, 而15分钟平均负载很低, 说明服务器正在命令高负载情况, 需要进一步排查CPU资源都消耗在了哪里. 反之, 如果15分钟平均负载很高, 1分钟平均负载较低, 则有可能是CPU资源紧张时刻已经过去.   
+上面例子中的输出, 可以看见最近1分钟的平均负载非常高, 且远高于最近15分钟负载, 因此我们需要继续排查当前系统中有什么进程消耗了大量的资源. 可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查.   
+判断一个系统负载是否偏高需要计算单核CPU的平均负载, 等于这里uptime命令显示的系统平均负载 / CPU核数, 一般以0.7为比较合适的值. 偏高说明有比较多的进程在等待使用CPU资源  
 
 2. `top`
-top命令中，按 `f` 键，进入选择排序列的界面, 按 `k` 键，并输入想要终止的PID，就可以直接杀死指定进程
-第3行：当前的CPU运行情况：  
-　　　　us：非nice用户进程占用CPU的比率  
-　　　　sy：内核、内核进程占用CPU的比率；  
-　　　　ni：如果一些用户进程修改过优先级，这里显示这些进程占用CPU时间的比率；  
-　　　　id：CPU空闲比率，如果系统缓慢而这个值很高，说明系统慢的原因不是CPU负载高；  
-　　　　wa：CPU等待执行I/O操作的时间比率，该指标可以用来排查磁盘I/O的问题，通常结合wa和id判断  
-　　　　hi：CPU处理硬件终端所占时间的比率；  
-　　　　si：CPU处理软件终端所占时间的比率；  
-　　　　st：流逝的时间，虚拟机中的其他任务所占CPU时间的比率；  
+top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输入想要终止的PID, 就可以直接杀死指定进程
+`RES`是常驻内存, 是进程切实使用的物理内存量
+第3行: 当前的CPU运行情况:  
+`us`: 非nice用户进程占用CPU的比率  
+　　　　`sy, system`: 内核、内核进程占用CPU的比率;   
+　　　　`ni, nice`: 如果一些用户进程修改过优先级, 这里显示这些进程占用CPU时间的比率;   
+　　　　`id`: CPU空闲比率, 如果系统缓慢而这个值很高, 说明系统慢的原因不是CPU负载高;   
+　　　　`wa, IO-wait`: CPU等待执行I/O操作的时间比率, 该指标可以用来排查磁盘I/O的问题, 通常结合wa和id判断  
+　　　　`hi`: CPU处理硬件终端所占时间的比率;   
+　　　　`si`: CPU处理软件终端所占时间的比率;   
+　　　　`st`: 流逝的时间, 虚拟机中的其他任务所占CPU时间的比率;   
 
-　用户进程占比高，wa低，说明系统缓慢的原因在于进程占用大量CPU，通常还会伴有教低的id，说明CPU空转时间很少；  
-　　wa低，id高，可以排除CPU资源瓶颈的可能  
-　　wa高，说明I/O占用了大量的CPU时间，需要检查交换空间的使用，交换空间位于磁盘上，性能远低于内存，当内存耗尽开始使用交换空间时，将会给性能带来严重影响，所以对于性能要求较高的服务器，一般建议关闭交换空间。另一方面，如果内存充足，但wa很高，说明需要检查哪个进程占用了大量的I/O资源。
+　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有教低的id, 说明CPU空转时间很少;   
+　　wa低, id高, 可以排除CPU资源瓶颈的可能  
+　　wa高, 说明I/O占用了大量的CPU时间, 需要检查交换空间的使用, 交换空间位于磁盘上, 性能远低于内存, 当内存耗尽开始使用交换空间时, 将会给性能带来严重影响, 所以对于性能要求较高的服务器, 一般建议关闭交换空间. 另一方面, 如果内存充足, 但wa很高, 说明需要检查哪个进程占用了大量的I/O资源.
 
 ### Memory troubleshooting
 [Linux系统排查1——内存篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4685629.html)
 Steps:
-　　1. 内存的使用率如何查看，使用率真的很高吗
+　　1. 内存的使用率如何查看, 使用率真的很高吗
 　　2. 内存用在哪里了
 　　3. 内存优化可以有哪些手段
 1. 内存硬件查看 `dmidecode -t memory`: 通过dmidecode工具可以查看很多硬件相关的数据
@@ -1543,37 +1545,37 @@ Steps:
 	Mem:          7.5G       7.4G       175M       327M        25M       527M
 	-/+ buffers/cache:       6.8G       729M
 	Swap:         1.9G       1.9G         0B
-free 命令下面有一行“-/+ buffers/cache”，该行显示的used是上一行“used”的值减去buffers和cached的值(7.4G - 327M - 25M)，同时该行的free是上一行的free加上buffers和cached的值(175M + 327M + 25M)
+free 命令下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“used”的值减去buffers和cached的值(7.4G - 327M - 25M), 同时该行的free是上一行的free加上buffers和cached的值(175M + 327M + 25M)
 
 3. 哪些进程消耗内存比较多 `top`
-top命令中，按下 f 键，进入选择排序列的界面, 按%MEM排序. RES是常驻内存，是进程切实使用的物理内存量，free命令中看到的used列下面的值，就包括常驻内存的加总，但不是虚拟内存的加总
+top命令中, 按下 f 键, 进入选择排序列的界面, 按%MEM排序. RES是常驻内存, 是进程切实使用的物理内存量, free命令中看到的used列下面的值, 就包括常驻内存的加总, 但不是虚拟内存的加总
 
 4. 交换空间
 `# swapon`
 `# swapoff`
 `# mkswap`
 
-　　使用free命令可以查看内存的总体使用，显示的内容也包括交换分区的大小，可以使用swapon，swapoff，命令开启或关闭交换空间，交换空间是磁盘上的文件，并不是真正的内存空间.  
-系统的可用内存一般等于物理内存 + 交换分区。交换分区在磁盘上， 因此速度比内存读写要慢得多。交换分区实际上就是磁盘上的文件，可以通过mkswap命令来创建交换空间
+　　使用free命令可以查看内存的总体使用, 显示的内容也包括交换分区的大小, 可以使用swapon, swapoff, 命令开启或关闭交换空间, 交换空间是磁盘上的文件, 并不是真正的内存空间.  
+系统的可用内存一般等于物理内存 + 交换分区. 交换分区在磁盘上,  因此速度比内存读写要慢得多. 交换分区实际上就是磁盘上的文件, 可以通过mkswap命令来创建交换空间
 
 5. 内核态内存占用 `# slabtop`  
-　　slab系统用来处理系统中比较小的元数据，如文件描述符等，进而组织内核态的内存分配。  
-　　一个slab包含多个object，例如dentry这些数据结构就是object，可以通过slabtop命令查看系统中活动的object的数量与内存占用情况，从而了解哪些数据结构最占用内核态的内存空间。  
-通常关注1. 哪些数据结构的内存占用最大，2. 哪些类型的数据结构对应的object最多，比如inode多代表文件系统被大量引用等
+　　slab系统用来处理系统中比较小的元数据, 如文件描述符等, 进而组织内核态的内存分配.   
+　　一个slab包含多个object, 例如dentry这些数据结构就是object, 可以通过slabtop命令查看系统中活动的object的数量与内存占用情况, 从而了解哪些数据结构最占用内核态的内存空间.   
+通常关注1. 哪些数据结构的内存占用最大, 2. 哪些类型的数据结构对应的object最多, 比如inode多代表文件系统被大量引用等
 
 6. 查看内存使用的动态变化
 `# vmstat N` 每隔N秒更新一次数据		
 
 7. dstat
 8. 查看共享内存空间 `pmap`
-`pmap pid` - Process Memory Usage 查看pid进程使用的共享内存，包括使用的库，所在堆栈空间等。
+`pmap pid` - Process Memory Usage 查看pid进程使用的共享内存, 包括使用的库, 所在堆栈空间等.
 
 9. 查看系统内存历史记录`# sar`
-　　用`sar`查看一个月以内的内存使用情况。
+　　用`sar`查看一个月以内的内存使用情况.
 
 #### 如何清理内存使用
 1. 释放占用的缓存空间
-`# sync     //先将内存刷出，避免数据丢失`
+`# sync     //先将内存刷出, 避免数据丢失`
 `# echo 1 > /proc/sys/vm/drop_caches //释放pagecache`
 `# echo 2 > /proc/sys/vm/drop_caches //释放dentry和inode`
 `# echo 3 > /proc/sys/vm/drop_caches //释放pagecache、dentry和inode`
@@ -1591,32 +1593,32 @@ slab的分布状况 `/proc/slabinfo`
 4. 限制其他用户的内存使用
 `# vim /etc/security/limits.conf`
 
-`user1 hard as 1000` （用户user1所有累加起来，内存不超过1000kiB）
-`user1 soft as 800` （用户user1一次运行，内存不超过800kiB）　　
+`user1 hard as 1000` （用户user1所有累加起来, 内存不超过1000kiB）
+`user1 soft as 800` （用户user1一次运行, 内存不超过800kiB）　　
 
-5. 大量连续内存数据：
+5. 大量连续内存数据:
 `# vim /etc/sysctl.conf`
 
 `vm.nr_hugepage=20`
 
 6. 调节page cache（大量一样的请求 调大page cache）  
 `vm.lowmem_reserve_ratio = 256 256 32` （保留多少内存作为pagecache 当前 最大 最小）
-`vm.vfs_cache_pressure=100` （大于100，回收pagecache）
+`vm.vfs_cache_pressure=100` （大于100, 回收pagecache）
 `vm.page.cluster=3`（一次性从swap写入内存的量为2的3次方页）
-`vm.zone_reclaim_mode=0/1`（当内存危机时，是否尽量回收内存 0:尽量回收 1:尽量不回收）
-`min_free_kbytes`：该文件表示强制Linux VM最低保留多少空闲内存（Kbytes）。
+`vm.zone_reclaim_mode=0/1`（当内存危机时, 是否尽量回收内存 0:尽量回收 1:尽量不回收）
+`min_free_kbytes`: 该文件表示强制Linux VM最低保留多少空闲内存（Kbytes）.
 
 7. 脏页
- 　　脏页是指已经更改但尚未刷到硬盘的内存页，由pdflush往硬盘上面刷。  
-`vm.dirty_background_radio=10` （当脏页占内存10%，pdflush工作）
-`vm.dirty_radio=40` （当进程自身脏页占内存40%，进程自己处理脏页，将其写入磁盘）
+ 　　脏页是指已经更改但尚未刷到硬盘的内存页, 由pdflush往硬盘上面刷.   
+`vm.dirty_background_radio=10` （当脏页占内存10%, pdflush工作）
+`vm.dirty_radio=40` （当进程自身脏页占内存40%, 进程自己处理脏页, 将其写入磁盘）
 `vm.dirty_expire_centisecs=3000` （脏页老化时间为30秒 3000/100=30秒）
-`vm.dirty_writeback_centisecs=500` （每隔5秒，pdflush监控一次内存数量 500/100=5秒）
+`vm.dirty_writeback_centisecs=500` （每隔5秒, pdflush监控一次内存数量 500/100=5秒）
 
 ### Disk & I/O
 `df -hT`	查看大小、分区、文件系统类型
-硬盘是否SCSI：/dev/sd<X>就是scsi的，hd<X>就是普通的。
-`cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD，1是传统硬盘  
+硬盘是否SCSI: /dev/sd<X>就是scsi的, hd<X>就是普通的.
+`cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD, 1是传统硬盘  
 
 #### Linux Disk Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
@@ -1631,14 +1633,14 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 9.	`smartctl -l error /dev/sda1` ⟶ (if available) errors
 
 　
-#### 当磁盘无法写入的时候，一般有以下可能：
+#### 当磁盘无法写入的时候, 一般有以下可能:
 [Linux系统排查3——I/O篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4700386.html)
 * 文件系统只读
 * 磁盘已满
 * I节点使用完
 
 ##### 遇到只读的文件系统
-`# mount -o remount, rw /home`  重新挂载改变/home分区的读写属性, remount是指重新挂载指定文件系统，rw指定重新挂载时的读写属性，该命令不改变挂载点，只是改变指定分区的读写属性。
+`# mount -o remount, rw /home`  重新挂载改变/home分区的读写属性, remount是指重新挂载指定文件系统, rw指定重新挂载时的读写属性, 该命令不改变挂载点, 只是改变指定分区的读写属性.
 
 ##### 磁盘满
 `df -h` 查看当前已挂载的所有分区及使用情况
@@ -1648,47 +1650,37 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 
 ##### I节点不足
 `df -i` 查看I节点的使用情况
-一旦遇到I节点用光的情形，有以下几种选择：  
+一旦遇到I节点用光的情形, 有以下几种选择:   
 　　1. 删除大量文件  
-　　2. 将大量文件移动到其他的文件系统中；  
-　　3. 将大量的文件压缩成一个文件；  
-　　4. 备份当前文件系统中的所有文件，重新格式化之前的硬盘，获得更多的I节点，再将文件复制回去。
+　　2. 将大量文件移动到其他的文件系统中;   
+　　3. 将大量的文件压缩成一个文件;   
+　　4. 备份当前文件系统中的所有文件, 重新格式化之前的硬盘, 获得更多的I节点, 再将文件复制回去.
 
 #### I/O
 1. `iostat` 查看系统分区的IO使用情况
-在第2行系统发行版本下面的第4、5行，可以看到与top命令中CPU使用情况类似的信息，  
-　　第7行，可以看到一些IO指标：  
-　　　　tps: 每秒I/O传输请求量；  
-　　　　kB_read/s：每秒读取多少KB；  
-　　　　kB_wrtn/s：每秒写多少KB；  
-　　　　kB_read：一共读了多少KB；  
-　　　　kB_wrtn：一共写了多少KB。  
-　　iostat命令属于sysstat工具包，由于我们的机器只挂载了一块硬盘，因此不能体现不同设备的I/O区别。
-
-2. `iotop`
-　　iotop命令类似于top命令，但是显示的是各个进程的I/O情况，对于定位I/O操作较重的进程有比较大的作用。
+2. `iotop` iotop命令类似于top命令, 但是显示的是各个进程的I/O情况, 对于定位I/O操作较重的进程有比较大的作用.
 
 
 #### 硬盘写速度
-普通硬盘的写速度大概100M/s，RAID级别的查看不方便，SSD的速度也不定，所以用dd测一下最靠谱:
-`dd if=/dev/zero of=dd.file bs=8k count=128k conv=fdatasync`
-`dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync`
-上面命令测试了分别以每次8k和1g的大小，写入1g文件的速度。
-`if`：输入文件名， /dev/zero 设备无穷尽地提供0
-`of`：输出文件名
-`bs`：块大小
-`count`：次数
-`conv=fdatasync` ：实际写盘，而不是写入Page Cache
+普通硬盘的写速度大概100M/s, RAID级别的查看不方便, SSD的速度也不定, 所以用dd测一下最靠谱:  
+`dd if=/dev/zero of=dd.file bs=8k count=128k conv=fdatasync`  
+`dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync`  
+上面命令测试了分别以每次8k和1g的大小, 写入1g文件的速度.   
+`if`: 输入文件名,  /dev/zero 设备无穷尽地提供0  
+`of`: 输出文件名  
+`bs`: 块大小  
+`count`: 次数  
+`conv=fdatasync` : 实际写盘, 而不是写入Page Cache  
 
 #### 硬盘读速度
-硬盘读速度的测试同理，不过要先清理缓存，否则直接从Page Cache读了。
-`sh -c "sync && echo 3 > /proc/sys/vm/drop_caches”`
-`dd if=./dd.file of=/dev/null bs=8k`
+硬盘读速度的测试同理, 不过要先清理缓存, 否则直接从Page Cache读了.   
+`sh -c "sync && echo 3 > /proc/sys/vm/drop_caches”`  
+`dd if=./dd.file of=/dev/null bs=8k`  
 
 ### Network troubleshooting
 `netstat`
 -t、-u、-w和-x分别表示TCP、UDP、RAW和UNIX套接字连接;
--a标记，还会显示出等待连接（也就是说处于监听模式）的套接字;
+-a标记, 还会显示出等待连接（也就是说处于监听模式）的套接字;
 -l 显示正在被监听(listen)的端口
 -n表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
 -p选项表示列出监听的程序
@@ -1697,7 +1689,7 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
        port or user names.
 
 Listening open ports: `netstat -anp | grep PORT`  
-`netstat -antup` 查看已建立的连接进程，所占用的端口 
+`netstat -antup` 查看已建立的连接进程, 所占用的端口
 $ netstat -anp | less: Finding the PID of the process using a specific port
 Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name   
 tcp        0      0 *:pssc                      *:*                         LISTEN      -       
@@ -1721,15 +1713,15 @@ tcp*, are from bcc/BPF tools.
 11 `iftop`
 
 #### 网卡
-* 先用`ifconfig`看看有多少块网卡和bonding。bonding是个很棒的东西，可以把多块网卡绑起来，突破单块网卡的带宽限制
-* 然后检查每块网卡的速度，比如`ethtool eth0`。
-* 再检查bonding，比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的，再留意其捆绑的网卡的速度。
-* 最后检查测试客户机与服务机之间的带宽，先简单`ping`或`traceroute` 一下得到RTT时间，`iperf`之类的可稍后。
+* 先用`ifconfig`看看有多少块网卡和bonding. bonding是个很棒的东西, 可以把多块网卡绑起来, 突破单块网卡的带宽限制
+* 然后检查每块网卡的速度, 比如`ethtool eth0`.
+* 再检查bonding, 比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的, 再留意其捆绑的网卡的速度.
+* 最后检查测试客户机与服务机之间的带宽, 先简单`ping`或`traceroute` 一下得到RTT时间, `iperf`之类的可稍后.
 
 Linux查看网卡数据吞吐量方法
-1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘：`iptraf -d eth0`  
-2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`。
-3. `sar -n DEV 1` 每一秒钟取一次值，取四次
+1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘: `iptraf -d eth0`  
+2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`.
+3. `sar -n DEV 1` 每一秒钟取一次值, 取四次
 4. `iperf` Diagnosing network speed
 5. 带宽监控 `nload`, https://linux.cn/article-2871-1.html
 
@@ -1739,42 +1731,42 @@ Linux查看网卡数据吞吐量方法
 [Quick HOWTO : Ch04 : Simple Network Troubleshooting](http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch04_:_Simple_Network_Troubleshooting#.V4rx8p7hJz0)
 
 
-网络排查一般是有一定的思路和顺序的，其实排查的思路就是根据具体的问题逐段排除故障可能发生的地方，最终确定问题。
+网络排查一般是有一定的思路和顺序的, 其实排查的思路就是根据具体的问题逐段排除故障可能发生的地方, 最终确定问题.
 
-网络问题是什么，是不通，还是慢？  
-1. 如果是网络不通，要定位具体的问题，一般是不断尝试排除不可能故障的地方，最终定位问题根源。一般需要查看  
+网络问题是什么, 是不通, 还是慢？  
+1. 如果是网络不通, 要定位具体的问题, 一般是不断尝试排除不可能故障的地方, 最终定位问题根源. 一般需要查看  
 	链路是否连通: `ethtool eth0`  
-		`Speed: 1000Mb/s`显示了当前网卡的速度，`Duplex: Full`显示了当前网络支持全双工, `Link detected: yes`显示当前网卡和网络的物理连接正常  
+		`Speed: 1000Mb/s`显示了当前网卡的速度, `Duplex: Full`显示了当前网络支持全双工, `Link detected: yes`显示当前网卡和网络的物理连接正常  
 	网卡是否正常启用: `ifconfig eth0`  
-		第3行显示了对该网卡的配置，包括IP，子网掩码等，这里可以检查是否出现错配，如果这一行显示不正确，那一定是网卡没有正确配置开启。  
-	本地网络是否连接:  用route 命令查看内核路由表 `route -n`得到网关, 之后就可以尝试ping 网关，排查与网关之间的连接  
-	DNS工作状况: `nslookup`, `dig` 如果这里nslookup命令无法解析目标域名，则很有可能是DNS配置不当  
+		第3行显示了对该网卡的配置, 包括IP, 子网掩码等, 这里可以检查是否出现错配, 如果这一行显示不正确, 那一定是网卡没有正确配置开启.   
+	本地网络是否连接:  用route 命令查看内核路由表 `route -n`得到网关, 之后就可以尝试ping 网关, 排查与网关之间的连接  
+	DNS工作状况: `nslookup`, `dig` 如果这里nslookup命令无法解析目标域名, 则很有可能是DNS配置不当  
 	能否路由到目标主机:  
         1. based on ICMP: `ping IP`, `traceroute IP`  
-        	ping得通，说明路由工作正常, ping不通可能是因为网络不通或者某个网关限制了ICMP协议包  
+        	ping得通, 说明路由工作正常, ping不通可能是因为网络不通或者某个网关限制了ICMP协议包  
         2. `sudo tcptraceroute 113.106.202.46`  
 	远程端口是否开放  
         1. 使用telnet检测远程主机的端口开放情况 `telnet IP PORT`,   
-        	telnet无法连接包含两种可能：1是端口确实没有开放，2是防火墙过滤了连接。  
+        	telnet无法连接包含两种可能: 1是端口确实没有开放, 2是防火墙过滤了连接.   
         2. `nmap HOST`, `nmap -p PORT IP` 可以了解端口无法连接的原因是端口关闭还是防火墙过滤了  
       本地端口 `# netstat -lnp | grep PORT`  
       查看防火墙规则: `iptables -L`  
 
-2. 如果是网络速度慢，一般有以下几个方式定位问题源：
+2. 如果是网络速度慢, 一般有以下几个方式定位问题源:
 	DNS是否是问题的源头:
-        1. `traceroute`不仅可以查看路由的正确性，还可以查看网络中每一跳的延时，从而定位延时最高的网络区段
-        2. `iftop`命令类似于`top`命令，查看哪些网络连接占用的带宽较多
+        1. `traceroute`不仅可以查看路由的正确性, 还可以查看网络中每一跳的延时, 从而定位延时最高的网络区段
+        2. `iftop`命令类似于`top`命令, 查看哪些网络连接占用的带宽较多
         3. `tcpdump`是常用的抓包工具
 	查看路由过程中哪些节点是瓶颈
 	查看带宽的使用情况
 
 ##### iftop
-查看哪些网络连接占用的带宽较多, 按照带宽占用高低排序，可以确定那些占用带宽的网络连接  
-最上方的一行刻度是整个网络的带宽比例，下面第1列是源IP，第2列是目标IP，箭头表示了二者之间是否在传输数据，以及传输的方向。最后三列分别是2s、10s、40s时两个主机之间的数据传输速率。
-　　最下方的TX、RX分别代表发送、接收数据的统计，TOTAL则是数据传输总量。
-在进入iftop的非交互界面后，按 `p` 键可以打开或关闭显示端口，按 `s` 键可以显示或隐藏源主机，而按 `d` 键则可以显示或隐藏目标主机。
+查看哪些网络连接占用的带宽较多, 按照带宽占用高低排序, 可以确定那些占用带宽的网络连接  
+最上方的一行刻度是整个网络的带宽比例, 下面第1列是源IP, 第2列是目标IP, 箭头表示了二者之间是否在传输数据, 以及传输的方向. 最后三列分别是2s、10s、40s时两个主机之间的数据传输速率.
+　　最下方的TX、RX分别代表发送、接收数据的统计, TOTAL则是数据传输总量.
+在进入iftop的非交互界面后, 按 `p` 键可以打开或关闭显示端口, 按 `s` 键可以显示或隐藏源主机, 而按 `d` 键则可以显示或隐藏目标主机.
 
-`-i` 选项可以指定要查看的网卡，默认情况下，iftop会显示自己找到的第一个网卡；
+`-i` 选项可以指定要查看的网卡, 默认情况下, iftop会显示自己找到的第一个网卡;
 `-n` 选项直接显示连接的IP, Don't do hostname lookups
 
 ##### iperf
@@ -1793,9 +1785,9 @@ UDP Clients & Servers
 ##### `tcpdump`常用选项
 `# tcpdump -n port N`    //只捕捉特定端口的流量
 `# tcpdump -n port N1 or port N2`    //捕获多个端口的流量
-`3 # tcpdump -w output.pcap`    //数据包转储，将原始数据包保留到output.pcap
-`# tcpdump -C 10 -w output.pcap`    //限制每个转储文件的上限，达到上限后将文件分卷(以MB为单位)
-`# tcpdump -C 10 -W 5 -w output.pcap`    //不仅限制每个卷的上限，而且限制卷的总数
+`# tcpdump -w output.pcap`    //数据包转储, 将原始数据包保留到output.pcap
+`# tcpdump -C 10 -w output.pcap`    //限制每个转储文件的上限, 达到上限后将文件分卷(以MB为单位)
+`# tcpdump -C 10 -W 5 -w output.pcap`    //不仅限制每个卷的上限, 而且限制卷的总数
 `# tcpdump -r output.pcap`    //重播已经保存的数据包记录
 
 ### 操作系统 `uname -a`
@@ -1804,23 +1796,18 @@ Redhat/CentOS版本 : `cat /etc/redhat-release`
 lsb_release -a
 
 ### 状态采集工具
-讲究点，要用来出报告的，用`Zabbix`之类。
+讲究点, 要用来出报告的, 用`Zabbix`之类.
 
 #### `dstat`
-实时观察的，我喜欢`dstat`，比`vmstat`，`iostat`, `sar`们都好用，起码对得够齐，单位能自动转换。不过`dstat`需要安装(`yum install dstat`，如果装不上，就要将就着用`vmstat`，`sar`了)
-    dstat：默认，已有足够信息
-    dstat -am：再多一个memory信息
-    dstat -amN bond0,lo： 如果有bonding，dstat会把bond0和eth0 算双份，还有lo的也算到总量里，所以还是用-N指定网卡好。
-要看IO细节，还是要用"iostat -dxm 5"
-    -d 不看cpu信息
-    -x 看细节
-    -m 以m为单位，而不以block原始size
-    5 5秒的间隔
+实时观察的, 我喜欢`dstat`, 比`vmstat`, `iostat`, `sar`们都好用, 起码对得够齐, 单位能自动转换. 不过`dstat`需要安装(`yum install dstat`, 如果装不上, 就要将就着用`vmstat`, `sar`了)
+    dstat: 默认, 已有足够信息
+    `dstat -am`: 再多一个memory信息
+    `dstat -amN bond0,lo`:如果有bonding, dstat会把bond0和eth0算双份, 还有lo的也算到总量里, 所以还是用-N指定网卡好
+要看IO细节, 还是要用`iostat -dxm 5`
 
-#### `vmstat 1`
-vmstat - System Activity, Hardware and System Information
+#### `vmstat` - System Activity, Hardware and System Information
 ```
-$ vmstat 1
+$ vmstat 2
 procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
 34  0    0 200889792  73708 591828    0    0     0     5    6   10 96  1  3  0  0
@@ -1830,36 +1817,80 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 32  0    0 200890208  73712 591860    0    0     0     0 15898 4840 98  1  1  0  0
 ^C
 ```
-`vmstat(8)` 命令，每行会输出一些系统核心指标，这些指标可以让我们更详细的了解系统状态。后面跟的参数1，表示每秒输出一次统计信息，表头提示了每一列的含义，这几介绍一些和性能调优相关的列：  
-`r`：等待在CPU资源的进程数。这个数据比平均负载更加能够体现CPU负载情况，数据中不包含等待IO的进程。如果这个数值大于机器CPU核数，那么机器的CPU资源已经饱和。  
-`free`：系统可用内存数（以千字节为单位），如果剩余内存不足，也会导致系统性能问题。下文介绍到的free命令，可以更详细的了解系统内存的使用情况。  
-`si, so`：交换区写入和读取的数量。如果这个数据不为0，说明系统已经在使用交换区（swap），机器物理内存已经不足  
-`us, sy, id, wa, st`：这些都代表了CPU时间的消耗，它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen，一般被其他虚拟机消耗）。  
+`vmstat(8)` 命令, 每行会输出一些系统核心指标, 这些指标可以让我们更详细的了解系统状态. 后面跟的参数2, 表示每2秒输出一次统计信息, 表头提示了每一列的含义, 这几介绍一些和性能调优相关的列:   
+`r`: 等待在CPU资源的进程数. 这个数据比平均负载更加能够体现CPU负载情况, 数据中不包含等待IO的进程. 如果这个数值大于机器CPU核数, 那么机器的CPU资源已经饱和.   
+`free`: 系统可用内存数（以千字节为单位）, 如果剩余内存不足, 也会导致系统性能问题. 下文介绍到的free命令, 可以更详细的了解系统内存的使用情况.   
+`si, so`: 交换区写入和读取的数量. 如果这个数据不为0, 说明系统已经在使用交换区（swap）, 机器物理内存已经不足  
+`us, sy, id, wa, st`: 这些都代表了CPU时间的消耗, 它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen, 一般被其他虚拟机消耗）.   
 
-上述这些CPU时间，可以让我们很快了解CPU是否出于繁忙状态。一般情况下，如果用户时间和系统时间相加非常大，CPU出于忙于执行指令。如果IO等待时间很长，那么系统的瓶颈可能在磁盘IO。
-示例命令的输出可以看见，大量CPU时间消耗在用户态，也就是用户应用程序消耗了CPU时间。这不一定是性能问题，需要结合r队列，一起分析。
+上述这些CPU时间, 可以让我们很快了解CPU是否出于繁忙状态. 一般情况下, 如果用户时间和系统时间相加非常大, CPU出于忙于执行指令. 如果IO等待时间很长, 那么系统的瓶颈可能在磁盘IO.
+示例命令的输出可以看见, 大量CPU时间消耗在用户态, 也就是用户应用程序消耗了CPU时间. 这不一定是性能问题, 需要结合r队列, 一起分析.
 
-####  `iostat-xz 1`
-iostat - Average CPU Load, Disk Activity
-`iostat`命令主要用于查看机器磁盘IO情况。该命令输出的列，主要含义是：
-`r/s, w/s, rkB/s, wkB/s`：分别表示每秒读写次数和每秒读写数据量（千字节）。读写量过大，可能会引起性能问题。
-`await`：IO操作的平均等待时间，单位是毫秒。这是应用程序在和磁盘交互时，需要消耗的时间，包括IO等待和实际操作的耗时。如果这个数值过大，可能是硬件设备遇到了瓶颈或者出现故障。
-`avgqu-sz`：向设备发出的请求平均数量。如果这个数值大于1，可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）。
-`%util`：设备利用率。这个数值表示设备的繁忙程度，经验值是如果超过60，可能会影响IO性能（可以参照IO操作平均等待时间）。如果到达100%，说明硬件设备已经饱和。
-如果显示的是逻辑设备的数据，那么设备利用率不代表后端实际的硬件设备已经饱和。值得注意的是，即使IO性能不理想，也不一定意味这应用程序性能会不好，可以利用诸如预读取、写缓存等策略提升应用性能。
+####  `iostat` Average CPU Load, Disk Activity
+主要用于查看机器磁盘IO情况. iostat命令属于sysstat工具包
+`iostat -dxm 5`  
+`-d` 不看cpu信息  
+`-x` 看细节  
+`-m` 以m为单位, 而不以block原始size  
+`5` 5秒的间隔  
 
-#### `sar -n DEV 1`, `sar -n TCP,ETCP 1`
-`-n`参数很有用，他有6个不同的开关：DEV | EDEV | NFS | NFSD | SOCK | ALL 。DEV显示网络接口信息，EDEV显示关于网络错误的统计数据，NFS统计活动的NFS客户端的信息，NFSD统计NFS服务器的信息，SOCK显示套 接字信息，ALL显示所有5个开关。它们可以单独或者一起使用。我们现在要用的就是`-n DEV`了
-	IFACE：LAN接口
-	rxpck/s：每秒钟接收的数据包
-	txpck/s：每秒钟发送的数据包
-	rxbyt/s：每秒钟接收的字节数
-	txbyt/s：每秒钟发送的字节数
-	rxcmp/s：每秒钟接收的压缩数据包
-	txcmp/s：每秒钟发送的压缩数据包
-	rxmcst/s：每秒钟接收的多播数据包
 
-sar - Collect and Report System Activity
+`iostat -d -k 1 10`
+参数:
+`-d` 表示, 显示设备（磁盘）使用状态  
+`-k`某些使用block为单位的列强制使用Kilobytes为单位  
+`1 10`表示, 数据显示每隔1秒刷新一次, 共显示10次.
+输出列含义
+`tps`: 每秒I/O传输请求量;   
+`kB_read/s`: 每秒读取多少KB;    
+`kB_wrtn/s`: 每秒写多少KB;   
+`kB_read`: 一共读了多少KB;   
+`kB_wrtn`: 一共写了多少KB.   
+
+
+`iostat -xz 1`
+`-x` 参数可以获得更多统计信息
+该命令输出列的主要含义是:
+`r/s, w/s`: 分别表示每秒读写次数, 读写量过大, 可能会引起性能问题.
+`rkB/s, wkB/s` 分别表示每秒读写数据量(kB). 读写量过大, 可能会引起性能问题.
+`await`: IO操作的平均等待时间, 单位是毫秒. 这是应用程序在和磁盘交互时, 需要消耗的时间, 包括IO等待和实际操作的耗时. 如果这个数值过大, 可能是硬件设备遇到了瓶颈或者出现故障. **一般地系统IO响应时间`await`应该低于5ms, 如果大于10ms就比较大了**.
+`svctm`: 平均每次设备I/O操作的服务时间 (毫秒).
+`%util`: 设备利用率. 在统计时间内所有处理IO时间, 除以总共统计时间`util = (r/s+w/s) * (svctm/1000)`. 例如, 如果统计间隔1秒, 该设备有0.8秒在处理IO, 而0.2秒闲置, 那么该设备的%util = 0.8/1 = 80%, 所以该参数暗示了设备的繁忙程度, 经验值是 **如果`%util`超过60, 可能会影响IO性能**（可以参照IO操作平均等待时间）. 如果到达100%, 说明硬件设备已经饱和.
+`avgrq-sz`:  平均每次设备I/O操作的数据大小 (扇区).
+`avgqu-sz`: 向设备发出的请求平均数量. **如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）**
+`rrqm/s`: 每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候, VFS将请求发到各个FS, 如果FS发现不同的读取请求读取的是相同Block的数据, FS会将这个请求合并Merge）;
+`wrqm/s`: 每秒这个设备相关的写入请求有多少被Merge了
+`rsec/s`: 每秒读取的扇区数; wsec/: 每秒写入的扇区数. r/s: The number of read requests that were issued to the device per second; w/s: The number of write requests that were issued to the device per second;
+
+如果显示的是逻辑设备的数据, 那么设备利用率不代表后端实际的硬件设备已经饱和. 值得注意的是, 即使IO性能不理想, 也不一定意味这应用程序性能会不好, 可以利用诸如预读取、写缓存等策略提升应用性能.
+
+
+`iostat -c 1 10` 查看CPU部分状态值
+cpu属性值说明:
+`%user`: CPU处在用户模式下的时间百分比.   
+`%nice`: CPU处在带NICE值的用户模式下的时间百分比.   
+`%system`: CPU处在系统模式下的时间百分比.   
+`%iowait`: CPU等待输入输出完成时间的百分比.   
+`%steal`: 管理程序维护另一个虚拟处理器时, 虚拟CPU的无意识等待时间百分比.   
+`%idle`: CPU空闲时间百分比.   
+
+1. `%iowait`的值过高, 表示硬盘存在I/O瓶颈
+2. `%idle`值高, 表示CPU较空闲
+3. 如果`%idle`值高但系统响应慢时, 有可能是CPU等待分配内存, 此时应加大内存容量. **`%idle`值如果持续低于10, 那么系统的CPU处理能力相对较低, 表明系统中最需要解决的资源是CPU**.
+
+#### sar - Collect and Report System Activity
+`sar`命令在这里可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
+`sar -n DEV 1`, `sar -n TCP,ETCP 1`
+`-n`参数很有用, 他有6个不同的开关: DEV | EDEV | NFS | NFSD | SOCK | ALL . DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套 接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了  
+	IFACE: LAN接口  
+	rxpck/s: 每秒钟接收的数据包  
+	txpck/s: 每秒钟发送的数据包  
+	rxbyt/s: 每秒钟接收的字节数  
+	txbyt/s: 每秒钟发送的字节数  
+	rxcmp/s: 每秒钟接收的压缩数据包  
+	txcmp/s: 每秒钟发送的压缩数据包  
+	rxmcst/s: 每秒钟接收的多播数据包  
+
 ```
 $ sar -n DEV 1
 Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)
@@ -1873,7 +1904,7 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CP
 12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
 ^C
 ```
-`sar`命令在这里可以查看网络设备的吞吐率。在排查性能问题时，可以通过网络设备的吞吐量，判断网络设备是否已经饱和。如示例输出中，eth0网卡设备，吞吐率大概在22 Mbytes/s，既176 Mbits/sec，没有达到1Gbit/sec的硬件上限。
+如示例输出中, eth0网卡设备, 吞吐率大概在22 Mbytes/s, 既176 Mbits/sec, 没有达到1Gbit/sec的硬件上限.
 
 `sar -n TCP,ETCP 1`
 ```
@@ -1889,44 +1920,44 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU
 12:17:21 AM      0.00      0.00      0.00      0.00      0.00
 ^C
 ```
-`sar`命令在这里用于查看TCP连接状态，其中包括：
-`active/s`：每秒本地发起的TCP连接数，既通过connect调用创建的TCP连接；
-`passive/s`：每秒远程发起的TCP连接数，即通过accept调用创建的TCP连接；
-`retrans/s`：每秒TCP重传数量；
-TCP连接数可以用来判断性能问题是否由于建立了过多的连接，进一步可以判断是主动发起的连接，还是被动接受的连接。TCP重传可能是因为网络环境恶劣，或者服务器压力过大导致丢包。
+`sar`命令在这里用于查看TCP连接状态, 其中包括:
+`active/s`: 每秒本地发起的TCP连接数, 既通过connect调用创建的TCP连接;
+`passive/s`: 每秒远程发起的TCP连接数, 即通过accept调用创建的TCP连接;
+`retrans/s`: 每秒TCP重传数量;
+TCP连接数可以用来判断性能问题是否由于建立了过多的连接, 进一步可以判断是主动发起的连接, 还是被动接受的连接. TCP重传可能是因为网络环境恶劣, 或者服务器压力过大导致丢包.
 
 ### File
 
 To easily display all the permissions on a path, you can use `namei -om /path/to/check`
 #### 文件特殊权限 SUID、SGID、STICKY简介
-linux中除了常见的读（r）、写（w）、执行（x）权限以外，还有3个特殊的权限，分别是setuid、setgid和stick bit
-setuid、setgid实例，/usr/bin/passwd 与/etc/passwd文件的权限
+linux中除了常见的读（r）、写（w）、执行（x）权限以外, 还有3个特殊的权限, 分别是setuid、setgid和stick bit
+setuid、setgid实例, /usr/bin/passwd 与/etc/passwd文件的权限
 ```
 sudo ls -l /usr/bin/passwd /etc/passwd
 -rw-r--r-- 1 root root  1549 08-19 13:54 /etc/passwd
 -rwsr-xr-x 1 root root 22984 2007-01-07 /usr/bin/passwd
 ```
-从权限上看，/etc/passwd仅有root权限的写（w）权，可实际上每个用户都可以通过/usr/bin/passwd命令去修改这个文件，于是这里就涉及了linux里的特殊权限setuid，正如-rwsr-xr-x中的s
+从权限上看, /etc/passwd仅有root权限的写（w）权, 可实际上每个用户都可以通过/usr/bin/passwd命令去修改这个文件, 于是这里就涉及了linux里的特殊权限setuid, 正如-rwsr-xr-x中的s
 
-stick bit （粘贴位） 实例，查看/tmp目录的权限
+stick bit （粘贴位） 实例, 查看/tmp目录的权限
 ```
 sudo ls -dl /tmp
 drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 ```
- tmp目录是所有用户共有的临时文件夹，所有用户都拥有读写权限，这就必然出现一个问题，A用户在/tmp里创建了文件a.file，此时B用户看了不爽，在/tmp里把它给删了（因为拥有读写权限），那肯定是不行的。实际上在/tmp目录中，只有文件的拥有者和root才能对其进行修改和删除，其他用户则不行，因为有特殊权限stick bit（粘贴位）权限，正如drwxrwxrwt中的最后一个t
+ tmp目录是所有用户共有的临时文件夹, 所有用户都拥有读写权限, 这就必然出现一个问题, A用户在/tmp里创建了文件a.file, 此时B用户看了不爽, 在/tmp里把它给删了（因为拥有读写权限）, 那肯定是不行的. 实际上在/tmp目录中, 只有文件的拥有者和root才能对其进行修改和删除, 其他用户则不行, 因为有特殊权限stick bit（粘贴位）权限, 正如drwxrwxrwt中的最后一个t
 
 ##### 特殊位作用
-- SUID:对一个可执行文件，不是以发起者身份来获取资源，而是以可执行文件的属主身份来执行。
-- SGID对一个可执行文件，不是以发起者身份来获取资源，而是以可执行文件的属组身份来执行。
-- STICKY：粘滞位，通常对目录而言。通常对于全局可写目录（other也可写）来说，让该目录具有sticky后，删除只对属于自己的文件有效（但是仍能编辑修改别人的文件，除了root的）。不能根据安全上下文获取对别人的文件的写权限
+- SUID:对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属主身份来执行.
+- SGID对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属组身份来执行.
+- STICKY: 粘滞位, 通常对目录而言. 通常对于全局可写目录（other也可写）来说, 让该目录具有sticky后, 删除只对属于自己的文件有效（但是仍能编辑修改别人的文件, 除了root的）. 不能根据安全上下文获取对别人的文件的写权限
 
-##### 设置方式：
-  SUID：置于 u 的 x 位，原位置有执行权限，就置为 s，没有了为 S . `#chmod u+s`
-  SGID：置于 g 的 x 位，原位置有执行权限，就置为 s，没有了为 S . `#chmod g+s`
-  STICKY：粘滞位，置于 o 的 x 位，原位置有执行权限，就置为 t ，否则为T  `#chmod o+t`
-在一些文件设置了特殊权限后，字母不是小写的s或者t，而是大写的S和T，那代表此文件的特殊权限没有生效，是因为你尚未给它对应用户的x权限  
-去除特殊位有： `#chmou u-s`等
-将三个特殊位的用八进制数值表示，放于 u/g/o 位之前。其中 suid :4 sgid:2  sticky:1
+##### 设置方式:
+  SUID: 置于 u 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod u+s`
+  SGID: 置于 g 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod g+s`
+  STICKY: 粘滞位, 置于 o 的 x 位, 原位置有执行权限, 就置为 t , 否则为T  `#chmod o+t`
+在一些文件设置了特殊权限后, 字母不是小写的s或者t, 而是大写的S和T, 那代表此文件的特殊权限没有生效, 是因为你尚未给它对应用户的x权限  
+去除特殊位有:  `#chmou u-s`等
+将三个特殊位的用八进制数值表示, 放于 u/g/o 位之前. 其中 suid :4 sgid:2  sticky:1
 也可以这样设:
 ```
 setuid:chmod 4755 xxx
@@ -1965,7 +1996,7 @@ NETMASK=255.255.255.0
 NETWORK=192.168.1.0
 TYPE=Ethernet
 
-如果需要动态分配IP，那么   
+如果需要动态分配IP, 那么   
 DEVICE   =   eth0   
 ONBOOT   =   yes   
 USERCTL   =   yes   
@@ -2012,7 +2043,7 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `ssh user@host`	以 user 用户身份连接到 host
 `ssh -p port user@host`	在端口 port 以 user 用户身份连接到 host
 `-f` ssh将在后台运行
-`-N` 不执行命令，仅转发端口
+`-N` 不执行命令, 仅转发端口
 `-C` 压缩传送的数据
 `-i` 使用指定的密钥登录
 	It is required that your private key files are NOT accessible by others
@@ -2031,11 +2062,11 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
 `ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'`
 
-`cd && tar czv src | ssh user@host 'tar xz'`	将$HOME/src/目录下面的所有文件，复制到远程主机的$HOME/src/目录
-`ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件，复制到用户的当前目录
+`cd && tar czv src | ssh user@host 'tar xz'`	将$HOME/src/目录下面的所有文件, 复制到远程主机的$HOME/src/目录
+`ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件, 复制到用户的当前目录
 `ssh user@host 'ps ax | grep [h]ttpd'`	查看远程主机是否运行进程httpd
 
-`yes | pv | ssh $host "cat > /dev/null"`	实时SSH网络吞吐量测试 通过SSH连接到主机，显示实时的传输速度，将所有传输数据指向/dev/null，需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
+`yes | pv | ssh $host "cat > /dev/null"`	实时SSH网络吞吐量测试 通过SSH连接到主机, 显示实时的传输速度, 将所有传输数据指向/dev/null, 需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
 `yes | pv | cat > /dev/null`
 
 `ssh host -l user "cat cmd.txt"`	通过SSH运行复杂的远程shell命令
@@ -2051,11 +2082,11 @@ chmod 600 .ssh/config
 ##### Keep SSH Sessions Alive 保持SSH连接不断线
 1. client: ssh -o ServerAliveInterval=60 username@host
 2. update .ssh/config
-源头发力的办法就是，让ssh一直尝试与服务器通信，不让其空闲下来，间隔时间与服务器发keepalive的心跳包，通过简单的ssh设置就能做到这一点
+源头发力的办法就是, 让ssh一直尝试与服务器通信, 不让其空闲下来, 间隔时间与服务器发keepalive的心跳包, 通过简单的ssh设置就能做到这一点
 vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 ServerAliveInterval <X>
 ServerAliveCountMax <Y>
-上面的X表示，两次心跳指令的发送间隔秒数，Y则代表发送指令的最大数量，你可以根据你要离开的时间，灵活的做出调整。或者你也可以不对最大发送指令数量，做限制，只给出一个间隔时间，保持心跳包接受顺畅就好
+上面的X表示, 两次心跳指令的发送间隔秒数, Y则代表发送指令的最大数量, 你可以根据你要离开的时间, 灵活的做出调整. 或者你也可以不对最大发送指令数量, 做限制, 只给出一个间隔时间, 保持心跳包接受顺畅就好
 
 > ServerAliveInterval: number of seconds that the client will wait before sending a null packet to the server (to keep the connection alive).
 
@@ -2068,19 +2099,19 @@ ServerAliveCountMax <Y>
 [远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html)
 
 动态转发:
-`ssh -D <local port> <SSH Server>`	动态转发 如果SSH Server是境外服务器，则该SOCKS代理实际上具备了翻墙功能
+`ssh -D <local port> <SSH Server>`	动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能
 
 本地端口转发:
 localhost连不上remoteSecret, remoteHost可以连通localhost和remoteSecret, 通过remoteHost连上remoteSecret
 `ssh -L localPort:remoteSecret:remoteSecretPort remoteHost`	#在本机执行本地端口转发Local forwarding:connect remoteSecret through remoteHost
 `ssh -L <local port>:<remote host>:<remote port> <SSH hostname>`
-example: 通过host3的端口转发，ssh登录host2
+example: 通过host3的端口转发, ssh登录host2
 1. `ssh -L 9001:host2:22 host3` 在本机执行
-2. `ssh -p 9001 localhost` ssh登录本机的9001端口，相当于连接host2的22端口
+2. `ssh -p 9001 localhost` ssh登录本机的9001端口, 相当于连接host2的22端口
 
 远程端口转发:
-localhost与remoteSecret之间无法连通，必须借助remoteHost转发, 不过remoteHost是一台内网机器，它可以连接外网的localhost，但是反过来就不行，外网的localhost连不上内网的remoteHost.
-解决办法:从remoteHost上建立与localhost的SSH连接，然后在localhost上使用这条连接
+localhost与remoteSecret之间无法连通, 必须借助remoteHost转发, 不过remoteHost是一台内网机器, 它可以连接外网的localhost, 但是反过来就不行, 外网的localhost连不上内网的remoteHost.
+解决办法:从remoteHost上建立与localhost的SSH连接, 然后在localhost上使用这条连接
 1. `ssh -R localPort:remoteSecret:remoteSecretPort localhost`	#在remoteHost执行
 2. `ssh -p localPort localhost`	#在localhost上SSH本机localPort, 即连接上了remoteSecret
 
@@ -2137,7 +2168,7 @@ trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 #### SCP
 `scp client_file user@host:filepath`	上传文件到服务器端
 `scp user@host:server_files client_file_path`	下载文件
-client_file 待上传的文件，可以有多个，多个文件之间用空格隔开。也可以用*.filetype上传某个类型的全部文件
+client_file 待上传的文件, 可以有多个, 多个文件之间用空格隔开. 也可以用*.filetype上传某个类型的全部文件
 user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
 
 #### Windows putty plink pscp
@@ -2145,9 +2176,9 @@ pscp.exe -pw pwd filename username@host:directory/subdirectory
 plink -pw pwd username@host ls;ls
 plink -pw pwd username@host -m local_script.sh
 plink -i %putty%/privateKey.ppk
-Windows的控制台会把两个双引号之间的字符串作为一个参数传递给被执行的程序，而不会把双引号也传递给程序
+Windows的控制台会把两个双引号之间的字符串作为一个参数传递给被执行的程序, 而不会把双引号也传递给程序
 所以错误命令C:\>plink 192.168.6.200 ls "-l"
-Windows控制台不认得单引号，所以上面那个命令的正确用法应该是：
+Windows控制台不认得单引号, 所以上面那个命令的正确用法应该是:
 c:\>plink 192.168.6.200 ls '-l'
 
 ### Software manage
@@ -2165,7 +2196,7 @@ apt-cache search #package 搜索包
 aptitude name for failed resolving dependency
 
 #### apt command
-apt-get 下载后，软件所在路径是 /var/cache/apt/archives
+apt-get 下载后, 软件所在路径是 /var/cache/apt/archives
 
 apt-cache policy maven	#check the version of package from apt-get
 apt-cache pkgnames #To list all the available packages,
@@ -2219,7 +2250,7 @@ cat /etc/resolv.conf
 nameserver 192.168.1.1
 
 ### mount disk
-用mount挂载你的windows分区，事先以root权限用fdisk -l查看。你就知道该挂载哪个了
+用mount挂载你的windows分区, 事先以root权限用fdisk -l查看. 你就知道该挂载哪个了
 mount /dev/cdrom /mnt/cdrom 挂载光盘
 
 auto mount your NTFS disk: Install pysdm or ntfs-config
@@ -2273,12 +2304,12 @@ Here, only the most important directories in the system will be presented.
 /tmp is a place for temporary files used by applications.
 /usr contains the majority of user utilities and applications, and partly replicates the root directory structure, containing for instance, among others, /usr/bin/ and /usr/lib.
 /var is dedicated variable data that potentially changes rapidly; a notable directory it contains is /var/log where system log files are kept.
-通常情况下，linux会这样放软件的组件：
+通常情况下, linux会这样放软件的组件:
 程序的文档->/usr/share/doc; /usr/local/share/doc
 程序->/usr/share; /usr/local/share
 程序的启动项->/usr/share/apps; /usr/local/share
 程序的语言包->/usr/share/locale; /usr/local/share/locale
 可执行文件->/usr/bin; /usr/local/bin
-而有的软件为了和系统组件分隔开，选择栖息于 /opt，但目录结构往往是一样的，把/usr或/usr/local 替换为了/opt/"软件名"
+而有的软件为了和系统组件分隔开, 选择栖息于 /opt, 但目录结构往往是一样的, 把/usr或/usr/local 替换为了/opt/"软件名"
 ~/share all softwares
 ~/opt soft links to specify version of ~/share softwares
