@@ -372,7 +372,7 @@ grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
 `-L`	列出不匹配的文件名
 `-w`	匹配整个单词
 `-A`, `-B`, `-C`	print context lines
-`-i`, --ignore-case不区分大小写地搜索. 默认情况区分大小写, 
+`-i`, --ignore-case不区分大小写地搜索. 默认情况区分大小写,
 `-n`, --line-number
 `-c`, --count
 `-r`, --recursive
@@ -681,7 +681,7 @@ $*, 该变量包含了所有输入的命令行参数值
 
 #### `pwd`, `PWD`
 `pwd`命令用于显示当前工作目录.
-环境变量`OLDPWD`表示前一次的工作目录, 
+环境变量`OLDPWD`表示前一次的工作目录,
 环境变量`PWD`表示当前的工作目录.
 
 #### Common Bash comparisons
@@ -1456,7 +1456,7 @@ gMTP connect to android from Ubuntu
 ### Performance
 http://www.brendangregg.com/linuxperf.html
 
-#### Linux Perf Analysis in 60s checklist
+#### Linux Perf Analysis in 60s Checklist
 http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 1.	`uptime` ⟶ load averages
 2.	`dmesg -T | tail` ⟶ kernel errors
@@ -1471,21 +1471,7 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 
 `dmesg | tail`	输出系统日志的最后10行
 `vmstat 1`, `iostat-xz 1`
-
-
 sysstat工具与负载历史回放
-sar命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放
-1. sar命令查看CPU、内存和磁盘记录
-　　默认情况下, sar命令显示当天的统计信息  
-`sar` CPU统计信息  
-`sar -r`显示收集的内存记录  
-`sar -b`显示磁盘I/O
-
-2. 使用sar查看指定时间、指定日期的历史记录
-参数-s和-e限定查看的时间
-`sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
-`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
-`sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
 ### CPU
 `lscpu` display information on CPU architecture
@@ -1551,9 +1537,9 @@ free 命令下面有一行“-/+ buffers/cache”, 该行显示的used是上一�
 top命令中, 按下 f 键, 进入选择排序列的界面, 按%MEM排序. RES是常驻内存, 是进程切实使用的物理内存量, free命令中看到的used列下面的值, 就包括常驻内存的加总, 但不是虚拟内存的加总
 
 4. 交换空间
-`# swapon`
-`# swapoff`
-`# mkswap`
+`# swapon` 开启交换空间
+`# swapoff` 关闭交换空间
+`# mkswap` 创建交换空间
 
 　　使用free命令可以查看内存的总体使用, 显示的内容也包括交换分区的大小, 可以使用swapon, swapoff, 命令开启或关闭交换空间, 交换空间是磁盘上的文件, 并不是真正的内存空间.  
 系统的可用内存一般等于物理内存 + 交换分区. 交换分区在磁盘上,  因此速度比内存读写要慢得多. 交换分区实际上就是磁盘上的文件, 可以通过mkswap命令来创建交换空间
@@ -1571,7 +1557,6 @@ top命令中, 按下 f 键, 进入选择排序列的界面, 按%MEM排序. RES�
 `pmap pid` - Process Memory Usage 查看pid进程使用的共享内存, 包括使用的库, 所在堆栈空间等.
 
 9. 查看系统内存历史记录`# sar`
-　　用`sar`查看一个月以内的内存使用情况.
 
 #### 如何清理内存使用
 1. 释放占用的缓存空间
@@ -1793,33 +1778,61 @@ UDP Clients & Servers
 ### 操作系统 `uname -a`
 find out system version: `cat /etc/*-release` or `ls /etc/*-release`
 Redhat/CentOS版本 : `cat /etc/redhat-release`
-lsb_release -a
+`lsb_release -a`
 
 ### 状态采集工具
 讲究点, 要用来出报告的, 用`Zabbix`之类.
 
 #### `dstat`
 实时观察的, 我喜欢`dstat`, 比`vmstat`, `iostat`, `sar`们都好用, 起码对得够齐, 单位能自动转换. 不过`dstat`需要安装(`yum install dstat`, 如果装不上, 就要将就着用`vmstat`, `sar`了)
-    dstat: 默认, 已有足够信息
-    `dstat -am`: 再多一个memory信息
-    `dstat -amN bond0,lo`:如果有bonding, dstat会把bond0和eth0算双份, 还有lo的也算到总量里, 所以还是用-N指定网卡好
+dstat: 默认, 已有足够信息  
+`dstat -am`: 再多一个memory信息  
+`dstat -amN bond0,lo`:如果有bonding, dstat会把bond0和eth0算双份, 还有lo的也算到总量里, 所以还是用-N指定网卡好  
 要看IO细节, 还是要用`iostat -dxm 5`
 
-#### `vmstat` - System Activity, Hardware and System Information
+#### `vmstat` - Report virtual memory statistics
+`vmstat [options] [delay [count]]`
 ```
-$ vmstat 2
+$ vmstat 2 5
 procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
- r  b swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
-34  0    0 200889792  73708 591828    0    0     0     5    6   10 96  1  3  0  0
+ r  b swpd   free      buff  cache   si   so    bi    bo   in   cs  us sy id wa st
+34  0    0 200889792  73708 591828    0    0     0     5    6   10  96  1  3  0  0
 32  0    0 200889920  73708 591860    0    0     0   592 13284 4282 98  1  1  0  0
-32  0    0 200890112  73708 591860    0    0     0     0 9501 2154 99  1  0  0  0
+32  0    0 200890112  73708 591860    0    0     0     0 9501  2154 99  1  0  0  0
 32  0    0 200889568  73712 591856    0    0     0    48 11900 2459 99  0  0  0  0
 32  0    0 200890208  73712 591860    0    0     0     0 15898 4840 98  1  1  0  0
-^C
 ```
-`vmstat(8)` 命令, 每行会输出一些系统核心指标, 这些指标可以让我们更详细的了解系统状态. 后面跟的参数2, 表示每2秒输出一次统计信息, 表头提示了每一列的含义, 这几介绍一些和性能调优相关的列:   
+Procs（进程）:
+* r: 运行队列中进程数量
+* b: 等待IO的进程数量
+
+Memory（内存）:
+* swpd: 使用虚拟内存大小
+* free: 可用内存大小
+* buff: 用作缓冲的内存大小
+* cache: 用作缓存的内存大小
+
+Swap:
+* si: 每秒从交换区写到内存的大小
+* so: 每秒写入交换区的内存大小
+
+IO：（现在的Linux版本块的大小为1024bytes）
+* bi: 每秒读取的块数
+* bo: 每秒写入的块数
+
+system：
+* in: 每秒中断数，包括时钟中断
+* cs: 每秒上下文切换数
+
+CPU（以百分比表示）
+* us: 用户进程执行时间(user time)
+* sy: 系统进程执行时间(system time)
+* id: 空闲时间(包括IO等待时间)
+* wa: 等待IO时间
+
+`vmstat(8)` 命令, 每行会输出一些系统核心指标, 这些指标可以让我们更详细的了解系统状态. 后面跟的参数2, 表示每2秒输出一次统计信息, 表头提示了每一列的含义, 介绍和性能调优相关的列:   
 `r`: 等待在CPU资源的进程数. 这个数据比平均负载更加能够体现CPU负载情况, 数据中不包含等待IO的进程. 如果这个数值大于机器CPU核数, 那么机器的CPU资源已经饱和.   
-`free`: 系统可用内存数（以千字节为单位）, 如果剩余内存不足, 也会导致系统性能问题. 下文介绍到的free命令, 可以更详细的了解系统内存的使用情况.   
+`free`: 系统可用内存数（以千字节为单位）, 如果剩余内存不足, 也会导致系统性能问题.  
 `si, so`: 交换区写入和读取的数量. 如果这个数据不为0, 说明系统已经在使用交换区（swap）, 机器物理内存已经不足  
 `us, sy, id, wa, st`: 这些都代表了CPU时间的消耗, 它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen, 一般被其他虚拟机消耗）.   
 
@@ -1828,14 +1841,14 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 
 ####  `iostat` Average CPU Load, Disk Activity
 主要用于查看机器磁盘IO情况. iostat命令属于sysstat工具包
-`iostat -dxm 5`  
+1. 查看详细状态 `iostat -dxm 5`  
 `-d` 不看cpu信息  
 `-x` 看细节  
 `-m` 以m为单位, 而不以block原始size  
 `5` 5秒的间隔  
 
 
-`iostat -d -k 1 10`
+2. 查看磁盘状态 `iostat -d -k 1 10`
 参数:
 `-d` 表示, 显示设备（磁盘）使用状态  
 `-k`某些使用block为单位的列强制使用Kilobytes为单位  
@@ -1848,7 +1861,7 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 `kB_wrtn`: 一共写了多少KB.   
 
 
-`iostat -xz 1`
+3. 查看详细状态 `iostat -xz 1`
 `-x` 参数可以获得更多统计信息
 该命令输出列的主要含义是:
 `r/s, w/s`: 分别表示每秒读写次数, 读写量过大, 可能会引起性能问题.
@@ -1865,31 +1878,44 @@ procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 如果显示的是逻辑设备的数据, 那么设备利用率不代表后端实际的硬件设备已经饱和. 值得注意的是, 即使IO性能不理想, 也不一定意味这应用程序性能会不好, 可以利用诸如预读取、写缓存等策略提升应用性能.
 
 
-`iostat -c 1 10` 查看CPU部分状态值
-cpu属性值说明:
-`%user`: CPU处在用户模式下的时间百分比.   
-`%nice`: CPU处在带NICE值的用户模式下的时间百分比.   
-`%system`: CPU处在系统模式下的时间百分比.   
-`%iowait`: CPU等待输入输出完成时间的百分比.   
-`%steal`: 管理程序维护另一个虚拟处理器时, 虚拟CPU的无意识等待时间百分比.   
-`%idle`: CPU空闲时间百分比.   
+4. 查看CPU部分状态值 `iostat -c 1 10`   
+cpu属性值说明:  
+`%user`: CPU处在用户模式下的时间百分比.  
+`%nice`: CPU处在带NICE值的用户模式下的时间百分比.  
+`%system`: CPU处在系统模式下的时间百分比.  
+`%iowait`: CPU等待输入输出完成时间的百分比.  
+`%steal`: 管理程序维护另一个虚拟处理器时, 虚拟CPU的无意识等待时间百分比.  
+`%idle`: CPU空闲时间百分比.  
 
 1. `%iowait`的值过高, 表示硬盘存在I/O瓶颈
 2. `%idle`值高, 表示CPU较空闲
 3. 如果`%idle`值高但系统响应慢时, 有可能是CPU等待分配内存, 此时应加大内存容量. **`%idle`值如果持续低于10, 那么系统的CPU处理能力相对较低, 表明系统中最需要解决的资源是CPU**.
 
 #### sar - Collect and Report System Activity
-`sar`命令在这里可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
-`sar -n DEV 1`, `sar -n TCP,ETCP 1`
-`-n`参数很有用, 他有6个不同的开关: DEV | EDEV | NFS | NFSD | SOCK | ALL . DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套 接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了  
-	IFACE: LAN接口  
-	rxpck/s: 每秒钟接收的数据包  
-	txpck/s: 每秒钟发送的数据包  
-	rxbyt/s: 每秒钟接收的字节数  
-	txbyt/s: 每秒钟发送的字节数  
-	rxcmp/s: 每秒钟接收的压缩数据包  
-	txcmp/s: 每秒钟发送的压缩数据包  
-	rxmcst/s: 每秒钟接收的多播数据包  
+`sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放
+可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
+
+1. 查看CPU、内存和磁盘记录. 默认情况下, sar命令显示当天的统计信息  
+`sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
+`sar -r 2 5`显示收集的内存记录  
+`sar -b 2 5`显示磁盘I/O
+`sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；  
+
+2. 查看指定时间、指定日期的历史记录 参数`-s`和`-e`限定查看的时间
+`sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
+`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
+`sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
+
+3. 查看网络状态 `sar -n DEV 1`  
+`-n`参数有6个不同的开关: DEV | EDEV | NFS | NFSD | SOCK | ALL. DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了   
+`IFACE`: LAN接口   
+`rxpck/s`: 每秒钟接收的数据包    
+`txpck/s`: 每秒钟发送的数据包   
+`rxbyt/s`: 每秒钟接收的字节数  
+`txbyt/s`: 每秒钟发送的字节数  
+`rxcmp/s`: 每秒钟接收的压缩数据包  
+`txcmp/s`: 每秒钟发送的压缩数据包  
+`rxmcst/s`: 每秒钟接收的多播数据包  
 
 ```
 $ sar -n DEV 1
@@ -1906,7 +1932,7 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CP
 ```
 如示例输出中, eth0网卡设备, 吞吐率大概在22 Mbytes/s, 既176 Mbits/sec, 没有达到1Gbit/sec的硬件上限.
 
-`sar -n TCP,ETCP 1`
+4. 查看TCP连接状态 `sar -n TCP,ETCP 1`  
 ```
 $ sar -n TCP,ETCP 1
 Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)
@@ -1920,7 +1946,7 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU
 12:17:21 AM      0.00      0.00      0.00      0.00      0.00
 ^C
 ```
-`sar`命令在这里用于查看TCP连接状态, 其中包括:
+输出内容:
 `active/s`: 每秒本地发起的TCP连接数, 既通过connect调用创建的TCP连接;
 `passive/s`: 每秒远程发起的TCP连接数, 即通过accept调用创建的TCP连接;
 `retrans/s`: 每秒TCP重传数量;
