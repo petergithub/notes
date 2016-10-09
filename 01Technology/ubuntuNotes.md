@@ -1,36 +1,37 @@
 [TOC]
 
-学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from strach)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.
+学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from strach)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.  
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
 ## Recent
-为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.
-vimtutor: vim interactive guide
-`man readline` to get the introduction to the combination of keys
+为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.  
+vimtutor: vim interactive guide  
+`man readline` to get the introduction to the combination of keys  
 
-ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.
-其原理是, ~符号是ssh命令中的转义字符, 就像我们平时编程中使用的\一样. 通过在ssh连接中输入~?, 你可以看到完整的命令帮助.
-`reset` 恢复出现问题的屏幕
+ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.  
+其原理是, ~符号是ssh命令中的转义字符, 就像我们平时编程中使用的\一样. 通过在ssh连接中输入~?, 你可以看到完整的命令帮助.  
+`reset` 恢复出现问题的屏幕  
 
-man readline to get more information:
+man readline to get more information:  
 Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
-    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
+    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash  
     * CTRL+s or C-S-r: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-CTRL+h: show hidden files
-nautilus: open your home folder
-location: make a command can be call anywhere
-/usr/share/icons/ubuntu-mono-dark/mimes/16
-tweak get the theme ubuntu-mono-dark
-`ln -sfn` update a symbolic link
-`strace ls a`
+    
+`CTRL+h`: show hidden files  
+`nautilus`: open your home folder  
+`location`: make a command can be call anywhere   
+/usr/share/icons/ubuntu-mono-dark/mimes/16  
+tweak get the theme ubuntu-mono-dark  
+`ln -sfn` update a symbolic link  
+`strace ls a`  
 
-`pstack` Linux命令查看某个进程的当前线程栈运行情况
-`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
+`pstack` Linux命令查看某个进程的当前线程栈运行情况  
+`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)  
 
-M-1 is meta-1 (Alt-1 in Ubuntu)
-C-1 is control-1
-`yum provides /usr/bin/ab`  discover which package contains the program `ab`
+M-1 is meta-1 (Alt-1 in Ubuntu)  
+C-1 is control-1  
+`yum provides /usr/bin/ab`  discover which package contains the program `ab`  
 
 
 `ls /fake/directory > peanuts.txt 2>&1` 2>&1 是将标准出错重定向到标准输出
@@ -87,83 +88,81 @@ rsyslog>>>>>>
 	init       1       root    3r     FIFO        0,8       0t0       6323 pipe
 ```
 FD – Represents the file descriptor. Some of the values of FDs are,
-
-    cwd – Current Working Directory
-    txt – Text file
-    mem – Memory mapped file
-    mmap – Memory mapped device
-    NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.
+* cwd – Current Working Directory
+* txt – Text file
+* mem – Memory mapped file
+* mmap – Memory mapped device
+* NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.
 
 TYPE – Specifies the type of the file. Some of the values of TYPEs are,
-
-    REG – Regular File
-    DIR – Directory
-    FIFO – First In First Out
-    CHR – Character special file
+* REG – Regular File
+* DIR – Directory
+* FIFO – First In First Out
+* CHR – Character special file
 
 Parameters:
-`+D` will recurse
-`+d` will not recurse
-`-c` based on process names starting with
-`-u` specific user
-`-p` specific process
-`-t` list the process id
-`-r` repeat until interrupt
-`+r` repeat until no open files found
-`-i` network
+* `+D` will recurse
+* `+d` will not recurse
+* `-c` based on process names starting with
+* `-u` specific user
+* `-p` specific process
+* `-t` list the process id
+* `-r` repeat until interrupt
+* `+r` repeat until no open files found
+* `-i` network
 
-Samples:
-List processes which opened a specific file: `lsof /var/log/syslog`
-List opened files under a directory: `lsof +D /var/log/`
-List opened files based on process names starting with: `lsof -c ssh -c init`
-can give multiple -c switch on a single command line.
-List processes using a mount point: `lsof /home`, `lsof +D /home/`
-List files opened by a specific user: `lsof -u username`
-Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`
-List all open files by a specific process: `lsof -p 1753`
-Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
-Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
+Samples:  
+List open files thread in order `lsof -n |awk '{print $2}'|sort|uniq -c |sort -nr| less`
+List processes which opened a specific file: `lsof /var/log/syslog`  
+List opened files under a directory: `lsof +D /var/log/`  
+List opened files based on process names starting with: `lsof -c ssh -c init`  
+can give multiple -c switch on a single command line.  
+List processes using a mount point: `lsof /home`, `lsof +D /home/`  
+List files opened by a specific user: `lsof -u username`  
+Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`  
+List all open files by a specific process: `lsof -p 1753`  
+Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`  
+Execute lsof in repeat mode: `lsof -u username -c init -a -r5`  
 
-List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
-List processes which are listening on a particular port: `lsof -i :25`
-List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
+List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.  
+List processes which are listening on a particular port: `lsof -i :25`  
+List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`  
 
-Get Unix timestamp 	`date +%s`
-Convert Unix timestamp to Date `date -d @1467540501`
-Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
+Get Unix timestamp 	`date +%s`  
+Convert Unix timestamp to Date `date -d @1467540501`  
+Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
 
 	date_str=`date +%Y%m%d%H%M%S`;echo $date_str
 
-`foo > stdout.txt 2> stderr.txt` use 2> to redirect to stderr
-`foo > allout.txt 2>&1` all output redirect to the same file
+`foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
+`foo > allout.txt 2>&1` all output redirect to the same file  
 
-`dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件
-if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中
-bs=1M表示每一次读写1M数据, count=50表示读写 50次, 这样就指定了生成文件的大小为50M
-dd做的只是文件拷贝工作
+`dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件  
+if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中  
+bs=1M表示每一次读写1M数据, count=50表示读写 50次, 这样就指定了生成文件的大小为50M  
+dd做的只是文件拷贝工作  
 
 `dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
 
 get the MD5 hash `echo -n Welcome | md5sum`
 
-`passwd <username>`	update password
-`id <username>`	get the user
-`id -nG <username>`	Find out user group identity
-`less /etc/group`	Get all groups in system
-`groupadd <groupName>`	Add a new group
-`useradd -g <groupName> <username>`	Add a new user to primary group
-`useradd -G <groupName> <username>`	Add a new user to secondary group
-`usermod -G {groupname1,groupname2,...} <username>`	Remove user from group which is not list in the command
-`groups username`	To find group memebership for username
+`passwd <username>`	update password  
+`id <username>`	get the user  
+`id -nG <username>`	Find out user group identity  
+`less /etc/group`	Get all groups in system  
+`groupadd <groupName>`	Add a new group  
+`useradd -g <groupName> <username>`	Add a new user to primary group  
+`useradd -G <groupName> <username>`	Add a new user to secondary group  
+`usermod -G {groupname1,groupname2,...} <username>`	Remove user from group which is not list in the command  
+`groups username`	To find group memebership for username  
 
-sudo apt-get install -f fixed it.
+sudo apt-get install -f fixed it.  
 
 pgrep 和 pkill
 pgrep -l apache2
-`ps -A -opid,stime,etime,args` 查看进程的启动时间
-`du -s * | sort -n | tail`	列出当前目录里最大的10个文件.
-`last`	To find out when a particular user last logged in to the Linux or Unix server.
-
+`ps -A -opid,stime,etime,args` 查看进程的启动时间  
+`du -s * | sort -n | tail`	列出当前目录里最大的10个文件.  
+`last`	To find out when a particular user last logged in to the Linux or Unix server.  
 
 
 Keyboard problems, setting 3rd level chooser and Meta key in Unity
@@ -179,10 +178,10 @@ or alternate method which lists the PID (note the PID is not the jobnum, the job
 3. `bg %jobnum`
 or alternate method %jobnum & for example for the first job %1 &
 
-To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.
-Show the status of all background and suspended jobs: jobs
-Bring a job back into the foreground: `fg %jobnumber`
-Bring a job back into the background: `bg %jobnumber`
+To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.  
+Show the status of all background and suspended jobs: jobs  
+Bring a job back into the foreground: `fg %jobnumber`  
+Bring a job back into the background: `bg %jobnumber`  
 
 #### ALREADY RUNNING PROCESS INTO NOHUP
 0. Run some SOMECOMMAND
@@ -205,119 +204,122 @@ ALT+Delete, and then press the up or down arrow key.
 ## Basic Command
 ### VI
 #### Configuration
-:set nu / :set nonu	(不)列出行号 (nu为行数)
-:set ic / :set noic	vi在查找过程中(不)区分大小写 :set ignorecase/:set noignorecase
+`:set nu` / `:set nonu`	(不)列出行号 (nu为行数)
+`:set ic` / `:set noic`	vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`
 
 #### Move
-`%`	move to the matching parenthesis
+`%`	move to the matching parenthesis (), {}, []  
+`(` / `)` move a sentence back/forward  
+`{` / `}` move paragraph back/forward  
 
 #### Basic vi
-`~`	切换大小写
-`:sp`	split window above and below
-`:sh`	暂时退出vi到系统下, 结束时按CTRL+d则回到vi
-`:r!command`	将命令command的输出结果放到当前行 如`:r!ls -ltr`
-`:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间
+`~`	切换大小写  
+`:sp`	split window above and below  
+`:sh`	暂时退出vi到系统下, 结束时按CTRL+d则回到vi  
+`:r!command`	将命令command的输出结果放到当前行 如`:r!ls -ltr`  
+`:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间  
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w）, 会提到命令:w!{cmd}, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. tee是一个把stdin保存到文件的小工具. 而%, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
-改变与替换操作命令
-<r> 替换光标所在的字符
-<R> 替换字符序列
-<cw> 替换一个单词
-<ce> 同<cw>
-<cb> 替换光标所在的前一字符
-<c$> 替换自光标位置至行尾的所有字符
-<C> 同<c$>
-<cc> 替换当前行
+改变与替换操作命令  
+<r> 替换光标所在的字符  
+<R> 替换字符序列  
+<cw> 替换一个单词  
+<ce> 同<cw>  
+<cb> 替换光标所在的前一字符  
+<c$> 替换自光标位置至行尾的所有字符  
+<C> 同<c$>  
+<cc> 替换当前行  
 
-`yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)
-`yiw`	不管当前光标处于单词的哪个字母, 都是复制整个单词(不包括末尾的空格)
-`diw`	删除当前光标所在的word(不包括空白字符), 意为Delete Inner Word 两个符号之间的单词
-`dt<LETTER>`	删除所有的内容, 直到遇到<LETTER>
-`daw`	删除当前光标所在的word(包括空白字符), 意为Delete A Word
-`guw`	光标下的单词变为小写
-`gUw`	光标下的单词变为大写
-`ga`	显示光标下的字符在当前使用的encoding下的内码
-`CTRL+SHIFT++`	zoom in on your terminal
-`CTRL+-`	Zoom out
+`yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)  
+`yiw`	不管当前光标处于单词的哪个字母, 都是复制整个单词(不包括末尾的空格)  
+`diw`	删除当前光标所在的word(不包括空白字符), 意为Delete Inner Word 两个符号之间的单词  
+`dt<LETTER>`	删除所有的内容, 直到遇到<LETTER>  
+`daw`	删除当前光标所在的word(包括空白字符), 意为Delete A Word  
+`guw`	光标下的单词变为小写  
+`gUw`	光标下的单词变为大写  
+`ga`	显示光标下的字符在当前使用的encoding下的内码  
+`CTRL+SHIFT++`	zoom in on your terminal  
+`CTRL+-`	Zoom out  
 
-`.` 命令重复上次的修改.
-`:!` command allows you to enter the name of a shell command
+`.` 命令重复上次的修改.  
+`:!` command allows you to enter the name of a shell command  
 修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.
-重复修改一个单词.
-如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.
-删除多行
-1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .
-2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式,  如该行存在function字串 一般 `d/fu` 也就搞定了
-输入单词A的前几个字母, 然后CTRL+n补全. <CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全, 还有<CTRL+o><CTRL+f> 用于对目录名进行补全
+重复修改一个单词.  
+如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.  
 
-记录功能: 命令模式下按q, 再按一个字母做名字, 就进入了记录模式, 再按q停止记录.
-回放记录: 在命令模式下按@, 再按下记录名字a. 连续回放可以在@前加次数
+删除多行  
+1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .  
+2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式,  如该行存在function字串 一般 `d/fu` 也就搞定了  
+输入单词A的前几个字母, 然后CTRL+n补全. <CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全, 还有<CTRL+o><CTRL+f> 用于对目录名进行补全  
+
+记录功能: 命令模式下按q, 再按一个字母做名字, 就进入了记录模式, 再按q停止记录.  
+回放记录: 在命令模式下按@, 再按下记录名字a. 连续回放可以在@前加次数  
 
 #### Move around inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
 #### 文件对比 合并 多窗口
-diff -u
-vimdiff  FILE_LEFT  FILE_RIGHT
-:qa (quit all)同时退出两个文件
-:wa (write all)
-:wqa (write, then quit all)
-:qa! (force to quit all)
+diff -u  
+vimdiff  FILE_LEFT  FILE_RIGHT  
+:qa (quit all)同时退出两个文件  
+:wa (write all)  
+:wqa (write, then quit all)  
+:qa! (force to quit all)  
 
-CTRL+w K(把当前窗口移到最上边)
-CTRL+w H(把当前窗口移到最左边)
-CTRL+w J(把当前窗口移到最下边)
-CTRL+w L(把当前窗口移到最右边)
-CTRL+w,r 交换上/下、左/右两个分隔窗口的位置
-其中2和4两个操作会把窗口改成垂直分割方式.
-在两个文件之间来回跳转, 可以用下列命令序列CTRL+w, w
-可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: ]c. 反向跳转是: [c
-`> -`, `> +` 调整窗口大小
+CTRL+w K(把当前窗口移到最上边)  
+CTRL+w H(把当前窗口移到最左边)  
+CTRL+w J(把当前窗口移到最下边)  
+CTRL+w L(把当前窗口移到最右边)  
+CTRL+w,r 交换上/下、左/右两个分隔窗口的位置  
+其中2和4两个操作会把窗口改成垂直分割方式.  
+在两个文件之间来回跳转, 可以用下列命令序列CTRL+w, w  
+可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: ]c. 反向跳转是: [c  
+`> -`, `> +` 调整窗口大小  
 
-dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
-do (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
-:diffu[pdate] #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
-zo (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
-zc (folding close)重新折叠
+dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里  
+do (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行  
+:diffu[pdate] #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:  
+zo (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行  
+zc (folding close)重新折叠  
 
 #### Mutiple tab
-:n next file :p previous file
-:bn 和 :bp :n 使用这两个命令来切换下一个或上一个文件. （陈皓注: 我喜欢使用:n到下一个文件）
+`:n` next file `:p` previous file  
+`:bn` 和 `:bp` `:n` 使用这两个命令来切换下一个或上一个文件. （陈皓注: 我喜欢使用:n到下一个文件）  
 
 #### custom keyboard shortcut
-`inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim
-`nnoremap j VipJ`
-`:map`	列出当前已定义的映射
+`inoremap jj <ESC>`	Remap Your ESCAPE Key in Vim  
+`nnoremap j VipJ`  
+`:map`	列出当前已定义的映射  
 
 
 #### VI正则表达式
 元字符 	说明
-. 	匹配任意字符
-[abc] 	匹配方括号中的任意一个字符, 可用-表示字符范围. 如[a-z0-9]匹配小写字母和数字
-[^abc] 	匹配除方括号中字符之外的任意字符
-\d 	匹配阿拉伯数字, 等同于[0-9]
-\D 	匹配阿拉伯数字之外的任意字符, 等同于[^0-9]
-\x 	匹配十六进制数字, 等同于[0-9A-Fa-f]
-\X 	匹配十六进制数字之外的任意字符, 等同于[^0-9A-Fa-f]
-\l 	匹配[a-z]
-\L 	匹配[^a-z]
-\u 	匹配[A-Z]
-\U 	匹配[^A-Z]
-\w 	匹配单词字母, 等同于[0-9A-Za-z_]
-\W 	匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]
-\t 	匹配<TAB>字符
-\s 	匹配空白字符, 等同于[\t]
-\S 	匹配非空白字符, 等同于[^\t]
+. 	匹配任意字符  
+[abc] 	匹配方括号中的任意一个字符, 可用-表示字符范围. 如[a-z0-9]匹配小写字母和数字  
+[^abc] 	匹配除方括号中字符之外的任意字符  
+\d 	匹配阿拉伯数字, 等同于[0-9]  
+\D 	匹配阿拉伯数字之外的任意字符, 等同于[^0-9]  
+\x 	匹配十六进制数字, 等同于[0-9A-Fa-f]  
+\X 	匹配十六进制数字之外的任意字符, 等同于[^0-9A-Fa-f]  
+\l 	匹配[a-z]  
+\L 	匹配[^a-z]  
+\u 	匹配[A-Z]  
+\U 	匹配[^A-Z]  
+\w 	匹配单词字母, 等同于[0-9A-Za-z_]  
+\W 	匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]  
+\t 	匹配<TAB>字符  
+\s 	匹配空白字符, 等同于[\t]  
+\S 	匹配非空白字符, 等同于[^\t]  
 
 一些普通字符需转意
 元字符 	说明
-\* 	匹配* 字符
-. 	匹配. 字符
-\/ 	匹配 / 字符
-\ 	匹配 \ 字符
-\[ 	匹配 [ 字符
-\] 	匹配 ] 字符
+\* 	匹配* 字符  
+. 	匹配. 字符  
+\/ 	匹配 / 字符  
+\ 	匹配 \ 字符  
+\[ 	匹配 [ 字符  
+\] 	匹配 ] 字符  
 
 表示数量的元字符
 元字符 	说明
@@ -336,21 +338,21 @@ $ 	匹配行尾
 \< 	匹配单词词首
 \> 	匹配单词词尾
 
-`\s` space
-`\n`,`\r\n` new line
-`\t` tab
-pattern `[^0-9]*,`	matches string start with non-number until to (,)
+`\s` space  
+`\n`,`\r\n` new line  
+`\t` tab  
+pattern `[^0-9]*,`	matches string start with non-number until to (,)  
 
 #### Replace
-`/`可以用`#`代替
-`:s`, `:&` repeat last :s command
-:g/old			查找old, 并打印出现它的每一行
-:s/old/new		替换当前行第一个old
-:s/old/new/gc	当前行old全替换并需要确认
-:n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line
-:%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束
-:%s/^ *//gc		去掉所有的行首空格
-:g/^\s*$/d	delete the blank lines
+`/`可以用`#`代替  
+`:s`, `:&` repeat last :s command  
+:g/old			查找old, 并打印出现它的每一行  
+:s/old/new		替换当前行第一个old  
+:s/old/new/gc	当前行old全替换并需要确认  
+:n,ms/old/new/g	n,m are the line numbers; n can be (.), which represent current line  
+:%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束  
+:%s/^ *//gc		去掉所有的行首空格  
+:g/^\s*$/d	delete the blank lines  
 :%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
 
 
@@ -366,9 +368,9 @@ Display only lines which match the pattern; lines which do not match the pattern
 
 ### find grep sed
 ```
-grep pattern files - 搜索 files 中匹配 pattern 的内容
-grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
-`-l`	只列出匹配的文件名
+grep pattern files - 搜索 files 中匹配 pattern 的内容  
+grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容  
+`-l`	只列出匹配的文件名  
 `-L`	列出不匹配的文件名
 `-w`	匹配整个单词
 `-A`, `-B`, `-C`	print context lines
@@ -981,140 +983,151 @@ echo $?	获取上一次命令执行的结果, 0表示成功, 非0表示失败
 `sudo su -` change to root user
 
 友情提示:
-   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
-   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
-    输入`du -sh dir`, 按回车执行命令
-    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir
-	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
-   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
-   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
-   	  CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
-	or remove it altogether with `stty stop undef`.
-	or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
-	After that `C-s` would work in the given terminal.
-	Set it in ~/.bashrc to make it work in every terminal.
-    	refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr
-   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）
+   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.  
+   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:  
+    输入`du -sh dir`, 按回车执行命令  
+    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir  
+	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`  
+   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出  
+   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.  
+   	  CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)  
+	The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` 		To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`  
+	or remove it altogether with `stty stop undef`.  
+	or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`  
+	After that `C-s` would work in the given terminal.  
+	Set it in ~/.bashrc to make it work in every terminal.  
+    	refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr  
+   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  
 
-ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
-undo 	CTRL+/
+ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.  
+undo 	CTRL+/  
 
 #### bash profile
-bash Startup Files: it looks for ~/.bash_profile, ~/.bash_login, and ~/.profile
- You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.
-add  one line in .profile
-`alias ls='ls --color=never'` #调用`\ls`使用原本的ls命令而不是别名
-add one line in .bashrc
-.bashrc:  `alias grep='grep --color=auto'`
+bash Startup Files: it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`  
+ You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.  
+add  one line in .profile  
+`alias ls='ls --color=never'` #调用`\ls`使用原本的ls命令而不是别名  
+add one line in .bashrc  
+.bashrc:  `alias grep='grep --color=auto'`  
 
 #### file carriage 换行
-两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行
-UNIX人认为在到达一行的结尾时新增一行<Line feed> (LF), 而Mac人则认同<Return> (CR)的解决办法, MS则坚持古老的<Return><Line feed> (CRLF)
-在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".
-1. $ dos2unix myfile.txt
-2. vi `:%s/^M$//g` #去掉行尾的^M.
-	`:%s/^M//g` #去掉所有的^M.
-3. `sed -e 's/^M//n/g' myfile.txt` // evluate
- `sed -i 's/^M//n/g' myfile.txt` // replace
+两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行  
+UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF)`, 而Mac人则认同`<Return> (CR)`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF)`
+在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".  
+1. $ dos2unix myfile.txt  
+2. vi `:%s/^M$//g` #去掉行尾的^M.  
+	`:%s/^M//g` #去掉所有的^M.  
+3. `sed -e 's/^M//n/g' myfile.txt` // evluate  
+ `sed -i 's/^M//n/g' myfile.txt` // replace  
 
-显示换行 `:set list` 进入<list mode>, 可以看到以`$`表示的换行符和以`^I`表示的制表符.
-vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望
-退出<list mode> `:set nolist`
+显示换行 `:set list` 进入<list mode>, 可以看到以`$`表示的换行符和以`^I`表示的制表符.  
+vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望  
+退出<list mode> `:set nolist`  
 
-删除换行
-可以用以下命令删除换行符:  `:%s/\n//g`
-可以用以下命令删除DOS文件中的回车符“^M”: `:%s/\r//g`
-可以用以下命令转换DOS回车符“^M”为真正的换行符: `:%s/\r/\r/g`
+删除换行  
+可以用以下命令删除换行符:  `:%s/\n//g`  
+可以用以下命令删除DOS文件中的回车符“^M”: `:%s/\r//g`  
+可以用以下命令转换DOS回车符“^M”为真正的换行符: `:%s/\r/\r/g`  
 
 `fileformats`选项, 用于处理文件格式问题  
-`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择, 而将MS-DOS的文件格式做为第二选择
-`:set fileformat?` 检测到的文件格式会被存放在fileformat选项中
-`:set fileformat=unix` 将文件转换为UNIX格式的文件
+`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择, 而将MS-DOS的文件格式做为第二选择  
+`:set fileformat?` 检测到的文件格式会被存放在fileformat选项中  
+`:set fileformat=unix` 将文件转换为UNIX格式的文件  
 
 在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以<EOL>为结束符的  
-`:set endofline` 设置文件以<EOL>结束符结尾
-`:set noendofline` 设置文件不以<EOL>结束符来结尾
+`:set endofline` 设置文件以<EOL>结束符结尾  
+`:set noendofline` 设置文件不以<EOL>结束符来结尾  
 
 ### zip jar tar
-`unzip project.war WEB-INF/lib/project.jar` only unzip the jar from the war
-`-q` perform operations quietly
-`-l` lists the contents of a ZIP archive to ensure your file is inside.
-`-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
-`unzip -O cp936` fix linux下文件解压乱码
-`zip -u project.war WEB-INF/lib/jaxen-core.jar` update zip file
-`zip -d project.war WEB-INF/lib/jaxen-core.jar`
+**zip** 
+`unzip project.war WEB-INF/lib/project.jar` only unzip the jar from the war  
+* `-q` perform operations quietly
+* `-l` lists the contents of a ZIP archive to ensure your file is inside.
+* `-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
 
-Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
-`zless`,`zipgrep`,`zgrep`,`zcat`
+examples:  
+* 防止linux下文件解压乱码 `unzip -O cp936` 
+* update zip file `zip -u project.war WEB-INF/lib/jaxen-core.jar` 
+* delete file in zip `zip -d project.war WEB-INF/lib/jaxen-core.jar`
 
+Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`  
+`zless`,`zipgrep`,`zgrep`,`zcat`  
+
+**tar**:  
 `tar -tf filename.tar.gz`	List files inside the tar.gz file
 `vim filename.tar.gz` List files and open file inside it with `Enter`
+`tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/` -C 选项提取文件到指定目录
 
-
-Extract multiple .tar.gz files with a single tar call
-`ls *.tar | xargs -i tar xf {}` or `cat *.tar | tar -xvf - -i`
-The `-i` option ignores the EOF at the end of the tar archives, from the man page:
+Extract multiple .tar.gz files with a single tar call  
+`ls *.tar | xargs -i tar xf {}` or `cat *.tar | tar -xvf - -i`  
+The `-i` option ignores the EOF at the end of the tar archives, from the man page:  
 `-i, --ignore-zeros` ignore blocks of zeros in archive (normally mean EOF)
 
-jar tvf <filename>.jar to find the content of the file without extracting.
-extract the class files in the jar
-jar xvf <jar name>.jar [class name]
-jar xvf package.jar com/vdm/Method.class
-update files
-cd C:\sp\Workspace\packager4p5\bin\classes
-jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class
-jar uvf C:\package.jar -C backup config.properties; add config.properties without backup folder path into jar
-java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame  (linux 下用 :)
+**jar**:  
+* list files without extracting `jar tvf <filename>.jar` 
+* extract files in the jar `jar xvf <jar name>.jar [class name]`
+* update files `jar xvf package.jar com/vdm/Method.class`
+
+* add file with folder path `cd C:\sp\Workspace\packager4p5\bin\classes; jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class`  
+* add file without backup folder path into jar `jar uvf C:\package.jar -C backup file`  
+
+`java -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame`  (linux 下用 :)  
 java命令引入jar时可以-cp参数, 但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar), 通常的jar都在同一目录, 且多于1个
-如: java -Djava.ext.dirs=lib MyClass
+如: java -Djava.ext.dirs=lib MyClass  
 
 
-### sort uniq cut
+### sort, uniq and cut
 `sort` `-t`设定间隔符 `-k`指定列数
 `sort [-fbMnrtuk] [file or stdin]`
-`-n`  : 使用『纯数字』进行排序(默认是以文字型态来排序的);
-`-r`  : 反向排序;
-`-t`  : 分隔符, 默认是用 [tab] 键来分隔;
-`-k`  : 以那个区间 (field) 来进行排序的意思
-/etc/passwd 内容是以 : 来分隔的, 以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
-默认是以字符串来排序的, 如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
-如果要对/etc/passwd,先以第六个域的第2个字符到第4个字符进行正向排序, 再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
 
-`uniq [-icu]`
-uniq 去除排序过的文件中的重复行, 因此uniq经常和sort合用. 也就是说, 为了使uniq起作用, 所有的重复行必须是相邻的.
-`-i`  : 忽略大小写字符的不同;
-`-c`  : 进行计数
-`-u`  : 只显示唯一的行
+* `-n`  : 使用『纯数字』进行排序(默认是以文字型态来排序的);
+* `-r`  : 反向排序;
+* `-t`  : 分隔符, 默认是用 [tab] 键来分隔;
+* `-k`  : 以那个区间 (field) 来进行排序的意思
 
-cut命令可以从一个文本文件或者文本流中提取文本列
-`cut -d '分隔字符' -f fields` 用于有特定分隔字符
-`-d`  : 后面接分隔字符. 与 -f 一起使用;
-`-f`  : 依据 -d 的分隔字符将一段信息分割成为数段, 用 -f 取出第几段的意思;
-`-c`  : 以字符 (characters) 的单位取出固定字符区间;
+示例:  
+* `/etc/passwd` 内容是以 `:` 来分隔的, 以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`  
+* 默认是以字符串来排序的, 如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`  
+* 如果要对`/etc/passwd`,先以第六个域的第2个字符到第4个字符进行正向排序, 再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
+
+`uniq [-icu]`  
+uniq 去除排序过的文件中的重复行, 因此uniq经常和sort合用. 也就是说, 为了使uniq起作用, 所有的重复行必须是相邻的.  
+
+* `-i`  : 忽略大小写字符的不同;
+* `-c`  : 进行计数
+* `-u`  : 只显示唯一的行
+
+cut命令可以从一个文本文件或者文本流中提取文本列  
+`cut -d '分隔字符' -f fields` 用于有特定分隔字符  
+
+* `-d`  : 后面接分隔字符. 与 -f 一起使用;
+* `-f`  : 依据 -d 的分隔字符将一段信息分割成为数段, 用 -f 取出第几段的意思;
+* `-c`  : 以字符 (characters) 的单位取出固定字符区间;
 
 操作PATH变量
-找出第五个路径 `echo $PATH | cut -d ':' -f 5`
-找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
-找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
-找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
-找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+* 找出第五个路径 `echo $PATH | cut -d ':' -f 5`
+* 找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
+* 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
+* 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
+* 找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
 
 ### curl
-查看网页源码 `curl www.sina.com`
-	保存网页`curl -o [文件名] www.sina.com`
-自动跳转重定向 `curl -L www.sina.com`
-显示http header
-	显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`
-	`-I`参数则是只显示http response的头信息.
-显示通信过程
-	`curl -v www.sina.com`
-	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
-HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.
-	`curl -X POST www.example.com` `curl -X DELETE www.example.com`
-HTTP认证	`curl --user name:password example.com`
+查看网页源码 `curl www.sina.com`  
+	保存网页`curl -o [文件名] www.sina.com`  
+自动跳转重定向 `curl -L www.sina.com`  
 
-提交表单并设置header
+显示http header  
+	显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`  
+	`-I`参数则是只显示http response的头信息.  
+	
+显示通信过程  `curl -v www.sina.com`  
+	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`  
+	
+HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.  
+	`curl -X POST www.example.com` `curl -X DELETE www.example.com`  
+HTTP认证	`curl --user name:password example.com`  
+
+提交表单并设置header  
 `curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`
 
 `-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`
@@ -1123,11 +1136,11 @@ Print 10 times: `seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_conne
 
 	curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
 
-Time to domain lookup: `time_namelookup`
-TCP handshake: `time_connect`
-SSL handshake: `time_appconnect`
-Time to first byte: `time_starttransfer`
-Total time: `time_total`
+Time to domain lookup: `time_namelookup`  
+TCP handshake: `time_connect`  
+SSL handshake: `time_appconnect`  
+Time to first byte: `time_starttransfer`  
+Total time: `time_total`  
 
 	curl -w "
 	namelookup: %{time_namelookup}
@@ -1139,9 +1152,8 @@ Total time: `time_total`
 	----------
 	time_total: %{time_total}\n" -so /dev/null https://www.baidu.com
 
-Timing Details With cURL
-https://josephscott.org/archives/2011/10/timing-details-with-curl/
-Step one: create a new file, curl-format.txt, and paste in:
+[Timing Details With cURL](https://josephscott.org/archives/2011/10/timing-details-with-curl/)  
+Step one: create a new file, curl-format.txt, and paste in:  
 
 	\n
         time_namelookup:  %{time_namelookup}\n
@@ -1154,9 +1166,10 @@ Step one: create a new file, curl-format.txt, and paste in:
              time_total:  %{time_total}\n
 	\n
 Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
-`-w "@curl-format.txt"` tells cURL to use our format file
-`-o /dev/null` redirects the output of the request to /dev/null
-`-s` tells cURL not to show a progress meter
+
+* `-w "@curl-format.txt"` tells cURL to use our format file
+* `-o /dev/null` redirects the output of the request to /dev/null
+* `-s` tells cURL not to show a progress meter
 
 And here is what you get back:
 
@@ -1194,72 +1207,73 @@ mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip username@gmail.com < /tmp/msg	send 
 sendmail user@example.com  < /tmp/email.txt
 
 ### help
-help命令用来描述不同的内置Bash命令help -s printf
-open another terminal: gnome-terminal
-man -k or apropos: key words search for command
-find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
-`locate indexserverconfig.xml`	find file based on index /var/lib/mlocate/mlocate.db
-`updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf
+help命令用来描述不同的内置Bash命令help -s printf  
+open another terminal: gnome-terminal  
+man -k or apropos: key words search for command  
+find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a  
+`locate indexserverconfig.xml`	find file based on index /var/lib/mlocate/mlocate.db  
+`updatedb`	update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf  
 
 ### Other
-`history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令
-查看最后一个日志文件cat /app/dmfdev08/dba/log/0001d795/bp/`ls -tr /app/dmfdev08/dba/log/0001d795/bp | tail -1`
+`history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令  
+查看最后一个日志文件 `ls -tr /data/log | tail -1`  
 cat << EOF > test.txt
 ABC
 DEF
-EOF
-tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/ -C 选项提取文件到指定目录
-watch -d -n 1 'df; ls -FlAt /path' 实时某个目录下查看最新改动过的文件
-watch -n 3 ls 以3秒钟执行一个ls命令
-du -sh dirname 查看目录的大小
-du -h --max-depth=1 显示当前目录中所有子目录的大小
-cd - 切换回上一个目录
-source .profile 使profile改动生效
-wget是linux最常用的下载命令
-tnsping MDATADEV.DOMAIN.COM
-使用一个命令来定义复杂的目录树	mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}
-ntsysv 就会*出图形界面给你选择(有的则显示在里面), 如果在文本界面就用ntsysv命令
-常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展, 所以我们可以用 `echo * == ls`
+EOF  
+`watch -d -n 1 'df; ls -FlAt /path'` 实时某个目录下查看最新改动过的文件  
+`watch -n 3 ls` 以3秒钟执行一个ls命令  
+`du -sh dirname` 查看目录的大小  
+`du -h --max-depth=1` 显示当前目录中所有子目录的大小  
+`cd -` 切换回上一个目录  
+`source .profile` 使profile改动生效  
+`wget -c file` continue stopped download  
+`wget -r url` recursive download files from url  
+`tnsping MDATADEV.DOMAIN.COM`  
+使用一个命令来定义复杂的目录树	`mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}`  
+ntsysv 就会*出图形界面给你选择(有的则显示在里面), 如果在文本界面就用ntsysv命令  
+常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展, 所以我们可以用 `echo * == ls`  
+`killall proc` kill all processes named proc  
 
 ## Advanced command
 ### Tmux
 tmux	CRTL-b
-tmux使用C/S模型构建, 主要包括以下单元模块:
-    server服务器. 输入tmux命令时就开启了一个服务器.
-    session会话. 一个服务器可以包含多个会话
-    window窗口. 一个会话可以包含多个窗口.
-    pane面板. 一个窗口可以包含多个面板.
-tmux ls #列出会话
-tmux a[ttach] -t session
+tmux使用C/S模型构建, 主要包括以下单元模块:  
+    server服务器. 输入tmux命令时就开启了一个服务器.  
+    session会话. 一个服务器可以包含多个会话  
+    window窗口. 一个会话可以包含多个窗口.  
+    pane面板. 一个窗口可以包含多个面板.  
+tmux ls #列出会话  
+tmux a[ttach] -t session  
 
 #### session operation:
-:new	create new session(:new -s sessionName)
-? 列出所有快捷键; 按q返回
-d 脱离当前会话,可暂时返回Shell界面, 输入tmux a[ttach]能够重新进入之前会话
-s 选择并切换会话; 在同时开启了多个会话时使用
-$ Rename the current session
+:new	create new session(:new -s sessionName)  
+? 列出所有快捷键; 按q返回  
+d 脱离当前会话,可暂时返回Shell界面, 输入tmux a[ttach]能够重新进入之前会话  
+s 选择并切换会话; 在同时开启了多个会话时使用  
+$ Rename the current session  
 
 #### window operation
-c 创建一个新的窗口
-w 以菜单方式显示及选择窗口
-n(到达下一个窗口) p(到达上一个窗口)
-& 关掉当前窗口, 也可以输入 exit
-, Rename the current window
+c 创建一个新的窗口  
+w 以菜单方式显示及选择窗口  
+n(到达下一个窗口) p(到达上一个窗口)  
+& 关掉当前窗口, 也可以输入 exit  
+, Rename the current window  
 
-If the window name keeps renaming, create file `.tmux.conf` with content below
-`set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"`
-Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`
+If the window name keeps renaming, create file `.tmux.conf` with content below  
+`set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"`  
+Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`  
 
 #### panel operation
-" 将当前面板上下分屏"
-% 将当前面板左右分屏
-x 关闭当前面板
-<光标键> 移动光标选择对应面板
-! 将当前面板置于新窗口,即新建一个窗口,其中仅包含当前面板
-CTRL+b+o交换两个panel位置
-space 调整panel摆放方式
-CTRL+方向键 	以1个单元格为单位移动边缘以调整当前面板大小
-ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小
+" 将当前面板上下分屏"  
+% 将当前面板左右分屏  
+x 关闭当前面板  
+<光标键> 移动光标选择对应面板  
+! 将当前面板置于新窗口,即新建一个窗口,其中仅包含当前面板  
+CTRL+b+o交换两个panel位置  
+space 调整panel摆放方式  
+CTRL+方向键 	以1个单元格为单位移动边缘以调整当前面板大小  
+ALT+方向键 	以5个单元格为单位移动边缘以调整当前面板大小  
 
 #### Example: tmux scripts:
 ``` shell
@@ -1470,7 +1484,7 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 10.	`top` ⟶ check overview
 
 `dmesg | tail`	输出系统日志的最后10行
-`vmstat 1`, `iostat-xz 1`
+`vmstat 5 5`, `iostat-xz 1`
 sysstat工具与负载历史回放
 
 ### CPU
@@ -1792,16 +1806,19 @@ dstat: 默认, 已有足够信息
 
 #### `vmstat` - Report virtual memory statistics
 `vmstat [options] [delay [count]]`
+
+``` bash
+
+	$ vmstat 2 5
+	procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+	 r  b swpd   free      buff  cache   si   so    bi    bo   in   cs  us sy id wa st
+	34  0    0 200889792  73708 591828    0    0     0     5    6   10  96  1  3  0  0
+	32  0    0 200889920  73708 591860    0    0     0   592 13284 4282 98  1  1  0  0
+	32  0    0 200890112  73708 591860    0    0     0     0 9501  2154 99  1  0  0  0
+	32  0    0 200889568  73712 591856    0    0     0    48 11900 2459 99  0  0  0  0
+	32  0    0 200890208  73712 591860    0    0     0     0 15898 4840 98  1  1  0  0
 ```
-$ vmstat 2 5
-procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
- r  b swpd   free      buff  cache   si   so    bi    bo   in   cs  us sy id wa st
-34  0    0 200889792  73708 591828    0    0     0     5    6   10  96  1  3  0  0
-32  0    0 200889920  73708 591860    0    0     0   592 13284 4282 98  1  1  0  0
-32  0    0 200890112  73708 591860    0    0     0     0 9501  2154 99  1  0  0  0
-32  0    0 200889568  73712 591856    0    0     0    48 11900 2459 99  0  0  0  0
-32  0    0 200890208  73712 591860    0    0     0     0 15898 4840 98  1  1  0  0
-```
+
 Procs（进程）:
 * r: 运行队列中进程数量
 * b: 等待IO的进程数量
@@ -1842,114 +1859,125 @@ CPU（以百分比表示）
 ####  `iostat` Average CPU Load, Disk Activity
 主要用于查看机器磁盘IO情况. iostat命令属于sysstat工具包
 1. 查看详细状态 `iostat -dxm 5`  
-`-d` 不看cpu信息  
-`-x` 看细节  
-`-m` 以m为单位, 而不以block原始size  
-`5` 5秒的间隔  
+
+* `-d` 不看cpu信息  
+* `-x` 看细节  
+* `-m` 以m为单位, 而不以block原始size  
+* `5` 5秒的间隔  
 
 
 2. 查看磁盘状态 `iostat -d -k 1 10`
 参数:
-`-d` 表示, 显示设备（磁盘）使用状态  
-`-k`某些使用block为单位的列强制使用Kilobytes为单位  
-`1 10`表示, 数据显示每隔1秒刷新一次, 共显示10次.
-输出列含义
-`tps`: 每秒I/O传输请求量;   
-`kB_read/s`: 每秒读取多少KB;    
-`kB_wrtn/s`: 每秒写多少KB;   
-`kB_read`: 一共读了多少KB;   
-`kB_wrtn`: 一共写了多少KB.   
+
+* `-d` 表示, 显示设备（磁盘）使用状态  
+* `-k`某些使用block为单位的列强制使用Kilobytes为单位  
+* `1 10`表示, 数据显示每隔1秒刷新一次, 共显示10次. 
+
+输出列含义  
+
+* `tps`: 每秒I/O传输请求量;   
+* `kB_read/s`: 每秒读取多少KB;    
+* `kB_wrtn/s`: 每秒写多少KB;   
+* `kB_read`: 一共读了多少KB;   
+* `kB_wrtn`: 一共写了多少KB.   
 
 
 3. 查看详细状态 `iostat -xz 1`
-`-x` 参数可以获得更多统计信息
-该命令输出列的主要含义是:
-`r/s, w/s`: 分别表示每秒读写次数, 读写量过大, 可能会引起性能问题.
-`rkB/s, wkB/s` 分别表示每秒读写数据量(kB). 读写量过大, 可能会引起性能问题.
-`await`: IO操作的平均等待时间, 单位是毫秒. 这是应用程序在和磁盘交互时, 需要消耗的时间, 包括IO等待和实际操作的耗时. 如果这个数值过大, 可能是硬件设备遇到了瓶颈或者出现故障. **一般地系统IO响应时间`await`应该低于5ms, 如果大于10ms就比较大了**.
-`svctm`: 平均每次设备I/O操作的服务时间 (毫秒).
-`%util`: 设备利用率. 在统计时间内所有处理IO时间, 除以总共统计时间`util = (r/s+w/s) * (svctm/1000)`. 例如, 如果统计间隔1秒, 该设备有0.8秒在处理IO, 而0.2秒闲置, 那么该设备的%util = 0.8/1 = 80%, 所以该参数暗示了设备的繁忙程度, 经验值是 **如果`%util`超过60, 可能会影响IO性能**（可以参照IO操作平均等待时间）. 如果到达100%, 说明硬件设备已经饱和.
-`avgrq-sz`:  平均每次设备I/O操作的数据大小 (扇区).
-`avgqu-sz`: 向设备发出的请求平均数量. **如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）**
-`rrqm/s`: 每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候, VFS将请求发到各个FS, 如果FS发现不同的读取请求读取的是相同Block的数据, FS会将这个请求合并Merge）;
-`wrqm/s`: 每秒这个设备相关的写入请求有多少被Merge了
-`rsec/s`: 每秒读取的扇区数; wsec/: 每秒写入的扇区数. r/s: The number of read requests that were issued to the device per second; w/s: The number of write requests that were issued to the device per second;
+`-x` 参数可以获得更多统计信息  
+该命令输出列的主要含义是:  
+
+* `r/s, w/s`: 分别表示每秒读写次数, 读写量过大, 可能会引起性能问题.
+* `rkB/s, wkB/s` 分别表示每秒读写数据量(kB). 读写量过大, 可能会引起性能问题.
+* `await`: IO操作的平均等待时间, 单位是毫秒. 这是应用程序在和磁盘交互时, 需要消耗的时间, 包括IO等待和实际操作的耗时. 如果这个数值过大, 可能是硬件设备遇到了瓶颈或者出现故障. **一般地系统IO响应时间`await`应该低于5ms, 如果大于10ms就比较大了**.
+* `svctm`: 平均每次设备I/O操作的服务时间 (毫秒).
+* `%util`: 设备利用率. 在统计时间内所有处理IO时间, 除以总共统计时间`util = (r/s+w/s) * (svctm/1000)`. 例如, 如果统计间隔1秒, 该设备有0.8秒在处理IO, 而0.2秒闲置, 那么该设备的%util = 0.8/1 = 80%, 所以该参数暗示了设备的繁忙程度, 经验值是 **如果`%util`超过60, 可能会影响IO性能**（可以参照IO操作平均等待时间）. 如果到达100%, 说明硬件设备已经饱和.
+* `avgrq-sz`:  平均每次设备I/O操作的数据大小 (扇区).
+* `avgqu-sz`: 向设备发出的请求平均数量. **如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）**
+* `rrqm/s`: 每秒这个设备相关的读取请求有多少被Merge了（当系统调用需要读取数据的时候, VFS将请求发到各个FS, 如果FS发现不同的读取请求读取的是相同Block的数据, FS会将这个请求合并Merge）;
+* `wrqm/s`: 每秒这个设备相关的写入请求有多少被Merge了
+* `rsec/s`: 每秒读取的扇区数; wsec/: 每秒写入的扇区数. r/s: The number of read requests that were issued to the device per second; w/s: The number of write requests that were issued to the device per second;
 
 如果显示的是逻辑设备的数据, 那么设备利用率不代表后端实际的硬件设备已经饱和. 值得注意的是, 即使IO性能不理想, 也不一定意味这应用程序性能会不好, 可以利用诸如预读取、写缓存等策略提升应用性能.
 
 
 4. 查看CPU部分状态值 `iostat -c 1 10`   
 cpu属性值说明:  
-`%user`: CPU处在用户模式下的时间百分比.  
-`%nice`: CPU处在带NICE值的用户模式下的时间百分比.  
-`%system`: CPU处在系统模式下的时间百分比.  
-`%iowait`: CPU等待输入输出完成时间的百分比.  
-`%steal`: 管理程序维护另一个虚拟处理器时, 虚拟CPU的无意识等待时间百分比.  
-`%idle`: CPU空闲时间百分比.  
+
+* `%user`: CPU处在用户模式下的时间百分比.  
+* `%nice`: CPU处在带NICE值的用户模式下的时间百分比.  
+* `%system`: CPU处在系统模式下的时间百分比.  
+* `%iowait`: CPU等待输入输出完成时间的百分比.  
+* `%steal`: 管理程序维护另一个虚拟处理器时, 虚拟CPU的无意识等待时间百分比.  
+* `%idle`: CPU空闲时间百分比.  
 
 1. `%iowait`的值过高, 表示硬盘存在I/O瓶颈
 2. `%idle`值高, 表示CPU较空闲
 3. 如果`%idle`值高但系统响应慢时, 有可能是CPU等待分配内存, 此时应加大内存容量. **`%idle`值如果持续低于10, 那么系统的CPU处理能力相对较低, 表明系统中最需要解决的资源是CPU**.
 
 #### sar - Collect and Report System Activity
-`sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放
+`sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放  
 可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
 
 1. 查看CPU、内存和磁盘记录. 默认情况下, sar命令显示当天的统计信息  
-`sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
-`sar -r 2 5`显示收集的内存记录  
-`sar -b 2 5`显示磁盘I/O
-`sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；  
+
+* `sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
+* `sar -r 2 5`显示收集的内存记录  
+* `sar -b 2 5`显示磁盘I/O
+* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；  
 
 2. 查看指定时间、指定日期的历史记录 参数`-s`和`-e`限定查看的时间
-`sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
-`-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
-`sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
+
+* `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
+* `-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
+* `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
 3. 查看网络状态 `sar -n DEV 1`  
 `-n`参数有6个不同的开关: DEV | EDEV | NFS | NFSD | SOCK | ALL. DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了   
-`IFACE`: LAN接口   
-`rxpck/s`: 每秒钟接收的数据包    
-`txpck/s`: 每秒钟发送的数据包   
-`rxbyt/s`: 每秒钟接收的字节数  
-`txbyt/s`: 每秒钟发送的字节数  
-`rxcmp/s`: 每秒钟接收的压缩数据包  
-`txcmp/s`: 每秒钟发送的压缩数据包  
-`rxmcst/s`: 每秒钟接收的多播数据包  
+
+* `IFACE`: LAN接口   
+* `rxpck/s`: 每秒钟接收的数据包    
+* `txpck/s`: 每秒钟发送的数据包   
+* `rxbyt/s`: 每秒钟接收的字节数  
+* `txbyt/s`: 每秒钟发送的字节数  
+* `rxcmp/s`: 每秒钟接收的压缩数据包  
+* `txcmp/s`: 每秒钟发送的压缩数据包  
+* `rxmcst/s`: 每秒钟接收的多播数据包  
 
 ```
-$ sar -n DEV 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)
-12:16:48 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
-12:16:49 AM      eth0  18763.00   5032.00  20686.42    478.30      0.00      0.00      0.00      0.00
-12:16:49 AM        lo     14.00     14.00      1.36      1.36      0.00      0.00      0.00      0.00
-12:16:49 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
-12:16:49 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
-12:16:50 AM      eth0  19763.00   5101.00  21999.10    482.56      0.00      0.00      0.00      0.00
-12:16:50 AM        lo     20.00     20.00      3.25      3.25      0.00      0.00      0.00      0.00
-12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
-^C
-```
+
+	$ sar -n DEV 2 5
+	Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)
+	12:16:48 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+	12:16:49 AM      eth0  18763.00   5032.00  20686.42    478.30      0.00      0.00      0.00      0.00
+	12:16:49 AM        lo     14.00     14.00      1.36      1.36      0.00      0.00      0.00      0.00
+	12:16:49 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+	12:16:49 AM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+	12:16:50 AM      eth0  19763.00   5101.00  21999.10    482.56      0.00      0.00      0.00      0.00
+	12:16:50 AM        lo     20.00     20.00      3.25      3.25      0.00      0.00      0.00      0.00
+	12:16:50 AM   docker0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+```  
+
 如示例输出中, eth0网卡设备, 吞吐率大概在22 Mbytes/s, 既176 Mbits/sec, 没有达到1Gbit/sec的硬件上限.
 
 4. 查看TCP连接状态 `sar -n TCP,ETCP 1`  
 ```
-$ sar -n TCP,ETCP 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)
-12:17:19 AM  active/s passive/s    iseg/s    oseg/s
-12:17:20 AM      1.00      0.00  10233.00  18846.00
-12:17:19 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s
-12:17:20 AM      0.00      0.00      0.00      0.00      0.00
-12:17:20 AM  active/s passive/s    iseg/s    oseg/s
-12:17:21 AM      1.00      0.00   8359.00   6039.00
-12:17:20 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s
-12:17:21 AM      0.00      0.00      0.00      0.00      0.00
-^C
+
+	$ sar -n TCP,ETCP 2 5
+	Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)
+	12:17:19 AM  active/s passive/s    iseg/s    oseg/s
+	12:17:20 AM      1.00      0.00  10233.00  18846.00
+	12:17:19 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s
+	12:17:20 AM      0.00      0.00      0.00      0.00      0.00
+	12:17:20 AM  active/s passive/s    iseg/s    oseg/s
+	12:17:21 AM      1.00      0.00   8359.00   6039.00
+	12:17:20 AM  atmptf/s  estres/s retrans/s isegerr/s   orsts/s
+	12:17:21 AM      0.00      0.00      0.00      0.00      0.00
 ```
-输出内容:
-`active/s`: 每秒本地发起的TCP连接数, 既通过connect调用创建的TCP连接;
-`passive/s`: 每秒远程发起的TCP连接数, 即通过accept调用创建的TCP连接;
-`retrans/s`: 每秒TCP重传数量;
+
+输出内容:  
+* `active/s`: 每秒本地发起的TCP连接数, 既通过connect调用创建的TCP连接;
+* `passive/s`: 每秒远程发起的TCP连接数, 即通过accept调用创建的TCP连接;
+* `retrans/s`: 每秒TCP重传数量; 
 TCP连接数可以用来判断性能问题是否由于建立了过多的连接, 进一步可以判断是主动发起的连接, 还是被动接受的连接. TCP重传可能是因为网络环境恶劣, 或者服务器压力过大导致丢包.
 
 ### File
