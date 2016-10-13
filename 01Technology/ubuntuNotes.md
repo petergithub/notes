@@ -38,8 +38,9 @@ C-1 is control-1
 redirect both stdout and stderr to a file: ``$ ls /fake/directory &> peanuts.txt`
 man top
 `fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
-sudo service network-manager start
+`sudo service network-manager start`
 http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb
+
 
 send 100 requests with a concurency of 50 requests to an URL
 `ab -n 100 -c 50 http://www.example.com/`
@@ -1322,6 +1323,84 @@ CTRL+a [	进入拷贝/回滚模式
 -c file	使用配置文件file, 而不使用默认的$HOME/.screenrc
 screen -wipe命令清除死掉的会话
 
+### `tcpdump`
+http://roclinux.cn/?p=2474  
+https://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html  
+tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包  
+
+`tcpdump -i eth0 -nn -X ‘port 53’ -c 1`  
+* `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡
+* `-c` 是Count的含义，设置tcpdump抓几个包
+* `-nn` 当tcpdump遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。比如，众所周知21端口是FTP端口，我们希望显示21，而非tcpdump自作聪明的将它显示成FTP
+* `-X` 把协议头和包内容都原原本本的显示出来（tcpdump会以16进制和ASCII的形式显示），这在进行协议分析时是绝对的利器. 对具体的数据包解释见: http://roclinux.cn/?p=2820
+* `-XX` tcpdump会从以太网部分就开始显示网络包内容，而不是仅从网络层协议开始显示
+* `-e` 增加以太网帧头部信息输出
+* `-s` 设置包大小限制值，如果你要追求高性能，建议把这个值调低，这样可以有效避免在大流量情况下的丢包现象
+* `-v` 输出更详细的信息: 加了-v选项之后，在原有输出的基础之上，你还会看到tos值、ttl值、ID值、总长度、校验值等。
+至于上述值的含义，需要你专门去研究下IP头、TCP头的具体协议定义
+
+* `-t` 输出时不打印时间戳
+* `-l` 使得输出变为行缓冲. Linux/UNIX的标准I/O提供了全缓冲、行缓冲和无缓冲三种缓冲方式。标准错误是不带缓冲的，终端设备常为行缓冲，而其他情况默认都是全缓冲的
+* `-q` 就是quiet output, 尽量少的打印一些信息
+* `-N` 不打印出host 的域名部分. 设置此选项后 tcpdump 将会打印'nic' 而不是 'nic.ddn.mil'
+* `-S` 打印TCP 数据包的顺序号时, 使用绝对的顺序号, 而不是相对的顺序号.(nt: 相对顺序号可理解为, 相对第一个TCP 包顺序号的差距,比如, 接受方收到第一个数据包的绝对顺序号为232323, 对于后来接收到的第2个,第3个数据包, tcpdump会打印其序列号为1, 2分别表示与第一个数据包的差距为1 和 2. 而如果此时-S 选项被设置, 对于后来接收到的第2个, 第3个数据包会打印出其绝对顺序号:232324, 232325)  
+
+* `-w` 将流量保存到文件中, 把raw packets（原始网络包）直接存储到文件中
+* `-r` 读取raw packets文件进行了“流量回放”，网络包被“抓”的速度都按照历史进行了回放, 可以使用`-e`、`-l`和过滤表达式来对输出信息进行控制
+
+* `-A` tcpdump只会显示ASCII形式的数据包内容，不会再以十六进制形式显示
+* `tcpdump -D` 列出所有可以选择的抓包对象
+* `-F` 指定过滤表达式所在的文件 `tcpdump -i eth0 -c 1 -t -F filter.txt`
+
+Common usage:
+* `tcpdump -l > dump.log &tail -f dump.log`  
+* 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log` 
+* 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据  
+	`tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'`
+* 抓取所有经过eth1，目标MAC地址是00:01:02:03:04:05的ICMP数据 `tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'`
+* 抓取所有经过eth1，目的网络是192.168，但目的主机不是192.168.1.200的TCP数据 `tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'`
+
+
+* 抓取HTTP包 `tcpdump -i eth0 -XvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT" 
+* 抓HTTP GET数据 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x47455420'`, GET的十六进制是47455420
+* 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c
+* 抓SSH返回 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x5353482D'` SSH-的十六进制是0x5353482D
+* 抓包并保存,重放  
+	`nohup tcpdump -i eth0 -lXvvennSs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.log.bin &`  
+	`tcpdump -r tcpdump.log.bin`  
+	`tcpdump -i eno16780032 -nnvvvNXs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.log.bin`  	
+
+#### 过滤表达式  
+`man pcap-filter` packet filter syntax  
+表达式是大体可以分成三种过滤条件  
+* 类型: 主要包括host，net，port
+* 方向: 主要包括src，dst，dst or src，dst and src
+* 协议: 主要包括fddi，ip，arp，rarp，tcp，udp等类型
+除了这三种类型的关键字之外，其他重要的关键字如下：gateway， broadcast，less， greater  
+还有三种逻辑运算，取非运算 `not` or `!`， 与运算是`and` or `&&`, 或运算是`or` or `||`  
+
+1. `host`：指定主机名或IP地址，例如’host roclinux.cn’或’host 202.112.18.34′
+2. `net` ：指定网络段，例如’arp net 128.3’或’dst net 128.3′
+3. `portrange`：指定端口区域，例如’src or dst portrange 6000-6008′
+4. `proto [ expr : size]`   
+	`proto`是protocol的缩写，指定协议名称，比如ip、tcp、ether  
+	`expr`用来指定数据报偏移量，表示从某个协议的数据报的第多少位开始提取内容，默认的起始位置是0；  
+	`size`表示从偏移量的位置开始提取多少个字节，可以设置为1、2、4, 默认提取1个字节  
+	例题：`ip[0] & 0xf != 5`  
+	IP协议的第0-4位，表示IP版本号，可以是IPv4（值为0100）或者IPv6（0110）；第5-8位表示首部长度，单位是“4字节”，如果首部长度为默认的20字节的话，此值应为5，即”0101″。ip[0]则是取这两个域的合体。0xf中的0x表示十六进制，f是十六进制数，转换成8位的二进制数是“0000 1111”。而5是一个十进制数，它转换成8位二进制数为”0000 0101″。  
+	这个语句中!=的左侧部分就是提取IP包首部长度域，如果首部长度不等于5，就满足过滤条件。言下之意也就是说，要求IP包的首部中含有可选字段
+
+* `host IP`  `port 53` 监视指定主机和端口的数据包 `tcpdump host 210.27.48.1 and \ (port 53 or  port 21 \)`  
+* `tcpdump -i eth0 'udp'` 抓取udp包, 这里还可以把udp改为ether、ip、ip6、arp、tcp、rarp等
+* `tcpdump -i eth0 'dst 8.8.8.8'` 设置src（source）和dst（destination）指定机器IP, 如果没有设置的话，默认是src or dst
+* `tcpdump -i eth0 'dst port 53 or dst port 80'` 查目标机器端口是53或80的网络包
+* `tcpdump 'port ftp or ftp-data'` 获取使用ftp端口和ftp数据端口的网络包, /etc/services存储着所有知名服务和传输层端口的对应关系
+* `tcpdump 'tcp[tcpflags] & tcp-syn != 0 and not dst host qiyi.com'` 获取roclinux.cn和baidu.com之间建立TCP三次握手中第一个网络包，即带有SYN标记位的网络包，另外，目的主机不能是qiyi.com
+* 要提取TCP协议的SYN、ACK、FIN标识字段，语法是`tcp[tcpflags] & tcp-syn`, `tcp[tcpflags] & tcp-ack`, `tcp[tcpflags] & tcp-fin`
+* 查看哪些ICMP包中“目标不可达、主机不可达”的包的表达式`icmp[0:2]==0x0301` 
+* 提取TCP协议里的SYN-ACK数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 `tcp[13]==18`
+* 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`
+
 ### Python
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
 var = raw_input('Prompt')
@@ -1483,7 +1562,7 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 9.	`sar -n TCP,ETCP 1` ⟶ TCP stats
 10.	`top` ⟶ check overview
 
-`dmesg | tail`	输出系统日志的最后10行
+`dmesg | tail`	输出系统日志的最后10行 or `less /var/log/dmesg`
 `vmstat 5 5`, `iostat-xz 1`
 sysstat工具与负载历史回放
 
@@ -1761,12 +1840,13 @@ Linux查看网卡数据吞吐量方法
 
 ##### iftop
 查看哪些网络连接占用的带宽较多, 按照带宽占用高低排序, 可以确定那些占用带宽的网络连接  
-最上方的一行刻度是整个网络的带宽比例, 下面第1列是源IP, 第2列是目标IP, 箭头表示了二者之间是否在传输数据, 以及传输的方向. 最后三列分别是2s、10s、40s时两个主机之间的数据传输速率.
-　　最下方的TX、RX分别代表发送、接收数据的统计, TOTAL则是数据传输总量.
+最上方的一行刻度是整个网络的带宽比例, 下面第1列是源IP, 第2列是目标IP, 箭头表示了二者之间是否在传输数据, 以及传输的方向. 最后三列分别是2s、10s、40s时两个主机之间的数据传输速率.  
+最下方的TX、RX分别代表发送、接收数据的统计, TOTAL则是数据传输总量.  
 在进入iftop的非交互界面后, 按 `p` 键可以打开或关闭显示端口, 按 `s` 键可以显示或隐藏源主机, 而按 `d` 键则可以显示或隐藏目标主机.
 
 `-i` 选项可以指定要查看的网卡, 默认情况下, iftop会显示自己找到的第一个网卡;
 `-n` 选项直接显示连接的IP, Don't do hostname lookups
+`iftop -i eth1 -P -Bn`  
 
 ##### iperf
 Diagnosing network speed with [iperf](https://iperf.fr/iperf-doc.php)  
