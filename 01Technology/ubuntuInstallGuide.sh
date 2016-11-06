@@ -90,6 +90,14 @@ cheat -v
 sudo add-apt-repository ppa:webupd8team/atom
 sudo apt-get update
 sudo apt-get install atom
+
+# tcpdump preparation
+# Reference: https://ubuntuforums.org/showthread.php?t=1501339
+(sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep enforce) && sudo apt-get install apparmor-utils && sudo aa-complain /usr/sbin/tcpdump && (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep complain) && echo setup for tcpdump
+
+# Performance Monitoring Tools: sysstat include sar
+apt-get update && apt-get install sysstat
+
 ########## development tools END ##########
 
 ########## wine BEGIN ##########
