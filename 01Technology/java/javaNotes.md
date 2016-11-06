@@ -20,12 +20,11 @@ concurrent: 主内存.寄存器是是运行时?
 	    /      \
 	>-------------->>
 
-## Java Mermory check
-
+## Java问题排查工具箱 
 ### 高CPU占用分析
 http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 一个应用占用CPU很高，除了确实是计算密集型应用之外，通常原因都是出现了死循环  
-1. top -H
+1. `top -H`
 2. 找到具体是CPU高占用的线程 `ps -mp <PID> -o THREAD,tid,time,rss,size,%mem`
 3. 将需要的线程ID转换为16进制格式 `printf "%x\n" tid`
 4. 打印线程的堆栈信息 `jstack PID |grep tid -A 30`  
@@ -39,6 +38,54 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 `hexdump -C /tmp/memory.bin` 或 `strings /tmp/memory.bin |less`
 
 用strace和ltrace查找malloc调用
+
+### CPU相关工具 bluedavy
+https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd 
+
+碰到一些CPU相关的问题时，通常需要用到的工具：
+
+`top (-H)` top可以实时的观察cpu的指标状况，尤其是每个core的指标状况，可以更有效的来帮助解决问题，-H则有助于看是什么线程造成的CPU消耗，这对解决一些简单的耗CPU的问题会有很大帮助。  
+
+`sar` sar有助于查看历史指标数据，除了CPU外，其他内存，磁盘，网络等等各种指标都可以查看，毕竟大部分时候问题都发生在过去，所以翻历史记录非常重要。  
+
+`jstack` jstack可以用来查看Java进程里的线程都在干什么，这通常对于应用没反应，非常慢等等场景都有不小的帮助，jstack默认只能看到Java栈，而jstack -m则可以看到线程的Java栈和native栈，但如果Java方法被编译过，则看不到（然而大部分经常访问的Java方法其实都被编译过）。  
+
+`pstack` pstack可以用来看Java进程的native栈。  
+
+`perf` 一些简单的CPU消耗的问题靠着 `top -H` + `jstack` 通常能解决，复杂的话就需要借助perf这种超级利器了。  
+
+`cat /proc/interrupts` 之所以提这个是因为对于分布式应用而言，频繁的网络访问造成的网络中断处理消耗也是一个关键，而这个时候网卡的多队列以及均衡就非常重要了，所以如果观察到cpu的si指标不低，那么看看interrupts就有必要了。
+
+### 内存相关工具 bluedavy
+碰到一些内存相关的问题时，通常需要用到的工具：  
+
+`jstat` `jstat -gcutil`或`-gc`等等有助于实时看gc的状况，不过我还是比较习惯看gc log。  
+
+`jmap` 在需要dump内存看看内存里都是什么的时候，`jmap -dump`可以帮助你；在需要强制执行fgc的时候（在CMS GC这种一定会产生碎片化的GC中，总是会找到这样的理由的），`jmap -histo:live`可以帮助你（显然，不要随便执行）。    
+
+`gcore` 相比`jmap -dump`，其实我更喜欢gcore，因为感觉就是更快，不过由于某些jdk版本貌似和gcore配合的不是那么好，所以那种时候还是要用jmap -dump的。  
+
+`mat` 有了内存dump后，没有分析工具的话然并卵，mat是个非常赞的工具，好用的没什么可说的。  
+
+`btrace` 少数的问题可以mat后直接看出，而多数会需要再用btrace去动态跟踪，btrace绝对是Java中的超级神器，举个简单例子，如果要你去查下一个运行的Java应用，哪里在创建一个数组大小>1000的ArrayList，你要怎么办呢，在有btrace的情况下，那就是秒秒钟搞定的事，:)  
+
+`gperf` Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。  
+
+除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file> 这样的参数必须是启动参数的标配。  
+
+### ClassLoader相关工具
+作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是`-XX:+TraceClassLoading`，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用`jar -tvf *.jar`这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。  
+
+### 其他工具
+`jinfo` Java有N多的启动参数，N多的默认值，而任何文档都不一定准确，只有用jinfo -flags看到的才靠谱，甚至你还可以看看jinfo -flag，你会发现更好玩的。  
+
+`dmesg` 你的java进程突然不见了？ 也许可以试试dmesg先看看。  
+
+`systemtap` 有些问题排查到java层面是不够的，当需要trace更底层的os层面的函数调用的时候，systemtap神器就可以派上用场了。  
+
+`gdb` 更高级的玩家们，拿着core dump可以用gdb来排查更诡异的一些问题。  
+
+## Java Mermory check
 
 ### Linux tool
 
@@ -83,20 +130,21 @@ jstack可以告诉你当前所有JVM线程正在做什么，包括用户线程�
 `jhat -port 8080 /tmp/java_11211.hprof` 服务启动后，访问http://localhost:8080/
 
 #### jstat
-可以告诉你当前的GC情况，包括GC次数、时间，具体的GC还可以结合gc.log文件去分析。
-`jstat -gc pid 250 10`
-根据JVM的内存布局
+可以告诉你当前的GC情况，包括GC次数、时间，具体的GC还可以结合gc.log文件去分析。  
+`jstat -gc pid 250 10`  
+`jstat -gcutil`  
+根据JVM的内存布局  
 * 堆内存 = 年轻代 + 年老代 + 永久代
 * 年轻代 = Eden区 + 两个Survivor区（From和To）
 
-以上统计数据各列的含义为
-    S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）
-    EC、EU：Eden区容量和使用量
-    OC、OU：年老代容量和使用量
-    PC、PU：永久代容量和使用量
-    YGC、YGT：年轻代GC次数和GC耗时
-    FGC、FGCT：Full GC次数和Full GC耗时
-    GCT：GC总耗时
+以上统计数据各列的含义为  
+    S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）  
+    EC、EU：Eden区容量和使用量  
+    OC、OU：年老代容量和使用量  
+    PC、PU：永久代容量和使用量  
+    YGC、YGT：年轻代GC次数和GC耗时  
+    FGC、FGCT：Full GC次数和Full GC耗时  
+    GCT：GC总耗时  
 
 
 #### Interpretation of FieldType characters
@@ -229,7 +277,7 @@ sar是淘宝的采集工具，主要用来收集服务器的系统信息（如cp
 首先标记出需要回收的对象,标记完成后统一回收所有被标记的对象.它是最基础的收集算法.
 
 缺点:  
-1.效率问题:两个过程效率都不高;  
+1.效率问题:标记和清除两个过程效率都不高;  
 2.空间问题:会产生大量不连续的内存碎片,导致最后无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作.
 
 ##### 3.3.2 复制算法 Copying
@@ -251,6 +299,9 @@ sar是淘宝的采集工具，主要用来收集服务器的系统信息（如cp
 **Young generation**: Serial, ParNew, Parallel Scavenge, G1(Garbage First)  
 **Tenured generation**: CMS(Concurrent Mark Sweep), Serial Old(MSC), Parallel Old, G1(Garbage First)
 
+![HostSpot垃圾回收器](image/HostSpot垃圾回收器.png "HostSpot垃圾回收器")   
+
+
 **algorithm combinations cheat sheet**
 
 Young 				|	Tenured 	|	JVM options
@@ -268,7 +319,7 @@ Parallel New 		|	CMS 		|	-XX:+UseParNewGC -XX:+UseConcMarkSweepGC
 G1 					|				|	-XX:+UseG1GC
 
 Note that this stands true for Java 8, for older Java versions the available combinations might differ a bit.  
-The table is from [GC Algorithms: Implementations](https://plumbr.eu/handbook/garbage-collection-algorithms-implementations)
+The table is from [GC Algorithms: Implementations](https://plumbr.eu/handbook/garbage-collection-algorithms-implementations )
 
 ##### 3.5.1 Serial收集器
 最基本最悠久的单线程收集器,在它进行时,必须暂停其他所有的工作线程,直到它结束. Stop the World.  
