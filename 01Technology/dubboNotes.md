@@ -55,7 +55,7 @@ Warn:
 ### dubbo一次接口调用的过程
 http://dubbo.io/Developer+Guide-zh.htm#DeveloperGuide-zh-远程调用细节
 
-![消费和提供者](http://dubbo.io/dubbo_rpc_invoke.jpg-version=1&modificationDate=1335250516000.jpg)
+![消费和提供者](http://dubbo.io/dubbo_rpc_invoke.jpg-version=1&modificationDate=1335250516000.jpg )
 Invoker是Dubbo领域模型中非常重要的一个概念，很多设计思路都是向它靠拢。这就使得Invoker渗透在整个实现代码里
 
 http://dubbo.io/User+Guide-zh.htm#UserGuide-zh-架构
@@ -99,7 +99,7 @@ http://dubbo.io/User+Guide-zh.htm#UserGuide-zh-架构
 
 
 #### 提供者暴露一个服务的详细过程
-![提供者暴露一个服务的详细过程](http://dubbo.io/dubbo_rpc_export.jpg-version=1&modificationDate=1335250516000.jpg)
+![提供者暴露一个服务的详细过程](http://dubbo.io/dubbo_rpc_export.jpg-version=1&modificationDate=1335250516000.jpg )
 上图是服务提供者暴露服务的主过程：
 首先ServiceConfig类拿到对外提供服务的实际类ref(如：HelloWorldImpl),然后通过ProxyFactory类的getInvoker方法使用ref生成一个AbstractProxyInvoker实例，到这一步就完成具体服务到Invoker的转化。接下来就是Invoker转换到Exporter的过程。
 
@@ -111,10 +111,26 @@ RMI协议的Invoker转为Exporter发生在RmiProtocol类的export方法，
 它通过Spring或Dubbo或JDK来实现RMI服务，通讯细节这一块由JDK底层来实现，这就省了不少工作量。
 
 #### 消费者消费一个服务的详细过程
-![消费者消费一个服务的详细过程](http://dubbo.io/dubbo_rpc_export.jpg-version=1&modificationDate=1335250516000.jpg)
-上图是服务消费的主过程：
-首先ReferenceConfig类的init方法调用Protocol的refer方法生成Invoker实例(如上图中的红色部分)，这是服务消费的关键。接下来把Invoker转换为客户端需要的接口(如：HelloWorld)。
-关于每种协议如RMI/Dubbo/Web service等它们在调用refer方法生成Invoker实例的细节和上一章节所描述的类似。
+![消费者消费一个服务的详细过程](http://dubbo.io/dubbo_rpc_refer.jpg-version=1&modificationDate=1335250516000.jpg )
+上图是服务消费的主过程：  
+首先ReferenceConfig类的init方法调用Protocol的refer方法生成Invoker实例(如上图中的红色部分)，这是服务消费的关键。接下来把Invoker转换为客户端需要的接口(如：HelloWorld)。  
+关于每种协议如RMI/Dubbo/Web service等它们在调用refer方法生成Invoker实例的细节和上一章节所描述的类似。  
+
+### dubbo 提供方变化后如何通知调用方
+注册中心为Zookeeper时, 消费者方有一个线程ZkEventThread去监听Zookeeper的变化, 如果状态有变化, 就通知消费者  
+
+```
+	
+	Daemon Thread [ZkClient-EventThread-15-127.0.0.1:2181] (Suspended (breakpoint at line 410 in AbstractRegistry))
+		ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410
+		ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273
+		ZookeeperRegistry(FailbackRegistry).notify(URL, NotifyListener, List<URL>) line: 259
+		ZookeeperRegistry.access$4(ZookeeperRegistry, URL, NotifyListener, List) line: 1
+		ZookeeperRegistry$3.childChanged(String, List<String>) line: 159
+		ZkclientZookeeperClient$2.handleChildChange(String, List<String>) line: 82
+		ZkClient$7.run() line: 568
+		ZkEventThread.run() line: 71
+```
 
 ### 通信机制
 网络传输扩展
