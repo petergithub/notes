@@ -9,15 +9,17 @@ vimtutor: vim interactive guide
 `man readline` to get the introduction to the combination of keys  
 
 ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.  
-其原理是, ~符号是ssh命令中的转义字符, 就像我们平时编程中使用的\一样. 通过在ssh连接中输入~?, 你可以看到完整的命令帮助.  
+其原理是, `~`符号是ssh命令中的转义字符, 就像我们平时编程中使用的`\`一样. 通过在ssh连接中输入`~?,` 你可以看到完整的命令帮助.  
 `reset` 恢复出现问题的屏幕  
 
 man readline to get more information:  
 Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
-    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash  
-    * CTRL+s or C-S-r: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-    
+`mv {short,very_long}.txt` will move short.txt to very_long.txt
+`CTRL+r`: 逆向搜索命令历史 reverse-i-search in bash  
+`CTRL+s` or `C-S-r`: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+`Alt + d`, `esc +d`   Delete the Word after the cursor.    
+`esc+t` transpose two adjacent words
 `CTRL+h`: show hidden files  
 `nautilus`: open your home folder  
 `location`: make a command can be call anywhere   
@@ -52,88 +54,12 @@ send requests during 30 seconds with a concurency of 50 requests to an URL
 execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
 `$((1 + RANDOM % 1000))` random number between 1 and 1000
 
-`crontab`
-To create a cronjob, just edit the crontab file: `crontab -e`
-`-l` 列出crontab文件
-`-e` 编辑当前的crontab文件
-`-r` 删除当前的crontab文件
-crontab特殊的符号说明:
-1. "*"代表所有的取值范围内的数字
-2. "/"代表每的意思, 如"*/5"表示每5个单位
-3. "-"代表从某个数字到某个数字
-4. ","分散的数字
-
-log path: /var/log/messages or /var/log/cron*
-
-发现Ubuntu下没有自动打开cron的日志服务功能, 解决方法如下
-cron的日志功能使用syslogd服务, 不同版本linux可能装了不同的软件, 这里介绍常见的两种:
-sysklogd>>>>>>
-1. 编辑 /etc/syslog.conf, 并且打开以cron.*开始的那行注释.
-2. 运行 /etc/init.d/sysklogd restart .
-3. 运行 /etc/init.d/cron restart .
-
-rsyslog>>>>>>
-1. 修改rsyslog文件, 将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉;
-2. 重启rsyslog服务service rsyslog restart
-3. 重启cron服务service cron restart
-
-`lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.
-
-```
-
-	$ lsof
-	COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
-	init       1       root  cwd       DIR        8,1      4096          2 /
-	init       1       root  txt       REG        8,1    124704     917562 /sbin/init
-	init       1       root    0u      CHR        1,3       0t0       4369 /dev/null
-	init       1       root    3r     FIFO        0,8       0t0       6323 pipe
-```
-FD – Represents the file descriptor. Some of the values of FDs are,
-* cwd – Current Working Directory
-* txt – Text file
-* mem – Memory mapped file
-* mmap – Memory mapped device
-* NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.
-
-TYPE – Specifies the type of the file. Some of the values of TYPEs are,
-* REG – Regular File
-* DIR – Directory
-* FIFO – First In First Out
-* CHR – Character special file
-
-Parameters:
-* `+D` will recurse
-* `+d` will not recurse
-* `-c` based on process names starting with
-* `-u` specific user
-* `-p` specific process
-* `-t` list the process id
-* `-r` repeat until interrupt
-* `+r` repeat until no open files found
-* `-i` network
-
-Samples:  
-List open files thread in order `lsof -n |awk '{print $2}'|sort|uniq -c |sort -nr| less`
-List processes which opened a specific file: `lsof /var/log/syslog`  
-List opened files under a directory: `lsof +D /var/log/`  
-List opened files based on process names starting with: `lsof -c ssh -c init`  
-can give multiple -c switch on a single command line.  
-List processes using a mount point: `lsof /home`, `lsof +D /home/`  
-List files opened by a specific user: `lsof -u username`  
-Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`  
-List all open files by a specific process: `lsof -p 1753`  
-Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`  
-Execute lsof in repeat mode: `lsof -u username -c init -a -r5`  
-
-List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.  
-List processes which are listening on a particular port: `lsof -i :25`  
-List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`  
-
-Get Unix timestamp 	`date +%s`  
+Get Unix timestamp 	`date +%s` 1477998994  
 Convert Unix timestamp to Date `date -d @1467540501`  
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
-
-	date_str=`date +%Y%m%d%H%M%S`;echo $date_str
+`date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
+`date -d '1 hours ago' "+%F"` 2016-11-01  
+`date +%Y%m%d%H%M%S` 20161101191653  
 
 `foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
 `foo > allout.txt 2>&1` all output redirect to the same file  
@@ -168,7 +94,7 @@ pgrep -l apache2
 
 Keyboard problems, setting 3rd level chooser and Meta key in Unity
 http://ubuntuforums.org/showthread.php?t=2220062
-If you're not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
+If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
 less /usr/share/X11/xkb/symbols/us
 
 ### Move Running Process to Background
@@ -188,7 +114,7 @@ Bring a job back into the background: `bg %jobnumber`
 0. Run some SOMECOMMAND
 1. ctrl+z to stop (pause) the program and get back to the shell
 2. bg to run it in the background
-3. disown -h so that the process isn't killed when the terminal closes
+3. disown -h so that the process is not killed when the terminal closes
 4. Type exit to get out of the shell because now your good to go as the operation will run in the background in it own process so its not tied to a shell
 
 This process is the equivalent of running nohup SOMECOMMAND
@@ -204,33 +130,59 @@ ALT+Delete, and then press the up or down arrow key.
 
 ## Basic Command
 ### VI
-#### Configuration
-`:set nu` / `:set nonu`	(不)列出行号 (nu为行数)
-`:set ic` / `:set noic`	vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`
+命令提示 Command line completion with `CTRL-D` and `<TAB>`  
+
+#### Set option Configuration
+`:set nu` / `:set nonu`	(不)列出行号 (nu为行数)  
+`:set ic` / `:set noic`	vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`  
+ignore case for just one search command, use  `\c` in the phrase:  `/ignore\c <ENTER>`  
+`:set ru` / `:set noru`	Show the line and column number of the cursor position  
+
+Typing ":set xxx" sets the option "xxx".  Some options are:  
+        'ic' 'ignorecase'       ignore upper/lower case when searching  
+        'is' 'incsearch'        show partial matches for a search phrase  
+        'hls' 'hlsearch'        highlight all matching phrases  
+     You can either use the long or the short option name.  
+  Prepend "no" to switch an option off:   :set noic  
+
 
 #### Move
 `%`	move to the matching parenthesis (), {}, []  
 `(` / `)` move a sentence back/forward  
 `{` / `}` move paragraph back/forward  
+After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer positions
 
 #### Basic vi
+`:help` VIM - main help file  
+find help on just about any subject, by giving an argument to the `:help` command. `:help w`, `:help c_CTRL-D`, `:help user-manual`  
 `~`	切换大小写  
 `:sp`	split window above and below  
 `:sh`	暂时退出vi到系统下, 结束时按CTRL+d则回到vi  
-`:r!command`	将命令command的输出结果放到当前行 如`:r!ls -ltr`  
+`.` 命令重复上次的修改.  
+`:!command`  executes an external command
+`:r !command`	将命令command的输出结果放到当前行 如`:r! ls -ltr`  
+read the output of an external command.  For example, `:r !ls`  reads the output of the `ls` command and puts it below the cursor
+
+`:r FILENAME`  retrieves disk file FILENAME and puts it below the cursor position
 `:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间  
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w）, 会提到命令:w!{cmd}, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. tee是一个把stdin保存到文件的小工具. 而%, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
+`.` 命令重复上次的修改.  
+修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.
+重复修改一个单词.  
+如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.  
+
+
 改变与替换操作命令  
-<r> 替换光标所在的字符  
-<R> 替换字符序列  
-<cw> 替换一个单词  
-<ce> 同<cw>  
-<cb> 替换光标所在的前一字符  
-<c$> 替换自光标位置至行尾的所有字符  
-<C> 同<c$>  
-<cc> 替换当前行  
+`r` 替换光标所在的字符  
+`R` 替换字符序列 a capital  `R`  to replace more than one character  
+`cw` 替换一个单词  
+`ce` 同`cw`  
+`cb` 替换光标所在的前一字符  
+`c$` 替换自光标位置至行尾的所有字符  
+`C` 同`c$`  
+`cc` 替换当前行  
 
 `yw`	只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)  
 `yiw`	不管当前光标处于单词的哪个字母, 都是复制整个单词(不包括末尾的空格)  
@@ -243,19 +195,14 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 `CTRL+SHIFT++`	zoom in on your terminal  
 `CTRL+-`	Zoom out  
 
-`.` 命令重复上次的修改.  
-`:!` command allows you to enter the name of a shell command  
-修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.
-重复修改一个单词.  
-如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.  
-
 删除多行  
 1. 如果要删除的段落的下一行是空行 一般用`d}` , 按两个键就可以了 多段的时候再按 .  
 2. 如果要删除的段落的下一行不是空行 则很容易找到该行的模式,  如该行存在function字串 一般 `d/fu` 也就搞定了  
 输入单词A的前几个字母, 然后CTRL+n补全. <CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全, 还有<CTRL+o><CTRL+f> 用于对目录名进行补全  
 
-记录功能: 命令模式下按q, 再按一个字母做名字, 就进入了记录模式, 再按q停止记录.  
-回放记录: 在命令模式下按@, 再按下记录名字a. 连续回放可以在@前加次数  
+Recording 记录功能: 命令模式下按`q`, 再按一个字母`a`做名字, 就进入了记录模式, 再按`q`停止记录.  
+Replay 回放记录: 在命令模式下按`@`, 再按下记录名字`a`. 连续回放可以在`@`前加次数. 
+To playback your keystrokes, press `@` followed by the letter previously chosen. Typing `@@` repeats the last playback.     
 
 #### Move around inside of long line
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
@@ -360,8 +307,8 @@ pattern `[^0-9]*,`	matches string start with non-number until to (,)
 ### less
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
-less `&pattern` is like grep in less
-Display only lines which match the pattern; lines which do not match the pattern are not displayed.  If pattern is empty (if you type & immediately followed by ENTER), any filtering is turned off, and all lines are displayed
+less `&pattern` is like `grep` in `less`
+Display only lines which match the pattern; lines which do not match the pattern are not displayed.  If pattern is empty (if you type `&` immediately followed by ENTER), any filtering is turned off, and all lines are displayed
 `&eth[01]`  will display lines containing eth0 or eth1
 `&arp.*eth0` will display lines containing arp followed by eth0
 `&arp|dns`  will display lines containing arp or dns
@@ -514,6 +461,34 @@ iconv -f fromEncoding -t toEncoding inputfile
 iconv -f GBK -t UTF-8 file1 -o file2
 
 ### awk
+#### Common usage 例子
+`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者
+`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number  
+
+`w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0  
+`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root  
+`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format  
+`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses  
+`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件  
+`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS  
+`echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
+
+按时间段查询: `cat log | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
+
+按时间区间查询:
+`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`  
+`awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
+
+awk求和 sum
+`echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
+
+删掉所有空行 `awk <pattern> '{print <stuff>}' <file>`  
+Print every line that has at least one field: `awk 'NF > 0' data`
+
+过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
+保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
+
+#### awk
 awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.
 语法格式 `awk 'pattern {action}' filename`
     `awk 'pattern' filename`   显示所有符合模式pattern的行
@@ -529,42 +504,16 @@ $1 $0上第一个字段的数据
 $2 $0上第二个字段的数据
 `awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`	print the whole line matched the pattern
 
-内建变量(Built-in Variables)
-`NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目
-`NR` (Number of Records)	整数, 其值表awk已读入的数据行数目
-`FILENAME`				awk正在处理的数据文件文件名
-`FS` (field seporator)	FS default as space and tab. FS="\n" take "\n" as seporator, `-F\t` take tab as seporator
-`RS` (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
-`awk -v RS=""` 按空白行切分文件成Records
-`awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records
-
-`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者
-`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number
-
-#### 例子
-`w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0  
-`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root  
-`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format  
+内建变量(Built-in Variables)  
+`NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目  
+`NR` (Number of Records)	整数, 其值表awk已读入的数据行数目  
+`FILENAME`				awk正在处理的数据文件文件名  
+`FS` (field seporator)	FS default as space and tab. `FS="\n"` take "\n" as seporator, `-F \t` take tab as seporator  
+`RS` (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.  
+`awk -v RS=""` 按空白行切分文件成Records  
+`awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records  
+`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者  
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number  
-`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses  
-`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件  
-`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS  
-`echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
-
-按时间段查询: `cat maillog | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
-
-按时间区间查询:
-`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`  
-`awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
-
-awk求和 sum
-`echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
-
-删掉所有空行 `awk <pattern> '{print <stuff>}' <file>`  
-Print every line that has at least one field: `awk 'NF > 0' data`
-
-过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
-保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
 #### awk的工作流程
 Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
@@ -654,17 +603,49 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
   `find . -name '*.py' | xargs grep some_function`
   `cat hosts | xargs -I {} ssh root@{} hostname`
 
+### `crontab`
+To create a cronjob, just edit the crontab file: `crontab -e`. 
+It uses `/bin/sh`
+`-l` 列出crontab文件
+`-e` 编辑当前的crontab文件 
+`-r` 删除当前的crontab文件
+crontab特殊的符号说明:
+1. "*"代表所有的取值范围内的数字
+2. "/"代表每的意思, 如"*/5"表示每5个单位
+3. "-"代表从某个数字到某个数字
+4. ","分散的数字
+
+```
+
+	MAILTO=username@example.org
+	5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
+```
+
+log path: `/var/log/messages` or `/var/log/cron*`
+
+发现Ubuntu下没有自动打开cron的日志服务功能, 解决方法如下
+cron的日志功能使用syslogd服务, 不同版本linux可能装了不同的软件, 这里介绍常见的两种:
+sysklogd>>>>>>
+1. 编辑 /etc/syslog.conf, 并且打开以cron.*开始的那行注释.
+2. 运行 /etc/init.d/sysklogd restart .
+3. 运行 /etc/init.d/cron restart .
+
+rsyslog>>>>>>
+1. 修改rsyslog文件, 将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉;
+2. 重启rsyslog服务service rsyslog restart
+3. 重启cron服务service cron restart
+
 ### shell
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)
 
-`cat /etc/shells`	get all available shells
-xargs echo
-在bash的脚本中, 你可以使用 set -x 来debug输出. 使用 set -e 来当有错误发生的时候abort执行. 考虑使用 set -o pipefail 来限制错误. 还可以使用trap来截获信号（如截获ctrl+c）.
+`cat /etc/shells`	get all available shells  
+`xargs echo`  
+在bash的脚本中, 你可以使用 set -x 来debug输出. 使用 set -e 来当有错误发生的时候abort执行. 考虑使用 set -o pipefail 来限制错误. 还可以使用trap来截获信号（如截获ctrl+c）.  
 在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中
 
-read -p "Press [Enter] key to continue"
-read -n 1 -p "Press any key to continue"
-sleep 2; echo 'end sleep 2 sec'
+`read -p "Press [Enter] key to continue"`  
+`read -n 1 -p "Press any key to continue"`  
+`sleep 2; echo 'end sleep 2 sec'`  
 
 ﻿$? 上一个命令的返回代码. 0为true, 1为false
 $$进程标识号
@@ -672,20 +653,20 @@ $*, 该变量包含了所有输入的命令行参数值
 
 
 #### `dirname $0`
-在命令行状态下单纯执行 $ cd `dirname $0` 是毫无意义的. 因为他返回当前路径的".".
-这个命令写在脚本文件里才有作用, 他返回这个脚本文件放置的目录, 并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）.
-在/home/admin/test/下新建test.sh内容如下:
+在命令行状态下单纯执行 $ cd `dirname $0` 是毫无意义的. 因为他返回当前路径的".".  
+这个命令写在脚本文件里才有作用, 他返回这个脚本文件放置的目录, 并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）.  
+在/home/admin/test/下新建test.sh内容如下:  
 
    cd `dirname $0`
    echo `pwd`
 
-然后返回到/home/admin/执行 `sh test/test.sh` 运行结果: `/home/admin/test`
-这样就可以知道一些和脚本一起部署的文件的位置了, 只要知道相对位置就可以根据这个目录来定位, 而可以不用关心绝对位置. 这样脚本的可移植性就提高了, 扔到任何一台服务器, （如果是部署脚本）都可以执行.
+然后返回到/home/admin/执行 `sh test/test.sh` 运行结果: `/home/admin/test`  
+这样就可以知道一些和脚本一起部署的文件的位置了, 只要知道相对位置就可以根据这个目录来定位, 而可以不用关心绝对位置. 这样脚本的可移植性就提高了, 扔到任何一台服务器, （如果是部署脚本）都可以执行.  
 
 #### `pwd`, `PWD`
-`pwd`命令用于显示当前工作目录.
-环境变量`OLDPWD`表示前一次的工作目录,
-环境变量`PWD`表示当前的工作目录.
+`pwd`命令用于显示当前工作目录.  
+环境变量`OLDPWD`表示前一次的工作目录,  
+环境变量`PWD`表示当前的工作目录.  
 
 #### Common Bash comparisons
 
@@ -735,11 +716,11 @@ positional parameter: space, line return
 1. `var_name=value` 变量名和等号之间不能有空格
 2. `echo ${var_name}` 变量名外面的花括号是为了帮助解释器识别变量的边界, 非必须
 
-双引号 "
+双引号 double quotes
 1. 双引号里的变量会进行替换.
 2. $、\、'、和"这几个字符是特殊字符 (shell 引号嵌套 使用转义 \" \')
 
-单引号 '
+单引号 ' '
 1. 单引号里的任何字符都会原样输出, 单引号字符串中的变量是无效的
 2. 单引号字串中不能出现单引号（对单引号使用转义符后也不行）
 
@@ -923,6 +904,8 @@ date 的+%s可以将日期转换成时间戳格式,看下面的例子:
 
 ### bash
 `man readline` to get the introduction to the combination of keys
+NB : LNEXT interpret the next character as a string. eg : for symbolize a `CR+LF` you must do the key
+combination `ctrl+v+return`, that will print `^M`
 The `M-` sequence means the `Alt` key
 
 CTRL+u remove line command
@@ -1314,7 +1297,7 @@ CTRL+a CTRL+a	切换到之前显示的窗口
 CTRL+a c	创建一个新的运行shell的窗口并切换到该窗口
 CTRL+a n	切换到下一个窗口
 CTRL+a p	切换到前一个窗口(与CTRL+a n相对)
-CTRL+a "	select window from list
+CTRL+a "	select window from list "
 CTRL+a 0..9	切换到窗口0..9
 CTRL+a a	发送CTRL+a到当前窗口 bash中到行首
 CTRL+a d	暂时断开screen会话
@@ -1327,8 +1310,11 @@ screen -wipe命令清除死掉的会话
 http://roclinux.cn/?p=2474  
 https://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html  
 tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包  
+一般计算机网卡都工作在非混杂模式下，此时网卡只接受来自网络端口的目的地址指向自己的数据。当网卡工作在混杂模式下时，网卡将来自接口的所有数据都捕获并交给相应的驱动程序。网卡的混杂模式一般在网络管理员分析网络数据作为网络故障诊断手段时用到，同时这个模式也被网络黑客利用来作为网络数据窃听的入口。在Linux操作系统中设置网卡混杂模式时需要管理员权限。在Windows操作系统和Linux操作系统中都有使用混杂模式的抓包工具，比如著名的开源软件Wireshark  
 
 `tcpdump -i eth0 -nn -X ‘port 53’ -c 1`  
+
+##### `tcpdump`常用选项
 * `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡
 * `-c` 是Count的含义，设置tcpdump抓几个包
 * `-nn` 当tcpdump遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。比如，众所周知21端口是FTP端口，我们希望显示21，而非tcpdump自作聪明的将它显示成FTP
@@ -1347,13 +1333,15 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 
 * `-w` 将流量保存到文件中, 把raw packets（原始网络包）直接存储到文件中
 * `-r` 读取raw packets文件进行了“流量回放”，网络包被“抓”的速度都按照历史进行了回放, 可以使用`-e`、`-l`和过滤表达式来对输出信息进行控制
+* `-C 10` 限制每个转储文件的上限, 达到上限后将文件分卷(以MB为单位)
+* `-W 5` 不仅限制每个卷的上限, 而且限制卷的总数
 
 * `-A` tcpdump只会显示ASCII形式的数据包内容，不会再以十六进制形式显示
 * `tcpdump -D` 列出所有可以选择的抓包对象
 * `-F` 指定过滤表达式所在的文件 `tcpdump -i eth0 -c 1 -t -F filter.txt`
 
 Common usage:
-* `tcpdump -l > dump.log &tail -f dump.log`  
+* `tcpdump -l > dump.log & tail -f dump.log`  
 * 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log` 
 * 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据  
 	`tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'`
@@ -1400,6 +1388,60 @@ Common usage:
 * 查看哪些ICMP包中“目标不可达、主机不可达”的包的表达式`icmp[0:2]==0x0301` 
 * 提取TCP协议里的SYN-ACK数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 `tcp[13]==18`
 * 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`
+
+
+### `lsof`
+`lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.
+
+```
+
+	$ lsof
+	COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
+	init       1       root  cwd       DIR        8,1      4096          2 /
+	init       1       root  txt       REG        8,1    124704     917562 /sbin/init
+	init       1       root    0u      CHR        1,3       0t0       4369 /dev/null
+	init       1       root    3r     FIFO        0,8       0t0       6323 pipe
+```
+FD – Represents the file descriptor. Some of the values of FDs are,
+* cwd – Current Working Directory
+* txt – Text file
+* mem – Memory mapped file
+* mmap – Memory mapped device
+* NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.
+
+TYPE – Specifies the type of the file. Some of the values of TYPEs are,
+* REG – Regular File
+* DIR – Directory
+* FIFO – First In First Out
+* CHR – Character special file
+
+Parameters:
+* `+D` will recurse
+* `+d` will not recurse
+* `-c` based on process names starting with
+* `-u` specific user
+* `-p` specific process
+* `-t` list the process id
+* `-r` repeat until interrupt
+* `+r` repeat until no open files found
+* `-i` network
+
+Samples:  
+List open files thread in order `lsof -n |awk '{print $2}'|sort|uniq -c |sort -nr| less`
+List processes which opened a specific file: `lsof /var/log/syslog`  
+List opened files under a directory: `lsof +D /var/log/`  
+List opened files based on process names starting with: `lsof -c ssh -c init`  
+can give multiple -c switch on a single command line.  
+List processes using a mount point: `lsof /home`, `lsof +D /home/`  
+List files opened by a specific user: `lsof -u username`  
+Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`  
+List all open files by a specific process: `lsof -p 1753`  
+Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`  
+Execute lsof in repeat mode: `lsof -u username -c init -a -r5`  
+
+List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.  
+List processes which are listening on a particular port: `lsof -i :25`  
+List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`  
 
 ### Python
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
@@ -1474,7 +1516,7 @@ Create an executable in your path:
 	export ECLIPSE_HOME="/home/peter/opt/eclipse"
 	$ECLIPSE_HOME/eclipse $*
 ```
-Let's also make eclipse executable everywhere by creating a symlink:
+Make eclipse executable everywhere by creating a symlink:
 `sudo ln -s /usr/bin/eclipse /bin/eclipse`
 Create the menu icon: `sudo gedit /usr/share/applications/eclipse.desktop` Type in this content and save:
 ```
@@ -1541,7 +1583,7 @@ gMTP connect to android from Ubuntu
 ### Ubuntu死机
 1. 重启桌面方法
 `sudo restart lightdm`restarting the GUI gnome-system-monitor or `ALT+CTRL+F1`进入命令行Console, kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg, 缺点是重新启动了Xorg的进程, 死机前原来正在运行的程序和数据无法恢复！
-2. When a single program stops working: ALT+F2, type xkill
+2. When a single program stops working: `ALT+F2`, type `xkill`
 
 ## System
 `zdump -v /etc/localtime` examine the contents of the time zone files
@@ -1551,16 +1593,16 @@ http://www.brendangregg.com/linuxperf.html
 
 #### Linux Perf Analysis in 60s Checklist
 http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
-1.	`uptime` ⟶ load averages
-2.	`dmesg -T | tail` ⟶ kernel errors
-3.	`vmstat 1` ⟶ overall stats by time
-4.	`mpstat -P ALL 1` ⟶ CPU balance
-5.	`pidstat 1` ⟶ process usage
-6.	`iostat -xz 1` ⟶ disk I/O
-7.	`free -m` ⟶ memory usage
-8.	`sar -n DEV 1` ⟶ network I/O
-9.	`sar -n TCP,ETCP 1` ⟶ TCP stats
-10.	`top` ⟶ check overview
+1.	`uptime` ⟶  load averages
+2.	`dmesg -T | tail` ⟶  kernel errors
+3.	`vmstat 1` ⟶  overall stats by time
+4.	`mpstat -P ALL 1` ⟶  CPU balance
+5.	`pidstat 1` ⟶  process usage
+6.	`iostat -xz 1` ⟶  disk I/O
+7.	`free -m` ⟶   memory usage
+8.	`sar -n DEV 1` ⟶   network I/O
+9.	`sar -n TCP,ETCP 1` ⟶   TCP stats
+10.	`top` ⟶  check overview
 
 `dmesg | tail`	输出系统日志的最后10行 or `less /var/log/dmesg`
 `vmstat 5 5`, `iostat-xz 1`
@@ -1575,13 +1617,13 @@ sysstat工具与负载历史回放
 
 #### Linux CPU Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1.	`uptime` ⟶ load averages
-2.	`vmstat 1` ⟶ system-wide utilization, run q length
-3.	`mpstat -P ALL 1` ⟶ CPU balance
-4.	`pidstat 1` ⟶ per-process CPU
-5.	CPU flame graph ⟶ CPU profiling
-6.	CPU subsecond offset heat map ⟶ look for gaps
-7.	`perf stat -a` -- sleep 10 ⟶ IPC, LLC hit ratio
+1.	`uptime` ⟶  load averages
+2.	`vmstat 1` ⟶  system-wide utilization, run q length
+3.	`mpstat -P ALL 1` ⟶  CPU balance
+4.	`pidstat 1` ⟶  per-process CPU
+5.	CPU flame graph ⟶  CPU profiling
+6.	CPU subsecond offset heat map ⟶  look for gaps
+7.	`perf stat -a` -- sleep 10 ⟶  IPC, LLC hit ratio
 htop can do 1-4
 
 #### top, uptime
@@ -1609,6 +1651,12 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有教低的id, 说明CPU空转时间很少;   
 　　wa低, id高, 可以排除CPU资源瓶颈的可能  
 　　wa高, 说明I/O占用了大量的CPU时间, 需要检查交换空间的使用, 交换空间位于磁盘上, 性能远低于内存, 当内存耗尽开始使用交换空间时, 将会给性能带来严重影响, 所以对于性能要求较高的服务器, 一般建议关闭交换空间. 另一方面, 如果内存充足, 但wa很高, 说明需要检查哪个进程占用了大量的I/O资源.
+
+`skill` 和 `snice`  
+如果您发现了一个占用大量 CPU 和内存的进程，但又不想停止它，该怎么办
+`skill -STOP PID` 冻结 not kill it
+`skill -CONT PID` 如果希望暂时冻结进程以便为完成更重要的进程腾出空间，该方法非常有用。要停止 "oracle" 用户的所有进程，只需要一个命令即可实现：
+`skill -STOP oracle` 可以使用用户、PID、命令或终端 id 作为参数
 
 ### Memory troubleshooting
 [Linux系统排查1——内存篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4685629.html)
@@ -1700,15 +1748,15 @@ slab的分布状况 `/proc/slabinfo`
 
 #### Linux Disk Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1.	`iostat –xnz 1` ⟶ any disk I/O? if not, stop looking
-2.	`vmstat 1` ⟶ is this swapping? or, high sys time?
-3.	`df -h` ⟶ are file systems nearly full?
-4.	`ext4slower 10` ⟶ (zfs*, xfs*, etc.) slow file system I/O?
-5.	`bioslower 10` ⟶ if so, check disks
-6.	`ext4dist 1` ⟶ check distribution and rate
-7.	`biolatency 1` ⟶ if interesting, check disks
-8.	`cat /sys/devices/…/ioerr_cnt` ⟶ (if available) errors
-9.	`smartctl -l error /dev/sda1` ⟶ (if available) errors
+1.	`iostat –xnz 1` ⟶  any disk I/O? if not, stop looking
+2.	`vmstat 1` ⟶  is this swapping? or, high sys time?
+3.	`df -h` ⟶  are file systems nearly full?
+4.	`ext4slower 10` ⟶  (zfs*, xfs*, etc.) slow file system I/O?
+5.	`bioslower 10` ⟶  if so, check disks
+6.	`ext4dist 1` ⟶  check distribution and rate
+7.	`biolatency 1` ⟶  if interesting, check disks
+8.	`cat /sys/devices/…/ioerr_cnt` ⟶  (if available) errors
+9.	`smartctl -l error /dev/sda1` ⟶  (if available) errors
 
 　
 #### 当磁盘无法写入的时候, 一般有以下可能:
@@ -1752,7 +1800,7 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 
 #### 硬盘读速度
 硬盘读速度的测试同理, 不过要先清理缓存, 否则直接从Page Cache读了.   
-`sh -c "sync && echo 3 > /proc/sys/vm/drop_caches”`  
+`sh -c "sync && echo 3 > /proc/sys/vm/drop_caches"`  
 `dd if=./dd.file of=/dev/null bs=8k`  
 
 ### Network troubleshooting
@@ -1776,16 +1824,16 @@ tcp        0      0 *:pssc                      *:*                         LIST
 
 #### Linux Network Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html
-1	`sar -n DEV,EDEV 1` ⟶ at interface limits? or use nicstat
-2	`sar -n TCP,ETCP 1` ⟶ active/passive load, retransmit rate
-3	`cat /etc/resolv.conf` ⟶ it's always DNS
-4	`mpstat -P ALL 1` ⟶ high kernel time? single hot CPU?
-5	`tcpretrans` ⟶ what are the retransmits? state?
-6	`tcpconnect` ⟶ connecting to anything unexpected?
-7	`tcpaccept` ⟶ unexpected workload?
-8	`netstat -rnv` ⟶ any inefficient routes?
-9	check firewall config ⟶ anything blocking/throttling?
-10	`netstat -s` ⟶ play 252 metric pickup
+1	`sar -n DEV,EDEV 1` ⟶  at interface limits? or use nicstat
+2	`sar -n TCP,ETCP 1` ⟶  active/passive load, retransmit rate
+3	`cat /etc/resolv.conf` ⟶  it is always DNS
+4	`mpstat -P ALL 1` ⟶  high kernel time? single hot CPU?
+5	`tcpretrans` ⟶  what are the retransmits? state?
+6	`tcpconnect` ⟶  connecting to anything unexpected?
+7	`tcpaccept` ⟶  unexpected workload?
+8	`netstat -rnv` ⟶  any inefficient routes?
+9	check firewall config ⟶  anything blocking/throttling?
+10	`netstat -s` ⟶  play 252 metric pickup
 tcp*, are from bcc/BPF tools.
 
 11 `iftop`
@@ -1799,7 +1847,7 @@ tcp*, are from bcc/BPF tools.
 Linux查看网卡数据吞吐量方法
 1、`iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘: `iptraf -d eth0`  
 2、`watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`.
-3. `sar -n DEV 1` 每一秒钟取一次值, 取四次
+3. `sar -n DEV 2 4` 每2秒钟取1次值, 取4次
 4. `iperf` Diagnosing network speed
 5. 带宽监控 `nload`, https://linux.cn/article-2871-1.html
 
@@ -1845,7 +1893,7 @@ Linux查看网卡数据吞吐量方法
 在进入iftop的非交互界面后, 按 `p` 键可以打开或关闭显示端口, 按 `s` 键可以显示或隐藏源主机, 而按 `d` 键则可以显示或隐藏目标主机.
 
 `-i` 选项可以指定要查看的网卡, 默认情况下, iftop会显示自己找到的第一个网卡;
-`-n` 选项直接显示连接的IP, Don't do hostname lookups
+`-n` 选项直接显示连接的IP, Do not do hostname lookups
 `iftop -i eth1 -P -Bn`  
 
 ##### iperf
@@ -1860,14 +1908,6 @@ TCP Clients & Servers
 UDP Clients & Servers
 1. `iperf -s -u` to Start a UDP Iperf server
 2. `iperf -c <SERVER_IP> -u` to Connect your client to your Iperf UDP server
-
-##### `tcpdump`常用选项
-`# tcpdump -n port N`    //只捕捉特定端口的流量
-`# tcpdump -n port N1 or port N2`    //捕获多个端口的流量
-`# tcpdump -w output.pcap`    //数据包转储, 将原始数据包保留到output.pcap
-`# tcpdump -C 10 -w output.pcap`    //限制每个转储文件的上限, 达到上限后将文件分卷(以MB为单位)
-`# tcpdump -C 10 -W 5 -w output.pcap`    //不仅限制每个卷的上限, 而且限制卷的总数
-`# tcpdump -r output.pcap`    //重播已经保存的数据包记录
 
 ### 操作系统 `uname -a`
 find out system version: `cat /etc/*-release` or `ls /etc/*-release`
@@ -1994,7 +2034,7 @@ cpu属性值说明:
 2. `%idle`值高, 表示CPU较空闲
 3. 如果`%idle`值高但系统响应慢时, 有可能是CPU等待分配内存, 此时应加大内存容量. **`%idle`值如果持续低于10, 那么系统的CPU处理能力相对较低, 表明系统中最需要解决的资源是CPU**.
 
-#### sar - Collect and Report System Activity
+#### sar (System Activity Recorder) - Collect and Report System Activity
 `sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放  
 可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
 
@@ -2003,12 +2043,18 @@ cpu属性值说明:
 * `sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
 * `sar -r 2 5`显示收集的内存记录  
 * `sar -b 2 5`显示磁盘I/O
-* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；  
+* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；服务器状况不良时，如果怀疑因为内存不足而导致了页面交换的发生，可以使用这个命令来确认是否发生了大量的交换. 
+    pswpin/s：每秒系统换入的交换页面（swap page）数量  
+    pswpout/s：每秒系统换出的交换页面（swap page）数量  
+要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来；  
+* 怀疑CPU存在瓶颈，可用 sar -u 和 sar -q 等来查看  
+* 怀疑内存存在瓶颈，可用sar -B、sar -r 和 sar -W 等来查看  
+* 怀疑I/O存在瓶颈，可用 sar -b、sar -u 和 sar -d 等来查看  
 
 2. 查看指定时间、指定日期的历史记录 参数`-s`和`-e`限定查看的时间
 
 * `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
-* `-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在相应的日志目录中
+* `-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在 `/var/log/systat/saN` or `/var/log/sa/saN`
 * `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录
 
 3. 查看网络状态 `sar -n DEV 1`  
@@ -2139,7 +2185,7 @@ BOOTPROTO   =   dhcp
 
 #### Change system proxy settings from the command line using gsettings
 http://ask.xmodulo.com/change-system-proxy-settings-command-line-ubuntu-desktop.html
-**Question**: change system proxy settings on Ubuntu desktop: "System Settings" -> "Network" -> "Network proxy". Is there a more convenient way to change desktop's proxy settings from the command line?  
+**Question**: change system proxy settings on Ubuntu desktop: "System Settings" -> "Network" -> "Network proxy". Is there a more convenient way to change proxy settings of desktop from the command line?  
 To modify a DConf setting: `$ gsettings set <schema> <key> <value>`
 To read a DConf setting: `$ gsettings get <schema> <key>`
 
@@ -2194,7 +2240,7 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `ssh-copy-id user@host`	将公钥添加到 host 以实现无密码登录
 `ssh-copy-id -i ~/.ssh/id_rsa.pub username@host`
 `cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`	从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
-`ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys' < ~/.ssh/id_rsa.pub'`
+`ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys < ~/.ssh/id_rsa.pub'`
 
 `cd && tar czv src | ssh user@host 'tar xz'`	将$HOME/src/目录下面的所有文件, 复制到远程主机的$HOME/src/目录
 `ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件, 复制到用户的当前目录
@@ -2275,7 +2321,7 @@ Host host_b
   Port 22
   ProxyCommand ssh -q -W %h:%p host-a
 ```
-Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that's the `ProxyCommand` being executed) and start the SSH session to your actual target.
+Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that is the `ProxyCommand` being executed) and start the SSH session to your actual target.
 
 SSH Jumphost configuration with netcat (nc)
 Alternatively, if you can't/don't want to use ssh to tunnel your connections, you can also use nc (netcat).
@@ -2361,7 +2407,7 @@ dpkg -c packageName	#View the Content of a Package
 dpkg -S packageName	#显示所有包含该软件包的目录
 dpkg -s packageName	#Check a Package is installed or not
 dpkg -L packageName	#Check the location of Packages installed
-dpkg --unpack packageName	#Unpack the Package but dont' Configure
+dpkg --unpack packageName	#Unpack the Package but do not Configure
 dpkg --configure packageName	#Reconfigure a Unpacked Package
 
 ### update hostname
@@ -2376,7 +2422,7 @@ vi /etc/hosts
 202.141.162.123 www.ajax.googleapis.com
 202.141.162.123 ajax.googleapis.com
 
-### 设置主DNS
+### 设置 DNS
 sudo vi /etc/resolvconf/resolv.conf.d/head
 sudo resolvconf -u
 cat /etc/resolv.conf
