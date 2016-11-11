@@ -36,8 +36,8 @@ C-1 is control-1
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`  
 
 
-`ls /fake/directory > peanuts.txt 2>&1` 2>&1 是将标准出错重定向到标准输出
-redirect both stdout and stderr to a file: ``$ ls /fake/directory &> peanuts.txt`
+`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出
+redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`
 man top
 `fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
 `sudo service network-manager start`
@@ -153,9 +153,9 @@ Typing ":set xxx" sets the option "xxx".  Some options are:
 After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer positions
 
 #### Basic vi
-`:help` VIM - main help file  
+VIM - main help file  `:help`
 find help on just about any subject, by giving an argument to the `:help` command. `:help w`, `:help c_CTRL-D`, `:help user-manual`  
-`~`	切换大小写  
+切换大小写 `~`	   
 `:sp`	split window above and below  
 `:sh`	暂时退出vi到系统下, 结束时按CTRL+d则回到vi  
 `.` 命令重复上次的修改.  
@@ -201,7 +201,7 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 输入单词A的前几个字母, 然后CTRL+n补全. <CTRL+o><CTRL+n> <CTRL+o><CTRL+p> 只是简单的上下文补全, 还有<CTRL+o><CTRL+f> 用于对目录名进行补全  
 
 Recording 记录功能: 命令模式下按`q`, 再按一个字母`a`做名字, 就进入了记录模式, 再按`q`停止记录.  
-Replay 回放记录: 在命令模式下按`@`, 再按下记录名字`a`. 连续回放可以在`@`前加次数. 
+Replay 回放记录: 在命令模式下按`@`, 再按下记录名字`a`. 连续回放可以在`@`前加次数.
 To playback your keystrokes, press `@` followed by the letter previously chosen. Typing `@@` repeats the last playback.     
 
 #### Move around inside of long line
@@ -315,7 +315,6 @@ Display only lines which match the pattern; lines which do not match the pattern
 `!` can invert any of the above: `&!event`
 
 ### find grep sed
-```
 grep pattern files - 搜索 files 中匹配 pattern 的内容  
 grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容  
 `-l`	只列出匹配的文件名  
@@ -331,79 +330,49 @@ grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
 `-e`, PATTERN, --regexp=PATTERN
 Use PATTERN as the pattern; useful to protect patterns beginning with -.
 
-grep pattern1 | pattern2 files	显示匹配 pattern1 或 pattern2 的行
-grep pattern1 files | grep pattern2	显示既匹配 pattern1 又匹配 pattern2 的行
-grep for multiple patterns
-	`grep 'word1\|word2\|word3' /path/to/file`
-	`grep -E 'word1|word2' *.doc`
-    Use single quotes in the pattern: `grep 'pattern*' file1 file2`, `grep 'AB.*DEF'`
-    Use extended regular expressions: `egrep 'pattern1|pattern2' *.py`
-    Use this syntax on older Unix shells: `grep -e pattern1 -e pattern2 *.pl`
-On Linux, you can also type `egrep` instead of `grep -E`
+`grep pattern1 | pattern2 files`	显示匹配 pattern1 或 pattern2 的行  
+`grep pattern1 files | grep pattern2`	显示既匹配 pattern1 又匹配 pattern2 的行 or `grep  'pattern1.*pattern2' filename`  
+grep for multiple patterns  
+	`grep 'word1\|word2\|word3' /path/to/file`  
+	`grep -E 'word1|word2' *.doc`  
+    Use single quotes in the pattern: `grep 'pattern*' file1 file2`, `grep 'AB.*DEF'`  
+    Use extended regular expressions: `egrep 'pattern1|pattern2' *.py`  
+    Use this syntax on older Unix shells: `grep -e pattern1 -e pattern2 *.pl`  
+On Linux, you can also type `egrep` instead of `grep -E`  
 
-escape double quote with backslash `echo "\"member\":\"time\"" |grep -e "member\""` or with single quote `echo '"member":"time"' |grep -e 'member"'`
-escape square brackets with backslash:   `grep "test\[1]" log.txt`
+escape double quote with backslash `echo "\"member\":\"time\"" |grep -e "member\""` or with  single quote `echo '"member":"time"' |grep -e 'member"'`  
+escape square brackets with backslash:   `grep "test\[1]" log.txt`  
 
+`grep -l old *.htm | xargs sed -n "/old/p"`  (`-n` 静默替换)  
+把web文件下所有文件中的`//old.example.com`替换为`//new.example.com`: `sed -i 's/\/\/new.example.com/\/\/old.example.com/g' $(grep -rl '//old.example.com' web/*)`  
 
-`grep -l old *.htm | xargs sed -n "/old/p"`  (sed -n '/old/p' 查询个数; sed -i 's/old/new/g' 替换)
+删除行尾空格: `%s/\s+$//g`
+删除行首多余空格: `%s/^\s*// 或者 %s/^ *//`
+删除沒有內容的空行: `%s/^$//`  
+删除包含有空格组成的空行: `%s/^\s*$//`  
+删除以空格或TAB开头到结尾的空行: `%s/^[ |\t]*$//`  
+替换变量:在正则式中以`\(`和`\)`括起来的正则表达式, 在后面使用的时候可以用`\1`、`\2`等变量来访问`\(`和`\)`中的内容.
+把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法 `:%s/abc\(.*\)xyz/xyz\1abc/g` or `:%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g`  
+把ABC转换为小写 `echo "ABC" | sed 's/[A-Z]*/\L&\E/'` 或 `echo "ABC" | sed 's/[A-Z]/\l&/g'`  
+把abc转换为大写 `echo "abc" | sed 's/[a-z]*/\U&\E/'` 或 `echo "abc" | sed 's/[a-z]/\u&/g'`  
+    `echo "ab_c" | sed 's/_[a-z]/\u&/g'`  
+    `echo "ab_c" | sed 's/_[a-z]/\U&\E/g'`  
+删除一个以上空格, 用一个空格代替	`s/[ ] [ ] [ ] */[ ]/g`
+删除行首空格 `s/^[ ][ ] *//g`   
+删除句点后跟两个或更多空格, 代之以一个空格 `s/\ .[ ][ ] */[ ]/g`  
+删除以句点结尾行  `s/\ . $//g`  
+删除包含a b c d的行  `-e/abcd/d`
+删除第一个字符 `s/^ .//g`  
+删除紧跟C O L的后三个字母 `s/COL \ ( . . . \ )//g`  
+从路径中删除第一个`\` `s/^ \///g`
+删除所有空格并用tab键替代 `s/[ ]/[TAB]//g`  
+删除行首所有tab键 `s/^ [TAB]//g`  
+删除所有tab键 `s/[TAB] *//g`  
 
-把web文件下所有文件中的//old.example.com替换为//new.example.com:
-
-	sed -i 's/\/\/new.example.com/\/\/old.example.com/g' `grep -rl '//old.example.com' web/*`
-
-sed -n '/old/p' `grep -l old *.htm`
-sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java
-sed -i 's#../../gxt#../../gxt2#g' */*.html
-
-:%s#":.*$#gc   "
-sed -i 's#":.*$#;//#g' test
-sed -i 's#":.*//#;//#g' test
-sed -i 's#":#;//#g' test
-sed -i 's#"#private String #g' test
-
-sed -i 's#\s`#private String #g' test
-sed -i 's#`\(.*\)COMMENT#;//#g' test
-sed -i "s#'##g" test
-sed -i "s#,##g" test
-sed -i 's/_[a-z]/\U&\E/g' test
-sed -i 's/_//g' test
-
-删除行尾空格: :%s/\s+$//g
-删除行首多余空格: %s/^\s*// 或者 %s/^ *//
-删除沒有內容的空行: %s/^$// 或者 g/^$/d
-删除包含有空格组成的空行: %s/^\s*$// 或者 g/^\s*$/d
-删除以空格或TAB开头到结尾的空行: %s/^[ |\t]*$// 或者 g/^[ |\t]*$/d
-替换变量:在正则式中以\(和\)括起来的正则表达式, 在后面使用的时候可以用\1、\2等变量来访问\(和\)中的内容.
-把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法
-    :%s/abc\(.*\)xyz/xyz\1abc/g
-    :%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g
-把ABC转换为小写
-    echo "ABC" | sed 's/[A-Z]*/\L&\E/' 或
-    echo "ABC" | sed 's/[A-Z]/\l&/g'
-    把abc转换为大写
-    echo "abc" | sed 's/[a-z]*/\U&\E/' 或
-    echo "abc" | sed 's/[a-z]/\u&/g'
-
-    echo "ab_c" | sed 's/_[a-z]/\u&/g'
-    echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
-	‘s/[ ] [ ] [ ] */[ ]/g’ 删除一个以上空格, 用一个空格代替
-	‘s/^[ ][ ] *//g’ 删除行首空格
-	‘s/\ .[ ][ ] */[ ]/g’ 删除句点后跟两个或更多空格, 代之以一个空格
-	‘s/\ . $//g’ 删除以句点结尾行
-	‘-e/abcd/d’ 删除包含a b c d的行
-	‘/^ $/d’ 删除空行
-	‘s/^ .//g’ 删除第一个字符
-	‘s/COL \ ( . . . \ )//g’ 删除紧跟C O L的后三个字母
-	‘s/^ \///g’ 从路径中删除第一个\
-	‘s/[ ]/[TAB]//g’ 删除所有空格并用tab键替代
-	‘S/^ [TAB]//g’ 删除行首所有tab键
-	‘s/[TAB] *//g’ 删除所有tab键
-
-find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'
-find . -type f -name "*.log" | xargs grep "ERROR" : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
-find . -name dfc.properties
-delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xargs rm
-```
+`find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`  
+`find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行  
+`find . -name dfc.properties`  
+delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`  
 
 #### 文件个数 count files in directory recursively
 `find . -type f | wc -l`  
@@ -412,27 +381,24 @@ delete file except notDelete.txt: find . -type f -not -name notDelete.txt | xarg
 `find -mindepth 1 -type d | wc -l`
 `ls -lR | grep "^d" | wc -l`  
 
-
 #### 替换多文件中的内容
-`find . -name '*.htm' | xargs sed -n '/old/p'`  (查询个数)
+`find . -name '*.htm' | xargs sed -n '/old/p'`  (静默替换)  
 `find . -name '*.htm' | xargs sed -i 's/old/new/g'` (替换或者 s#old#new#g)
+`sed -n '/old/p' $(grep -l old *.htm)`  
+`sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java`  
 
 #### 删除.svn文件夹
-find . -type d -name ".svn" | xargs rm -rf
-find . -name "*.svn"  | xargs rm -rf  或
-find . -type d -iname ".svn" -exec rm -rf {} \;
+`find . -type d -name ".svn" | xargs rm -rf`  
+`find . -name "*.svn"  | xargs rm -rf`  或  
+`find . -type d -iname ".svn" -exec rm -rf {} \;`  
 
 #### 多目录重命名文件
-```
-for file in `find . -name 'sync1.properties'`; do echo $file; done
-for i in `find . -name sync1.properties`; do mv $i `echo $i | sed 's/sync1.properties$/sync.properties/'`; done
-```
+`for file in $(find . -name sync1.properties) do echo $file; done`  
+`for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done`  
 
 #### 查找包含class的jar文件
-```
-find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
-find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
-```
+`find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done`  
+`find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done`  
 
 #### 文件及文件名乱码处理 删除文件名乱码文件
 1. `ls -i` print the index number of each file(文件的i节点) 12345
@@ -441,24 +407,18 @@ find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JA
 命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
 ##### 文件名编码转换
-`convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换
+`convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换  
 转换文件名由GBK为UTF8 :  `convmv -r -f cp936 -t utf8 --notest --nosmart *`
 
 ##### 查看文件编码
-`file <fileName>`
+`file <fileName>`  
 Vim中查看文件编码 `:set fileencoding`
 
 ##### 文件编码转换
-1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式
-:set fileencoding=utf-8
-
-2. enconv 转换文件 编码 , 比如要将一个GBK编码 的文件 转换成UTF-8编码 , 操作如下
-enconv -L zh_CN -x UTF-8 filename
-
-3. iconv 转换, iconv的命令格式如下:
-iconv -f fromEncoding -t toEncoding inputfile
-比如将一个GBK编码 的文件 转换成 UTF-8 编码
-iconv -f GBK -t UTF-8 file1 -o file2
+1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式 `:set fileencoding=utf-8`
+2. enconv 转换文件 编码 , 比如要将一个GBK编码 的文件 转换成UTF-8编码 , 操作如下 `enconv -L zh_CN -x UTF-8 filename`
+3. iconv 转换, iconv的命令格式如下: `iconv -f fromEncoding -t toEncoding inputfile`  
+  比如将一个GBK编码 的文件 转换成 UTF-8 编码 `iconv -f GBK -t UTF-8 file1 -o file2`
 
 ### awk
 #### Common usage 例子
@@ -489,22 +449,22 @@ Print every line that has at least one field: `awk 'NF > 0' data`
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
 #### awk
-awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.
-语法格式 `awk 'pattern {action}' filename`
-    `awk 'pattern' filename`   显示所有符合模式pattern的行
-    `awk '{action}' filename`   对所有行执行操作action
-    `awk '{action}'`           从命令行输入数据
-awk还支持命令文件 `awk -f awk_file data_file`
-`awk -v RS="?" filename`
+awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.  
+语法格式 `awk 'pattern {action}' filename`  
+    `awk 'pattern' filename`   显示所有符合模式pattern的行  
+    `awk '{action}' filename`   对所有行执行操作action  
+    `awk '{action}'`           从命令行输入数据  
+awk还支持命令文件 `awk -f awk_file data_file`  
+`awk -v RS="?" filename`  
 
 #### 变量
-内建的字段变量
-$0 一字符串, 其内容为目前 awk 所读入的数据行.
-$1 $0上第一个字段的数据
-$2 $0上第二个字段的数据
-`awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`	print the whole line matched the pattern
+内建的字段变量  
+$0 一字符串, 其内容为目前 awk 所读入的数据行.  
+$1 $0上第一个字段的数据  
+$2 $0上第二个字段的数据  
+`awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`	print the whole line matched the pattern  
 
-内建变量(Built-in Variables)  
+内建变量(Built-in Variables)   
 `NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目  
 `NR` (Number of Records)	整数, 其值表awk已读入的数据行数目  
 `FILENAME`				awk正在处理的数据文件文件名  
@@ -516,43 +476,43 @@ $2 $0上第二个字段的数据
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number  
 
 #### awk的工作流程
-Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern
-Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十分类似.
-例如: awk的 I/O指令 : print, printf( ),
-	getline var < file 一次读取一行 变量 var(var省略时,表示置于$0)
-	 awk的 流程控制指令 : if(...){..} else{..}, while(...){...}...
+Pattern 一般常使用 "关系表达式"(Relational expression) 来当成 Pattern  
+Actions 是由许多awk指令构成. 而awk的指令与 C 语言中的指令十分类似.  
+例如: awk的 I/O指令 : print, printf( ),  
+	getline var < file 一次读取一行 变量 var(var省略时,表示置于$0)  
+	 awk的 流程控制指令 : if(...){..} else{..}, while(...){...}...  
 
-awk 如何处理 Pattern { Actions } ?
-awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions.
+awk 如何处理 Pattern { Actions } ?  
+awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不为0的数字,或不是空的字符串), 则 awk将执行该 Pattern 所对应的 Actions.反之, 若 Pattern 之值不为 true, 则awk将不执行该 Pattern所对应的 Actions.  
 
-执行awk时, 它会反复进行下列四步骤.
+执行awk时, 它会反复进行下列四步骤.  
 
-    自动从指定的数据文件中读取一个数据行.
-    自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...
-    依次执行程序中 所有 的 Pattern { Actions } 指令.
-    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4.
+    自动从指定的数据文件中读取一个数据行.  
+    自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...  
+    依次执行程序中 所有 的 Pattern { Actions } 指令.  
+    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4.  
 
-awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop).
+awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop).  
 
 #### Pattern
 awk 中提供下列 关系运算符(Relation Operator)
 
-	运算符 含意
-	> 大于
-	< 小于
-	>= 大于或等于
-	<= 小于或等于
-	== 等于
-	!= 不等于
-	~ match
-	!~ not match
-	上列关系运算符除~(match)与!~(not match)外与 C 语言中之含意一致.
-	~(match) 与!~(match) 在 awk 之含意简述如下 :
+	运算符 含意  
+	`>` 大于  
+	`<` 小于  
+	`>=` 大于或等于  
+	`<=` 小于或等于  
+	`==` 等于  
+	`!=` 不等于  
+	match `~`  
+	`!~` not match  
+	上列关系运算符除`~`(match)与`!~`(not match)外与 C 语言中之含意一致.
+	(match)`~` 与`!~`(match) 在 awk 之含意简述如下 :
 	A为字符串, B为正则表达式.
-	A ~B 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
-	A !~B 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.
+	`A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
+	`A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.
 
-	|| or, && and, ! not
+	`||` or, `&&` and, `!` not
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`
 `$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
@@ -561,21 +521,21 @@ awk 中提供下列 关系运算符(Relation Operator)
 
 #### Actions
 
-	Actions 是由下列指令(statement)所组成 :
-    表达式 ( function calls, assignments..)
-    print 表达式列表
-    printf( 格式化字符串, 表达式列表)
-    if( 表达式 ) 语句 [else 语句]
-    while( 表达式 ) 语句
-    do 语句 while( 表达式)
-    for( 表达式; 表达式; 表达式) 语句
-    for( variable in array) 语句
-    delete
-    break
-    continue
-    next
-    exit [表达式]
-    语句
+	Actions 是由下列指令(statement)所组成 :  
+    表达式 ( function calls, assignments..)  
+    print 表达式列表  
+    printf( 格式化字符串, 表达式列表)  
+    if( 表达式 ) 语句 [else 语句]  
+    while( 表达式 ) 语句  
+    do 语句 while( 表达式)  
+    for( 表达式; 表达式; 表达式) 语句  
+    for( variable in array) 语句  
+    delete  
+    break  
+    continue  
+    next  
+    exit [表达式]  
+    语句  
 
 awk 中大部分指令与 C 语言中的用法一致
 
@@ -600,20 +560,20 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
 控制每行参数个数`-L`和最大并行数`-P`. 如果你不确定它们是否会按你想的那样工作, 先使用 xargs echo 查看一下. 此外, 使用 -I{} 会很方便. 例如:
 
-  `find . -name '*.py' | xargs grep some_function`
+  `find . -name '*.py' | xargs grep some_function`  
   `cat hosts | xargs -I {} ssh root@{} hostname`
 
 ### `crontab`
-To create a cronjob, just edit the crontab file: `crontab -e`. 
-It uses `/bin/sh`
-`-l` 列出crontab文件
-`-e` 编辑当前的crontab文件 
-`-r` 删除当前的crontab文件
-crontab特殊的符号说明:
-1. "*"代表所有的取值范围内的数字
-2. "/"代表每的意思, 如"*/5"表示每5个单位
-3. "-"代表从某个数字到某个数字
-4. ","分散的数字
+To create a cronjob, just edit the crontab file: `crontab -e`.  
+It uses `/bin/sh`  
+`-l` 列出crontab文件  
+`-e` 编辑当前的crontab文件  
+`-r` 删除当前的crontab文件  
+crontab特殊的符号说明:  
+1. "*"代表所有的取值范围内的数字  
+2. "/"代表每的意思, 如"*/5"表示每5个单位  
+3. "-"代表从某个数字到某个数字  
+4. ","分散的数字  
 
 ```
 
@@ -621,16 +581,16 @@ crontab特殊的符号说明:
 	5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
 ```
 
-log path: `/var/log/messages` or `/var/log/cron*`
+log path: `/var/log/messages` or `/var/log/cron*`  
 
-发现Ubuntu下没有自动打开cron的日志服务功能, 解决方法如下
-cron的日志功能使用syslogd服务, 不同版本linux可能装了不同的软件, 这里介绍常见的两种:
-sysklogd>>>>>>
+发现Ubuntu下没有自动打开cron的日志服务功能, 解决方法如下  
+cron的日志功能使用syslogd服务, 不同版本linux可能装了不同的软件, 这里介绍常见的两种:  
+sysklogd>>>>>>  
 1. 编辑 /etc/syslog.conf, 并且打开以cron.*开始的那行注释.
 2. 运行 /etc/init.d/sysklogd restart .
 3. 运行 /etc/init.d/cron restart .
 
-rsyslog>>>>>>
+rsyslog>>>>>>  
 1. 修改rsyslog文件, 将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉;
 2. 重启rsyslog服务service rsyslog restart
 3. 重启cron服务service cron restart
@@ -789,6 +749,14 @@ switch流程控制
 	if [ a || b && c ]; then
 	　 ....
 	elif ....; then
+	　 ....
+	else
+	　 ....
+	fi
+
+
+	if [ a || b && c ]
+	then
 	　 ....
 	else
 	　 ....
@@ -996,7 +964,7 @@ add one line in .bashrc
 
 #### file carriage 换行
 两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行  
-UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF)`, 而Mac人则认同`<Return> (CR)`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF)`
+UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Mac人则认同`<Return> (CR) \r`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF) \r\n`
 在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".  
 1. $ dos2unix myfile.txt  
 2. vi `:%s/^M$//g` #去掉行尾的^M.  
@@ -1023,15 +991,15 @@ vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望
 `:set noendofline` 设置文件不以<EOL>结束符来结尾  
 
 ### zip jar tar
-**zip** 
+**zip**
 `unzip project.war WEB-INF/lib/project.jar` only unzip the jar from the war  
 * `-q` perform operations quietly
 * `-l` lists the contents of a ZIP archive to ensure your file is inside.
 * `-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
 
 examples:  
-* 防止linux下文件解压乱码 `unzip -O cp936` 
-* update zip file `zip -u project.war WEB-INF/lib/jaxen-core.jar` 
+* 防止linux下文件解压乱码 `unzip -O cp936`
+* update zip file `zip -u project.war WEB-INF/lib/jaxen-core.jar`
 * delete file in zip `zip -d project.war WEB-INF/lib/jaxen-core.jar`
 
 Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`  
@@ -1048,7 +1016,7 @@ The `-i` option ignores the EOF at the end of the tar archives, from the man pag
 `-i, --ignore-zeros` ignore blocks of zeros in archive (normally mean EOF)
 
 **jar**:  
-* list files without extracting `jar tvf <filename>.jar` 
+* list files without extracting `jar tvf <filename>.jar`
 * extract files in the jar `jar xvf <jar name>.jar [class name]`
 * update files `jar xvf package.jar com/vdm/Method.class`
 
@@ -1103,10 +1071,10 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 显示http header  
 	显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`  
 	`-I`参数则是只显示http response的头信息.  
-	
+
 显示通信过程  `curl -v www.sina.com`  
 	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`  
-	
+
 HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.  
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`  
 HTTP认证	`curl --user name:password example.com`  
@@ -1342,14 +1310,14 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 
 Common usage:
 * `tcpdump -l > dump.log & tail -f dump.log`  
-* 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log` 
+* 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log`
 * 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据  
 	`tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'`
 * 抓取所有经过eth1，目标MAC地址是00:01:02:03:04:05的ICMP数据 `tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'`
 * 抓取所有经过eth1，目的网络是192.168，但目的主机不是192.168.1.200的TCP数据 `tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'`
 
 
-* 抓取HTTP包 `tcpdump -i eth0 -XvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT" 
+* 抓取HTTP包 `tcpdump -i eth0 -XvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT"
 * 抓HTTP GET数据 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x47455420'`, GET的十六进制是47455420
 * 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c
 * 抓SSH返回 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x5353482D'` SSH-的十六进制是0x5353482D
@@ -1385,7 +1353,7 @@ Common usage:
 * `tcpdump 'port ftp or ftp-data'` 获取使用ftp端口和ftp数据端口的网络包, /etc/services存储着所有知名服务和传输层端口的对应关系
 * `tcpdump 'tcp[tcpflags] & tcp-syn != 0 and not dst host qiyi.com'` 获取roclinux.cn和baidu.com之间建立TCP三次握手中第一个网络包，即带有SYN标记位的网络包，另外，目的主机不能是qiyi.com
 * 要提取TCP协议的SYN、ACK、FIN标识字段，语法是`tcp[tcpflags] & tcp-syn`, `tcp[tcpflags] & tcp-ack`, `tcp[tcpflags] & tcp-fin`
-* 查看哪些ICMP包中“目标不可达、主机不可达”的包的表达式`icmp[0:2]==0x0301` 
+* 查看哪些ICMP包中“目标不可达、主机不可达”的包的表达式`icmp[0:2]==0x0301`
 * 提取TCP协议里的SYN-ACK数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 `tcp[13]==18`
 * 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`
 
@@ -1918,7 +1886,7 @@ Redhat/CentOS版本 : `cat /etc/redhat-release`
 讲究点, 要用来出报告的, 用`Zabbix`之类.
 
 #### `dstat`
-实时观察的, 我喜欢`dstat`, 比`vmstat`, `iostat`, `sar`们都好用, 起码对得够齐, 单位能自动转换. 不过`dstat`需要安装(`yum install dstat`, 如果装不上, 就要将就着用`vmstat`, `sar`了)
+实时观察的, 对得够齐, 单位能自动转换. 不过`dstat`需要安装(`yum install dstat`)
 dstat: 默认, 已有足够信息  
 `dstat -am`: 再多一个memory信息  
 `dstat -amN bond0,lo`:如果有bonding, dstat会把bond0和eth0算双份, 还有lo的也算到总量里, 所以还是用-N指定网卡好  
@@ -1991,7 +1959,7 @@ CPU（以百分比表示）
 
 * `-d` 表示, 显示设备（磁盘）使用状态  
 * `-k`某些使用block为单位的列强制使用Kilobytes为单位  
-* `1 10`表示, 数据显示每隔1秒刷新一次, 共显示10次. 
+* `1 10`表示, 数据显示每隔1秒刷新一次, 共显示10次.
 
 输出列含义  
 
@@ -2043,7 +2011,7 @@ cpu属性值说明:
 * `sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
 * `sar -r 2 5`显示收集的内存记录  
 * `sar -b 2 5`显示磁盘I/O
-* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；服务器状况不良时，如果怀疑因为内存不足而导致了页面交换的发生，可以使用这个命令来确认是否发生了大量的交换. 
+* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；服务器状况不良时，如果怀疑因为内存不足而导致了页面交换的发生，可以使用这个命令来确认是否发生了大量的交换.
     pswpin/s：每秒系统换入的交换页面（swap page）数量  
     pswpout/s：每秒系统换出的交换页面（swap page）数量  
 要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来；  
@@ -2103,7 +2071,7 @@ cpu属性值说明:
 输出内容:  
 * `active/s`: 每秒本地发起的TCP连接数, 既通过connect调用创建的TCP连接;
 * `passive/s`: 每秒远程发起的TCP连接数, 即通过accept调用创建的TCP连接;
-* `retrans/s`: 每秒TCP重传数量; 
+* `retrans/s`: 每秒TCP重传数量;
 TCP连接数可以用来判断性能问题是否由于建立了过多的连接, 进一步可以判断是主动发起的连接, 还是被动接受的连接. TCP重传可能是因为网络环境恶劣, 或者服务器压力过大导致丢包.
 
 ### File
@@ -2273,6 +2241,14 @@ ServerAliveCountMax <Y>
 > ClientAliveInterval: number of seconds that the server will wait before sending a null packet to the client (to keep the connection alive).
 
 > Setting a value of 0 (the default) will disable these features so your connection could drop if it is idle for too long.
+
+#### Troubleshooting sshd
+https://help.ubuntu.com/community/SSH/OpenSSH/Configuring
+1. `ps -ef | grep ssh`, `sudo ss -lnp | grep sshd` or `sudo netstat -anp | grep sshd`
+`root      3865     1  0 11:53 ?        00:00:00 /usr/sbin/sshd -D`
+2. `sudo service ssh restart`
+3. `less /var/log/syslog`
+4. `$(which sshd) -Ddp 10222`
 
 ##### SSH隧道 端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术
