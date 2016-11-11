@@ -1,6 +1,7 @@
 [TOC]
 
 # Nginx
+[nginx documentation](https://nginx.org/en/docs ) 
 
 ## Recent
 https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
@@ -16,10 +17,11 @@ https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
 
 
 ## Nginx offical
-[nginx documentation](http://nginx.org/en/docs/)
+[nginx documentation](http://nginx.org/en/docs )
 
 NGINX (发音为 “engine X”)
-cd /data/softwares/tengine-2.1/sbin
+cd /data/softwares/tengine-2.1/
+`sudo /usr/local/nginx/sbin/nginx` start nginx
 `./sbin/nginx -s <signal>`
 Where signal may be one of the following:
     `stop` — fast shutdown
@@ -51,6 +53,19 @@ location optional_modifier location_match {
 (location =) > (location 完整路径) > (location ^~ 路径) > (location ~,~* 正则顺序) > (location 部分起始路径) > (/)
 
 ###一个示例：
+
+```
+	
+	location /settlementWeb {
+             proxy_pass   http://localhost:3000;
+             proxy_redirect off;
+             proxy_set_header Host $host;
+             proxy_set_header X-Real-IP $remote_addr;
+             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+```
+
+
 ```
 location  = / {
   # 精确匹配 / ，主机名后面不能带任何字符串
