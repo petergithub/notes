@@ -131,6 +131,9 @@ ALT+Delete, and then press the up or down arrow key.
 ## Basic Command
 ### VI
 命令提示 Command line completion with `CTRL-D` and `<TAB>`  
+`:help` help document
+Jump to a subject:  Position the cursor on a tag (e.g. |bars|) and hit `CTRL-]`
+Jump back:  Type `CTRL-T` or `CTRL-O` (repeat to go further back)
 
 #### Set option Configuration
 `:set nu` / `:set nonu`	(不)列出行号 (nu为行数)  
@@ -208,28 +211,28 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
 #### 文件对比 合并 多窗口
-diff -u  
-vimdiff  FILE_LEFT  FILE_RIGHT  
-:qa (quit all)同时退出两个文件  
-:wa (write all)  
-:wqa (write, then quit all)  
-:qa! (force to quit all)  
+`diff -u`  
+`vimdiff  FILE_LEFT  FILE_RIGHT`   
+`:qa` (quit all)同时退出两个文件  
+`:wa` (write all)  
+`:wqa` (write, then quit all)  
+`:qa!` (force to quit all)   
 
-CTRL+w K(把当前窗口移到最上边)  
-CTRL+w H(把当前窗口移到最左边)  
-CTRL+w J(把当前窗口移到最下边)  
-CTRL+w L(把当前窗口移到最右边)  
-CTRL+w,r 交换上/下、左/右两个分隔窗口的位置  
+`CTRL+w K`(把当前窗口移到最上边)  
+`CTRL+w H`(把当前窗口移到最左边)  
+`CTRL+w J`(把当前窗口移到最下边)  
+`CTRL+w L`(把当前窗口移到最右边)  
+`CTRL+w,r` 交换上/下、左/右两个分隔窗口的位置  
 其中2和4两个操作会把窗口改成垂直分割方式.  
-在两个文件之间来回跳转, 可以用下列命令序列CTRL+w, w  
-可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: ]c. 反向跳转是: [c  
+在两个文件之间来回跳转, 可以用下列命令序列`CTRL+w, w`  
+可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: `]c`. 反向跳转是: `[c`  
 `> -`, `> +` 调整窗口大小  
 
-dp (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里  
-do (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行  
-:diffu[pdate] #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:  
-zo (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行  
-zc (folding close)重新折叠  
+`dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里  
+`do` (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行  
+`:diffu[pdate]` #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:  
+`zo` (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行  
+`zc` (folding close)重新折叠  
 
 #### Mutiple tab
 `:n` next file `:p` previous file  
@@ -242,49 +245,49 @@ zc (folding close)重新折叠
 
 
 #### VI正则表达式
-元字符 	说明
-. 	匹配任意字符  
-[abc] 	匹配方括号中的任意一个字符, 可用-表示字符范围. 如[a-z0-9]匹配小写字母和数字  
-[^abc] 	匹配除方括号中字符之外的任意字符  
-\d 	匹配阿拉伯数字, 等同于[0-9]  
-\D 	匹配阿拉伯数字之外的任意字符, 等同于[^0-9]  
-\x 	匹配十六进制数字, 等同于[0-9A-Fa-f]  
-\X 	匹配十六进制数字之外的任意字符, 等同于[^0-9A-Fa-f]  
-\l 	匹配[a-z]  
-\L 	匹配[^a-z]  
-\u 	匹配[A-Z]  
-\U 	匹配[^A-Z]  
-\w 	匹配单词字母, 等同于[0-9A-Za-z_]  
-\W 	匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]  
-\t 	匹配<TAB>字符  
-\s 	匹配空白字符, 等同于[\t]  
-\S 	匹配非空白字符, 等同于[^\t]  
+元字符 	说明  
+`.` 	匹配任意字符  
+`[abc]` 	匹配方括号中的任意一个字符, 可用-表示字符范围. 如[a-z0-9]匹配小写字母和数字  
+`[^abc]` 	匹配除方括号中字符之外的任意字符  
+`\d` 	匹配阿拉伯数字, 等同于[0-9]  
+`\D` 	匹配阿拉伯数字之外的任意字符, 等同于[^0-9]  
+`\x` 	匹配十六进制数字, 等同于[0-9A-Fa-f]  
+`\X` 	匹配十六进制数字之外的任意字符, 等同于[^0-9A-Fa-f]  
+`\l` 	匹配[a-z]  
+`\L` 	匹配[^a-z]  
+`\u` 	匹配[A-Z]  
+`\U` 	匹配[^A-Z]  
+`\w` 	匹配单词字母, 等同于[0-9A-Za-z_]  
+`\W` 	匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]  
+`\t` 	匹配<TAB>字符  
+`\s` 	匹配空白字符, 等同于[\t]  
+`\S` 	匹配非空白字符, 等同于[^\t]  
 
-一些普通字符需转意
-元字符 	说明
-\* 	匹配* 字符  
-. 	匹配. 字符  
-\/ 	匹配 / 字符  
-\ 	匹配 \ 字符  
-\[ 	匹配 [ 字符  
-\] 	匹配 ] 字符  
+一些普通字符需转意  
+元字符 	说明  
+`\*` 	匹配* 字符  
+`.` 	匹配. 字符  
+`\/` 	匹配 / 字符  
+`\` 	匹配 \ 字符  
+`\[` 	匹配 [ 字符  
+`\]` 	匹配 ] 字符  
 
-表示数量的元字符
-元字符 	说明
-* 	匹配0-任意个
-\+ 	匹配1-任意个
-\? 	匹配0-1个
-\{n,m} 	匹配n-m个
-\{n} 	匹配n个
-\{n,} 	匹配n-任意个
-\{,m} 	匹配0-m个
+表示数量的元字符  
+元字符 	说明  
+`*` 	匹配0-任意个  
+`\+` 	匹配1-任意个  
+`\?` 	匹配0-1个  
+`\{n,m}` 	匹配n-m个  
+`\{n}` 	匹配n个  
+`\{n,}` 	匹配n-任意个  
+`\{,m}` 	匹配0-m个  
 
-表示位置的元字符
-元字符 	说明
-$ 	匹配行尾
-^ 	匹配行首
-\< 	匹配单词词首
-\> 	匹配单词词尾
+表示位置的元字符  
+元字符 	说明  
+`$` 	匹配行尾  
+`^` 	匹配行首  
+`\<` 	匹配单词词首  
+`\>` 	匹配单词词尾  
 
 `\s` space  
 `\n`,`\r\n` new line  
@@ -301,7 +304,10 @@ pattern `[^0-9]*,`	matches string start with non-number until to (,)
 :%s/old/new/gc	全文替换,也可用1,$表示从第一行到文本结束  
 :%s/^ *//gc		去掉所有的行首空格  
 :g/^\s*$/d	delete the blank lines  
-:%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).
+:%s/\s\+/,/g	use a substitution (:s///) over each line (%) to replace all (g) continuous whitespace (\s\+) with a comma (,).  
+
+提示`replace with hehe (y/n/a/q/l/^E/^Y)?`  
+`y`替换，`n`不替换，`a`替换所有，`q`放弃，`l`替换第一个并进入插入模式，`^E`和`^Y`是提示你用`Ctrl+e`或`Ctrl+y`来滚动屏幕的
 
 
 ### less
