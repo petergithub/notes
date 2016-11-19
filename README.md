@@ -56,6 +56,16 @@ Author Judas.n http://code.youmeek.com/ judas.n@qq.com
 	* `Maven site:www.youmeek.com`  
 	* `Maven link:www.youmeek.com` 返回所有链接到youmeek.com的网页
 
+### 可供自学的资料
+原文 [技术的正宗与野路子](http://zhangtielei.com/posts/blog-programmer-learn.html )
+
+1. Tutorial（入门教程）。由该项技术的官网提供
+2. Specification，简称Spec。这是集中体现该项技术的设计思想的东西，是高度抽象的描述。这个一般也是一份完备的、系统的描述，包含该项技术涉及到的方方面面。这部分资料在不同的地方叫法不同，在相对简单的技术项目中，也可能没有；在另一些情况下，这部分资料混杂在其它文档资料之中；它还可能以论文（paper）的形式出现。
+3. API Reference。
+4. 别人写的技术博客。质量良莠不齐，到底有没有价值，我们要学会去分辨。
+5. 技术书籍。跟技术博客类似，质量有好有坏。稍后我们和技术博客放在一起来分析。
+6. Source Code。如果我们要学习的技术是开源的，那么很幸运，我们能得到源代码。这是一份终极资料。
+
 ## 思考问题的一个思维提纲
 
 1. 核心问题是什么？（只能有一个，如果有很多，找到最重要的那个）
