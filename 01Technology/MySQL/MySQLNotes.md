@@ -472,5 +472,10 @@ It pending to get the lock.
 ### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
 ### 通过MMM构建Mysql高可用集群系统
 ###  MySQL读写分离解决方案
-通过amoeba 实现MySQL读写分离
-通过keepalived构建高可用的amoeba服务
+* 通过amoeba 实现MySQL读写分离
+* 通过keepalived构建高可用的amoeba服务
+* MySQL-Proxy（官方）
+* Amoeba for MySQL
+* MaxScale
+* Atlas（360）, based on MySQL-Proxy 0.8.2
+* Cobar（Alibaba）
