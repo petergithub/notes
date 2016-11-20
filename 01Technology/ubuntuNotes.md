@@ -243,7 +243,6 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `nnoremap j VipJ`  
 `:map`	列出当前已定义的映射  
 
-
 #### vi regular expression 正则表达式
 元字符 	说明  
 `.` 	匹配任意字符  
@@ -263,7 +262,7 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `\s` 	匹配空白字符, 等同于[\t]  
 `\S` 	匹配非空白字符, 等同于[^\t]  
 
-一些普通字符需转意  
+一些普通字符需转义  
 元字符 	说明  
 `\*` 	匹配* 字符  
 `.` 	匹配. 字符  
@@ -292,7 +291,6 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `\s` space  
 `\n`,`\r\n` new line  
 `\t` tab  
-pattern `[^0-9]*,`	matches string start with non-number until to (,)  
 
 #### Replace
 `/`可以用`#`代替  
@@ -570,7 +568,7 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
   `find . -name '*.py' | xargs grep some_function`  
   `cat hosts | xargs -I {} ssh root@{} hostname`  
 
-### `crontab`
+### crontab
 To create a cronjob, just edit the crontab file: `crontab -e`.  
 It uses `/bin/sh`  
 `-l` 列出crontab文件  

@@ -5,6 +5,10 @@ https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended
 正则表达式入门
 http://deerchao.net/tutorials/regex/regex.htm#mission
 
+### Example
+`^[^#].*[^\s\s]$` 匹配中结尾不是两个空格的行, 修改mark down 文件  
+`[^0-9]*,`	matches string start with non-number until to (,)  
+
 ### 元字符
 表1.常用的元字符  
  代码 	说明  
