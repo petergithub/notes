@@ -44,17 +44,17 @@ man top
 http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb  
 
 
-send 100 requests with a concurency of 50 requests to an URL  
+send 100 requests with a concurrency of 50 requests to an URL  
 `ab -n 100 -c 50 http://www.example.com/`  
 
-send requests during 30 seconds with a concurency of 50 requests to an URL  
+send requests during 30 seconds with a concurrency of 50 requests to an URL  
 `ab -t 30 -c 50 URL http://www.example.com/`  
 
 
-execte `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`  
+execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`  
 `$((1 + RANDOM % 1000))` random number between 1 and 1000  
 
-Get Unix timestamp 	`date +%s` 1477998994  
+Get Unix time stamp 	`date +%s` 1477998994  
 Convert Unix timestamp to Date `date -d @1467540501`  
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
 `date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
@@ -132,6 +132,7 @@ ALT+Delete, and then press the up or down arrow key.
 ### VI
 命令提示 Command line completion with `CTRL-D` and `<TAB>`  
 `:help` help document  
+`:help cmdline-special` special character  
 Jump to a subject:  Position the cursor on a tag (e.g. |bars|) and hit `CTRL-]`  
 Jump back:  Type `CTRL-T` or `CTRL-O` (repeat to go further back)  
 
@@ -168,7 +169,8 @@ read the output of an external command.  For example, `:r !ls`  reads the output
 
 `:r FILENAME`  retrieves disk file FILENAME and puts it below the cursor position  
 `:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间  
-`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入:help :w）, 会提到命令:w!{cmd}, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. tee是一个把stdin保存到文件的小工具. 而%, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件    
+`:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入`:help :w`）, 会提到命令`:w!{cmd}`, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. `tee`是一个把stdin保存到文件的小工具. 而`%`, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件.  
+`:help cmdline-special` to see meaning of `%`  
 replace a character by a newline in Vim: Use `\r` instead of `\n`.  
 
 `.` 命令重复上次的修改.  
@@ -1156,20 +1158,22 @@ And here is what you get back:
 
 ### rsync
 `rsync -avPz src/ dest` Copy contents of `src/` to destination  
-`-a`  等于 `-rlptgoD`  
-        `-r` 是递归  
-        `-l` 是链接文件, 意思是拷贝链接文件;  
-        `-p` 表示保持文件原有权限  
-        `-t` 保持文件原有时间;  
-        `-g` 保持文件原有用户组  
-        `-o` 保持文件原有属主;  
-        `-D` 相当于块设备文件  
-`-z` 传输时压缩;  
-`-P` 等于 `--partial --progress`  
-       `--partial` 保留那些因故没有完全传输的文件, 以是加快随后的再次传输  
-       `--progress` 进度       
-`-v` 详细输出信息  
-`-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)  
+* `-a`  等于 `-rlptgoD`  
+* `-r` 是递归  
+* `-l` 是链接文件, 意思是拷贝链接文件;  
+* `-p` 表示保持文件原有权限  
+* `-t` 保持文件原有时间;  
+* `-g` 保持文件原有用户组  
+* `-o` 保持文件原有属主;  
+* `-D` 相当于块设备文件  
+
+* `-z` 传输时压缩;  
+* `-P` 等于 `--partial --progress`  
+* `--partial` 保留那些因故没有完全传输的文件, 以是加快随后的再次传输  
+* `--progress` 进度       
+
+* `-v` 详细输出信息  
+* `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)  
 
 ### mail
 mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null  
@@ -1294,7 +1298,7 @@ CTRL+a [	进入拷贝/回滚模式
 -c file	使用配置文件file, 而不使用默认的$HOME/.screenrc  
 screen -wipe命令清除死掉的会话  
 
-### `tcpdump`
+### tcpdump
 http://roclinux.cn/?p=2474  
 https://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html  
 tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包  
@@ -1302,7 +1306,7 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 
 `tcpdump -i eth0 -nn -X ‘port 53’ -c 1`  
 
-##### `tcpdump`常用选项
+##### 常用选项
 * `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡  
 * `-c` 是Count的含义，设置tcpdump抓几个包  
 * `-nn` 当tcpdump遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。比如，众所周知21端口是FTP端口，我们希望显示21，而非tcpdump自作聪明的将它显示成FTP  
@@ -1337,14 +1341,14 @@ Common usage:
 * 抓取所有经过eth1，目的网络是192.168，但目的主机不是192.168.1.200的TCP数据 `tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'`  
 
 
-* 抓取HTTP包 `tcpdump -i eth0 -XvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT"  
+* 抓取HTTP包 `tcpdump -i eth0 -lXvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT"  
 * 抓HTTP GET数据 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x47455420'`, GET的十六进制是47455420  
 * 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c  
 * 抓SSH返回 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x5353482D'` SSH-的十六进制是0x5353482D  
 * 抓包并保存,重放  
-	`nohup tcpdump -i eth0 -lXvvennSs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.log.bin &`  
+	`tcpdump -i eth0 -lXvvenns 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.log.bin &`  
 	`tcpdump -r tcpdump.log.bin`  
-	`tcpdump -i eno16780032 -nnvvvNXs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.log.bin`  	
+	`tcpdump -i eno16780032 -lXvvennNs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.log.bin`  	
 
 #### 过滤表达式  
 `man pcap-filter` packet filter syntax  
@@ -1378,7 +1382,7 @@ Common usage:
 * 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`  
 
 
-### `lsof`
+### lsof
 `lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.  
 
 ```
@@ -1415,7 +1419,7 @@ Parameters:
 * `-i` network  
 
 Samples:  
-List open files thread in order `lsof -n |awk '{print $2}'|sort|uniq -c |sort -nr| less`  
+List open files thread in order `lsof -n |awk '{print $1,$2}'|sort|uniq -c |sort -nr| head`  
 List processes which opened a specific file: `lsof /var/log/syslog`  
 List opened files under a directory: `lsof +D /var/log/`  
 List opened files based on process names starting with: `lsof -c ssh -c init`  
@@ -1535,6 +1539,20 @@ catalina.sh jpda start
 java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n -jar remoting-debug.jar  
 Listeningfor transport dt_socket at address: 8000  
 
+### LAMP
+https://askubuntu.com/questions/284971/how-to-run-php-web-application-in-lamp-server-and-how-to-do-mysql-connection  
+
+1. Install Apache: `sudo apt-get install apache2`
+2. Testing Apache: `http://localhost/`
+3. Install PHP: `sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt`
+4. Restart Apache: `sudo /etc/init.d/apache2 restart`
+5. Test PHP: `sudo echo "<?php phpinfo(); ?>" > /var/www/html/testphp.php`, then open `http://localhost/testphp.php` or execute the following command, which will make PHP run the code without the need for creating a file `php -r 'echo "\n\nYour PHP installation is working fine.\n\n\n";'`
+6. Install MySQL: `sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql`
+
+7. PHP Modules: check avaliable libraries: `apt-cache search php5-`, install `sudo apt-get install name of the module`
+
+libapache2-mod-auth-mysql php5-mysql
+
 ### Chinese input installation
 1.click dash home, search for "language support"  
 2.click "install/remove language" and add Chinese  
@@ -1595,8 +1613,23 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 10.	`top` ⟶  check overview  
 
 `dmesg | tail`	输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`  
-`vmstat 5 5`, `iostat-xz 1`  
-sysstat工具与负载历史回放  
+`sysstat`工具与负载历史回放  
+
+性能指标总结  
+http://blog.csdn.net/heyongluoyao8/article/details/51413668  
+1. CPU  
+* CPU利用率：us <= 70，sy <= 35，us + sy <= 70。
+* 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的。
+* 可运行队列：每个处理器的可运行队列<=3个线程。
+2. Memory  
+* swap in (si) == 0，swap out (so) == 0
+* 可用内存/物理内存 >= 30%
+3. Disk: Use% <= 90%
+4. Disk I/O: I/O等待的请求比例 <= 20%
+5. Network I/O: UDP包丢包率与TCP包重传率不能超过1%/s。
+6. Connect Num: <= 1024
+7. File Handle Num: num/max_num <= 90%
+
 
 ### CPU
 `lscpu` display information on CPU architecture  
@@ -1606,8 +1639,8 @@ sysstat工具与负载历史回放
 `w` - Find Out Who Is Logged on And What They Are Doing  
 
 #### 良好状态指标  
-* CPU利用率：User Time <= 70%，System Time <= 35%，User Time + System Time <= 70% (同时可以结合idle值来看，也就是%id，如果%id<=70% 则表示IO的压力较大)  
-* 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的  
+* CPU利用率：User Time <= 70%，System Time <= 35%，User Time + System Time <= 70% (同时可以结合idle值来看，也就是%id，如果%id<=70% 则表示IO的压力较大) `top`输出  
+* 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的 `cs` in `vmstat`  
 * 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue   
 * wa（wait）: 参考值：小于25%，超过25%的wa的值可以表示磁盘子系统可能没有被正确平衡，也可能是磁盘密集工作负载的结果，系统的磁盘或其它I/o可能有问题，可以通过iostat/sar -C命令进一步分解分析
 * r: 参考值：小于4，队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`  
@@ -1650,20 +1683,19 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 7.	`perf stat -a` -- sleep 10 ⟶  IPC, LLC hit ratio  
 htop can do 1-4  
 
-#### top, uptime
+#### top uptime
 `top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等. 因此通过这个命令, 可以相对全面的查看系统负载的来源. 同时, `top`命令支持排序, 可以按照不同的列排序, 方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等.  
 
 1. `uptime`  
 `23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02`  
-命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况. 通过这三个数据, 可以了解服务器负载是在趋于紧张还是区域缓解. 如果1分钟平均负载很高, 而15分钟平均负载很低, 说明服务器正在命令高负载情况, 需要进一步排查CPU资源都消耗在了哪里. 反之, 如果15分钟平均负载很高, 1分钟平均负载较低, 则有可能是CPU资源紧张时刻已经过去.   
-上面例子中的输出, 可以看见最近1分钟的平均负载非常高, 且远高于最近15分钟负载, 因此我们需要继续排查当前系统中有什么进程消耗了大量的资源. 可以通过下文将会介绍的`vmstat`、`mpstat`等命令进一步排查.   
+命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况. 通过这三个数据, 可以了解服务器负载是在趋于紧张还是区域缓解. 如果1分钟平均负载很高, 而15分钟平均负载很低, 说明服务器正在命令高负载情况, 需要进一步排查CPU资源都消耗在了哪里. 反之, 如果15分钟平均负载很高, 1分钟平均负载较低, 则有可能是CPU资源紧张时刻已经过去.  
 判断一个系统负载是否偏高需要计算单核CPU的平均负载, 等于这里uptime命令显示的系统平均负载 / CPU核数, 一般以0.7为比较合适的值. 偏高说明有比较多的进程在等待使用CPU资源  
 
 2. `top`  
 top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输入想要终止的PID, 就可以直接杀死指定进程  
 `RES`是常驻内存, 是进程切实使用的物理内存量  
 第3行: 当前的CPU运行情况:  
-`us`: 非nice用户进程占用CPU的比率  
+	`us, user`: 非nice用户进程占用CPU的比率  
 　　　　`sy, system`: 内核、内核进程占用CPU的比率;   
 　　　　`ni, nice`: 如果一些用户进程修改过优先级, 这里显示这些进程占用CPU时间的比率;   
 　　　　`id`: CPU空闲比率, 如果系统缓慢而这个值很高, 说明系统慢的原因不是CPU负载高;   
@@ -1683,13 +1715,13 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 `skill -STOP oracle` 可以使用用户、PID、命令或终端 id 作为参数  
 
 ### Memory
-良好状态指标  
-* swap in （si） == 0，swap out （so） == 0  
-* 应用程序可用内存/系统物理内存 <= 70%  (可用内存=系统free memory+buffers+cached)  
+#### 良好状态指标  
+* swap in （si） == 0，swap out （so） == 0  `si, so` in `vmstat`  
+* 应用程序可用内存/系统物理内存 >= 30%  (可用内存=系统free memory+buffers+cached) `free`  
 
-使用 `vmstat 2 3` 每隔2秒更新一次数据, 更新3次
 使用`sar -B`、`sar -r` 和 `sar -W`查看  
 `dmesg | grep oom-killer shows the OutOfMemory-killer at work`  
+`cat /proc/meminfo`  
 
 #### Momory troubleshooting
 [Linux系统排查1——内存篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4685629.html)  
@@ -1775,7 +1807,8 @@ slab的分布状况 `/proc/slabinfo`
 `cat /sys/block/sda/queue/rotational`	硬盘是否SSD, 0是SSD, 1是传统硬盘  
 
 #### 良好状态指标
-* `iowait` % < 20%  
+* Use% <= 90%
+* `iowait` % < 20%, `iostat -c 2 5` 查看 iowait 的值  
 * 提高命中率的一个简单方式就是增大文件缓存区面积，缓存区越大预存的页面就越多，命中率也越高  
 * Linux 内核希望能尽可能产生次缺页中断（从文件缓存区读），并且能尽可能避免主缺页中断（从硬盘读），这样随着次缺页中断的增多，文件缓存区也逐步增大，直到系统只有少量可用物理内存的时候 Linux 才开始释放一些不用的页  
 * 一般地系统I/O响应时间`await`应该低于5ms, 如果大于10ms就比较大了  
@@ -1783,7 +1816,6 @@ slab的分布状况 `/proc/slabinfo`
 * 如果`%util`超过60, 可能会影响IO性能; 如果到达100%, 说明硬件设备已经饱和.  
 * 如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）  
 
-`iostat -c 2 5` 查看 iowait 的值
 `iostat -xz 2 5`查看 svctm, await, util, avgqu-sz 的值
 使用`sar -b`、`sar -u` 和 `sar -d`查看
 
@@ -1852,7 +1884,7 @@ Listening open ports: `netstat -anp | grep PORT`
 #### 良好状态指标
 * 对于UDP, 接收、发送缓冲区不长时间有等待处理的网络包  
 * 对于TCP, 不会出现因为缓存不足而存在丢包的事，因为网络等其他原因，导致丢了包，协议层也会通过重传机制来保证丢的包到达对方。所以，tcp而言更多的专注重传率 `cat /proc/net/snmp | grep Tcp`
-
+* 连接数如果超过1024报警 `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`
 ##### UDP
 `netstat -lunp` 查看所有监听的UDP端口的网络情况, RecvQ、SendQ为0，或者不长时间有数值是比较正常的。
 `netstat -su` 查看丢包情况（网卡收到了，但是应用层没有处理过来造成的丢包）, packet receive errors 这一项数值增长了，则表明在丢包
@@ -1945,7 +1977,7 @@ Linux查看网卡数据吞吐量方法
 
 Listening open ports: `netstat -antup | grep PORT`  
 
-#### ss 
+#### ss
 short for Socket Statistics, 用来获取socket统计信息,显示和netstat类似的内容, ss命令是iproute工具集中的一员  
 从某种意义上说，iproute工具集几乎可以替代掉net-tools工具集，具体的替代方案是这样的：  
 
@@ -1972,7 +2004,7 @@ VLAN 			|	vconfig			| 	ip link
 
 	Total: 295 (kernel 312)
 	TCP:   48 (estab 1, closed 31, orphaned 0, synrecv 0, timewait 0/0), ports 13
-	
+
 	Transport Total     IP        IPv6
 	*         312       -         -
 	RAW       0         0         0
@@ -2013,7 +2045,7 @@ Redhat/CentOS版本 : `cat /etc/redhat-release`
 [系统性能评估标准](http://blog.csdn.net/hguisu/article/details/39373311 )
              好	                            |      坏	              	|	糟糕
 ----|---------------------------------------|---------------------------|--------------------
-CPU	|	user% + sys%< 70%			      	|	user% + sys%= 85%		|	user% + sys% >=90% 
+CPU	|	user% + sys%< 70%			      	|	user% + sys%= 85%		|	user% + sys% >=90%
 内存	|	"Swap In（si）＝0  Swap Out（so）＝0"	|	Per CPU with 10 page/s	|	More Swap In & Swap Out		
 磁盘	|	iowait % < 20%						|	iowait % =35%	        |	iowait % >= 50%
 
@@ -2021,7 +2053,8 @@ CPU	|	user% + sys%< 70%			      	|	user% + sys%= 85%		|	user% + sys% >=90%
 ### 状态采集工具
 讲究点, 要用来出报告的, 用`Zabbix`之类.  
 `ulimit -n` 查看系统默认的最大文件句柄数，系统默认是1024  
-`lsof -n|awk '{print $1,$2}'|sort|uniq -c|sort -nr|less` 查看当前进程打开了多少句柄数, 第一列是打开的句柄数，第二列是进程ID  
+`lsof -n|awk '{print $1,$2}'|sort|uniq -c|sort -nr|head` 查看当前进程打开了多少句柄数, 第一列是打开的句柄数，第二列是进程ID  
+查看连接数(超过1024即较高) `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`  
 
 #### dstat
 实时观察的, 对得够齐, 单位能自动转换. 不过`dstat`需要安装(`yum install dstat`)  
@@ -2036,38 +2069,39 @@ dstat: 默认, 已有足够信息
 ``` bash
 
 	$ vmstat 2 3
-	procs ---------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+	procs ---------memory---------- 	---swap-- -----io---- -system-- ------cpu-----
 	 r  b swpd   free      buff  cache   si   so    bi    bo   in   cs  us sy id wa st
 	34  0    0 200889792  73708 591828    0    0     0     5    6   10  96  1  3  0  0
 	32  0    0 200889920  73708 591860    0    0     0   592 13284 4282 98  1  1  0  0
 	32  0    0 200890112  73708 591860    0    0     0     0 9501  2154 99  1  0  0  0
 ```
 
+Part `FIELD DESCRIPTION FOR VM MODE` in `man vmstat`  
 procs（进程）:  
-* r, run queue: 运行队列中进程数量  
+* r, run queue: 运行队列中进程数量(就是说多少个进程真的分配到CPU, 当这个值超过了CPU数目，就会出现CPU瓶颈了)  
 * b, blocked: 等待IO的进程数量  
 
 memory（内存）:  
-* swpd: 使用虚拟内存大小  
-* free: 可用内存大小  
+* swpd: 虚拟内存已使用大小，如果大于0，表示你的机器物理内存不足了，如果不是程序内存泄露的原因，那么你该升级内存了或者把耗内存的任务迁移到其他机器  
+* free: 空闲的物理内存的大小  
 * buff: 用作缓冲的内存大小  
 * cache: 用作缓存的内存大小  
 
 swap:  
-* si, swap in: 每秒从交换区写到内存的大小, 从 SWAP 读取到 RAM  
-* so, swap out: 每秒写入交换区的内存大小, 从 RAM 写到 SWAP  
+* si: Amount of memory swapped in from disk (/s). 每秒从磁盘读入虚拟内存的大小，如果这个值大于0，表示物理内存不够用或者内存泄露了  
+* so: Amount of memory swapped to disk (/s)，如果这个值大于0，同上  
 
 io：（现在的Linux版本块的大小为1024bytes）  
-* bi: 每秒读取的块数(数据从磁盘读入内存)  
-* bo: 每秒写入的块数  
+* bi: 块设备每秒接收的块数量(数据从磁盘读入内存)，这里的块设备是指系统上所有的磁盘和其他块设备，默认块大小1024byte  
+* bo: 块设备每秒发送的块数量，例如我们读取文件，bo就要大于0。bi和bo一般都要接近0，不然就是IO过于频繁，需要调整  
 
 system：  
 * in, interrupts: 每秒中断数，包括时钟中断  
-* cs, context switch: 每秒上下文切换数  
+* cs, context switch: 每秒上下文切换数, 值要越小越好，太大了，要考虑调低线程或者进程的数目  
 
 cpu（以百分比表示）  
-* us, user time: 用户进程执行时间  
-* sy, system time: 系统进程执行时间  
+* us, user time: 用户进程执行时间占比(%)，例如在做高运算的任务时，如加密解密，那么会导致us很大，这样，r也会变大，造成系统瓶颈  
+* sy, system time: 系统进程执行时间占比(%)，如果太高，表示系统调用时间长，如IO频繁操作  
 * id: 空闲时间(包括IO等待时间)  
 * wa: 等待IO时间  
 
@@ -2080,7 +2114,7 @@ cpu（以百分比表示）
 上述这些CPU时间, 可以让我们很快了解CPU是否出于繁忙状态. 一般情况下, 如果用户时间和系统时间相加非常大, CPU出于忙于执行指令. 如果IO等待时间很长, 那么系统的瓶颈可能在磁盘IO.  
 示例命令的输出可以看见, 大量CPU时间消耗在用户态, 也就是用户应用程序消耗了CPU时间. 这不一定是性能问题, 需要结合r队列, 一起分析.  
 
-####  `iostat` Average CPU Load, Disk Activity
+####  iostat - Average CPU Load, Disk Activity
 主要用于查看机器磁盘IO情况. iostat命令属于sysstat工具包  
 `iostat 2 3`  
 参数:  
@@ -2135,29 +2169,28 @@ cpu属性值说明:
 
 #### sar (System Activity Recorder) - Collect and Report System Activity
 `sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放  
-可以查看网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.  
+可以查看CPU、内存和磁盘记录, 网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.  
 
-1. 查看CPU、内存和磁盘记录. 默认情况下, sar命令显示当天的统计信息  
-
-* `sar -u 2 5` CPU统计信息  Report CPU utilization for each 2 seconds. 5 lines are displayed.  
-* `sar -r 2 5`显示收集的内存记录  
-* `sar -b 2 5`显示磁盘I/O  
-* `sar -W`：查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降；服务器状况不良时，如果怀疑因为内存不足而导致了页面交换的发生，可以使用这个命令来确认是否发生了大量的交换.  
+* `sar 2 5`: for each 2 seconds. 5 lines are displayed.    
+* `-b` 显示磁盘I/O, Report I/O and transfer rate statistics
+* `-d` Report activity for each block device
+* `-r` 显示收集的内存记录  
+* `-u` CPU统计信息  Report CPU utilization
+* `-n` Report network statistics
+* `-W` 查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降, 则服务器状况不良  
     pswpin/s：每秒系统换入的交换页面（swap page）数量  
     pswpout/s：每秒系统换出的交换页面（swap page）数量  
-要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来；  
+* `-e [ hh:mm:ss ]` Set the ending time of the report
+* `-s [ hh:mm:ss ]` Set the starting time of the report, `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录  
+* `-f [ filename ]` records from filename (created by the -o filename flag), file location: /var/log/sysstat/sadd or `/var/log/sa/sadd`, sysstat工具只存储1个月内的系统使用记录, 每天的记录以sadd为文件名保存. `sar -f /var/log/sysstat/sa08`查看本月8号的CPU使用记录  
+
+1. 要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来  
 * 怀疑CPU存在瓶颈，可用 `sar -u` 和 `sar -q` 等来查看  
 * 怀疑内存存在瓶颈，可用 `sar -B`、`sar -r` 和 `sar -W` 等来查看  
 * 怀疑I/O存在瓶颈，可用 `sar -b`、`sar -u` 和 `sar -d` 等来查看  
 
-2. 查看指定时间、指定日期的历史记录 参数`-s`和`-e`限定查看的时间  
-
-* `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录  
-* `-f` 查看本月内之前某一天的历史统计信息, sysstat工具只存储1个月内的系统使用记录, 每天的记录以saN为文件名保存在 `/var/log/systat/saN` or `/var/log/sa/saN`  
-* `sar -f /var/log/sysstat/sa08` 查看本月8号的CPU使用记录  
-
 3. 查看网络状态 `sar -n DEV 1`  
-`-n`参数有6个不同的开关: DEV | EDEV | NFS | NFSD | SOCK | ALL. DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了   
+`-n`参数有6个不同的关键字: DEV | EDEV | NFS | NFSD | SOCK | ALL. DEV显示网络接口信息, EDEV显示关于网络错误的统计数据, NFS统计活动的NFS客户端的信息, NFSD统计NFS服务器的信息, SOCK显示套接字信息, ALL显示所有5个开关. 它们可以单独或者一起使用. 我们现在要用的就是`-n DEV`了   
 
 * `IFACE`: LAN接口   
 * `rxpck/s`: 每秒钟接收的数据包    
