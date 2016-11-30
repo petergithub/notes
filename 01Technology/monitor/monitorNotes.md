@@ -214,3 +214,12 @@ Dapper是Google生产环境下的分布式跟踪系统，Dapper有三个设计�
 Drapper的日志格式：  
 dapper用span来表示一个服务调用开始和结束的时间，也就是时间区间。
 dapper记录了span的名称以及每个span的ID和父ID，如果一个span没有父ID被称之为root span。所有的span都挂在一个特定的trace上，共用一个traceID，这些ID用全局64位整数标示。
+
+## 再谈系统 Monitoring 和 Alerting
+朱赟 [嘀嗒嘀嗒] (https://mp.weixin.qq.com/s?__biz=MzA4ODgwNjk1MQ==&mid=2653788488&idx=1&sn=284ed9cf28461cee25ce4c9ddfa2e271&chksm=8bfdba00bc8a33160598fb3d9f06ec8785e736f8a132bc57ab987aa77bafbf0b89a5d77b1d10&mpshare=1&scene=23&srcid=1122rhD6YOujJreDU2ZXKKNN#rd )
+1. Syslog 或 Kibana Log：也就是系统的日志.  日志系统的架构经过多年的演变，现在比较流行的一种应该是 ELK (ElasticSearch-LogStash-Kibana) 架构了
+2. Hive 或者 DB Persisted Event：可以做比较详尽的 Event Tracking。这个根据不同的使用场景可以做的特别 Powerful。但是需要搭建比较完善的 Event Pipeline 和 Processing System。量大以后 Scalability 的处理也很重要。对工程师的要求比较高，尤其是在 Infrastructure 方面
+3. Datadog：可以记录一些系统的 Statistic。打个比方。对一个 Charge 函数。可以入口的时候设一个计数器，出口的时候为成功的 Charge 和失败的 Charge 各设一个计数器。这样就可以用图表追踪 Charge 成功的 Rate。并且可以进一步设置一个 Alert，当这个 Rate 低于 99.9% 的时候就 Fire Alarm。Datadog 还可以做一些很细致的统计、画图和警报。很多公司都有大屏幕用 Datadog 实时 Monitor 系统的核心 Metrics。
+4. Sentry 和 NewRelic：主要是实时 Track 系统的 Error 和异常。对一些 API 或者 Client、Server Error 进行 Aggregation。很多公司 Oncall 必不可少的监测手段。
+5. 基于机器学习或者数学模型建立的 Alert 系统：比如之前《公司里的 Data Scientist（数据科学家）》一文中提过的我们建立的一个异常监测系统就属于这一类。
+6. 基于 DB Trigger 的 Auditing Trail：记录所有的 DB 改动，可以还原所有数据库写操作的历史。
