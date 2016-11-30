@@ -21,6 +21,19 @@ concurrent: 主内存.寄存器是是运行时?
 	>-------------->>
 
 ## Java问题排查工具箱 
+
+### java.net.SocketException 异常
+https://www.ibm.com/developerworks/community/blogs/738b7897-cd38-4f24-9f05-48dd69116837/entry/understanding_some_common_socketexceptions_in_java3?lang=en  
+http://developer.51cto.com/art/201003/189724.htm  
+
+1. java.net.SocketException: Broken pipe (UNIX)
+A broken pipe error is seen when the remote end of the connection is closed gracefully.
+Solution: This exception usually arises when the socket operations performed on either ends are not sync'ed.
+
+2. java.net.SocketException: reset by peer.  This error happens on server side
+3. java.net.SocketException: Connection reset. This error happens on client side
+This exception appears when the remote connection is unexpectedly and forcefully closed due to various reasons like application crash, system reboot, hard close of remote host. Kernel from the remote system sends out a packets with RST bit to the local system. The local socket on performing any SEND (could be a Keep-alive packet) or RECEIVE operations subsequently fail with this error. Certain combinations of linger settings can also result in packets with RST bit set.
+
 ### 高CPU占用分析
 http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 一个应用占用CPU很高，除了确实是计算密集型应用之外，通常原因都是出现了死循环  
@@ -72,6 +85,10 @@ https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c
 `gperf` Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。  
 
 除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file> 这样的参数必须是启动参数的标配。  
+
+jvm log 时间格式
+打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
+打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`  
 
 ### ClassLoader相关工具
 作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是`-XX:+TraceClassLoading`，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用`jar -tvf *.jar`这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。  
