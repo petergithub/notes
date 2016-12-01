@@ -2,12 +2,25 @@
 
 https://en.wikipedia.org/wiki/Regular_expression#POSIX_basic_and_extended
 
-正则表达式入门
-http://deerchao.net/tutorials/regex/regex.htm#mission
-
 ### Example
 `^[^#].*[^\s\s]$` 匹配中结尾不是两个空格的行, 修改mark down 文件  
 `[^0-9]*,`	matches string start with non-number until to (,)  
+
+## filename
+http://www.interlude.org.uk/unix/Unix%20Reg%20exp%20stuff.htm  
+Matching file names with regular expressions  
+You can use the following metacharacters within any shell to create regular expressions that match file names.  
+* `?`       matches any single character
+* `*`       matches any number of any characters
+* `[nnn]`   matches any of the enclosed characters
+* `[!nnn]`  matches any character that is not enclosed
+* `[n-n]`   matches any character in this range
+
+example: `ls *.fm`, `rm prog.?`, `cp [pP]art[0-9] ../book`  
+
+
+## 正则表达式入门
+http://deerchao.net/tutorials/regex/regex.htm#mission
 
 ### 元字符
 表1.常用的元字符  
