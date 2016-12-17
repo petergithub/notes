@@ -1,7 +1,11 @@
 
 # Monitor Notes
-
-
+## Tools
+javamelody https://github.com/javamelody/javamelody/wiki
+Is there a free and open source On-Prem alternative to NewRelic available for use in Java apps? https://www.reddit.com/r/java/comments/4ph65q/is_there_a_free_and_open_source_onprem/  
+Glowroot Open source Java APM https://glowroot.org/  
+metrics http://metrics.dropwizard.io/3.1.0/  
+http://blog.takipi.com/java-performance-monitoring-5-open-source-tools-you-should-know/  
 
 ## Think
 如果你正在开发的是Web系统，那么你不应当只把程序写完往服务器一扔就完事，而至少应当清楚一系列数据：
