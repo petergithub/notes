@@ -12,7 +12,7 @@ SELECT FROM_UNIXTIME(1467542031);
 select SUBSTRING(1456958130210,1,10);  
 
 show full processlist;  
-explain sql query;  
+`explain SQL` query;  then `show warings` to get the raw SQL clause
 
 MySQL压力测试  
 1. mysqlslap的介绍及使用  

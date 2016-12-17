@@ -40,10 +40,10 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 1. `top -H`
 2. 找到具体是CPU高占用的线程 `ps -mp <PID> -o THREAD,tid,time,rss,size,%mem`
 3. 将需要的线程ID转换为16进制格式 `printf "%x\n" tid`
-4. 打印线程的堆栈信息 `jstack PID |grep tid -A 30`  
+4. 打印线程的堆栈信息 `jstack PID | grep tid -A 30`  
 
 ### 检查步骤
-查看java线程在内存增长时线程数 `jstack PID |grep 'java.lang.Thread.State' |wc -l` 或者 `cat /proc/pid/status |grep Thread`
+查看java线程在内存增长时线程数 `jstack PID | grep 'java.lang.Thread.State' | wc -l` 或者 `cat /proc/pid/status | grep Thread`
 
 用pmap查看进程内的内存情况，观察java的heap和stack大小 `pmap -x pid |less`
 
