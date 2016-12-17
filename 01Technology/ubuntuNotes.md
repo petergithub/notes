@@ -12,6 +12,9 @@ ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Ente
 其原理是, `~`符号是ssh命令中的转义字符, 就像我们平时编程中使用的`\`一样. 通过在ssh连接中输入`~?,` 你可以看到完整的命令帮助.  
 `reset` 恢复出现问题的屏幕  
 
+Convert a number from hexadecimal to decimal: `echo $((0xFF))`
+Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
+
 man readline to get more information:  
 Question: Cancel failed reverse-i-search in bash but keep what I typed in  
 
@@ -129,7 +132,7 @@ ALT+Delete, and then press the up or down arrow key.
 
 
 ## Basic Command
-### VI
+### vi
 命令提示 Command line completion with `CTRL-D` and `<TAB>`  
 `:help` help document  
 `:help cmdline-special` special character  
@@ -461,8 +464,39 @@ awk扫描filename中的每一行, 对符合模式pattern的行执行操作action
     `awk 'pattern' filename`   显示所有符合模式pattern的行  
     `awk '{action}' filename`   对所有行执行操作action  
     `awk '{action}'`           从命令行输入数据  
+    `awk '/search pattern1/ {Actions} /search pattern2/ {Actions}' file`
 awk还支持命令文件 `awk -f awk_file data_file`  
 `awk -v RS="?" filename`  
+
+Initialization and Final Action  
+
+```
+
+	Syntax: 
+	BEGIN { Actions}
+	{ACTION} # Action for everyline in a file
+	END { Actions }
+	
+	# is for comments in Awk
+```
+
+example:  
+
+```
+
+	$ awk 'BEGIN {print "Name\tDesignation\tDepartment\tSalary";}
+	> {print $2,"\t",$3,"\t",$4,"\t",$NF;}
+	> END{print "Report Generated\n--------------";
+	> }' employee.txt
+	Name	Designation	Department	Salary
+	Thomas 	 Manager 	 Sales 	         $5,000
+	Jason 	 Developer 	 Technology 	 $5,500
+	Sanjay 	 Sysadmin 	 Technology 	 $7,000
+	Nisha 	 Manager 	 Marketing 	 $9,500
+	Randy 	 DBA 	 	 Technology 	 $6,000
+	Report Generated
+	--------------
+```
 
 #### 变量
 内建的字段变量  
@@ -475,7 +509,7 @@ $2 $0上第二个字段的数据
 `NF` (Number of Fields) 	整数, 其值表$0上所存在的字段数目  
 `NR` (Number of Records)	整数, 其值表awk已读入的数据行数目  
 `FILENAME`				awk正在处理的数据文件文件名  
-`FS` (field seporator)	FS default as space and tab. `FS="\n"` take "\n" as seporator, `-F \t` take tab as seporator  
+`FS` (field separator)	FS default as space and tab. `FS="\n"` take "\n" as separator, `-F \t` take tab as separator  
 `RS` (Record Separator)	awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.  
 `awk -v RS=""` 按空白行切分文件成Records  
 `awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records  
@@ -520,6 +554,8 @@ awk 中提供下列 关系运算符(Relation Operator)
 	`A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.  
 
 	`||` or, `&&` and, `!` not  
+
+
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`  
 `$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).  
@@ -545,6 +581,47 @@ awk 中提供下列 关系运算符(Relation Operator)
     语句  
 
 awk 中大部分指令与 C 语言中的用法一致  
+例子:  
+http://www.thegeekstuff.com/2010/02/awk-conditional-statements  
+
+1. Awk If Else  
+
+	awk '{
+	if ($3 >=35 && $4 >= 35 && $5 >= 35)
+		print $0,"=>","Pass";
+	else
+		print $0,"=>","Fail";
+	}' student-marks
+
+2. Awk If Else If  
+
+```
+	
+	$ cat grade.awk
+	{
+	total=$3+$4+$5;
+	avg=total/3;
+	if ( avg >= 90 ) grade="A";
+	else if ( avg >= 80) grade ="B";
+	else if (avg >= 70) grade ="C";
+	else grade="D";
+	
+	print $0,"=>",grade;
+	}
+	$ awk -f grade.awk student-marks
+	Jones 2143 78 84 77 => C
+	Gondrol 2321 56 58 45 => D
+```
+
+3. Awk Ternary ( ?: )   
+```
+
+	$ awk 'ORS=NR%3?",":"\n"' student-marks
+	Jones 2143 78 84 77,Gondrol 2321 56 58 45,RinRao 2122 38 37
+	Edwin 2537 87 97 95,Dayan 2415 30 47,
+```
+
+`ORS` gets appended after every line that gets output  
 
 #### awk 的内建函数(Built-in Functions)
 1. index( 原字串, 找寻的子字串 )
@@ -1708,6 +1785,12 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 　　wa低, id高, 可以排除CPU资源瓶颈的可能  
 　　wa高, 说明I/O占用了大量的CPU时间, 需要检查交换空间的使用, 交换空间位于磁盘上, 性能远低于内存, 当内存耗尽开始使用交换空间时, 将会给性能带来严重影响, 所以对于性能要求较高的服务器, 一般建议关闭交换空间. 另一方面, 如果内存充足, 但wa很高, 说明需要检查哪个进程占用了大量的I/O资源.  
 
+`Shift+P` sort by CPU utilization
+`Shift+M` sort by Memory utilization
+`Shift+H` toggle the visibility of threads  
+`Shift+K` see kernel threads  
+
+
 `skill` 和 `snice`  
 如果您发现了一个占用大量 CPU 和内存的进程，但又不想停止它，该怎么办  
 `skill -STOP PID` 冻结 not kill it  
@@ -2377,11 +2460,12 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `cd && tar czv src | ssh user@host 'tar xz'`	将$HOME/src/目录下面的所有文件, 复制到远程主机的$HOME/src/目录  
 `ssh user@host 'tar cz src' | tar xzv`	将远程主机$HOME/src/目录下面的所有文件, 复制到用户的当前目录  
 `ssh user@host 'ps ax | grep [h]ttpd'`	查看远程主机是否运行进程httpd  
+`ssh user@host 'bash -s' < local_script.sh` execute the local script on the remote server  
 
 `yes | pv | ssh $host "cat > /dev/null"`	实时SSH网络吞吐量测试 通过SSH连接到主机, 显示实时的传输速度, 将所有传输数据指向/dev/null, 需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)  
 `yes | pv | cat > /dev/null`  
 
-`ssh host -l user "cat cmd.txt"`	通过SSH运行复杂的远程shell命令  
+`ssh user@host -l user "cat cmd.txt"`	通过SSH运行复杂的远程shell命令  
 `mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"`	通过SSH将MySQL数据库复制到新服务器  
 
 `ssh -oStrictHostKeyChecking=no user@host` you will not be prompted to accept a host key but with some waring sometimes.  
@@ -2633,4 +2717,21 @@ Here, only the most important directories in the system will be presented.
 可执行文件->/usr/bin; /usr/local/bin  
 而有的软件为了和系统组件分隔开, 选择栖息于 /opt, 但目录结构往往是一样的, 把/usr或/usr/local 替换为了/opt/"软件名"  
 ~/share all softwares  
-~/opt soft links to specify version of ~/share softwares  
+~/opt softwares  
+
+### Source code
+https://peteris.rocks/blog/htop/#source-code  
+```
+	
+	$ which uptime
+	/usr/bin/uptime
+	$ dpkg -S /usr/bin/uptime
+	procps: /usr/bin/uptime
+```	
+Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.  
+You can then go to packages.ubuntu.com and search for the package there.  
+Here is the page for procps: http://packages.ubuntu.com/source/xenial/procps  
+If you scroll to the bottom of the page, you'll see links to the source code repositories:  
+* Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
+* Debian Package Source Repository (Browsable) https://anonscm.debian.org/cgit/collab-maint/procps.git/
+
