@@ -47,7 +47,7 @@ git pull all the projects in the folder
 	done
 ```
 
-####tag
+#### tag
 `git tag -m "comment" <tagName>`  
 `git tag -a <tagName> <commit-id>`  
 `git show <tagName>`	查看相应标签的版本信息，并连同显示打标签时的提交对象  
@@ -169,7 +169,7 @@ Add hooks for `git merge` and `git checkout`
 ### git auto complete　自动补全
 download git-completion.bash from source code and load it from .bashrc
 ```
-wget https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
+wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
 
 if [ -f ~/.git-completion.bash ]; then
         . ~/.git-completion.bash

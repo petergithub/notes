@@ -298,21 +298,17 @@ mysql -uroot -p密码 < c:\\school.sql
 MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)  
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
 备份文件中的“--”字符开头的行为注释语句；以“/*!”开头、以“*/”结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
-``` sql
-mysqldump -u USERNAME -p database_name > outfile_name.sql
-mysqldump -uroot --default-character-set=utf8 --hex-blob dbName > dbName.sql
--d 没有数据 
---hex-blob 为有blob数据做的,防止乱码和导入失败用
---add-drop-table 在每个create语句之前增加一个drop table
---no-create-info, -t Do not write CREATE TABLE statements that re-create each dumped table.
---default-character-set=utf8 带语言参数导出
 
---single-transaction	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. . It is useful only with transactional tables such as InnoDB
-
---lock-tables=false , -l	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, --single-transaction is a much better option, because it does not need to lock the tables at all.
-
---where/-w `mysqldump -uroot -p123456 meteo sdata --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
-```
+`mysqldump -u USERNAME -p database_name > outfile_name.sql`  
+`mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName > dbName.sql`  
+* `-d` 没有数据 
+* `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
+* `--add-drop-table` 在每个create语句之前增加一个drop table
+* `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
+* `--default-character-set=utf8` 带语言参数导出
+* `--single-transaction`	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
+* `--lock-tables=false , -l`	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
+* `--where/-w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
 
 #### Import/Restore
 `mysql> USE 数据库名;`  

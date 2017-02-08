@@ -48,8 +48,9 @@ dir "/data/software/redis-account"
 `redis-server redis.master6379.conf --daemonize yes`  redis-server in background as a daemon thread 
 `redis-server sentinel.26379.conf --sentinel --daemonize yes` or `redis-sentinel sentinel.26379.conf --daemonize yes`
 
-shutdown: `redis-cli shutdown` or `redis-server stop`
-restart: `redis-server restart`
+shutdown redis server: `redis-cli shutdown` or `redis-server stop`  
+restart redis server: `redis-server restart`  
+shutdown redis sentinel: `redis-cli -h localhost -p 26379 shutdown`
 
 ### 常规操作命令
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)
