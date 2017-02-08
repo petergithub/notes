@@ -62,6 +62,7 @@ Convert Unix timestamp to Date `date -d @1467540501`
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
 `date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
 `date -d '1 hours ago' "+%F"` 2016-11-01  
+`date -d now "+%Y%m%d %H:%M:%S"`
 `date +%Y%m%d%H%M%S` 20161101191653  
 
 `foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
@@ -383,6 +384,9 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 `find . -name dfc.properties`  
 delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`  
 
+`find * -type f | grep fileName`	查找文件并列出相对路径  
+`ls -R | grep fileName` 只是列出文件名  
+
 #### 文件个数 count files in directory recursively
 `find . -type f | wc -l`  
 `la -lR | grep "^-" | wc -l`  
@@ -646,6 +650,28 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
   `find . -name '*.py' | xargs grep some_function`  
   `cat hosts | xargs -I {} ssh root@{} hostname`  
+
+### kill
+
+refer to https://unix.stackexchange.com/questions/169898/what-does-kill-0-do  
+> man 2 kill  
+...  
+If sig is 0, then no signal is sent, but error checking is still performed; this can be used to check for the existence of a process ID or process group ID.
+
+So signal 0 will not actually in fact send anything to your process's PID, but will in fact check whether you have permissions to do so.
+
+``` bash
+
+	#!/bin/bash
+	
+	PID=$(pgrep sleep)
+	if ! kill -0 $PID 2>/dev/null; then 
+	  echo "you don't have permissions to kill PID:$PID"
+	  exit 1
+	fi
+	
+	kill -9 $PID
+```
 
 ### crontab
 To create a cronjob, just edit the crontab file: `crontab -e`.  
@@ -1147,6 +1173,10 @@ uniq 去除排序过的文件中的重复行, 因此uniq经常和sort合用. 也
 * `-i`  : 忽略大小写字符的不同;  
 * `-c`  : 进行计数  
 * `-u`  : 只显示唯一的行  
+Sample:  
+删除交集，不同的部分放到一个新文件中	`cat list.txt list.txt.old | sort | uniq -u > list.txt.new`  
+取出两个文件的并集,重复的行只保留一份	`cat file1 file2 | sort | uniq > file3`  
+取出两个文件的交集,只留下同时存在于两个文件中的文件	`cat file1 file2 | sort | uniq -d >file3`  
 
 cut命令可以从一个文本文件或者文本流中提取文本列  
 `cut -d '分隔字符' -f fields` 用于有特定分隔字符  
@@ -1232,6 +1262,9 @@ And here is what you get back:
 	time_starttransfer:  0.092
 	                   ----------
 	        time_total:  0.164
+
+#### options
+* `-u, --USER` username:password  
 
 ### rsync
 `rsync -avPz src/ dest` Copy contents of `src/` to destination  
