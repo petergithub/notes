@@ -28,28 +28,38 @@ sudo apt-get update # This is very important step to update system first.
 ## In Ubuntu, /bin/sh is link to Dash default. Change it to /bin/bash
 # sudo dpkg-reconfigure dash
 
-########## Config GVim BEGIN ##########
+## auto mount your NTFS disk: Install pysdm or ntfs-config for Ubuntu 14.04
+# vi /etc/fstab
+# /path/to/disk /dev/sda5 /media/pu/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
+
+########## GVim config: clone configuration files from stash ##########
 sudo apt-get install vim-gnome
+
 ## update configuration to make cut/copy/paste like Windows
 #cp /usr/share/vim/vim74/vimrc_example.vim .vimrc
 #echo "source \$VIMRUNTIME/mswin.vim" >> .vimrc
 #echo "behave mswin" >> .vimrc
+
 ## place the backup file into tmp
-echo "set backupdir=/tmp,." >> .vimrc
-echo "set directory=/tmp,." >> .vimrc
+#echo "set backupdir=/tmp,." >> .vimrc
+#echo "set directory=/tmp,." >> .vimrc
 ##" set encoding
-echo "set termencoding=utf-8" >> .vimrc
-echo "set encoding=utf-8" >> .vimrc
-echo "set fileencoding=utf-8" >> .vimrc
-echo "set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1" >> .vimrc
+#echo "set termencoding=utf-8" >> .vimrc
+#echo "set encoding=utf-8" >> .vimrc
+#echo "set fileencoding=utf-8" >> .vimrc
+#echo "set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1" >> .vimrc
 
 # :w !sudo tee % ##saving file as sudo when forgot to start vim using sudo
-echo "command W w !sudo tee % > /dev/null" >> .vimrc	## take W as a shortcut
+#echo "command W w !sudo tee % > /dev/null" >> .vimrc	## take W as a shortcut
 ## gvim fileName # open file with gvim
 ## update default editor from nano to vim when less/more
-echo 'export EDITOR=vim' >> ~/.bash_profile
+#echo 'export EDITOR=vim' >> ~/.bashp
+
+## Make configuration effective
+echo ". ~/.bashp" >> ~/.bashrc
+#echo ". ~/.bashwork" >> ~/.bashrc
 source ~/.bashrc
-########## Config GVim END ##########
+########## GVim config END ##########
 
 ########## tools BEGIN ##########
 sudo apt-get install nautilus-open-terminal # open terminal here
@@ -60,7 +70,7 @@ sudo apt-get update
 sudo apt-get install nautilus-gksu
 nautilus -q
 sudo apt-get install trash-cli
-echo del='trash-put' >> ~/.bash_profile
+echo del='trash-put' >> ~/.bashp
 #sudo apt-get install gconf-editor
 # install flash plugin for firefox
 #sudo apt-get install flashplugin-nonfree
@@ -69,8 +79,8 @@ sudo apt-get -y install p7zip p7zip-full p7zip-rar
 
 ## put shortcut
 mkdir bin
-#echo export PATH=.:~/bin:\$PATH >> ~/.bash_profile
-#echo "Download .bash_profile from https://github.com/petergithub/configuration/blob/master/.bash_profile"
+#echo export PATH=.:~/bin:\$PATH >> ~/.bashp
+#echo "Download .bashp from https://github.com/petergithub/configuration/blob/master/.bashp"
 ########## tools END ##########
 
 ########## development tools BEGIN ##########
@@ -102,6 +112,7 @@ apt-get update && apt-get install sysstat
 
 ########## wine BEGIN ##########
 ## https://wiki.winehq.org/Ubuntu
+## winecfg: wine configuration
 sudo add-apt-repository ppa:wine/wine-builds
 sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
@@ -133,9 +144,9 @@ sudo apt-get install maven
 #$ echo $JAVA_HOME
 #//show nothing
 #vim ~/.bashrc add lines or using >>
-echo export JAVA_HOME=~/opt/java >> ~/.bash_profile
-echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bash_profile
-echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bash_profile
+echo export JAVA_HOME=~/opt/java >> ~/.bashp
+echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bashp
+echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bashp
 ##restart terminal or source ~/.bashrc or . ~/.bashrc
 source ~/.bashrc
 
@@ -210,22 +221,30 @@ sudo apt-get install dconf-editor
 ########### Disable auto-opening nautilus window after auto-mount USB
 gsettings set org.gnome.desktop.media-handling automount-open false
 
-
-########### CacheBrowser https://cachebrowser.info/#/download
-#sudo apt-get install python-setuptools
-#sudo apt-get install python-dev
-
-########### virtual box
-#virtual box connect usb:	`sudo adduser <user> vboxusers`
-#add user to group vboxsf:	`sudo usermod -a -G vboxsf <user>`
-
 ########### set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
 #sudo vi /etc/default/grub
 #update seconds: GRUB_HIDDEN_TIMEOUT=1
 #sudo update-grub
 
+
+########### Linux Tools
+## Calibre: calibre is a powerful and easy to use e-book manager.
+## Binary install https://calibre-ebook.com/download_linux
+sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.py | sudo python -c "import sys; main=lambda:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
+
+## CacheBrowser https://cachebrowser.info/#/download
+#sudo apt-get install python-setuptools
+#sudo apt-get install python-dev
+
+## virtual box
+#virtual box connect usb:	`sudo adduser <user> vboxusers`
+#add user to group vboxsf:	`sudo usermod -a -G vboxsf <user>`
+
 ## 安装ubuntu受限的额外的解码器
 sudo apt-get install ubuntu-restricted-extras
+
+## Transmission 
+## Transmission is a cross-platform BitTorrent client https://transmissionbt.com/about/
 
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
 #make PREFIX=/path/to/target >& make.log &
