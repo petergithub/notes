@@ -1194,13 +1194,22 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 
 ### curl
 查看网页源码 `curl www.sina.com`  
-	保存网页`curl -o [文件名] www.sina.com`  
+保存网页`curl -o [文件名] www.sina.com`  
 自动跳转重定向 `curl -L www.sina.com`  
 
-显示http header  
-	显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`  
-	`-I`参数则是只显示http response的头信息.  
+显示http header, 显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`, `-I`参数则是只显示http response的头信息.  
 
+#### option
+* `-o, --output <file>`	Write output to <file> instead of stdout
+* `-i, --include`	(HTTP)  Include  the  HTTP-header in the output
+* `-I, --head`	Fetch the HTTP-header only!
+* `-L, --location`	Follow redirects
+* `-v, --verbose`	Makes the fetching more  verbose/talkative
+* `--trace <file>`	Enables  a  full  trace  dump of all incoming and outgoing data
+* `-X, --request <command>`	Specifies a custom request method curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词  
+* `-s, --silent`	Silent  or  quiet  mode. Don't show progress meter or error messages.  Makes Curl mute. It will still output the data  you  ask for
+
+#### Sample
 显示通信过程  `curl -v www.sina.com`  
 	更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`  
 
