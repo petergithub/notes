@@ -1,8 +1,8 @@
 #Install Ubuntu
-#1、引导分区: /boot	256M for personal; 512M for server
-#2、交换分区: swap	2G virtual memory
-#3、系统分区: / 　　　装系统和软件，我这里给力10G的空间
-#4、个人文件分区：/home　你想多大就多大，类似windows的“我的文档” 13G
+#1、引导分区: /boot	256M for personal; 512M for server; try 1G
+#2、交换分区: swap	8G virtual memory
+#3、系统分区: / 　　　装系统和软件 27G
+#4、个人文件分区：/home　你想多大就多大，类似windows的“我的文档” 35G
 
 # Windows 10 install Ubuntu with EasyBCD 添加新条目-neogrub-安装-配置
 #title Install Ubuntu
@@ -30,7 +30,7 @@ sudo apt-get update # This is very important step to update system first.
 
 ## auto mount your NTFS disk: Install pysdm or ntfs-config for Ubuntu 14.04
 # vi /etc/fstab
-# /path/to/disk /dev/sda5 /media/pu/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
+# /path/to/disk /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
 ########## GVim config: clone configuration files from stash ##########
 sudo apt-get install vim-gnome
@@ -144,10 +144,12 @@ sudo apt-get install maven
 #$ echo $JAVA_HOME
 #//show nothing
 #vim ~/.bashrc add lines or using >>
-echo export JAVA_HOME=~/opt/java >> ~/.bashp
-echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bashp
-echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bashp
+#echo export JAVA_HOME=~/opt/java >> ~/.bashp
+#echo export PATH=.:\$JAVA_HOME/bin:\$PATH >> ~/.bashp
+#echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bashp
 ##restart terminal or source ~/.bashrc or . ~/.bashrc
+
+sudo echo export JAVA_HOME=/home/<username>/opt/java >> /etc/profile
 source ~/.bashrc
 
 ##install MySQL http://wiki.ubuntu.org.cn/MySQL
