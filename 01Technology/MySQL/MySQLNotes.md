@@ -181,9 +181,12 @@ SHOW CREATE TABLE
 导入.sql文件命令： SOURCE d:/mysql.sql;  
 
 `./mysqld_safe` start MySQL server  
-显示当前的user： SELECT USER();  
-来查看数据库版本 SELECT VERSION();  
-显示use的数据库名： SELECT DATABASE();  
+`sudo /etc/init.d/mysql start`	start mysql server on ubuntu
+`sudo /etc/init.d/mysql restart`	restart mysql server on ubuntu
+`/etc/init/mysql.conf` 
+显示当前的user： `SELECT USER();`  
+来查看数据库版本 `SELECT VERSION();`  
+显示use的数据库名： `SELECT DATABASE();`  
 find the mysql data directory by `grep datadir /etc/my.cnf` or    
 `mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
 `mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`  
@@ -399,6 +402,20 @@ exit
 •Profile  
 –Oprofile  
 –gprof  
+
+### slow log 
+#### record slow log
+`show variables  like '%slow_query_log%'`	Query slow log status
+`set global slow_query_log=1`	Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
+`slow_query_log = 1`	开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）  
+`slow_query_log_file = /tmp/mysql_slow.log`	slow log location, default value: host_name-slow.log   
+`long_query_time=2`	慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
+`log_queries_not_using_indexes`	未使用索引的查询也被记录到慢查询日志中（可选项）   
+  
+
+MySQL提供了日志分析工具mysqldumpslow   
+`mysqldumpslow -s r -t 10 /data/softwares/mysql/mysql06_slow.log`	得到返回记录集最多的10个SQL
+`mysqldumpslow -s c -t 10 /data/softwares/mysql/mysql06_slow.log`	得到访问次数最多的10个SQL
 
 ### Example: 数据库插入数据时加锁 多线程(多job)重复insert
 1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`  
