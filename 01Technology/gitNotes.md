@@ -5,6 +5,8 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 
 ## Commands
 ### Most recent
+`git log -m --name-only` List all modified files in git merge commit 
+
 Final release version  
 `git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交  
 `git merge --squash <branchName>`	把branchName上所有提交合并为一次提交到当前分支上再commit  
