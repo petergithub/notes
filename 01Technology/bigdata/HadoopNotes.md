@@ -96,7 +96,9 @@ https://hbase.apache.org/book.html#quickstart
 5. Connect to HBase: `./bin/hbase shell`, Exit the HBase Shell: `quit`
 
 ### Basic command
-4. Create a table: `create 'test', 'cf'`
+`table_help`, `status`, `version`, `whoami`
+`list` list tables, `describe 'table name'` 
+4. Create a table: `create 'test', 'columnFamily'`
 5. List Information About your Table: `list 'test'`
 6. Put data into your table: `put 'test', 'row1', 'cf:a', 'value1'`
 7. Scan the table for all data at once: `scan 'test'`
@@ -104,3 +106,25 @@ https://hbase.apache.org/book.html#quickstart
 9. Disable a table: `disable 'test'`, `enable 'test'`  
 	If you want to delete a table or change its settings, as well as in some other situations, you need to disable the table first  
 10. Drop the table: `drop 'test'`
+
+## Hive 
+[Apache Hive](https://hive.apache.org/ )
+[GettingStarted](https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-RunningHive )
+### Hive Command Line Options
+[LanguageManual Cli](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Cli )
+
+usage: hive
+ -d,--define <key=value>          Variable substitution to apply to Hive commands. e.g. -d A=B or --define A=B
+ -e <quoted-query-string>         SQL from command line
+ -f <filename>                    SQL from files
+ -H,--help                        Print help information
+ -h <hostname>                    Connecting to Hive Server on remote host
+    --hiveconf <property=value>   Use value for given property
+    --hivevar <key=value>         Variable substitution to apply to hive
+                                  commands. e.g. --hivevar A=B
+ -i <filename>                    Initialization SQL file
+ -p <port>                        Connecting to Hive Server on port number
+ -S,--silent                      Silent mode in interactive shell
+ -v,--verbose                     Verbose mode (echo executed SQL to the
+                                  console)
+
