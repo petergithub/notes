@@ -386,6 +386,9 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 
 `find * -type f | grep fileName`	查找文件并列出相对路径  
 `ls -R | grep fileName` 只是列出文件名  
+`find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
+`find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
+`find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
 
 #### 文件个数 count files in directory recursively
 `find . -type f | wc -l`  
@@ -461,6 +464,8 @@ Print every line that has at least one field: `awk 'NF > 0' data`
 
 过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`  
+
+tomcat localhost_access_log filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`
 
 #### awk
 awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.  
@@ -1208,6 +1213,11 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 * `--trace <file>`	Enables  a  full  trace  dump of all incoming and outgoing data
 * `-X, --request <command>`	Specifies a custom request method curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词  
 * `-s, --silent`	Silent  or  quiet  mode. Don't show progress meter or error messages.  Makes Curl mute. It will still output the data  you  ask for
+* `--cookie "key1=value1;k2=v2"` Pass cookie
+* `-H, --header`	Sent with header
+* `-u, --USER`	username:password  
+* `-w, --write-out "@curl-format.txt"`	tells cURL to use our format file  
+* `-m, --max-time <seconds>`	超时时间. Maximum time in seconds that you allow the whole operation to  take. 
 
 #### Sample
 显示通信过程  `curl -v www.sina.com`  
@@ -1216,6 +1226,11 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.  
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`  
 HTTP认证	`curl --user name:password example.com`  
+
+分段下载:  
+download part 1  `curl --header "range:bytes=0-99" -o file.part1 -L URL` or `curl --range 0-99 URL`  
+down load part 2  `curl --header "range:bytes=100-" -o file.part2 -L URL` or `curl --range 100-`  
+`cat file.part* > file`  merge to one file  
 
 提交表单并设置header  
 `curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`  
@@ -1259,7 +1274,6 @@ Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://exa
 
 * `-w "@curl-format.txt"` tells cURL to use our format file  
 * `-o /dev/null` redirects the output of the request to /dev/null  
-* `-s` tells cURL not to show a progress meter  
 
 And here is what you get back:  
 
@@ -1273,7 +1287,6 @@ And here is what you get back:
 	        time_total:  0.164
 
 #### options
-* `-u, --USER` username:password  
 
 ### rsync
 `rsync -avPz src/ dest` Copy contents of `src/` to destination  
@@ -2479,12 +2492,17 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 #### SSH
 `ssh user@host`	以 user 用户身份连接到 host  
 `ssh -p port user@host`	在端口 port 以 user 用户身份连接到 host  
-`-f` ssh将在后台运行  
-`-N` 不执行命令, 仅转发端口  
-`-C` 压缩传送的数据  
-`-i` 使用指定的密钥登录  
+`-f`	ssh将在后台运行  
+`-N`	不执行命令, 仅转发端口  
+`-T`	表示不为这个连接分配TTY
+`-g`	Allows remote hosts to connect to local forwarded ports.
+`-C`	压缩传送的数据  
+`-i`	使用指定的密钥登录  
 	It is required that your private key files are NOT accessible by others  
-	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa  
+	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa 
+`-t` Force pseudo-tty allocation for bash to use as an interactive shell
+	 
+`ssh -t user@server "mail && bash"`	Single command to login to SSH and run program
 
 escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;  
 `~.`	close the connection  
@@ -2517,6 +2535,15 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 ##### Bad owner or permissions on .ssh/config
 chmod 600 .ssh/config  
 
+##### Troubleshooting sshd
+https://help.ubuntu.com/community/SSH/OpenSSH/Configuring  
+
+1. `ps -ef | grep ssh`, `sudo ss -lnp | grep sshd` or `sudo netstat -anp | grep sshd`
+`root      3865     1  0 11:53 ?        00:00:00 /usr/sbin/sshd -D`
+2. `sudo service ssh restart`
+3. `less /var/log/syslog`
+4. `$(which sshd) -Ddp 10222`
+
 ##### Keep SSH Sessions Alive 保持SSH连接不断线
 1. client: ssh -o ServerAliveInterval=60 username@host  
 2. update .ssh/config  
@@ -2532,28 +2559,26 @@ ServerAliveCountMax <Y>
 
 > Setting a value of 0 (the default) will disable these features so your connection could drop if it is idle for too long.
 
-#### Troubleshooting sshd
-https://help.ubuntu.com/community/SSH/OpenSSH/Configuring  
-
-1. `ps -ef | grep ssh`, `sudo ss -lnp | grep sshd` or `sudo netstat -anp | grep sshd`
-`root      3865     1  0 11:53 ?        00:00:00 /usr/sbin/sshd -D`
-2. `sudo service ssh restart`
-3. `less /var/log/syslog`
-4. `$(which sshd) -Ddp 10222`
-
 ##### SSH隧道 端口转发(Port Forwarding)
 这是一种隧道(tunneling)技术  
-[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html)  
+[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html )  
+[Linux下ssh动态端口转发](https://www.chenyudong.com/archives/linux-ssh-port-dynamic-forward.html )  
+[实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward )  
 
 动态转发:  
-`ssh -D <local port> <SSH Server>`	动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能  
+`ssh -D <local port> <SSH Server>`	动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能    
+`ssh -D 7070 remoteServer -gfNT` Dynamic forward all the connection by SOCKS  
+`ssh -D 7070 -l username proxy.remotehost.com -gfNT -o ProxyCommand="connect -H web-proxy.oa.com:8080 %h %p "` 给ssh连接增加http代理, 如果你的PC无法直接访问到ssh服务器上，但是有http代理可以访问，那么可以为建立这个socks5的动态端口转发加上一个代理.  
+其中ProxyCommand指定了使用`connect`程序(`sudo apt-get install connect-proxy`)来进行代理。通常还可以使用corkscrew来达到相同的效果。
+
+
 
 本地端口转发:  
 localhost连不上remoteSecret, remoteHost可以连通localhost和remoteSecret, 通过remoteHost连上remoteSecret  
 `ssh -L localPort:remoteSecret:remoteSecretPort remoteHost`	#在本机执行本地端口转发Local forwarding:connect remoteSecret through remoteHost  
 `ssh -L <local port>:<remote host>:<remote port> <SSH hostname>`  
-example: 通过host3的端口转发, ssh登录host2  
-1. `ssh -L 9001:host2:22 host3` 在本机执行  
+example: 通过 host3 的端口转发, ssh通过连接 localhost 登录 host2  
+1. `ssh -L 9001:host2:22 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)  
 2. `ssh -p 9001 localhost` ssh登录本机的9001端口, 相当于连接host2的22端口  
 
 远程端口转发:  
