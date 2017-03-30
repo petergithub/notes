@@ -6,6 +6,13 @@
 mysqlreport --user root --password  
 /etc/mysql/my.cnf ~/.my.cnf  
 
+`select @@datadir;` select the data directory
+
+refer to https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html
+`clear     (\c)` Clear the current input statement.
+`status    (\s)` Get status information from the server.
+
+
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 SELECT UNIX_TIMESTAMP(NOW());  
 SELECT FROM_UNIXTIME(1467542031);  
@@ -13,6 +20,20 @@ select SUBSTRING(1456958130210,1,10);
 
 show full processlist;  
 `explain SQL` query;  then `show warings` to get the raw SQL clause
+
+Autocompletion in the MySQL command-line client
+Edit or create a file called .my.cnf in your home directory, containing:
+```
+
+	[mysql]
+	auto-rehash
+```
+
+Input-Line Editing
+https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html
+echo bind "^W" ed-delete-prev-word > .editrc
+echo bind "^U" vi-kill-line-prev >> .editrc
+
 
 MySQL压力测试  
 1. mysqlslap的介绍及使用  
@@ -54,18 +75,22 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 	
 ``` mysql	
 	
-	mysql> SELECT UNIX_TIMESTAMP('2005-03-27 02:00:00');
+	mysql> SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
 	+---------------------------------------+
-	| UNIX_TIMESTAMP('2005-03-27 02:00:00') |
+	| UNIX_TIMESTAMP('2009-02-14 07:31:30') |
 	+---------------------------------------+
-	|                            1111885200 |
+	|                            1234567890 |
 	+---------------------------------------+
-	mysql> SELECT FROM_UNIXTIME(1111885200);
+	mysql> SELECT FROM_UNIXTIME(1234567890);
 	+---------------------------+
-	| FROM_UNIXTIME(1111885200) |
+	| FROM_UNIXTIME(1234567890) |
 	+---------------------------+
-	| 2005-03-27 03:00:00       |
+	| 2009-02-14 07:31:30      |
 	+---------------------------+
+	
+	SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
+	SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
+	
 ```
 
 ### case-sensitive
@@ -181,6 +206,7 @@ SHOW CREATE TABLE
 导入.sql文件命令： SOURCE d:/mysql.sql;  
 
 `./mysqld_safe` start MySQL server  
+`service mysql stop`, `service mysql start` Ubuntu start MySQL
 `sudo /etc/init.d/mysql start`	start mysql server on ubuntu
 `sudo /etc/init.d/mysql restart`	restart mysql server on ubuntu
 `/etc/init/mysql.conf` 
@@ -302,8 +328,8 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
 备份文件中的“--”字符开头的行为注释语句；以“/*!”开头、以“*/”结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
 
-`mysqldump -u USERNAME -p database_name > outfile_name.sql`  
-`mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName > dbName.sql`  
+`mysqldump -u USERNAME -p dbName > dbName.sql`  
+`mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`  
 * `-d` 没有数据 
 * `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
 * `--add-drop-table` 在每个create语句之前增加一个drop table
@@ -312,6 +338,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 * `--single-transaction`	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
 * `--lock-tables=false , -l`	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
 * `--where/-w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
+
 
 #### Import/Restore
 `mysql> USE 数据库名;`  
@@ -337,6 +364,32 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 	TERMINATED BY ',' 
 	ESCAPED BY '"' 
 	LINES TERMINATED BY '\r\n';
+```
+
+#### Get the sizes of the tables
+How to get the sizes of the tables of a mysql database?
+https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database
+You can use this query to show the size of a table (although you need to substitute the variables first):
+```
+
+	SELECT 
+	    table_name AS TableName, 
+	    round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB" 
+	FROM information_schema.TABLES 
+	WHERE table_schema = "$DB_NAME"
+	    AND table_name = "$TABLE_NAME";
+```
+
+or this query to list the size of every table in every database, largest first:
+
+```
+
+	SELECT 
+	     table_schema as DatabaseName, 
+	     table_name AS TableName, 
+	     round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB" 
+	FROM information_schema.TABLES 
+	ORDER BY (data_length + index_length) DESC;
 ```
 
 ### MySQL Workbench update shortcut Auto-complete 
@@ -477,6 +530,9 @@ console 2:
 
 It pending to get the lock.  
 
+## Performance
+
+[MySQL性能优化的最佳20+条经验](http://coolshell.cn/articles/1846.html )
 
 ## 构建高性能的 MySQL 集群系统
 ### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
