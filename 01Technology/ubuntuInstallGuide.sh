@@ -4,11 +4,21 @@
 #3、系统分区: / 　　　装系统和软件 27G
 #4、个人文件分区：/home　你想多大就多大，类似windows的“我的文档” 35G
 
-# Windows 10 install Ubuntu with EasyBCD 添加新条目-neogrub-安装-配置
-#title Install Ubuntu
+## Windows install Ubuntu with EasyBCD from local drive with iso image (硬盘安装 Ubuntu 双系统)
+## 1. copy ubuntu.iso/casper/{vmlinuz(.efi),initrd.lz} to C:/
+## 2. install EasyBCD -> Add New Entry -> NeoGrub -> Install -> Configure -> Put following lines in menu.lst with the text editor (添加新条目-neogrub-安装-配置)
+#title Ubuntu Live CD to install Ubuntu
 #root (hd0,0)
 #kernel (hd0,0)/vmlinuz boot=casper iso->scan/filename=(hd0,0)/ubuntu-14.04.2-desktop-i386.iso ro quiet >splash locale=en_US.UTF-8
 #initrd (hd0,0)/initrd.lz
+## 3. restart system with "Ubuntu Live CD to install Ubuntu"
+## 4. sudo umount -l /isodevice
+## 5. Click "Install ubuntu"
+## 6. After install completed, set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
+#sudo vi /etc/default/grub
+#update seconds: GRUB_HIDDEN_TIMEOUT=1
+#sudo update-grub
+
 
 # dpkg -i AdbeRdr*.deb	# install
 ## installed programs: /usr/share/applications/ or ~/.local/share/applications
@@ -30,7 +40,7 @@ sudo apt-get update # This is very important step to update system first.
 
 ## auto mount your NTFS disk: Install pysdm or ntfs-config for Ubuntu 14.04
 # vi /etc/fstab
-# /path/to/disk /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
+# /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
 ########## GVim config: clone configuration files from stash ##########
 sudo apt-get install vim-gnome
@@ -62,7 +72,7 @@ source ~/.bashrc
 ########## GVim config END ##########
 
 ########## tools BEGIN ##########
-sudo apt-get install nautilus-open-terminal # open terminal here
+#sudo apt-get install nautilus-open-terminal # open terminal here
 ## $ nautilus . # open folder here
 # open folder with root permission
 sudo apt-add-repository ppa:upubuntu-com/ppa
@@ -70,7 +80,10 @@ sudo apt-get update
 sudo apt-get install nautilus-gksu
 nautilus -q
 sudo apt-get install trash-cli
-echo del='trash-put' >> ~/.bashp
+#echo del='trash-put' >> ~/.bashp
+## It lets you install local deb packages resolving and installing its dependencies
+sudo apt-get install gdebi
+sudo apt-get install ncdu
 #sudo apt-get install gconf-editor
 # install flash plugin for firefox
 #sudo apt-get install flashplugin-nonfree
@@ -85,6 +98,7 @@ mkdir bin
 
 ########## development tools BEGIN ##########
 sudo apt-get install git
+sudo apt-get install tig
 sudo apt-get install tmux
 
 ## cheat for command
@@ -95,6 +109,8 @@ git clone https://github.com/chrisallenlane/cheat.git
 cd cheat
 sudo python setup.py install
 cheat -v
+cd ..
+rm -r cheat
 
 # atom 32 bit installation
 sudo add-apt-repository ppa:webupd8team/atom
@@ -113,12 +129,15 @@ apt-get update && apt-get install sysstat
 ########## wine BEGIN ##########
 ## https://wiki.winehq.org/Ubuntu
 ## winecfg: wine configuration
+sudo dpkg --add-architecture i386 
 sudo add-apt-repository ppa:wine/wine-builds
 sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
 # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys PUBKEY
 ## sudo apt-get install wine1.7
 sudo apt-get install --install-recommends winehq-staging
+## 64位系统出错，安装libgtk2.0即可
+sudo apt install libgtk2.0-0:i386 lib32z1 lib32ncurses5
 # install mfc42.dll to start windows application
 sudo apt-get install winetricks
 winetricks mfc42
@@ -129,11 +148,10 @@ winetricks mfc42
 sudo apt-get install python-software-properties
 sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
-#sudo apt-get install oracle-java7-installer
-sudo apt-get install oracle-java8-installer
-sudo mkdir -p {/home/share,~/opt/}
-ln -s /usr/lib/jvm/java-8-oracle /home/share/java-8-oracle
-ln -s /home/share/java-8-oracle ~/opt/java
+sudo apt-get install oracle-java7-installer
+#sudo apt-get install oracle-java8-installer
+sudo mkdir -p ~/opt/
+ln -s /usr/lib/jvm/java-8-oracle ~/opt/java
 sudo apt-get install maven
 
 #Managing Java
@@ -153,7 +171,7 @@ sudo echo export JAVA_HOME=/home/<username>/opt/java >> /etc/profile
 source ~/.bashrc
 
 ##install MySQL http://wiki.ubuntu.org.cn/MySQL
-sudo apt-get install mysql-server-5.6
+sudo apt-get install mysql-server-5.7
 #sudo start mysql #手动的话这样启动
 #sudo stop mysql #手动停止
 ##enter MySQL
@@ -164,24 +182,32 @@ sudo apt-get install mysql-server-5.6
 ## install GUI client
 ## sudo apt-get install mysql-workbench #version is not the latest
 
+## install Nginx
+sudo add-apt-repository ppa:nginx/stable
+sudo apt-get update
+sudo apt-get install nginx
+
 ##check the architecture of containers binaries
 #file /bin/bash
 
 ##add Advanced settings设置
 #sudo apt-get install gnome-tweak-tool
 sudo apt-get install unity-tweak-tool
-sudo apt-get install ccsm
+#sudo apt-get install ccsm # Ubuntu 14.04
+
+# Disable ctrl+alt+down in Ubuntu 16.04 (make it availabel in eclipse)
+sudo apt install compizconfig-settings-manager
+## Dash->CompizConfig Settings Manager->Desktop->Desktop Wall->Bindings->disable Moving down/up
 
 ###### Chinese input #######
 ## sudo apt-get install fcitx-table-wbpy ## install Chinese input
 
 ## download from http://pinyin.sogou.com/linux/ and config Ctrl + space for sogou
-## 1. System Settings -> Language Support -> Keyboard input method system: iBus
+## 1. System Settings -> Language Support -> Keyboard input method system: fcitx
 ## 2. System Settings -> Keyboard -> Text Entry -> Switch to next source using: empty
-## 3. System Settings -> Language Support -> Keyboard input method system: fcitx
-## 4. Dash -> Fcitx Configuration -> Global Config
-## 5. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
-## 6. Disable "C-semicolon": Dash -> Fcitx Configuration -> Tab "Addon" -> Double click ClipBoard -> "Trigger key for ClipBoard history list" -> hit "Esc" -> OK
+## 3. Dash -> Fcitx Configuration -> Global Config
+## 4. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
+## 5. Disable "C-semicolon": Dash -> Fcitx Configuration -> Tab "Addon" -> Double click ClipBoard -> "Trigger key for ClipBoard history list" -> hit "Esc" -> OK
 
 # Linux字体渲染
 # 一条命令搞定Linux字体渲染——Ubuntu系发行版微软雅黑+宋体终极解决方案【原创推荐】 http://www.lulinux.com/archives/278
@@ -196,6 +222,11 @@ sudo apt-get install ccsm
 #安装PDF阅读器－－Acrobat7.0
 #虽然ubuntu自带的文档查看器可以看PDF，但有些PDF文件不太规范，从而导致乱码。这时就需要用官方的 Acrobat了，不过这个软件较大，启动也较慢。
 sudo apt-get install acroread --force-yes -y
+## To see the Acrobat reader option when you right-click on the file
+sudo vi /usr/share/applications/AdobeReader.desktop
+## Edit the Exec=acroread line to be Exec=acroread %U
+## Edit -> Preferences -> Documents -> Restore last view settings when reopening documents
+
 #再下载其中文语言包
 #wget http://download.adobe.com/pub/adobe/reader/unix/7x/7.0.8/misc/FontPack708_chs_i386-linux.tar.gz
 #tar zxvf FontPack708_chs_i386-linux.tar.gz
@@ -215,24 +246,25 @@ gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8', 'CU
 #gsettings set org.gnome.gedit.preferences.encodings auto-detected "['GB18030', 'GB2312', 'GBK', 'UTF-8', 'BIG5', 'CURRENT', 'UTF-16']"
 
 # dconf-editor - Graphical editor for dconf
-sudo apt-get install dconf-editor
+#sudo apt-get install dconf-editor
+sudo apt-get install dconf-tools
 #mkdir -p ~/.local/share/gedit/plugins
 ## plugin to restore tabs opened last time
 ## https://github.com/raelgc/gedit-restore-tabs
 
 ########### Disable auto-opening nautilus window after auto-mount USB
 gsettings set org.gnome.desktop.media-handling automount-open false
-
-########### set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
-#sudo vi /etc/default/grub
-#update seconds: GRUB_HIDDEN_TIMEOUT=1
-#sudo update-grub
-
+#gsettings set org.gnome.desktop.media-handling automount false
 
 ########### Linux Tools
 ## Calibre: calibre is a powerful and easy to use e-book manager.
 ## Binary install https://calibre-ebook.com/download_linux
 sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.py | sudo python -c "import sys; main=lambda:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
+
+## Disable Desktop Notifications
+sudo add-apt-repository ppa:vlijm/nonotifs
+sudo apt-get update
+sudo apt-get install nonotifs
 
 ## CacheBrowser https://cachebrowser.info/#/download
 #sudo apt-get install python-setuptools
