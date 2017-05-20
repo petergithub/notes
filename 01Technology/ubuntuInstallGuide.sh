@@ -43,7 +43,7 @@ sudo apt-get update # This is very important step to update system first.
 # /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
 ########## GVim config: clone configuration files from stash ##########
-sudo apt-get install vim-gnome
+sudo apt-get -y install vim-gnome
 
 ## update configuration to make cut/copy/paste like Windows
 #cp /usr/share/vim/vim74/vimrc_example.vim .vimrc
@@ -72,23 +72,20 @@ source ~/.bashrc
 ########## GVim config END ##########
 
 ########## tools BEGIN ##########
-#sudo apt-get install nautilus-open-terminal # open terminal here
+#sudo apt-get -y install nautilus-open-terminal # open terminal here
 ## $ nautilus . # open folder here
 # open folder with root permission
 sudo apt-add-repository ppa:upubuntu-com/ppa
 sudo apt-get update
-sudo apt-get install nautilus-gksu
+
+## gdebi lets you install local deb packages resolving and installing its dependencies
+sudo apt-get -y install gdebi ncdu nautilus-gksu
 nautilus -q
-sudo apt-get install trash-cli
+
+## flashplugin-nonfree: flash plugin for firefox
+## autokey-gtk: quick paste tool
+sudo apt-get -y install p7zip p7zip-full p7zip-rar unrar autokey-gtk trash-cli adobe-flashplugin flashplugin-nonfree
 #echo del='trash-put' >> ~/.bashp
-## It lets you install local deb packages resolving and installing its dependencies
-sudo apt-get install gdebi
-sudo apt-get install ncdu
-#sudo apt-get install gconf-editor
-# install flash plugin for firefox
-#sudo apt-get install flashplugin-nonfree
-sudo apt-get install autokey-gtk # quick paste tool
-sudo apt-get -y install p7zip p7zip-full p7zip-rar
 
 ## put shortcut
 mkdir bin
@@ -97,12 +94,15 @@ mkdir bin
 ########## tools END ##########
 
 ########## development tools BEGIN ##########
-sudo apt-get install git
-sudo apt-get install tig
-sudo apt-get install tmux
+# atom 32 bit installation
+sudo add-apt-repository ppa:webupd8team/atom
+sudo apt-get update
+
+# Performance Monitoring Tools: sysstat include sar
+sudo apt-get -y install git tig tmux maven traceroute python-pip sysstat wireshark atom
+sudo adduser $USER wireshark
 
 ## cheat for command
-sudo apt-get install python-pip
 ## pip install --install-option="--prefix=/path/to/install" package_name
 sudo pip install docopt pygments
 git clone https://github.com/chrisallenlane/cheat.git
@@ -112,17 +112,9 @@ cheat -v
 cd ..
 rm -r cheat
 
-# atom 32 bit installation
-sudo add-apt-repository ppa:webupd8team/atom
-sudo apt-get update
-sudo apt-get install atom
-
 # tcpdump preparation
 # Reference: https://ubuntuforums.org/showthread.php?t=1501339
-(sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep enforce) && sudo apt-get install apparmor-utils && sudo aa-complain /usr/sbin/tcpdump && (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep complain) && echo setup for tcpdump
-
-# Performance Monitoring Tools: sysstat include sar
-apt-get update && apt-get install sysstat
+(sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep enforce) && sudo apt-get -y install apparmor-utils && sudo aa-complain /usr/sbin/tcpdump && (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep complain) && echo setup for tcpdump
 
 ########## development tools END ##########
 
@@ -135,24 +127,23 @@ sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
 # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys PUBKEY
 ## sudo apt-get install wine1.7
-sudo apt-get install --install-recommends winehq-staging
+sudo apt-get -y install --install-recommends winehq-staging
 ## 64位系统出错，安装libgtk2.0即可
-sudo apt install libgtk2.0-0:i386 lib32z1 lib32ncurses5
+sudo apt -y install libgtk2.0-0:i386 lib32z1 lib32ncurses5
 # install mfc42.dll to start windows application
-sudo apt-get install winetricks
+sudo apt-get -y install winetricks
 winetricks mfc42
 ########## wine END ##########
 
 #install JDK, oracle JDK is no longer provided as a PPA source
 #https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get
-sudo apt-get install python-software-properties
+sudo apt-get -y install python-software-properties
 sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
-sudo apt-get install oracle-java7-installer
-#sudo apt-get install oracle-java8-installer
+sudo apt-get -y install oracle-java7-installer
+#sudo apt-get -y install oracle-java8-installer
 sudo mkdir -p ~/opt/
 ln -s /usr/lib/jvm/java-8-oracle ~/opt/java
-sudo apt-get install maven
 
 #Managing Java
 #Listing all java installed version
@@ -167,11 +158,11 @@ sudo apt-get install maven
 #echo export CLASSPATH=.:\$JAVA_HOME/lib:\$CLASSPATH >> ~/.bashp
 ##restart terminal or source ~/.bashrc or . ~/.bashrc
 
-sudo echo export JAVA_HOME=/home/<username>/opt/java >> /etc/profile
+sudo echo export JAVA_HOME=/home/$USER/opt/java >> /etc/profile
 source ~/.bashrc
 
 ##install MySQL http://wiki.ubuntu.org.cn/MySQL
-sudo apt-get install mysql-server-5.7
+sudo apt-get -y install mysql-server-5.7
 #sudo start mysql #手动的话这样启动
 #sudo stop mysql #手动停止
 ##enter MySQL
@@ -180,19 +171,20 @@ sudo apt-get install mysql-server-5.7
 #sudo mysqladmin -uroot password newpassword
 ## configuration file /etc/mysql/my.cnf
 ## install GUI client
-## sudo apt-get install mysql-workbench #version is not the latest
+## sudo apt-get -y install mysql-workbench #version is not the latest
 
 ## install Nginx
 sudo add-apt-repository ppa:nginx/stable
 sudo apt-get update
-sudo apt-get install nginx
+sudo apt-get -y install nginx
 
 ##check the architecture of containers binaries
 #file /bin/bash
 
 ##add Advanced settings设置
+#sudo apt-get install gnome-system-tool
 #sudo apt-get install gnome-tweak-tool
-sudo apt-get install unity-tweak-tool
+sudo apt-get -y install unity-tweak-tool
 #sudo apt-get install ccsm # Ubuntu 14.04
 
 # Disable ctrl+alt+down in Ubuntu 16.04 (make it availabel in eclipse)
@@ -221,7 +213,7 @@ sudo apt install compizconfig-settings-manager
 # nohup wget ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb &
 #安装PDF阅读器－－Acrobat7.0
 #虽然ubuntu自带的文档查看器可以看PDF，但有些PDF文件不太规范，从而导致乱码。这时就需要用官方的 Acrobat了，不过这个软件较大，启动也较慢。
-sudo apt-get install acroread --force-yes -y
+sudo apt-get -y install acroread --force-yes -y
 ## To see the Acrobat reader option when you right-click on the file
 sudo vi /usr/share/applications/AdobeReader.desktop
 ## Edit the Exec=acroread line to be Exec=acroread %U
@@ -246,8 +238,9 @@ gsettings set org.gnome.gedit.preferences.encodings auto-detected "['UTF-8', 'CU
 #gsettings set org.gnome.gedit.preferences.encodings auto-detected "['GB18030', 'GB2312', 'GBK', 'UTF-8', 'BIG5', 'CURRENT', 'UTF-16']"
 
 # dconf-editor - Graphical editor for dconf
-#sudo apt-get install dconf-editor
-sudo apt-get install dconf-tools
+#sudo apt-get -y install dconf-editor
+sudo apt-get -y install dconf-tools
+#sudo apt-get -y install gconf-editor
 #mkdir -p ~/.local/share/gedit/plugins
 ## plugin to restore tabs opened last time
 ## https://github.com/raelgc/gedit-restore-tabs
@@ -264,18 +257,24 @@ sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.py | 
 ## Disable Desktop Notifications
 sudo add-apt-repository ppa:vlijm/nonotifs
 sudo apt-get update
-sudo apt-get install nonotifs
+sudo apt-get -y install nonotifs
 
 ## CacheBrowser https://cachebrowser.info/#/download
-#sudo apt-get install python-setuptools
-#sudo apt-get install python-dev
+#sudo apt-get -y install python-setuptools
+#sudo apt-get -y install python-dev
 
 ## virtual box
-#virtual box connect usb:	`sudo adduser <user> vboxusers`
-#add user to group vboxsf:	`sudo usermod -a -G vboxsf <user>`
+## virtual box connect usb: host Ubuntu 16.04, guest WinXP
+## 1. Add current user into group vboxusers, restart Ubuntu is required
+## 2. Setting -> USB -> Enable USB Controller -> USB 2.0 or 3.0 depends on your USB type (Try each one by one)
+## 3. Check device management if any driver required. (USB 3.0 driver is required for XP).
+## 4. Add 
+sudo adduser $USER vboxusers
+## add user to group vboxsf
+sudo usermod -a -G vboxsf $USER
 
 ## 安装ubuntu受限的额外的解码器
-sudo apt-get install ubuntu-restricted-extras
+sudo apt-get -y install ubuntu-restricted-extras
 
 ## Transmission 
 ## Transmission is a cross-platform BitTorrent client https://transmissionbt.com/about/
