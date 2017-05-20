@@ -67,6 +67,7 @@ Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 
 `foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
 `foo > allout.txt 2>&1` all output redirect to the same file  
+`log4j.appender.console.target=System.err`  
 
 `dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件  
 if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中  
@@ -80,14 +81,14 @@ get the MD5 hash `echo -n Welcome | md5sum`
 `passwd <username>`	update password  
 `id <username>`	get the user  
 `id -nG <username>`	Find out user group identity  
-`less /etc/group`	Get all groups in system  
+`less /etc/group` or `groups`	Get all groups in system  
 `groupadd <groupName>`	Add a new group  
 `useradd -g <groupName> <username>`	Add a new user to primary group  
 `useradd -G <groupName> <username>`	Add a new user to secondary group  
 `usermod -G {groupname1,groupname2,...} <username>`	Remove user from group which is not list in the command  
 `groups username`	To find group memebership for username  
 
-sudo apt-get install -f fixed it.  
+`sudo apt-get install -f` fixed it.  
 
 pgrep 和 pkill  
 pgrep -l apache2  
@@ -463,9 +464,11 @@ awk求和 sum  `echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } E
 Print every line that has at least one field: `awk 'NF > 0' data`  
 
 过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
-保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`  
+保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`   
 
-tomcat localhost_access_log filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`
+tomcat localhost_access_log filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`  
+
+awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`  
 
 #### awk
 awk扫描filename中的每一行, 对符合模式pattern的行执行操作action.  
@@ -709,6 +712,8 @@ rsyslog>>>>>>
 1. 修改rsyslog文件, 将/etc/rsyslog.d/50-default.conf 文件中的#cron.*前的#删掉;  
 2. 重启rsyslog服务service rsyslog restart  
 3. 重启cron服务service cron restart  
+
+`(crontab -l ; echo "00 09 * * 1-5 echo hello") | crontab -`  [How to create a cron job using Bash](https://stackoverflow.com/questions/878600/how-to-create-a-cron-job-using-bash )  
 
 ### shell
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)  
@@ -959,6 +964,18 @@ switch流程控制
 	esac
 ```
 
+``
+
+	#! /bin/bash
+start=20170101
+end=20170103
+while [ ${start} -le ${end} ]
+do
+  echo ${start}
+  start=`date -d "1 day ${start}" +%Y%m%d`  # 日期自增
+done
+	```
+
 #### example
 
 ##### read each line from file
@@ -1092,7 +1109,7 @@ add  one line in .profile
 add one line in .bashrc  
 .bashrc:  `alias grep='grep --color=auto'`  
 
-#### file carriage 换行
+#### file carriage return & line feed 换行
 两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行  
 UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Mac人则认同`<Return> (CR) \r`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF) \r\n`  
 在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".  
@@ -1227,18 +1244,27 @@ HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动�
 	`curl -X POST www.example.com` `curl -X DELETE www.example.com`  
 HTTP认证	`curl --user name:password example.com`  
 
-分段下载:  
-download part 1  `curl --header "range:bytes=0-99" -o file.part1 -L URL` or `curl --range 0-99 URL`  
-down load part 2  `curl --header "range:bytes=100-" -o file.part2 -L URL` or `curl --range 100-`  
-`cat file.part* > file`  merge to one file  
+##### socks5 proxy
+`curl -v https://ww.example.com --socks5-hostname localhost:7070`
 
-提交表单并设置header  
+##### 分段下载:  
+* download part 1  `curl --header "range:bytes=0-99" -o file.part1 -L URL` or `curl --range 0-99 URL`  
+* down load part 2  `curl --header "range:bytes=100-" -o file.part2 -L URL` or `curl --range 100-`  
+* `cat file.part* > file`  merge to one file  
+
+
+##### POST application/x-www-form-urlencoded 提交表单并设置header  
 `curl -X POST --header "Content-Type: application/x-www-form-urlencoded" --data  "username=name&token=value" https://login.test.com/account/update`  
 
 `-F/--form <name=content> Specify HTTP multipart POST data ` e.g. `--form "file=@/path/to/file"`  
 
-Print 10 times: `seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`  
+##### POST application/json
+`curl -d '{"key1":"value1", "key2":"value2"}' -H "Content-Type: application/json" -X POST http://localhost:3000/data`
 
+##### Print 10 times
+`seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`  
+
+##### Print request time detail
 	curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com  
 
 Time to domain lookup: `time_namelookup`  
