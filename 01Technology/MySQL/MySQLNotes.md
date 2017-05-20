@@ -12,64 +12,57 @@ refer to https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html
 `clear     (\c)` Clear the current input statement.
 `status    (\s)` Get status information from the server.
 
+767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 SELECT UNIX_TIMESTAMP(NOW());  
 SELECT FROM_UNIXTIME(1467542031);  
 select SUBSTRING(1456958130210,1,10);  
 
-show full processlist;  
+`show full processlist`;  
+#### explain
+[EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
+[详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
+
 `explain SQL` query;  then `show warings` to get the raw SQL clause
+##### Type
+性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
 
-Autocompletion in the MySQL command-line client
-Edit or create a file called .my.cnf in your home directory, containing:
-```
+##### 需要强调rows是核心指标  
+绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说  
+* rows<1000，是在可接受的范围内的。
+* rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
+* rows大于1万时，应慎重考虑SQL的设计，优化SQL
 
-	[mysql]
-	auto-rehash
-```
+这个没有绝对值可参考，一般来说越小越好，，如果100万数据量的数据库，rows是70万，通过这个可以判断sql的查询性能很差，如果100万条数据量的数据库，rows是1万，从我个人的角度，还是能接受的。
 
-Input-Line Editing
-https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html
-echo bind "^W" ed-delete-prev-word > .editrc
-echo bind "^U" vi-kill-line-prev >> .editrc
+##### extra 列
+该列包含MySQL解决查询的详细信息
+* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现  
+* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中  
 
+当执行计划Extra 出现Using filesort 、Using temporary 时，可以考虑是否需要进行sql优化和调整索引，最后再调整my.cnf 中与排序或者临时表相关的参数，如sort_buffer_size或者tmp_table_size.
+
+#### 建立索引原则
+1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
+2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
+3. 尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
+4. 索引列不能参与计算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);   
+5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
+6. 
 
 MySQL压力测试  
 1. mysqlslap的介绍及使用  
 2. sysbench  
 3. tpcc-mysql  
 
-MySQL 5.5.3+ UTF8mb4支持emoji  
 HA: percona xtradb cluster, galera cluster   
-
-append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
 
 To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`  
 To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`  
 mysql query escape %前面加两个反斜杠，比如  
 `select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'`  
 
-查看支持的字符集和排序方式: `show character set`, `show collation`  
-查看数据库字符集`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`  
-查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;`  
-查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;`  
-
-
-创建表的时候指定CHARSET为utf8mb4  
-```
-	
-	CREATE TABLE IF NOT EXISTS table_name (
-	...
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
-```
-update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`  
-
-update table character:   
-`ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
-`ALTER TABLE table_name modify column_name text charset utf8mb4;`  
-
-update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
 
 ### datetime query
 	
@@ -95,7 +88,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 
 ### case-sensitive
 make a case-sensitive query  
-`SELECT *  FROM table WHERE BINARY column = 'value'`  
+`select *  from table where BINARY column = 'value'`  
 `select * from t1 where name = binary 'YOU'`  
 
 设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
@@ -186,9 +179,19 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 mysql线上将采用一master多slave的方式来进行部署  
 
 ## Basic command
+### Admin command
+`./mysqld_safe` start MySQL server  
+`service mysql stop`, `service mysql start` Ubuntu start MySQL
+`sudo /etc/init.d/mysql start`	start mysql server on ubuntu
+`sudo /etc/init.d/mysql restart`	restart mysql server on ubuntu
+`/etc/init/mysql.conf` 
+
+find the mysql data directory by `grep datadir /etc/my.cnf` or    
+`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
+`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'` 
 
 ### Common command
-连接MYSQL mysql -h主机地址 -Pport -u用户名 －p用户密码 -S /data/mysql/mysql.sock  
+连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
 mysql -h110.110.110.110 -u root -p 123;（注:u与root之间可以不用加空格，其它也一样）  
 显示当前数据库服务器中的数据库列表：SHOW DATABASES;  
 USE 库名；  
@@ -202,20 +205,19 @@ SHOW CREATE TABLE
 将表中记录清空： DELETE FROM 表名;  
 往表中插入记录： INSERT INTO 表名 VALUES (”hyq”,”M”);  
 更新表中数据： UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';  
-用文本方式将数据装入数据表中： LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名;  
-导入.sql文件命令： SOURCE d:/mysql.sql;  
+用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名`  
+导入.sql文件命令： `SOURCE d:/mysql.sql`  
 
-`./mysqld_safe` start MySQL server  
-`service mysql stop`, `service mysql start` Ubuntu start MySQL
-`sudo /etc/init.d/mysql start`	start mysql server on ubuntu
-`sudo /etc/init.d/mysql restart`	restart mysql server on ubuntu
-`/etc/init/mysql.conf` 
+`ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
+`ALTER TABLE tableName DROP INDEX idx_name;`
+
+append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
 显示当前的user： `SELECT USER();`  
 来查看数据库版本 `SELECT VERSION();`  
-显示use的数据库名： `SELECT DATABASE();`  
-find the mysql data directory by `grep datadir /etc/my.cnf` or    
-`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
-`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`  
+显示use的数据库名： `SELECT DATABASE();`   
+
+`show variables where variable_name like '%myisam%'`    
+`show variables like '%char%'`  
 
 #### 修改密码
 格式：mysqladmin -u用户名 -p旧密码 password 新密码  
@@ -250,8 +252,31 @@ grant select,insert,update,delete on mydb.* to test2@localhost identified by “
 grant select,insert,update,delete on mydb.* to test2@localhost identified by “”;  
 mysql> FLUSH PRIVILEGES;  
 
-#### 查看三种MySQL字符集的方法
-- 查看MySQL数据库服务器和数据库MySQL字符集  
+### Charset 查看三种MySQL字符集
+MySQL 5.5.3+ UTF8mb4支持emoji  
+查看支持的字符集和排序方式: `show character set`, `show collation` or `show variables like '%char%'`  
+查看数据库字符集`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`  
+查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;` or `show table status from databaseName like 'tableName'`   
+查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;` or `show full columns from tableName`  
+
+#### Sample
+##### 创建表的时候指定CHARSET为utf8mb4  
+```
+	
+	CREATE TABLE IF NOT EXISTS table_name (
+	...
+	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+```
+update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`  
+
+update table character:   
+`ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
+`ALTER TABLE table_name modify column_name text charset utf8mb4;`  
+
+update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
+
+##### 查看MySQL数据库服务器和数据库MySQL字符集  
+
 	```sql
 	mysql> show variables like '%char%';
 	+--------------------------+-----------------------------------------------+
@@ -268,11 +293,12 @@ mysql> FLUSH PRIVILEGES;
 	+--------------------------+-----------------------------------------------+
 	8 rows in set (0.00 sec)
 	```
-- 查看MySQL数据表（table）的MySQL字符集  
+##### 查看MySQL数据表（table）的MySQL字符集  
+
 	``` sql
 	mysql> show table status from settlement like 'tableName' \G
 	*************************** 1. row ***************************
-	           Name: st_card
+	           Name: tableName
 	         Engine: InnoDB
 	        Version: 10
 	     Row_format: Compact
@@ -287,7 +313,8 @@ mysql> FLUSH PRIVILEGES;
 	      Collation: utf8_general_ci
 	1 row in set (0.00 sec)
 	```
-- 查看MySQL数据列（column）的MySQL字符集  
+##### 查看MySQL数据列（column）的MySQL字符集  
+
 	``` sql
 	mysql> show full columns from st_card \G
 	     Field: merchant_id
@@ -301,28 +328,8 @@ mysql> FLUSH PRIVILEGES;
 	```	
 
 
-#### Example: 建库和建表以及插入数据
-``` sql
-DROP DATABASE IF EXISTS school; //如果存在SCHOOL则删除
-CREATE DATABASE school; //建立库SCHOOL
-USE school; //打开库SCHOOL
-CREATE TABLE teacher //建立表TEACHER
-(
-id INT(3) AUTO_INCREMENT NOT NULL PRIMARY KEY,
-name CHAR(10) NOT NULL,
-address VARCHAR(50) DEFAULT ‘深圳',
-year DATE
-);
 
--- 以下为插入字段  
-INSERT INTO teacher VALUES(”,'jack','大连二中','1975-12-23′);  
-```
-如果你在mysql提示符键入上面的命令也可以，但不方便调试。  
-（1）你可以将以上命令原样写入一个文本文件中，假设为school.sql，然后复制到c:\\下，并在DOS状态进入目录\\mysql\\bin，然后键入以下命令：  
-mysql -uroot -p密码 < c:\\school.sql  
-如果成功，空出一行无任何显示；如有错误，会有提示。（以上命令已经调试，你只要将//的注释去掉即可使用）。  
-（2）或者进入命令行后使用 mysql> source c:\\school.sql; 也可以将school.sql文件导入数据库中。  
-
+### Backup & restore
 #### Export/Backup database mysqldump
 MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)  
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
@@ -366,6 +373,39 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 	LINES TERMINATED BY '\r\n';
 ```
 
+### Backup script 
+``` bash
+
+	date_str=`date +%Y%m%d%H%M%S`
+	cd /data2/backup
+	mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
+```
+
+### Example: 建库和建表以及插入数据
+
+``` sql
+
+	DROP DATABASE IF EXISTS school; //如果存在SCHOOL则删除
+	CREATE DATABASE school; //建立库SCHOOL
+	USE school; //打开库SCHOOL
+	CREATE TABLE teacher //建立表TEACHER
+	(
+	id INT(3) AUTO_INCREMENT NOT NULL PRIMARY KEY,
+	name CHAR(10) NOT NULL,
+	address VARCHAR(50) DEFAULT ‘深圳',
+	year DATE
+	);
+```
+
+-- 以下为插入字段  
+`INSERT INTO teacher VALUES(”,'jack','大连二中','1975-12-23′);`
+  
+如果你在mysql提示符键入上面的命令也可以，但不方便调试。  
+（1）你可以将以上命令原样写入一个文本文件中，假设为school.sql，然后复制到c:\\下，并在DOS状态进入目录\\mysql\\bin，然后键入以下命令：  
+mysql -uroot -p密码 < c:\\school.sql  
+如果成功，空出一行无任何显示；如有错误，会有提示。（以上命令已经调试，你只要将//的注释去掉即可使用）。  
+（2）或者进入命令行后使用 mysql> source c:\\school.sql; 也可以将school.sql文件导入数据库中。  
+
 #### Get the sizes of the tables
 How to get the sizes of the tables of a mysql database?
 https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database
@@ -392,20 +432,50 @@ or this query to list the size of every table in every database, largest first:
 	ORDER BY (data_length + index_length) DESC;
 ```
 
-### MySQL Workbench update shortcut Auto-complete 
+#### find the selectivity of several prefix lengths in one query
+```
+
+	SELECT COUNT(DISTINCT LEFT(city, 3))/COUNT(*) AS sel3,
+	 COUNT(DISTINCT LEFT(city, 4))/COUNT(*) AS sel4,
+	 COUNT(DISTINCT LEFT(city, 5))/COUNT(*) AS sel5,
+	 COUNT(DISTINCT LEFT(city, 6))/COUNT(*) AS sel6,
+	 COUNT(DISTINCT LEFT(city, 7))/COUNT(*) AS sel7
+	FROM sakila.city;
+```	
+
+#### find out the best prefix length for a given column
+https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-key-length-is-1000-bytes  
+```
+
+	SELECT
+	 ROUND(SUM(LENGTH(`menu_link`)<10)*100/COUNT(*),2) AS length_10,
+	 ROUND(SUM(LENGTH(`menu_link`)<20)*100/COUNT(*),2) AS length_20,
+	 ROUND(SUM(LENGTH(`menu_link`)<50)*100/COUNT(*),2) AS length_50,
+	 ROUND(SUM(LENGTH(`menu_link`)<100)*100/COUNT(*),2) AS length_100
+	FROM `pds_core_menu_items`;
+```
+
+### Configuration
+#### MySQL Workbench update shortcut Auto-complete 
 D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
 /usr/share/mysql-workbench/data/main_menu.xml  
 
 
-## Advanced
-
-### Backup script 
-``` bash
-
-	date_str=`date +%Y%m%d%H%M%S`
-	cd /data2/backup
-	mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
+#### Autocompletion in the MySQL command-line client
+Edit or create a file called .my.cnf in your home directory, containing:
 ```
+
+	[mysql]
+	auto-rehash
+```
+
+#### Input-Line Editing
+[MySQL Tips](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )
+echo bind "^W" ed-delete-prev-word > .editrc
+echo bind "^U" vi-kill-line-prev >> .editrc
+
+
+## Advanced
 
 ### MySQL忘记root密码
 1、在DOS窗口下输入net stop mysql5 或 net stop mysql  
@@ -430,7 +500,8 @@ exit
 
 ``` sql
 
-	UPDATE st_clearing_statement SET refund_transactions = 0, trade_transactions = 83
+	UPDATE st_clearing_statement SET refund_transactions = 0, trade_transactions = 83  
+	
 	SELECT 
 	    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`, 
 	    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
@@ -466,8 +537,20 @@ exit
 `log_queries_not_using_indexes`	未使用索引的查询也被记录到慢查询日志中（可选项）   
   
 
-MySQL提供了日志分析工具mysqldumpslow   
-`mysqldumpslow -s r -t 10 /data/softwares/mysql/mysql06_slow.log`	得到返回记录集最多的10个SQL
+#### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )  
+* --help
+* -a	Do not abstract all numbers to N and strings to 'S'.
+* -g pattern	Consider only queries that match the (grep-style) pattern. 
+* -s	sort_type  
+ * t, at: Sort by query time or average query time  
+ * l, al: Sort by lock time or average lock time  
+ * r, ar: Sort by rows sent or average rows sent  
+ * c: Sort by count
+* -t N	Display only the first N queries in the output. 
+
+##### Sample   
+`mysqldumpslow -s t -t 10 /var/lib/mysql/mysql-slow.log`	得到返回查询时间最长的10个SQL
+`mysqldumpslow -s r -t 10 /var/lib/mysql/mysql-slow.log`	得到返回记录集最多的10个SQL
 `mysqldumpslow -s c -t 10 /data/softwares/mysql/mysql06_slow.log`	得到访问次数最多的10个SQL
 
 ### Example: 数据库插入数据时加锁 多线程(多job)重复insert
@@ -533,6 +616,13 @@ It pending to get the lock.
 ## Performance
 
 [MySQL性能优化的最佳20+条经验](http://coolshell.cn/articles/1846.html )
+[MySQL 5.6 Reference Manual 8.6.1 Optimizing MyISAM Queries](https://dev.mysql.com/doc/refman/5.6/en/optimizing-queries-myisam.html )
+
+### MySQL Query Cache
+[8.10.3 The MySQL Query Cache](https://dev.mysql.com/doc/refman/5.6/en/query-cache.html )  
+The have_query_cache server system variable indicates whether the query cache is available `SHOW VARIABLES LIKE 'have_query_cache';`  
+The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM customer;`  
+
 
 ## 构建高性能的 MySQL 集群系统
 ### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
