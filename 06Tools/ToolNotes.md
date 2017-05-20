@@ -50,5 +50,7 @@ sudo add-apt-repository ppa:diodon-team/stable
 f.lux GUI
 sudo add-apt-repository ppa:nathan-renniewaldock/flux
 
+webtorrent-desktop
+
 ### Extend
 From OSX to Ubuntu https://nicolas.perriault.net/code/2016/from-osx-to-ubuntu/
