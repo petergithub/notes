@@ -9,8 +9,9 @@ mysqlreport --user root --password
 `select @@datadir;` select the data directory
 
 refer to https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html
-`clear     (\c)` Clear the current input statement.
-`status    (\s)` Get status information from the server.
+`clear     (\c)` Clear the current input statement.  
+`status    (\s)` Get status information from the server.  
+[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
 
 767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 
@@ -49,7 +50,7 @@ select SUBSTRING(1456958130210,1,10);
 3. 尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
 4. 索引列不能参与计算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);   
 5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
-6. 
+6.
 
 MySQL压力测试  
 1. mysqlslap的介绍及使用  
@@ -65,9 +66,9 @@ mysql query escape %前面加两个反斜杠，比如
 
 
 ### datetime query
-	
-``` mysql	
-	
+
+``` mysql
+
 	mysql> SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
 	+---------------------------------------+
 	| UNIX_TIMESTAMP('2009-02-14 07:31:30') |
@@ -80,10 +81,10 @@ mysql query escape %前面加两个反斜杠，比如
 	+---------------------------+
 	| 2009-02-14 07:31:30      |
 	+---------------------------+
-	
+
 	SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
 	SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
-	
+
 ```
 
 ### case-sensitive
@@ -184,11 +185,11 @@ mysql线上将采用一master多slave的方式来进行部署
 `service mysql stop`, `service mysql start` Ubuntu start MySQL
 `sudo /etc/init.d/mysql start`	start mysql server on ubuntu
 `sudo /etc/init.d/mysql restart`	restart mysql server on ubuntu
-`/etc/init/mysql.conf` 
+`/etc/init/mysql.conf`
 
 find the mysql data directory by `grep datadir /etc/my.cnf` or    
 `mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
-`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'` 
+`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 ### Common command
 连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
@@ -259,10 +260,21 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;` or `show table status from databaseName like 'tableName'`   
 查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;` or `show full columns from tableName`  
 
+* `utf8_bin`: case-sensitive, because it compares the binary values of the characters.  
+* Both `utf8_general_ci` and `utf8_unicode_ci` perform case-insensitive comparison. operations performed using the `_general_ci` collation are faster than those for the `_unicode_ci` collation. For example, comparisons for the utf8_general_ci collation are faster, but slightly less correct, than comparisons for utf8_unicode_ci.
+
+* `utf8_bin` compares the bits blindly. No case folding, no accent stripping.
+* `utf8_general_ci` compares one byte with one byte. It does case folding and accent stripping, but no 2-character comparisions: ij is not equal ĳ in this collation.
+* `utf8_*_ci` is a set of language-specific rules, but otherwise like unicode_ci. Some special cases: Ç, Č, ch, ll
+* `utf8_unicode_ci` follows an old Unicode standard for comparisons. ij=ĳ, but ae != æ
+* `utf8_unicode_520_ci` follows an newer Unicode standard. ae = æ
+
+http://mysql.rjweb.org/utf8_collations.html    
+
 #### Sample
 ##### 创建表的时候指定CHARSET为utf8mb4  
 ```
-	
+
 	CREATE TABLE IF NOT EXISTS table_name (
 	...
 	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
@@ -323,9 +335,9 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 	      Null: YES
 	       Key: MUL
 	   Default: NULL
-	     Extra: 
+	     Extra:
 	Privileges: select,insert,update,references
-	```	
+	```
 
 
 
@@ -337,7 +349,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 `mysqldump -u USERNAME -p dbName > dbName.sql`  
 `mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`  
-* `-d` 没有数据 
+* `-d` 没有数据
 * `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
 * `--add-drop-table` 在每个create语句之前增加一个drop table
 * `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
@@ -353,27 +365,27 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 `mysql -uroot -p dbName < dbName.sql` or   
 `mysql -uroot -p dbName -e "source /path/to/dbName.sql"`  
 
-#### MySQL Export Table to CSV 
+#### MySQL Export Table to CSV
 [Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)  
 `mysql -uroot -proot -D account -s -e "select id,username from user_0 limit 10 INTO OUTFILE '/tmp/user.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'"`    
 `mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`  
 
 ``` mysql
-	
-	SELECT 
+
+	SELECT
 	    orderNumber, status, orderDate, requiredDate, comments
 	FROM
 	    orders
 	WHERE
-	    status = 'Cancelled' 
-	INTO OUTFILE 'C:/tmp/cancelled_orders.csv' 
-	FIELDS ENCLOSED BY '"' 
-	TERMINATED BY ',' 
-	ESCAPED BY '"' 
+	    status = 'Cancelled'
+	INTO OUTFILE 'C:/tmp/cancelled_orders.csv'
+	FIELDS ENCLOSED BY '"'
+	TERMINATED BY ','
+	ESCAPED BY '"'
 	LINES TERMINATED BY '\r\n';
 ```
 
-### Backup script 
+### Backup script
 ``` bash
 
 	date_str=`date +%Y%m%d%H%M%S`
@@ -399,7 +411,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 -- 以下为插入字段  
 `INSERT INTO teacher VALUES(”,'jack','大连二中','1975-12-23′);`
-  
+
 如果你在mysql提示符键入上面的命令也可以，但不方便调试。  
 （1）你可以将以上命令原样写入一个文本文件中，假设为school.sql，然后复制到c:\\下，并在DOS状态进入目录\\mysql\\bin，然后键入以下命令：  
 mysql -uroot -p密码 < c:\\school.sql  
@@ -412,10 +424,10 @@ https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-o
 You can use this query to show the size of a table (although you need to substitute the variables first):
 ```
 
-	SELECT 
-	    table_name AS TableName, 
-	    round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB" 
-	FROM information_schema.TABLES 
+	SELECT
+	    table_name AS TableName,
+	    round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
+	FROM information_schema.TABLES
 	WHERE table_schema = "$DB_NAME"
 	    AND table_name = "$TABLE_NAME";
 ```
@@ -424,11 +436,11 @@ or this query to list the size of every table in every database, largest first:
 
 ```
 
-	SELECT 
-	     table_schema as DatabaseName, 
-	     table_name AS TableName, 
-	     round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB" 
-	FROM information_schema.TABLES 
+	SELECT
+	     table_schema as DatabaseName,
+	     table_name AS TableName,
+	     round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
+	FROM information_schema.TABLES
 	ORDER BY (data_length + index_length) DESC;
 ```
 
@@ -441,7 +453,7 @@ or this query to list the size of every table in every database, largest first:
 	 COUNT(DISTINCT LEFT(city, 6))/COUNT(*) AS sel6,
 	 COUNT(DISTINCT LEFT(city, 7))/COUNT(*) AS sel7
 	FROM sakila.city;
-```	
+```
 
 #### find out the best prefix length for a given column
 https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-key-length-is-1000-bytes  
@@ -456,7 +468,7 @@ https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-
 ```
 
 ### Configuration
-#### MySQL Workbench update shortcut Auto-complete 
+#### MySQL Workbench update shortcut Auto-complete
 D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
 /usr/share/mysql-workbench/data/main_menu.xml  
 
@@ -501,12 +513,12 @@ exit
 ``` sql
 
 	UPDATE st_clearing_statement SET refund_transactions = 0, trade_transactions = 83  
-	
-	SELECT 
-	    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`, 
+
+	SELECT
+	    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`,
 	    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
 	FROM prince
-	
+
 ```
 
 ## MySQL线上常见故障剖析
@@ -527,7 +539,7 @@ exit
 –Oprofile  
 –gprof  
 
-### slow log 
+### slow log
 #### record slow log
 `show variables  like '%slow_query_log%'`	Query slow log status
 `set global slow_query_log=1`	Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
@@ -535,18 +547,18 @@ exit
 `slow_query_log_file = /tmp/mysql_slow.log`	slow log location, default value: host_name-slow.log   
 `long_query_time=2`	慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
 `log_queries_not_using_indexes`	未使用索引的查询也被记录到慢查询日志中（可选项）   
-  
+
 
 #### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )  
 * --help
 * -a	Do not abstract all numbers to N and strings to 'S'.
-* -g pattern	Consider only queries that match the (grep-style) pattern. 
+* -g pattern	Consider only queries that match the (grep-style) pattern.
 * -s	sort_type  
  * t, at: Sort by query time or average query time  
  * l, al: Sort by lock time or average lock time  
  * r, ar: Sort by rows sent or average rows sent  
  * c: Sort by count
-* -t N	Display only the first N queries in the output. 
+* -t N	Display only the first N queries in the output.
 
 ##### Sample   
 `mysqldumpslow -s t -t 10 /var/lib/mysql/mysql-slow.log`	得到返回查询时间最长的10个SQL
@@ -585,7 +597,7 @@ select nonexistent orderId, which is not a index column, it will lock the whole 
 select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;  
 
 ```
-  
+
 	CREATE TABLE `test_sql_type` (
 	  `id` bigint(32) NOT NULL AUTO_INCREMENT,
 	  `orderId` int(8) DEFAULT NULL COMMENT 'another int',
