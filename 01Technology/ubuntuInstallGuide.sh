@@ -30,6 +30,9 @@
 # apt-get-install package-name=version	# install specified version of package
 # apt-cache search # ------(package 搜索包)
 
+## uninstall
+# sudo apt-get remove <package> && sudo apt-get autoremove
+
 # update the package lists /etc/apt/sources.list from repositories
 # following  to update http://wiki.ubuntu.org.cn/源列表
 # mirrors.aliyun.com is the fast
