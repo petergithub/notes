@@ -204,6 +204,9 @@ sudo apt install compizconfig-settings-manager
 ## 4. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
 ## 5. Disable "C-semicolon": Dash -> Fcitx Configuration -> Tab "Addon" -> Double click ClipBoard -> "Trigger key for ClipBoard history list" -> hit "Esc" -> OK
 
+### TM2013
+#ln -sfn ~/.longene/tm2013/drive_c/Program\ Files/Tencent/tm2013/Users ~/Documents/Tencent.tm2013.Users
+
 # Linux字体渲染
 # 一条命令搞定Linux字体渲染——Ubuntu系发行版微软雅黑+宋体终极解决方案【原创推荐】 http://www.lulinux.com/archives/278
 
