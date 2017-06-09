@@ -1,5 +1,9 @@
 
 # Monitor Notes
+
+## TODO
+book: O'Reilly的Effective Monitoring and Alerting
+
 ## Tools
 javamelody https://github.com/javamelody/javamelody/wiki
 Is there a free and open source On-Prem alternative to NewRelic available for use in Java apps? https://www.reddit.com/r/java/comments/4ph65q/is_there_a_free_and_open_source_onprem/  
