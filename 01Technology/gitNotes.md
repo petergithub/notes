@@ -170,13 +170,7 @@ Add hooks for `git merge` and `git checkout`
 
 ### git auto complete　自动补全
 download git-completion.bash from source code and load it from .bashrc
-```
-wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash
-
-if [ -f ~/.git-completion.bash ]; then
-        . ~/.git-completion.bash
-fi
-```
+`wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && echo >> ~/.bashrc && echo "if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash; fi" >> ~/.bashrc && source ~/.bashrc`
 
 ### git中文乱码解决(git bash中的中文乱码问题)
 ls命令查看当前文件夹下文件时，中文文件、文件名乱码：
