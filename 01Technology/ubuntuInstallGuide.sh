@@ -1,6 +1,6 @@
 #Install Ubuntu
 #1、引导分区: /boot	256M for personal; 512M for server; try 1G
-#2、交换分区: swap	8G virtual memory
+#2、交换分区: swap	8G 8192M virtual memory
 #3、系统分区: / 　　　装系统和软件 27G
 #4、个人文件分区：/home　你想多大就多大，类似windows的“我的文档” 35G
 
@@ -105,15 +105,17 @@ sudo apt-get update
 sudo apt-get -y install git tig tmux maven traceroute python-pip sysstat wireshark atom
 sudo adduser $USER wireshark
 
+## update hosts
+mkdir -p ~/work/ubuntuGitWorkspace/peter; cd ~/work/ubuntuGitWorkspace/peter; git clone https://github.com/racaljk/hosts.git
+
+## configuration file setup, CLEAN THE FOLDER AFTER DOWNLOAD
+cd ~; git clone https://github.com/petergithub/configuration.git
+
 ## cheat for command
 ## pip install --install-option="--prefix=/path/to/install" package_name
 sudo pip install docopt pygments
-git clone https://github.com/chrisallenlane/cheat.git
-cd cheat
-sudo python setup.py install
-cheat -v
-cd ..
-rm -r cheat
+git clone https://github.com/chrisallenlane/cheat.git && cd cheat && sudo python setup.py install
+cheat -v && cd .. && rm -r cheat
 
 # tcpdump preparation
 # Reference: https://ubuntuforums.org/showthread.php?t=1501339
