@@ -26,7 +26,7 @@
 ## apt-get 下载后，软件所在路径是 /var/cache/apt/archives
 
 ## dpkg -S packageName     #显示所有包含该软件包的目录
-# apt-cache policy maven	# check the version of package from apt-get
+# apt show maven (apt-cache policy maven)	check the version of package from apt-get
 # apt-get-install package-name=version	# install specified version of package
 # apt-cache search # ------(package 搜索包)
 
@@ -283,6 +283,10 @@ sudo usermod -a -G vboxsf $USER
 
 ## 安装ubuntu受限的额外的解码器
 sudo apt-get -y install ubuntu-restricted-extras
+
+## playonlinux
+#sudo add-apt-repository ppa:noobslab/apps && sudo apt-get update
+sudo apt-get install playonlinux
 
 ## Transmission 
 ## Transmission is a cross-platform BitTorrent client https://transmissionbt.com/about/

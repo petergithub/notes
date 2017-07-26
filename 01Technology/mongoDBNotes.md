@@ -18,22 +18,77 @@ options:
   -o [ --out ] arg          output file; if not specified, stdout is used
 
 ## Commands
+### Start Server & Connection
+
+`mongod`	To start MongoDB using all defaults  
+`mongod --dbpath /path/to/mongodb/data/ --auth`	To start MongoDB  
+
+`mongo <host>:<port>/<dbName>`  Connect to mongo   
+`--quiet` Suppress MongoDB shell version  
+`--eval` execute command
+`--nodb` start mongo client without using a database
+
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME`  
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet script.js`  
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'printjson(db.currentOp())' | less`  
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'db.users.find({a:'b'}).pretty().shellPrint()' | less`  
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'printjson(db.adminCommand('listDatabases'))' | less`  
+
+
+
 ### Basic Commands
-`mongod`	To start MongoDB using all defaults
-`mongod --dbpath /path/to/mongodb/data/ --auth`	To start MongoDB
+runCommand syntax: `db.runCommand()`  
+dropping a collection(drop database) `db.DATABASE_NAME.drop()` or `db.runCommand({"drop" : "DATABASE_NAME"})`   
+`> help`  
+`load("/path/to/script.js")`  
 
-`mongo <host>:<port>/<dbName>`  Connect to mongo  
-`show dbs`  
-`use test`  
-`show collections`  
-To format the printed result, you can add the .pretty() to the operation: `db.myCollection.find().pretty()`
+#### format
+To format the printed result, you can add the .pretty() to the operation: `db.myCollection.find().pretty()`  
+```
+// print a result collection  
+
+function printResult (r) {
+  print(tojson(r))
+}
+
+db.foo.find().forEach(printResult)
+```
+
+```
+// print begin and end time of the command
+var date1 = new Date()
+print ("begin " + tojson(date1.toLocaleString()))
+
+var result = db.getCollectionNames()
+print (tojson(result))
+
+var date1 = Date()
+print ("end " + tojson(date1.toLocaleString()))
+~          
+```
+
+#### db
+查看当前正在使用的数据库 `show dbs` == `db.getMongo().getDBs()`   
+查看当前正在使用的数据库 `db`  
+切换数据库 `use DATABASE_NAME` == `db.getSisterDB("DATABASE_NAME")`    
+删除数据库 删除数据库首先使用use命令切换到要删除的数据库，然后使用`db.dropDatabase()`  
+`db.stats()`
+
+#### collection
+`show collections` == `show tables` == `db.getCollectionNames()`
+查看单个集合，可以使用 `db.getCollection("COLLECTION_NAME")`   
 `db.collectionName.findOne()`  
-`db.getCollection('collectionName').count()`  
-`db.col.find({key1:value1, key2:value2})`  
-`db.col.findOne({key1:value1},{key2:0, key3:1})`	0, exclude key2; 1, display key3
+`db.getCollection('COLLECTION_NAME').count()`  
+创建集合 `db.createCollection(COLLECTION_NAME, options)`
+重命名 `db.COLLECTION_NAME.renameCollection("NEW_NAME")`
+集合的删除 `db.COLLECTION_NAME.drop()`  
 
-runCommand syntax: `db.runCommand()`
-dropping a collection(drop database) `db.collectionName.drop()` or `db.runCommand({"drop" : "collectionName"})`  
+#### query
+`db.COLLECTION_NAME.find({key1:value1, key2:value2})`  
+`db.COLLECTION_NAME.findOne({key1:value1},{key2:0, key3:1})`	0, exclude key2; 1, display key3  
+limit()指定查询结果数量  `db.COLLECTION_NAME.find().limit(NUMBER)`  
+skip()指定查询偏移量 `db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)`  
+sort()实现查询结果排序 `db.COLLECTION_NAME.find().sort({KEY:1})` 排序方式为可选值为：1和-1，1表示使用升序排列，-1表示降序排序  
 
 ### Query Criteria 查询条件
 `"$lt","$lte","$gt","$gte", "$ne"`分别对应`<,<=,>,>=,<>`  
@@ -42,7 +97,7 @@ dropping a collection(drop database) `db.collectionName.drop()` or `db.runComman
 `db.users.find({"name":{"$ne":"refactor1"}})`  
 `db.collections.findOne({"gateWayPayInfo.gateWayPayorderInfo.outOrderId" : "20150809173033000000000000005503"});`  
 
-#### 使用"$in","$nin","$or", "$not"查询 
+#### 使用"$in","$nin","$or", "$not"查询
 - 使用`"$in"`, `"$nin"`
  查询出pageViews为10000,20000的数据: `db.users.find({pageViews:{"$in":[10000,20000]}})`  
 
@@ -142,7 +197,7 @@ use "$elemMatch" to force MongoDB to compare both clauses with a single array el
 #### Querying on Embedded Documents
 have a document that looks like this:
 ```
-	
+
 	{
 		"name" : {
 			"first" : "Joe",
@@ -154,29 +209,20 @@ have a document that looks like this:
 Query: `db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})`  
 
 ### $where Queries
-### Cursors
-#### Limits, Skips and Sorts
-`db.c.find().limit(3)`  
-`db.c.find().skip(3)`  
-Sort direction can be 1 (ascending) or −1 (descending).  
-`db.c.find().sort({username : 1, age : -1})`  
 
 
 ### Index
-Find all indexes:
-`db.system.indexes.find()`
-Setup index(Key 值为要创建的索引字段，1为指定按升序创建索引，如果你想按降序来创建索引指定为-1即可):
-`db.collectionName.ensureIndex({KEY:1})`
-ensureIndex() 方法中你也可以设置使用多个字段创建索引（关系型数据库中称作复合索引）:
-`db.collectionName.ensureIndex({"title":1,"description":-1})`
-创建索引时加background:true 的选项，让创建工作在后台执行
-`db.values.ensureIndex({open: 1, close: 1}, {background: true})`
+Find all indexes: `db.system.indexes.find()`  
+Setup index(Key 值为要创建的索引字段，1为指定按升序创建索引，如果你想按降序来创建索引指定为-1即可): `db.COLLECTION_NAME.ensureIndex({KEY:1})`  
+ensureIndex() 方法中你也可以设置使用多个字段创建索引（关系型数据库中称作复合索引）: `db.COLLECTION_NAME.ensureIndex({"title":1,"description":-1})`  
+创建索引时加background:true 的选项，让创建工作在后台执行 `db.COLLECTION_NAME.ensureIndex({open: 1, close: 1}, {background: true})`  
+重建索引 `db.COLLECTION_NAME.reIndex()`  
 
-删除索引
-删除集合中的某一个索引：
-`db.collection.dropIndex({x: 1, y: -1})`
-db.collection.dropIndexes();
-`db.collection.dropIndexes();`
+查看集合中的索引: `db.COLLECTION_NAME.getIndexes()`  
+查看集合中的索引大小`db.COLLECTION_NAME.totalIndexSize()`  
+
+删除集合中的某一个索引: `db.COLLECTION_NAME.dropIndex("INDEX-NAME")` or `db.COLLECTION_NAME.dropIndex({x: 1, y: -1})`  
+删除所有索引 `db.COLLECTION_NAME.dropIndexes();`
 
 ### Update
 post = {title:title}
@@ -194,7 +240,7 @@ delete joe.name
 db.users.update({"name":"joe"},joe)
 db.users.update({"name":"joe"},{"$set":{"age":20}})
 
-{ "_id" : ObjectId("55b61a2634a254ddb211bf32"), "relationships" : { "friends" : 2, "enemies" : 3 }, "username" : "joe" }
+`{ "_id" : ObjectId("55b61a2634a254ddb211bf32"), "relationships" : { "friends" : 2, "enemies" : 3 }, "username" : "joe" }`
 
 ### Dump & Restore
 mongodump -p 31000	mongodump will create a dump
@@ -211,6 +257,7 @@ mongod --replSet replSetName -f mongod.conf --fork
 
 #### Enable Auth
 ##### Create the user administrator
+```
 use admin
 db.createUser(
   {
@@ -219,6 +266,10 @@ db.createUser(
     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
   }
 )
+```
+
+`db.createUser({user: "admin",pwd: "password",roles: [ { role: "root", db: "admin" } ]});`
+`db.auth("admin","password");`
 
 ##### Re-start the MongoDB instance with access control
 `mongod --auth`
@@ -228,7 +279,7 @@ db.createUser(
 
 ##### Create additional users as needed for your deployment
 ```
-	
+
 	use test
 	db.createUser(
 	  {
@@ -243,3 +294,109 @@ db.createUser(
 ##### Connect and authenticate as myTester
 `mongo --port 27017 -u "myTester" -p "xyz123" --authenticationDatabase "test"`  
 `db.auth("myTester","xyz123")`  
+
+
+## Profile 优化
+
+### Command
+`mongotop -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`  
+`mongostat -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`  
+[mongottop](https://docs.mongodb.com/manual/reference/program/mongotop/ )  
+[mongostat](https://docs.mongodb.com/manual/reference/program/mongostat/#fields )  
+
+
+`db.runCommand( { serverStatus: 1 } )`  
+`db.COLLECTION_NAME.stats()`  
+
+`db.currentOp()` Seeing the Current Operations 寻找有问题的操作 [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )  
+`db.killOp(<opid>)` get opid from `db.currentOp()`  
+
+#### [explain](https://docs.mongodb.com/manual/reference/explain-results/ )
+`db.collection.find().explain()`  
+方法的参数如下：  
+    verbose：{String}，可选参数。指定冗长模式的解释输出，方式指定后会影响explain()的行为及输出信息。  
+    可选值有："queryPlanner"、"executionStats"、"allPlansExecution"，默认为"queryPlanner"
+[执行计划函数explain](https://itbilu.com/database/mongo/V1WFKy-Cl.html )
+
+```
+
+	> db.COLLECTION_NAME.find({"appkey" : "fnimbzyp1d" , "event" : "active","cdate": 20170614}).explain()
+	{
+        "cursor" : "BtreeCursor appkey_1_event_1_cdate_1",
+        "isMultiKey" : false,
+        "n" : 6632,
+        "nscannedObjects" : 6632,
+        "nscanned" : 6632,
+        "nscannedObjectsAllPlans" : 6632,
+        "nscannedAllPlans" : 6632,
+        "scanAndOrder" : false,
+        "indexOnly" : false,
+        "nYields" : 52,
+        "nChunkSkips" : 0,
+        "millis" : 414,
+        "indexBounds" : {
+                "appkey" : [
+                        [
+                                "fnimbzyp1d",
+                                "fnimbzyp1d"
+                        ]
+                ],
+                "event" : [
+                        [
+                                "active",
+                                "active"
+                        ]
+                ],
+                "cdate" : [
+                        [
+                                20170614,
+                                20170614
+                        ]
+                ]
+        },
+        "server" : "kickseed:27017",
+        "filterSet" : false
+	}
+```
+
+`"cursor" : "BtreeCursor appkey_1_event_1_cdate_1"` BtreeCursor means that an index was used
+`"n" : 6632` This is the number of documents returned by the query  
+`"nscannedObjects" : 6632` This is a count of the number of times MongoDB had to follow an index pointer to the actual document on disk. If the query contains criteria that is not part of the index or requests fields back that aren’t contained in the index, MongoDB must look up the document each index entry points to.  
+`"nscanned" : 6632` The number of index entries looked at if an index was used. If this was a table scan, it is the number of documents examined.  
+
+Refer to P100, Using explain() and hint(), MongoDB权威指南第2版 MongoDB The Definitive Guide  
+
+
+#### [Database Profiling](https://docs.mongodb.com/manual/administration/analyzing-mongodb-performance/#database-profiling )
+`db.getProfilingLevel()` 查看当前的分析级别  
+`db.setProfilingLevel(1)`  
+`db.setProfilingLevel(2)` Level 2 means “profile everything.”  
+`db.system.profile.find( { millis : { $gt : 5 } } )`  
+`db.system.profile.find().pretty()`  
+
+### [MongoDB 性能优化五个简单步骤](http://blog.oneapm.com/apm-tech/183.html )
+第一步：找出慢语句
+
+一般来说查询语句太慢和性能问题瓶颈有着直接的关系，所以可以用 MongoDB 的性能分析工具来找出这些慢语句：
+
+db.setProfilingLevel(1, 100);
+
+第二步：使用 explain 分析
+
+通过使用 explain 来对这些慢语句进行诊断。此外还可以 mtools 来分析日志。
+
+第三步：创建索引
+
+分析完之后需要创建新的索引 (index) 来提升查询的性能。别忘了在 MondoDB 中可以在后台创建索引以避免 collections 锁和系统崩溃。
+
+第四步：使用稀疏索引来减少空间占用
+
+如果使用 sparse documents，并重度使用关键字 $exists，可以使用 sparse indexes 来减少空间占用提升查询的性能。
+
+第五步：读写分离
+
+如果读写都在主节点的话，从节点就一直处在空置状态，这是一种浪费。对于报表或者搜索这种读操作来说完全可以在从节点实现，因此要做的是在 connection string 中设置成 secondarypreferred。
+
+小结
+
+这些方法虽然能够起一定的作用，但最主要的目的还是为架构上的提升争取点时间罢了。

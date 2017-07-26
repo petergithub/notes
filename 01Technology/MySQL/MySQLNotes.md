@@ -2,16 +2,34 @@
 
 # MySQL Notes
 
+## TODO
+
+库拆分, 分库, 热备, 散表
+
+try mysql command with alt+. to input last word in last command
+  editline(libedit) vs. readline
+  MySQL 5.7.x on ubuntu 16.04 is compiled using editline library not readline
+  ~$ mysql --version
+  mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper
+  https://bugs.launchpad.net/percona-server/+bug/1266386
+
+慢日志 pt_query_digest
+pt-duplicate-key-checker tool included with Percona Toolkit,
+validate your planned changes carefully with a tool such as pt-upgrade
+二级索引 secondary index
+
+
 ## Recent
 mysqlreport --user root --password  
 /etc/mysql/my.cnf ~/.my.cnf  
 
 `select @@datadir;` select the data directory
 
-refer to https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html
-`clear     (\c)` Clear the current input statement.  
-`status    (\s)` Get status information from the server.  
-[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
+`sudo systemctl start/stop/status mysql`
+
+`sudo systemctl status mysql`
+`sudo systemctl start mysql`
+`sudo systemctl stop mysql`
 
 767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 
@@ -20,7 +38,11 @@ SELECT UNIX_TIMESTAMP(NOW());
 SELECT FROM_UNIXTIME(1467542031);  
 select SUBSTRING(1456958130210,1,10);  
 
-`show full processlist`;  
+#### 查询优化
+deferred join延迟关联 select <cols> from profiles inner join (select <primary
+key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as
+x using (<primary key cols>)
+
 #### explain
 [EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
 [详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
@@ -47,7 +69,7 @@ select SUBSTRING(1456958130210,1,10);
 #### 建立索引原则
 1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
 2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
-3. 尽量选择区分度高的列作为索引,区分度的公式是count(distinct col)/count(*)，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
+3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
 4. 索引列不能参与计算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);   
 5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
 6.
@@ -93,22 +115,24 @@ make a case-sensitive query
 `select * from t1 where name = binary 'YOU'`  
 
 设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
-*_bin: 表示的是binary case sensitive collation，也就是说是区分大小写的   
-*_cs: case sensitive collation，区分大小写   
-*_ci: case insensitive collation，不区分大小写   
+`*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的   
+`*_cs`: case sensitive collation，区分大小写   
+`*_ci`: case insensitive collation，不区分大小写   
 
 ### MySQL help
 `help` to get List of all MySQL commands
-http://linuxcommand.org/man_pages/mysql1.html  
-```
-clear     (\c) Clear the current input statement.
-edit      (\e) Edit command with $EDITOR.
-ego       (\G) Send command to mysql server, display result vertically.
-nopager   (\n) Disable pager, print to stdout.
-pager     (\P) Set PAGER [to_pager]. Print the query results via PAGER.
-tee       (\T) Set outfile [to_outfile]. Append everything into given outfile.
-system    (\!) Execute a system shell command.
-```
+
+[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
+[mysql Commands](https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html )
+`clear     (\c)` Clear the current input statement.  
+`status    (\s)` Get status information from the server.  
+`edit      (\e)` Edit command with $EDITOR.
+`ego       (\G)` Send command to mysql server, display result vertically.
+`nopager   (\n)` Disable pager, print to stdout.
+`pager     (\P)` Set PAGER [to_pager]. Print the query results via PAGER.
+`tee       (\T)` Set outfile [to_outfile]. Append everything into given outfile.
+`system    (\!)` Execute a system shell command.
+
 `pager less`, `pager less -n -i -S`   
 From `man less`:  
 `-i` Causes searches to ignore case  
@@ -119,6 +143,7 @@ From `man less`:
 
 `tee queries.log`	Logging to file 'queries.log'  
 log to a file the statements you typed and their output, pretty much like the Unix `tee` command:  
+
 
 ### Transaction
 Using the Transaction Information Schema Tables
@@ -179,7 +204,15 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8  
 mysql线上将采用一master多slave的方式来进行部署  
 
-## Basic command
+#### check database status
+1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
+2. 看看索引是不是对的，看看哪些SQL本身是有问题的
+
+`show full processlist`;  
+count states of SQL: `mysql -e "show processlist \G" | grep State: | sort | uniq -c | sort -rn`
+
+
+## Basic
 ### Admin command
 `./mysqld_safe` start MySQL server  
 `service mysql stop`, `service mysql start` Ubuntu start MySQL
@@ -207,12 +240,13 @@ SHOW CREATE TABLE
 往表中插入记录： INSERT INTO 表名 VALUES (”hyq”,”M”);  
 更新表中数据： UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';  
 用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名`  
-导入.sql文件命令： `SOURCE d:/mysql.sql`  
 
 `ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
 `ALTER TABLE tableName DROP INDEX idx_name;`
 
 append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
+
+`SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
 显示当前的user： `SELECT USER();`  
 来查看数据库版本 `SELECT VERSION();`  
 显示use的数据库名： `SELECT DATABASE();`   
@@ -236,8 +270,8 @@ grant select,insert,update,delete on mydb.* to test2@localhost identified by “
 show grants for USERNAME@IP; 查看用户权限  
 select * from mysql.user where user='cactiuser' \G    
 SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user; 查看MYSQL数据库中所有用户  
-CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';  
-GRANT ALL PRIVILEGES ON * . * TO 'newuser'@'localhost';  
+CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';  
+GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';
 REVOKE [type of permission] ON [database name].[table name] FROM ‘[username]’@‘localhost’;  
 DROP USER ‘demo’@‘localhost’;  
 
@@ -339,9 +373,13 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 	Privileges: select,insert,update,references
 	```
 
-
+### [数据类型宽度](http://blog.jobbole.com/87318/ ) 
+显示宽度只用于显示，并不能限制取值范围和占用空间，例如：INT(3)会占用4个字节的存储空间，并且允许的最大值也不会是999，而是INT整型
+[Numeric Type Attributes](https://dev.mysql.com/doc/refman/5.7/en/numeric-type-attributes.html )
+[MySQL: Why specify display width without using zerofill](https://stackoverflow.com/questions/12592376/mysql-why-specify-display-width-without-using-zerofill )
 
 ### Backup & restore
+
 #### Export/Backup database mysqldump
 MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)  
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
@@ -635,6 +673,19 @@ It pending to get the lock.
 The have_query_cache server system variable indicates whether the query cache is available `SHOW VARIABLES LIKE 'have_query_cache';`  
 The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM customer;`  
 
+### 优化建议 -- 知乎哈哈
+第一优化你的sql和索引；
+第二加缓存，memcached,redis；
+第三以上都做了后，还是慢，就做主从复制或主主复制，读写分离，可以在应用层做，效率高，也可以用三方工具，第三方工具推荐360的atlas,其它的要么效率不高，要么没人维护；
+第四如果以上都做了还是慢，不要想着去做切分，mysql自带分区表，先试试这个，对你的应用是透明的，无需更改代码,但是sql语句是需要针对分区表做优化的，sql条件中要带上分区条件的列，从而使查询定位到少量的分区上，否则就会扫描全部分区，另外分区表还有一些坑，在这里就不多说了；
+第五如果以上都做了，那就先做垂直拆分，其实就是根据你模块的耦合度，将一个大的系统分为多个小的系统，也就是分布式系统；
+第六才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
+mysql数据库一般都是按照这个步骤去演化的，成本也是由低到高；
+
+作者：哈哈
+链接：https://www.zhihu.com/question/19719997/answer/81930332
+来源：知乎
+著作权归作者所有，转载请联系作者获得授权。
 
 ## 构建高性能的 MySQL 集群系统
 ### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统

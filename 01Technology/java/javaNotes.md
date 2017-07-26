@@ -42,6 +42,11 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 3. 将需要的线程ID转换为16进制格式 `printf "%x\n" tid`
 4. 打印线程的堆栈信息 `jstack PID | grep tid -A 30`  
 
+#### checklist from linux to application process
+1. `top` 看出pid为 12666 的java进程占用了较多的cpu资源
+2. `top -Hp 12666` 查看该进程下各线程的CPU资源, 可以找到占资源较多的线程pid 为 12666 (12666 用 16 进制表示为 0x321e)
+3. `jstack 12666 | grep nid=0x321e` 查看当前java进程的堆栈状态
+
 ### 检查步骤
 查看java线程在内存增长时线程数 `jstack PID | grep 'java.lang.Thread.State' | wc -l` 或者 `cat /proc/pid/status | grep Thread`
 

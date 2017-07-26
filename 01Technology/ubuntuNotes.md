@@ -3,14 +3,47 @@
 学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from strach)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.  
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love  
 
+## TODO
+### email 
+
+configuration for mail
+`mail -s "subject" -A /opt/attachment.txt username@gmail.com < /dev/null`
+/etc/mail/sendmail.mc
+
+```
+
+	sendmail pu.shang@tcl.com < /tmp/email.txt
+	# cat /tmp/email.txt
+	Subject: Terminal Email Send
+	
+	Email Content line 1
+	Email Content line 2
+```
+
 ## Recent
 为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.  
 vimtutor: vim interactive guide  
 `man readline` to get the introduction to the combination of keys  
 
+
+`openssl s_client -connect www.example.com:443`
+
 ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.  
 其原理是, `~`符号是ssh命令中的转义字符, 就像我们平时编程中使用的`\`一样. 通过在ssh连接中输入`~?,` 你可以看到完整的命令帮助.  
 `reset` 恢复出现问题的屏幕  
+
+move hidden files together:
+1. `shopt -s dotglob nullglob`: set shopt
+2. `move configuration/* .`: move files
+3. `shopt -u dotglob nullglob`: unset shopt
+
+`shopt | grep on` will print a list of all the enabled options.
+`man bash` search `shopt`
+`dotglob` If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
+`nullglob` If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
+expands non-matching globs to zero arguments, rather than to themselves.
+https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin
+http://mywiki.wooledge.org/glob
 
 Convert a number from hexadecimal to decimal: `echo $((0xFF))`
 Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
@@ -30,6 +63,7 @@ Question: Cancel failed reverse-i-search in bash but keep what I typed in
 tweak get the theme ubuntu-mono-dark  
 `ln -sfn` update a symbolic link  
 `strace ls a`  
+`strace -ffp 12114`
 
 `pstack` Linux命令查看某个进程的当前线程栈运行情况  
 `ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)  
@@ -39,8 +73,6 @@ C-1 is control-1
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`  
 
 
-`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出  
-redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`  
 man top  
 `fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.  
 `sudo service network-manager start`  
@@ -68,6 +100,8 @@ Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 `foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
 `foo > allout.txt 2>&1` all output redirect to the same file  
 `log4j.appender.console.target=System.err`  
+`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出  
+redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`  
 
 `dd if=/dev/zero of=10M.file bs=1M count=10`	在当前目录下生成一个10M的文件  
 if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中  
@@ -694,6 +728,17 @@ crontab特殊的符号说明:
 4. ","分散的数字  
 
 ```
+	
+	Graphically:
+	
+	 ┌────────── minute (0 - 59)
+	 │ ┌──────── hour (0 - 23)
+	 │ │ ┌────── day of month (1 - 31)
+	 │ │ │ ┌──── month (1 - 12)
+	 │ │ │ │ ┌── day of week (0 - 6 => Sunday - Saturday, or
+	 │ │ │ │ │                1 - 7 => Monday - Sunday)
+	 ↓ ↓ ↓ ↓ ↓
+	 * * * * * command to be executed
 
 	MAILTO=username@example.org  
 	5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1  
@@ -1062,16 +1107,16 @@ Add comments for multi-lines
     * CTRL+c: 终止命令  
     * CTRL+z: 挂起命令  
 Bang (!) 命令  
-    * !!: 执行上一条命令  
-    * !blah: 执行最近的以 blah 开头的命令, 如 !ls  
-    * !blah:p: 仅打印输出, 而不执行  
-    * !$: 上一条命令的最后一个参数, 与 ALT+. 相同  
-    * !$:p: 打印输出 !$ 的内容  
-    * !*: 上一条命令的所有参数  
-    * !*:p: 打印输出 !* 的内容  
-    * ^blah: 删除上一条命令中的 blah  
-    * ^blah^foo: 将上一条命令中的 blah 替换为 foo  
-    * ^blah^foo^: 将上一条命令中所有的 blah 都替换为 foo  
+    * `!!`: 执行上一条命令  
+    * `!blah`: 执行最近的以 blah 开头的命令, 如 !ls  
+    * `!blah:p`: 仅打印输出, 而不执行  
+    * `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同  
+    * `!$:p`: 打印输出 !$ 的内容  
+    * `!*`: 上一条命令的所有参数  
+    * `!*:p`: 打印输出 `!*` 的内容  
+    * `^blah`: 删除上一条命令中的 blah  
+    * `^blah^foo`: 将上一条命令中的 blah 替换为 foo  
+    * `^blah^foo^`: 将上一条命令中所有的 blah 都替换为 foo  
 $ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new  
 !$	是一个特殊的环境变量, 它代表了上一个命令的最后一个字符串  
 !!	Run the last command-name  
@@ -1080,6 +1125,7 @@ echo !!:1	to call 1st arg
 echo !!:2	to call 2nd arg  
 echo $?	获取上一次命令执行的结果, 0表示成功, 非0表示失败  
 `sudo su -` change to root user  
+`su - username`(load new env) vs. `su username`
 
 友情提示:  
    1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.  
@@ -2217,6 +2263,7 @@ CPU	|	user% + sys%< 70%			      	|	user% + sys%= 85%		|	user% + sys% >=90%
 ### 状态采集工具
 讲究点, 要用来出报告的, 用`Zabbix`之类.  
 `ulimit -n` 查看系统默认的最大文件句柄数，系统默认是1024  
+`ulimit -c unlimited`  To enable core dumping  
 `lsof -n|awk '{print $1,$2}'|sort|uniq -c|sort -nr|head` 查看当前进程打开了多少句柄数, 第一列是打开的句柄数，第二列是进程ID  
 查看连接数(超过1024即较高) `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`  
 
@@ -2616,7 +2663,7 @@ localhost与remoteSecret之间无法连通, 必须借助remoteHost转发, 不过
 `ssh -R <local port>:<remote host>:<remote port> <SSH hostname>`	#远程端口转发remote forwarding  
 
 ##### Jumphost
-[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/)  
+[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/ )  
 
 Jumphosts are used as intermediate hops between your actual SSH target and yourself. Instead of using something like "unsecure" SSH agent forwarding, you can use ProxyCommand to proxy all your commands through your jumphost.  
 You want to connect to HOST B and have to go through HOST A, because of firewalling, routing, access privileges  
@@ -2628,16 +2675,17 @@ Classic SSH Jumphost configuration
 A configuration like this will allow you to proxy through HOST A.  
 
 ```
-$ cat .ssh/config
-Host host-a
-  Hostname 10.0.0.5
-  User your_username
-
-Host host_b
-  Hostname 192.168.0.1
-  User your_username
-  Port 22
-  ProxyCommand ssh -q -W %h:%p host-a
+	
+	$ cat .ssh/config
+	Host host-a
+	  Hostname 10.0.0.5
+	  User your_username
+	
+	Host host_b
+	  Hostname 192.168.0.1
+	  User your_username
+	  Port 22
+	  ProxyCommand ssh -q -W %h:%p host-a
 ```
 Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that is the `ProxyCommand` being executed) and start the SSH session to your actual target.  
 

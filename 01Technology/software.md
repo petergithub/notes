@@ -9,7 +9,7 @@
 
 ### Tomcat build
 #### Code
-Entry point is Bootstrap 
+Entry point is Bootstrap
 set java_home=C:\ProgramFiles\Java\jdk1.6.0_45
 set java_home=C:\ProgramFiles\Java\jdk1.7.0_21
 1. read BUILDING.txt (it needs Patch for version tomcat 8.0)
@@ -28,15 +28,15 @@ set java_home=C:\ProgramFiles\Java\jdk1.7.0_21
 	# Added by Shang Pu
 	# refer to http://www.student.lu.se/docs/logging.html
 	############################################################
-	#The default logging.properties specifies a ConsoleHandler for routing logging to stdout and also a FileHandler. A handler's log level threshold can be set using SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You can also target specific packages to collect logging from and specify a level. Here is how you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging documentation for the complete details. 
+	#The default logging.properties specifies a ConsoleHandler for routing logging to stdout and also a FileHandler. A handler's log level threshold can be set using SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You can also target specific packages to collect logging from and specify a level. Here is how you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging documentation for the complete details.
 	#org.apache.catalina.level=FINE
 	```
 
 #### Configuration
 URL with Chinese URIEncoding="UTF-8"
 ```
-<Connector port="8080" protocol="HTTP/1.1" 
-           connectionTimeout="20000" 
+<Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
            redirectPort="8443" URIEncoding="UTF-8" />
 ```
 for tomcat 7 set Xmx
@@ -64,13 +64,13 @@ echo 'export JAVA_OPTS="-Xms1024M -Xmx2048M"' > $CATALINA_HOME/bin/setenv.sh
 
 ### lucene
 run test
-set java VM parameter "-ea"	to enable 
+set java VM parameter "-ea"	to enable
 
 ### Spring
 https://src.springframework.org/svn/spring-samples/
-consider running with the -a flag to avoid evaluating other subprojects you depend on. 
+consider running with the -a flag to avoid evaluating other subprojects you depend on.
 For example, if you're iterating on changes in spring-webmvc,
-cd spring-webmvc 
+cd spring-webmvc
 run ../gradlew -a build to tell gradle to evaluate and build only that subproject.
 
 #### Spring artifact versioning
@@ -88,7 +88,7 @@ run ../gradlew -a build to tell gradle to evaluate and build only that subprojec
 3.1.0.RC2            - second release candidate toward 3.1.0 GA
 3.1.0.RELEASE        - final GA (generally available) release of 3.1.0
 3.1.1.BUILD-SNAPSHOT - nightly snapshot of the 3.1.1 maintenance release
-3.1.1.RELEASE        - final GA release of 3.1.1 
+3.1.1.RELEASE        - final GA release of 3.1.1
 
 #### Gradle command:
 https://github.com/SpringSource/spring-framework/wiki/Gradle-build-and-release-FAQ
@@ -100,7 +100,7 @@ gradlew build
 ## Operating System
 ### Windows
 #### Misc.
-replace one line in notepad++ which contain REPLEACH_THIS_LINE	^.*REPLEACH_THIS_LINE.*$\r\n
+replace one line in notepad++ which contain REPLEACH_THIS_LINE	`^.*REPLEACH_THIS_LINE.*$\r\n`
 F4 重复上一步操作，比如，插入行、设置格式等等频繁的操作, 公式里面切换绝对引用，直接点选目标，按F4轮流切换
 Alt+Shift+D    - Current date;
 Alt+Shift+T    - Current time.
@@ -108,10 +108,6 @@ start cmd /k
 type: Windows Displays the contents of a text file or files.
 nslookup http://wsyc.lqwang.com/
 tracert http://haijia.bjxueche.net/
-
-### Ubuntu
-Visio like: Dia, yEd Graph Editor
-Video player: VLC can play stream
 
 
 ## Network tools
@@ -142,9 +138,9 @@ develop, test, staging, production environment
 
 ### 02 Requirements
 ### 03 Design
-#### swagger 
+#### swagger
 http://swagger.io
-A Powerful Interface to your API 
+A Powerful Interface to your API
 https://github.com/swagger-api/swagger-ui
 
 ### 04 Build
@@ -169,7 +165,7 @@ UAT: User Acceptance Test
 通过amoeba 实现MySQL读写分离
 通过keepalived构建高可用的amoeba服务
 
-#### Distributed Configuration Management Platform(分布式配置管理平台) 
+#### Distributed Configuration Management Platform(分布式配置管理平台)
 https://github.com/knightliao/disconf
 
 #### Commons Configuration
@@ -186,7 +182,7 @@ cp local-sample.js local.js
 npm install pm2 -g
 pm2 start bin/www
 pm2 stop bin/www
-pm2 list 
+pm2 list
 pm2 delete id
 
 ### 07 Support
@@ -211,13 +207,13 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 [Home](https://github.com/javamelody/javamelody/wiki)
 
 #### 运维工具组合的进化
-##### 命令执行与配置管理 
+##### 命令执行与配置管理
 Ansible, SaltStack, Puppet  
 
-##### 持续交付与代码 
+##### 持续交付与代码
 Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
-##### ELK生态的成熟 
+##### ELK生态的成熟
 提供日志收集，分析，和实时搜索，与可视化监控
 ##### 应用监控 APM
-    
+
 ##### 国内开源 open-falcon

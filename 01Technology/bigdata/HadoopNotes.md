@@ -130,11 +130,27 @@ usage: hive
                                   console)
                                   
 Display header: `set hive.cli.print.header=true`
-                                  
+`set hive.metastore.warehouse.dir=/user/myname/hive/warehouse;` 用户设定自己的数据仓库目录。不影响其他用户。也在$HOME/.hiverc中设置，则每次启动hive自动加载
+
+Get all setting: `hive -e "set -v;" > ~/config.txt`
+
 #### Basic commands
 [LanguageManual Select](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select )
 Hive will print information to standard error such as the time taken to run a query during the course of operation.    
 `SELECT current_database()`  
+字符串s 转整型 `cast(s as int)` 
+
+#### Privileges
+`SHOW ROLES;` `SHOW CURRENT ROLES;`
+`SET ROLE ADMIN;`
+`CREATE ROLE role_name;`
+`GRANT select ON DATABASE db_name TO ROLE role_name;`
+`GRANT select ON TABLE db_name.table_name TO ROLE role_name;`
+`REVOKE select ON TABLE db_name.table_name FROM ROLE role_name;`
+`SHOW PRINCIPALS role_name;`
+`SHOW GRANT [principal_name] ON (ALL| ([TABLE] table_or_view_name)`
+`SHOW GRANT ROLE admin;`
+
 
 #### Examples
 ##### Run query
