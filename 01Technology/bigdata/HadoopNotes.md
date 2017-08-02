@@ -9,6 +9,13 @@ Reference: https://www.tutorialspoint.com/hbase/hbase_installation.htm
 4. stop hbase: $HBASE_HOME/bin/stop-hbase.sh
 5. http://localhost:8088
 
+### Command
+[Hadoop FileSystem Shell](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html )
+`hadoop fs -help ls`  
+`hadoop fs -ls` 
+`hdfs dfs -put source target` copy files  
+`hdfs dfs -cat /user/hadoop/data.txt` cat path/to/file
+
 ### Verifying Hadoop Installation
 1. Name Node Setup: `hdfs namenode -format` Formatting the HDFS file system via the NameNode   
 2. Verifying Hadoop dfs: `start-dfs.sh`
@@ -163,3 +170,8 @@ Hive will print information to standard error such as the time taken to run a qu
 ##### export file
 * output tab-separated file `hive -e 'select books from table' > /tmp/temp.tsv`
 * output comma-delimited file: `hive -e 'select books from table' | sed 's/[[:space:]]\+/,/g' > /tmp/temp.tsv`
+
+### Configuration
+[Hive Configuration Properties](https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-Tez )
+`set hive.groupby.skewindata=true;` Hive will trigger an additional MapReduce job whose map output will randomly distribute to the reducer to avoid data skew  
+

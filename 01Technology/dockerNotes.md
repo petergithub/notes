@@ -1,9 +1,35 @@
-`sudo docker run -i -t ubuntu:14.04 /bin/bash`  #start a container base on the image. 这样在这个container中启动了一个终端并运行bash 其中， -t 选项让Docker分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上， -i 则让容器的标准输入保持打开。
--d 可以让它后台运行。
-exit 退出。
 
-`docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`
-rename image `docker tag server:latest myname/server:latest`
+`docker images`	Show all images in your local repository  
+`docker run -i -t <image_id || repository:tag> -bash`	Run a container from a specific image  
+`docker run -itd ubuntu:14.04 /bin/bash`	start a container and running bash
+	`-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上  
+	`-i` 让容器的标准输入保持打开  
+	`-d` 后台运行  
+`exit` 退出
+
+`docker ps`	Show running containers  
+	`-a, --all`	Show all containers (default shows just running)  
+	`-n, --last int`	Show n last created containers (includes all states) (default -1)  
+ 	`-l, --latest`	Show the latest created container (includes all states)  
+
+`docker start -i <image_id>`	Start a existed container  
+`docker attach <container_id>`	Attach a running container  
+`[Ctrl-p] + [Ctrl-q]`	Exit without shutting down a container  
+`docker stop <hash>`	# Gracefully stop the specified container
+
+`docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`  
+`docker tag server:latest myname/server:latest`	Rename image  
+
+`docker rm <container_id/contaner_name>`   
+`docker rm $(docker ps -a -q | grep -v $(docker ps -q))`	# Remove all containers from this machine except the running one
+`docker rm $(docker ps -a -q)`	# Remove all containers from this machine
+`docker rmi <image_id/image_name ...>`  
+
+`docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`  
+
+`docker save -o <save image to path> <image name>`	save the docker image as a tar file
+`docker load -i <path to image tar file>`	load the image into docker 
+`docker save <image> | bzip2 | pv | ssh user@host 'bunzip2 | docker load'`	Transferring a Docker image via SSH, bzipping the content on the fly, put pv in the middle of the pipe to see how the transfer is going
 
 #### Docker commit the changes you make to the container and then run it.
 1. `sudo docker pull ubuntu`

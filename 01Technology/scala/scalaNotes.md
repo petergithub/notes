@@ -393,3 +393,35 @@ class Frog extends Animal with Philosophical with HasLegs {
       override def toString = "green"
 }
 ```
+
+### Chapter 13 Packages and Imports
+
+In summary, an import selector can consist of the following:
+
+* A simple name x. This includes x in the set of imported names.
+* A renaming clause `x => y`. This makes the member named x visible under the name y.
+* A hiding clause `x => _`. This excludes x from the set of imported names.
+* A `catch-all _`. This imports all members except those members mentioned in a preceding clause. If a catch-all is given, it must come last in the list of import selectors.
+```
+// easy access to Fruit
+import bobsdelights.Fruit
+
+// easy access to all members of bobsdelights
+import bobsdelights._
+
+// easy access to all members of Fruits
+import bobsdelights.Fruits._
+
+import Fruits.{Apple, Orange} // This imports just members Apple and Orange from object Fruits.
+import Fruits.{Apple => McIntosh, Orange} // the Apple object is renamed to McIntosh
+import Fruits.{Pear => _, _} // This imports all members of Fruits except Pear
+```
+
+three import clauses had been added to the top of every source file with extension ".scala", later imports overshadow earlier ones:
+```
+  import java.lang._ // everything in the java.lang package
+  import scala._     // everything in the scala package
+  import Predef._    // everything in the Predef object
+```
+
+### Chapter 14 Assertions and Tests
