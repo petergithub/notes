@@ -18,6 +18,17 @@ pt-duplicate-key-checker tool included with Percona Toolkit,
 validate your planned changes carefully with a tool such as pt-upgrade
 二级索引 secondary index
 
+https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/  
+INNER JOIN: match in both Table A and Table B.  
+FULL OUTER JOIN: all records in Table A and Table B  
+LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.  
+
+TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`   
+
+`SELECT * FROM TableA FULL OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableA.id IS null OR TableB.id IS null`   
+To produce the set of records unique to Table A and Table B, we perform the same full outer join, then **exclude the records we don't want from both sides via a where clause**.
+
+`SELECT * FROM TableA CROSS JOIN TableB`  cartesian product, this joins "everything to everything"
 
 ## Recent
 mysqlreport --user root --password  
