@@ -146,6 +146,18 @@ Get all setting: `hive -e "set -v;" > ~/config.txt`
 Hive will print information to standard error such as the time taken to run a query during the course of operation.    
 `SELECT current_database()`  
 字符串s 转整型 `cast(s as int)` 
+`SHOW PARTITIONS table_name`  
+`INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;`  
+`INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;`  
+
+#### Config
+`SET hive.execution.engine=tez;`  
+`SET tez.queue.name=queueName;`  
+
+
+#### Advanced
+[Hive Joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins)
+
 
 #### Privileges
 `SHOW ROLES;` `SHOW CURRENT ROLES;`
@@ -167,7 +179,7 @@ Hive will print information to standard error such as the time taken to run a qu
 * running a script non-interactively from a Hadoop supported filesystem `hive -f hdfs://<namenode>:<port>/hive-script.sql`, `hive -f s3://mys3bucket/s3-script.sql `
 * output information to log: `hive --hiveconf tez.queue.name=sysopt -e "select t.dt,t.times,count(distinct t.uuid) from(select dt,uuid,count(uuid) times from data_warehouse.dw_app_orc_dt where dt = '20170420' group by dt,uuid order by dt) t group by t.dt, t.times limit 10;" >> test.log 2>&1`  
 
-##### export file
+##### Export file
 * output tab-separated file `hive -e 'select books from table' > /tmp/temp.tsv`
 * output comma-delimited file: `hive -e 'select books from table' | sed 's/[[:space:]]\+/,/g' > /tmp/temp.tsv`
 
