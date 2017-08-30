@@ -30,7 +30,7 @@
 # apt-get-install package-name=version	# install specified version of package
 # apt-cache search # ------(package 搜索包)
 
-## uninstall
+## uninstall (even install with .debi package from local)
 # sudo apt-get remove <package> && sudo apt-get autoremove
 
 # update the package lists /etc/apt/sources.list from repositories
@@ -47,6 +47,9 @@ sudo apt-get update # This is very important step to update system first.
 
 ########## GVim config: clone configuration files from stash ##########
 sudo apt-get -y install vim-gnome
+
+## get customized vim configuration file .vimrc
+# wget --no-check-certificate -O ~/.vimrc https://raw.githubusercontent.com/petergithub/configuration/master/.vimrc
 
 ## update configuration to make cut/copy/paste like Windows
 #cp /usr/share/vim/vim74/vimrc_example.vim .vimrc
@@ -82,7 +85,7 @@ sudo apt-add-repository ppa:upubuntu-com/ppa
 sudo apt-get update
 
 ## gdebi lets you install local deb packages resolving and installing its dependencies
-sudo apt-get -y install gdebi ncdu nautilus-gksu
+sudo apt-get -y install gdebi ncdu nautilus-gksu xclip
 nautilus -q
 
 ## flashplugin-nonfree: flash plugin for firefox
