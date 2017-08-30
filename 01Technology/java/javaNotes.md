@@ -20,7 +20,12 @@ concurrent: 主内存.寄存器是是运行时?
 	    /      \
 	>-------------->>
 
-## Java问题排查工具箱 
+## Java 8
+
+method reference :: syntax (meaning “use this method as a value”
+`File[] hiddenFiles = new File(".").listFiles(File::isHidden);`
+
+## Java问题排查工具箱
 
 ### java.net.SocketException 异常
 https://www.ibm.com/developerworks/community/blogs/738b7897-cd38-4f24-9f05-48dd69116837/entry/understanding_some_common_socketexceptions_in_java3?lang=en  
@@ -58,7 +63,7 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 用strace和ltrace查找malloc调用
 
 ### CPU相关工具 bluedavy
-https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd 
+https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd
 
 碰到一些CPU相关的问题时，通常需要用到的工具：
 

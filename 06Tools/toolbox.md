@@ -9,7 +9,7 @@ VLC media player
 ncdu - NCurses Disk Usage: ncdu (NCurses Disk Usage) is a curses-based version of the well-known 'du', and provides a fast way to see what directories are using your disk space.
 
 Disk usage analyzer
-Visio like: Dia
+Visio like: Dia, sudo apt-get install -y dia
 Graph Editor: yEd
 RemoteMouse: mono ~/opt/RemoteMouse/RemoteMouse.exe http://remotemouse.net
 Pocket Files: share files and private files http://app.rambax.com/pocketfiles
