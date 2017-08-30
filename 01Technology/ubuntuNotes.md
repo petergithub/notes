@@ -4,7 +4,7 @@
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love  
 
 ## TODO
-### email 
+### email
 
 configuration for mail
 `mail -s "subject" -A /opt/attachment.txt username@gmail.com < /dev/null`
@@ -15,7 +15,7 @@ configuration for mail
 	sendmail pu.shang@tcl.com < /tmp/email.txt
 	# cat /tmp/email.txt
 	Subject: Terminal Email Send
-	
+
 	Email Content line 1
 	Email Content line 2
 ```
@@ -88,14 +88,6 @@ send requests during 30 seconds with a concurrency of 50 requests to an URL
 
 execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`  
 `$((1 + RANDOM % 1000))` random number between 1 and 1000  
-
-Get Unix time stamp 	`date +%s` 1477998994  
-Convert Unix timestamp to Date `date -d @1467540501`  
-Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
-`date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
-`date -d '1 hours ago' "+%F"` 2016-11-01  
-`date -d now "+%Y%m%d %H:%M:%S"`
-`date +%Y%m%d%H%M%S` 20161101191653  
 
 `foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr  
 `foo > allout.txt 2>&1` all output redirect to the same file  
@@ -424,6 +416,7 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 `find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
 `find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
 `find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
+`find / -name '*log*' -size +1000M -exec du -h {} \;` find files size more than 1G
 
 #### 文件个数 count files in directory recursively
 `find . -type f | wc -l`  
@@ -476,6 +469,7 @@ Vim中查看文件编码 `:set fileencoding`
 `ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者  
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`	print each filed number  
 
+`alias aprint='awk "{print \$1}"'`  the $ is preceded by a \ to prevent $1 from being expanded by the shell.
 `w | awk '/pts\/0/ {print $1}'`	print who is on the TTY pts/0  
 `ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root  
 `ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format  
@@ -518,11 +512,11 @@ Initialization and Final Action
 
 ```
 
-	Syntax: 
+	Syntax:
 	BEGIN { Actions}
 	{ACTION} # Action for everyline in a file
 	END { Actions }
-	
+
 	# is for comments in Awk
 ```
 
@@ -642,7 +636,7 @@ http://www.thegeekstuff.com/2010/02/awk-conditional-statements
 2. Awk If Else If  
 
 ```
-	
+
 	$ cat grade.awk
 	{
 	total=$3+$4+$5;
@@ -651,7 +645,7 @@ http://www.thegeekstuff.com/2010/02/awk-conditional-statements
 	else if ( avg >= 80) grade ="B";
 	else if (avg >= 70) grade ="C";
 	else grade="D";
-	
+
 	print $0,"=>",grade;
 	}
 	$ awk -f grade.awk student-marks
@@ -705,14 +699,80 @@ So signal 0 will not actually in fact send anything to your process's PID, but w
 ``` bash
 
 	#!/bin/bash
-	
+
 	PID=$(pgrep sleep)
-	if ! kill -0 $PID 2>/dev/null; then 
+	if ! kill -0 $PID 2>/dev/null; then
 	  echo "you don't have permissions to kill PID:$PID"
 	  exit 1
 	fi
-	
+
 	kill -9 $PID
+```
+
+### date
+`date --help`
+`date -R` for `--rfc-2822` format which displays correct offset  
+Valid timezones are defined in `/usr/share/zoneinfo/`  
+
+Get Unix time stamp 	`date +%s` 1477998994  
+Convert Unix timestamp to Date `date -d @1467540501`  
+Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
+`date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
+`date -d '1 hours ago' "+%F"` 2016-11-01  
+`date -d now "+%Y%m%d %H:%M:%S"`
+`date +%Y%m%d%H%M%S` 20161101191653  
+
+`man timezone`  
+>The offset is positive if the local timezone is west of the Prime Meridian and negative if it is east  
+
+example: timezone `UTC+0800` is `TZ=UTC-8` or `TZ=Asia/Shanghai`
+```
+~$ TZ=Asia/Shanghai date -R
+Wed, 30 Aug 2017 13:58:05 +0800
+~$ TZ=UTC-8 date -R
+Wed, 30 Aug 2017 13:58:32 +0800
+~$ TZ=UTC date -R
+Wed, 30 Aug 2017 05:58:36 +0000
+~$ TZ=UTC+8 date -R
+Tue, 29 Aug 2017 21:58:33 -0800
+```
+
+#### 日期自增
+```
+
+	#! /bin/bash
+	# 日期自增
+	start=20170101
+	end=20170103
+	while [ $start -le $end ]
+	do
+	  echo $start
+	  start=`date -d "1 day $start" +%Y%m%d`  
+	done
+```
+#### 时间比较
+[Shell比较两个日期的大小](http://www.linuxsong.org/2010/09/shell-date-compare/)  
+在Shell中我们可以利用date命令比较两个日期的大小, 方法是先把日期转换成时间戳格式, 再进行比较.  
+date 的+%s可以将日期转换成时间戳格式,看下面的例子:  
+
+``` shell
+
+	#!/bin/bash
+	# 时间比较
+
+	date1="2008-4-09 12:00:00"
+	date2="2008-4-10 15:00:00"
+
+	t1=`date -d "$date1" +%s`
+	t2=`date -d "$date2" +%s`
+
+	if [ $t1 -gt $t2 ]; then
+	    echo "$date1 > $date2"
+	elif [ $t1 -eq $t2 ]; then
+	    echo "$date1 == $date2"
+	else
+	    echo "$date1 < $date2"
+	fi
 ```
 
 ### crontab
@@ -728,9 +788,9 @@ crontab特殊的符号说明:
 4. ","分散的数字  
 
 ```
-	
+
 	Graphically:
-	
+
 	 ┌────────── minute (0 - 59)
 	 │ ┌──────── hour (0 - 23)
 	 │ │ ┌────── day of month (1 - 31)
@@ -759,6 +819,12 @@ rsyslog>>>>>>
 3. 重启cron服务service cron restart  
 
 `(crontab -l ; echo "00 09 * * 1-5 echo hello") | crontab -`  [How to create a cron job using Bash](https://stackoverflow.com/questions/878600/how-to-create-a-cron-job-using-bash )  
+
+`at` want a command to run once at a later date, `at 4:01pm`  
+If you want a command to be run once at system boot, the correct solution is to use either:  
+    * system RC scripts (/etc/rc.local)
+    * crontab with the @reboot special prefix (see manpage)
+
 
 ### shell
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)  
@@ -1009,18 +1075,6 @@ switch流程控制
 	esac
 ```
 
-``
-
-	#! /bin/bash
-start=20170101
-end=20170103
-while [ ${start} -le ${end} ]
-do
-  echo ${start}
-  start=`date -d "1 day ${start}" +%Y%m%d`  # 日期自增
-done
-	```
-
 #### example
 
 ##### read each line from file
@@ -1036,30 +1090,6 @@ done
 	do
 	    echo $x "   "  $((${x} + 10)) " " $(($x * 10))
 	done
-```
-
-##### 时间比较
-[Shell比较两个日期的大小](http://www.linuxsong.org/2010/09/shell-date-compare/)  
-在Shell中我们可以利用date命令比较两个日期的大小, 方法是先把日期转换成时间戳格式, 再进行比较.  
-date 的+%s可以将日期转换成时间戳格式,看下面的例子:  
-
-``` shell
-
-	#!/bin/bash
-
-	date1="2008-4-09 12:00:00"
-	date2="2008-4-10 15:00:00"
-
-	t1=`date -d "$date1" +%s`
-	t2=`date -d "$date2" +%s`
-
-	if [ $t1 -gt $t2 ]; then
-	    echo "$date1 > $date2"
-	elif [ $t1 -eq $t2 ]; then
-	    echo "$date1 == $date2"
-	else
-	    echo "$date1 < $date2"
-	fi
 ```
 
 ### bash
@@ -1202,6 +1232,7 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 `tar -tf filename.tar.gz`	List files inside the tar.gz file  
 `vim filename.tar.gz` List files and open file inside it with `Enter`  
 `tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/` -C 选项提取文件到指定目录  
+`-exclude path/to/exclude` exclude files
 
 Extract multiple .tar.gz files with a single tar call  
 `ls *.tar | xargs -i tar xf {}` or `cat *.tar | tar -xvf - -i`  
@@ -1280,7 +1311,7 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 * `-H, --header`	Sent with header
 * `-u, --USER`	username:password  
 * `-w, --write-out "@curl-format.txt"`	tells cURL to use our format file  
-* `-m, --max-time <seconds>`	超时时间. Maximum time in seconds that you allow the whole operation to  take. 
+* `-m, --max-time <seconds>`	超时时间. Maximum time in seconds that you allow the whole operation to  take.
 
 #### Sample
 显示通信过程  `curl -v www.sina.com`  
@@ -1405,11 +1436,13 @@ EOF
 `watch -n 3 ls` 以3秒钟执行一个ls命令  
 `du -sh dirname` 查看目录的大小  
 `du -h --max-depth=1` 显示当前目录中所有子目录的大小  
+`du -a / | sort -rn`
 `cd -` 切换回上一个目录  
 `source .profile` 使profile改动生效  
 `wget -c file` continue stopped download  
 `wget -r url` recursive download files from url  
 `tnsping MDATADEV.DOMAIN.COM`  
+`mkdir -p $(dirname /tmp/tmp/log)` Create folder /tmp/tmp
 使用一个命令来定义复杂的目录树	`mkdir -p project/{lib/ext,bin,src,doc/{html,info,pdf},demo/stat/a}`  
 ntsysv 就会*出图形界面给你选择(有的则显示在里面), 如果在文本界面就用ntsysv命令  
 常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展, 所以我们可以用 `echo * == ls`  
@@ -1426,7 +1459,7 @@ tmux使用C/S模型构建, 主要包括以下单元模块:
 tmux ls #列出会话  
 tmux a[ttach] -t session  
 
-#### session operation:
+#### session operation
 :new	create new session(:new -s sessionName)  
 ? 列出所有快捷键; 按q返回  
 d 脱离当前会话,可暂时返回Shell界面, 输入tmux a[ttach]能够重新进入之前会话  
@@ -2572,9 +2605,9 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `-C`	压缩传送的数据  
 `-i`	使用指定的密钥登录  
 	It is required that your private key files are NOT accessible by others  
-	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa 
+	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
 `-t` Force pseudo-tty allocation for bash to use as an interactive shell
-	 
+
 `ssh -t user@server "mail && bash"`	Single command to login to SSH and run program
 
 escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;  
@@ -2675,12 +2708,12 @@ Classic SSH Jumphost configuration
 A configuration like this will allow you to proxy through HOST A.  
 
 ```
-	
+
 	$ cat .ssh/config
 	Host host-a
 	  Hostname 10.0.0.5
 	  User your_username
-	
+
 	Host host_b
 	  Hostname 192.168.0.1
 	  User your_username
@@ -2859,16 +2892,15 @@ Here, only the most important directories in the system will be presented.
 ### Source code
 https://peteris.rocks/blog/htop/#source-code  
 ```
-	
+
 	$ which uptime
 	/usr/bin/uptime
 	$ dpkg -S /usr/bin/uptime
 	procps: /usr/bin/uptime
-```	
+```
 Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.  
 You can then go to packages.ubuntu.com and search for the package there.  
 Here is the page for procps: http://packages.ubuntu.com/source/xenial/procps  
 If you scroll to the bottom of the page, you'll see links to the source code repositories:  
 * Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
 * Debian Package Source Repository (Browsable) https://anonscm.debian.org/cgit/collab-maint/procps.git/
-
