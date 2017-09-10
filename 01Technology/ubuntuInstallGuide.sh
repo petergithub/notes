@@ -128,9 +128,10 @@ cheat -v && cd .. && rm -r cheat
 
 ########## wine BEGIN ##########
 ## https://wiki.winehq.org/Ubuntu
+sudo apt-get install software-properties-common # install apt-add-repository
 ## winecfg: wine configuration
-sudo dpkg --add-architecture i386 
-sudo add-apt-repository ppa:wine/wine-builds
+sudo dpkg --add-architecture i386  # check by dpkg --print-foreign-architectures
+sudo add-apt-repository ppa:wine/wine-builds 
 sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
 # sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys PUBKEY
@@ -208,6 +209,9 @@ sudo apt install compizconfig-settings-manager
 ## 3. Dash -> Fcitx Configuration -> Global Config
 ## 4. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
 ## 5. Disable "C-semicolon": Dash -> Fcitx Configuration -> Tab "Addon" -> Double click ClipBoard -> "Trigger key for ClipBoard history list" -> hit "Esc" -> OK
+
+### wechat
+sudo snap install electronic-wechat
 
 ### TM2013
 #ln -sfn ~/.longene/tm2013/drive_c/Program\ Files/Tencent/tm2013/Users ~/Documents/Tencent.tm2013.Users
@@ -293,6 +297,11 @@ sudo apt-get install playonlinux
 
 ## Transmission 
 ## Transmission is a cross-platform BitTorrent client https://transmissionbt.com/about/
+
+## Snap
+sudo snap install <snap name> # To install a snap
+sudo snap remove <snap name> # remove the snap
+other command: list / find <text to search> / revert <snap name> / refresh <snap name> 
 
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
 #make PREFIX=/path/to/target >& make.log &

@@ -710,7 +710,7 @@ So signal 0 will not actually in fact send anything to your process's PID, but w
 ```
 
 ### date
-`date --help`
+`date --help`  
 `date -R` for `--rfc-2822` format which displays correct offset  
 Valid timezones are defined in `/usr/share/zoneinfo/`  
 

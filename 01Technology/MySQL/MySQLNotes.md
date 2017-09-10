@@ -427,7 +427,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 	    orders
 	WHERE
 	    status = 'Cancelled'
-	INTO OUTFILE 'C:/tmp/cancelled_orders.csv'
+	INTO OUTFILE '/tmp/cancelled_orders.csv'
 	FIELDS ENCLOSED BY '"'
 	TERMINATED BY ','
 	ESCAPED BY '"'

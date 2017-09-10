@@ -1,6 +1,14 @@
 # Spark Notes
 
-`docker attach spark`  
+`docker start spark && docker attach spark`  
+su - hadoop
+sh /usr/local/bootstrap.sh
+172.17.0.2
+http://172.17.0.2:8088/cluster/scheduler
+http://172.17.0.2:50070/dfshealth.html#tab-overview
+
+spark://569f44d409fd:7077
+spark://172.17.0.2:7077
 
 ## Shell
 open Spark shell: `$SPARK_HOME/sbin/spark-shell`  
@@ -65,3 +73,21 @@ After the broadcast variable is created, it should be used instead of the value 
 #### Accumulators
 Accumulators are variables that are only “added” to through an associative and commutative operation and can therefore be efficiently supported in parallel.  
 A numeric accumulator can be created by calling `SparkContext.longAccumulator()` or `SparkContext.doubleAccumulator()` to accumulate values of type Long or Double, respectively.
+
+## Tune Spark Jobs
+### Basic parameters
+https://stackoverflow.com/questions/37871194/how-to-tune-spark-executor-number-cores-and-executor-memory
+http://blog.cloudera.com/blog/2015/03/how-to-tune-your-apache-spark-jobs-part-2/
+
+`--executor-cores` or `spark.executor.cores` : number of cores, concurrent tasks as executor can run
+`--num-executors` or `spark.executor.instances`: number of executors
+`--executor-memory` or `spark.executor.memory`: executor memory
+
+#### Steps
+[Configuring Spark](https://cwiki.apache.org/confluence/display/Hive/Hive+on+Spark:+Getting+Started#HiveonSpark:GettingStarted-ConfiguringSpark)
+1. number of cores: to be 5, 6 or 7 depending on `yarn.nodemanager.resource.cpu-vcores` is divisible by.   
+2. executor memory: `spark.executor.memory = yarn.nodemanager.resource.memory-mb * (spark.executor.cores / yarn.nodemanager.resource.cpu-vcores)`  
+`spark.yarn.executor.memoryOverhead`	15-20% of spark.executor.memory  
+3. number of executors: Based on the physical memory and executor memory
+
+[Understanding Resource Allocation configurations for a Spark application](http://site.clairvoyantsoft.com/understanding-resource-allocation-configurations-spark-application/ )

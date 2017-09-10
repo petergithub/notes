@@ -9,6 +9,12 @@ Reference: https://www.tutorialspoint.com/hbase/hbase_installation.htm
 4. stop hbase: $HBASE_HOME/bin/stop-hbase.sh
 5. http://localhost:8088
 
+### Configuration
+`/etc/hadoop/conf/capacity-scheduler.xml`  
+`yarn.scheduler.capacity.resource-calculator`  
+`org.apache.hadoop.yarn.util.resource.DefaultResourceCalculator` It considers only memory  
+`org.apache.hadoop.yarn.util.resource.DominantResourceCalculato` It uses both cpu and memory.  
+
 ### Command
 [Hadoop FileSystem Shell](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html )
 `hadoop fs -help ls`  
@@ -154,9 +160,33 @@ Hive will print information to standard error such as the time taken to run a qu
 `SET hive.execution.engine=tez;`  
 `SET tez.queue.name=queueName;`  
 
+##### hiveconf
+[LanguageManual VariableSubstitution](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+VariableSubstitution )
+test.sql: `select * from foo where day >= '${hiveconf:CURRENT_DATE}'`  
+`hive --hiveconf CURRENT_DATE='2012-09-16' -f test.hql`  
+`hive --hiveconf CONF='this is conf' -e '!echo ${hiveconf:CONF};'`  
+
+`hive> set hiveconf:CONF=conf1;`  
+`hive> set hiveconf:CONF;`  
+
+##### hivevar
+`set hivevar:tablename=mytable;`  
+`hive> source /path/to/setup.hql;` # setup.hql which sets a tablename variable  
+or `hive> select * from ${tablename}`  
+or `hive> select * from ${hivevar:tablename}`  
+
+`hive --hivevar TABLE_NAME=mytable -f test.hql`  
+`hive --hivevar VAR='this is var' -e '!echo ${VAR};'`  
+`hive> set hivevar:VAR=var1;`  
+`hive> set hivevar:VAR;`  
 
 #### Advanced
 [Hive Joins](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Joins)
+
+##### cube
+cube简称数据魔方，可以实现hive多个任意维度的查询，cube(a,b,c)则首先会对(a,b,c)进行group by，然后依次是(a,b),(a,c),(a),(b,c),(b),(c),最后在对全表进行group by，他会统计所选列中值的所有组合的聚合
+
+`select a,b,c from table group by a,b,c with cube;`
 
 
 #### Privileges
