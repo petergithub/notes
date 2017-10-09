@@ -64,6 +64,9 @@ mvn dependency:resolve 打印出已解决依赖的列表
 mvn dependency:tree 打印整个依赖树
 mvn dependency:list -e -U -X
 
+### Proxy
+`export MAVEN_OPTS="-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080"`  
+or `mvn -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080`
 
 ## Introduction to the Standard Directory Layout
 src/main/java Application/Library sources
