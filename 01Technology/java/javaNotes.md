@@ -114,18 +114,6 @@ jvm log 时间格式
 
 ## Java Mermory check
 
-### Linux tool
-
-#### top
-这个是Linux自带的命令，查看系统资源消耗情况，可以看看CPU、内存、SWAP、I/O的消耗情况，需要特别注意的有几个值：
-* ni，这个值如果特别高说明线程上下文切换开销较大，看看是不是开了太多的线程导致的。
-* res，这个代表了进程实际占用的内存
-* swap，内存不足就会占用swap空间，这个时候一般应用的性能会急剧下降，需要特别关注
-`pstack` Linux命令。可以查看某个进程的当前线程栈运行情况。
-
-#### iostat
-如果目标服务是磁盘I/O较重的程序，则用`iostat -d 1`，检查磁盘I/O情况。若“目标服务对应的磁盘”读写量在预估之内（预估要注意cache机制的影响）
-
 ### 虚拟机监控工具
 http://www.oracle.com/technetwork/java/javase/memleaks-137499.html#gdysp
 jps: 虚拟机进程状况工具  (Java Virtual Machine Process Status Tool)

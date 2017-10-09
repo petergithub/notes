@@ -161,11 +161,19 @@ ALT+Delete, and then press the up or down arrow key.
 
 ## Basic Command
 ### vi
+[What is your most productive shortcut with Vim?](https://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim/1220118#1220118)
+
 命令提示 Command line completion with `CTRL-D` and `<TAB>`  
 `:help` help document  
 `:help cmdline-special` special character  
 Jump to a subject:  Position the cursor on a tag (e.g. |bars|) and hit `CTRL-]`  
 Jump back:  Type `CTRL-T` or `CTRL-O` (repeat to go further back)  
+`CTRL-O` Go to previous (`^O` - "O" for old) location or to the next (^I - "I" just near to "O"). When you perform searches, edit files etc., you can navigate through these "jumps" forward and back.
+`gi` Go to last edited location (very useful if you performed some searching and than want go back to edit)
+
+`~` changes case
+`>` indent block (in visual mode)
+`<` unindent block (in visual mode)
 
 #### Set option Configuration
 `:set nu` / `:set nonu`	(不)列出行号 (nu为行数)  
@@ -186,6 +194,23 @@ Typing ":set xxx" sets the option "xxx".  Some options are:
 `(` / `)` move a sentence back/forward  
 `{` / `}` move paragraph back/forward  
 After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer positions  
+`gi` Go to last edited location (very useful if you performed some searching and than want go back to edit)
+
+Move around inside of long line: `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines  
+
+#### Selection
+You need to select to the next matching parenthesis. 
+* `v%` if the cursor is on the starting/ending parenthesis 
+* `vib` if the cursor is inside the parenthesis block
+
+* select text between quotes: `vi"` for double quotes, `vi'` for single quotes
+* select a curly brace block (very common on C-style languages): `viB`, `vi{`
+
+#### mark and registers
+You can move to the line containing a mark using the ' (single quote) command. Thus 'a moves to the beginning of the line containing the 'a' mark. You can move to the precise location of any mark using the ` (backquote) command. Thus `z will move directly to the exact location of the 'z' mark.
+
+I can use any of the 26 "named" registers by prefixing the "object" reference with " (the double quote modifier). Thus if I use "add I'm cutting the current line into the 'a' register and if I use "by/foo then I'm yanking a copy of the text from here to the next line containing "foo" into the 'b' register. To paste from a register I simply prefix the paste with the same modifier sequence: "ap pastes a copy of the 'a' register's contents into the text after the cursor and "bP pastes a copy from 'b' to before the current line.
+
 
 #### Basic vi
 VIM - main help file  `:help`  
@@ -239,9 +264,6 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 Recording 记录功能: 命令模式下按`q`, 再按一个字母`a`做名字, 就进入了记录模式, 再按`q`停止记录.  
 Replay 回放记录: 在命令模式下按`@`, 再按下记录名字`a`. 连续回放可以在`@`前加次数.  
 To playback your keystrokes, press `@` followed by the letter previously chosen. Typing `@@` repeats the last playback.     
-
-#### Move around inside of long line
-`gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines  
 
 #### 文件对比 合并 多窗口
 `diff -u`  
@@ -494,7 +516,7 @@ Print every line that has at least one field: `awk 'NF > 0' data`
 过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=  
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`   
 
-tomcat localhost_access_log filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`  
+tomcat `localhost_access_log` filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`  
 
 awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`  
 
@@ -823,7 +845,7 @@ rsyslog>>>>>>
 `at` want a command to run once at a later date, `at 4:01pm`  
 If you want a command to be run once at system boot, the correct solution is to use either:  
     * system RC scripts (/etc/rc.local)
-    * crontab with the @reboot special prefix (see manpage)
+    * crontab with the `@reboot` special prefix (see manpage)
 
 
 ### shell
@@ -1833,7 +1855,7 @@ gMTP connect to android from Ubuntu
 
 ### Performance
 [Linux Performance](http://www.brendangregg.com/linuxperf.html )  
-[The USE Method](http://www.brendangregg.com/usemethod.html )    
+[The USE Method](http://www.brendangregg.com/usemethod.html )  
 
 #### Linux Perf Analysis in 60s Checklist
 http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html  
@@ -1849,8 +1871,9 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 9.	`sar -n TCP,ETCP 1` ⟶   TCP stats  
 10.	`top` ⟶  check overview  
 
-`dmesg | tail`	输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`  
-`sysstat`工具与负载历史回放  
+11. `dmesg | tail`	输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`  
+12. `sysstat`工具与负载历史回放  
+13. `dstat` 
 
 性能指标总结  
 http://blog.csdn.net/heyongluoyao8/article/details/51413668  
@@ -1869,10 +1892,21 @@ http://blog.csdn.net/heyongluoyao8/article/details/51413668
 
 
 ### CPU
+#### Linux CPU Checklist
+http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html  
+
+1.	`uptime` ⟶  load averages  
+2.	`vmstat 1` ⟶  system-wide utilization, run q length  
+3.	`mpstat -P ALL 1` ⟶  CPU balance  
+4.	`pidstat 1` ⟶  per-process CPU  
+5.	CPU flame graph ⟶  CPU profiling  
+6.	CPU subsecond offset heat map ⟶  look for gaps  
+7.	`perf stat -a` -- sleep 10 ⟶  IPC, LLC hit ratio  
+8. `htop` can do 1-4  
+
 `lscpu` display information on CPU architecture  
 `cat /proc/cpuinfo` view the amount of cores  
 `pidstat -l 2 10`  
-`ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程  
 `w` - Find Out Who Is Logged on And What They Are Doing  
 
 #### 良好状态指标  
@@ -1908,18 +1942,6 @@ waiting time。指CPU花费在等待I/O操作上的总时间，与blocked相似
 steal time。指当前CPU被强制（involuntary wait ）等待另外虚拟的CPU处理完毕时花费的时间，此时 hypervisor 在为另一个虚拟处理器服务   
 Softirq time 、Hardirq time。分别对应系统在处理软硬中断时候所花费的CPU时间  
 
-#### Linux CPU Checklist
-http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html  
-
-1.	`uptime` ⟶  load averages  
-2.	`vmstat 1` ⟶  system-wide utilization, run q length  
-3.	`mpstat -P ALL 1` ⟶  CPU balance  
-4.	`pidstat 1` ⟶  per-process CPU  
-5.	CPU flame graph ⟶  CPU profiling  
-6.	CPU subsecond offset heat map ⟶  look for gaps  
-7.	`perf stat -a` -- sleep 10 ⟶  IPC, LLC hit ratio  
-htop can do 1-4  
-
 #### top uptime
 `top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等. 因此通过这个命令, 可以相对全面的查看系统负载的来源. 同时, `top`命令支持排序, 可以按照不同的列排序, 方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等.  
 
@@ -1941,7 +1963,7 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 　　　　`si`: CPU处理软件终端所占时间的比率;   
 　　　　`st`: 流逝的时间, 虚拟机中的其他任务所占CPU时间的比率;   
 
-　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有教低的id, 说明CPU空转时间很少;   
+　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有较低的id, 说明CPU空转时间很少;   
 　　wa低, id高, 可以排除CPU资源瓶颈的可能  
 　　wa高, 说明I/O占用了大量的CPU时间, 需要检查交换空间的使用, 交换空间位于磁盘上, 性能远低于内存, 当内存耗尽开始使用交换空间时, 将会给性能带来严重影响, 所以对于性能要求较高的服务器, 一般建议关闭交换空间. 另一方面, 如果内存充足, 但wa很高, 说明需要检查哪个进程占用了大量的I/O资源.  
 
@@ -1957,6 +1979,16 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 `skill -CONT PID` 如果希望暂时冻结进程以便为完成更重要的进程腾出空间，该方法非常有用。要停止 "oracle" 用户的所有进程，只需要一个命令即可实现：  
 `skill -STOP oracle` 可以使用用户、PID、命令或终端 id 作为参数  
 
+#### perf 
+`sudo perf record -F 99 -p 13204 -g -- sleep 30`  
+perf record表示记录，-F 99表示每秒99次，-p 13204是进程号，即对哪个进程进行分析，-g表示记录调用栈，sleep 30则是持续30秒。  
+perf 命令（performance 的缩写）讲起，它是 Linux 系统原生提供的性能分析工具，会返回 CPU 正在执行的函数名以及调用栈（stack）
+
+[The USE Method](http://www.brendangregg.com/usemethod.html )  
+[如何读懂火焰图](http://www.ruanyifeng.com/blog/2017/09/flame-graph.html )  
+[Flame Graphs](http://www.brendangregg.com/flamegraphs.html )
+ 
+
 ### Memory
 #### 良好状态指标  
 * swap in （si） == 0，swap out （so） == 0  `si, so` in `vmstat`  
@@ -1965,6 +1997,7 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 使用`sar -B`、`sar -r` 和 `sar -W`查看  
 `dmesg | grep oom-killer shows the OutOfMemory-killer at work`  
 `cat /proc/meminfo`  
+`ps aux | sort -nk +4 | tail`	列出头十个最耗内存的进程  
 
 #### Momory troubleshooting
 [Linux系统排查1——内存篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4685629.html)  
@@ -2065,7 +2098,7 @@ slab的分布状况 `/proc/slabinfo`
 #### Linux Disk Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html  
 
-1.	`iostat –xnz 1` ⟶  any disk I/O? if not, stop looking
+1.	`iostat -xnz 1` ⟶  any disk I/O? if not, stop looking
 2.	`vmstat 1` ⟶  is this swapping? or, high sys time?
 3.	`df -h` ⟶  are file systems nearly full?
 4.	`ext4slower 10` ⟶  (zfs*, xfs*, etc.) slow file system I/O?
@@ -2093,6 +2126,11 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 
 ##### I节点不足
 `df -i` 查看I节点的使用情况  
+
+identify the directory which is using all your inodes:   
+* `sudo du --inodes -d 3 / | sort -n | tail`
+* `sudo find / -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n | tail -n 15`
+
 一旦遇到I节点用光的情形, 有以下几种选择:   
 　　1. 删除大量文件  
 　　2. 将大量文件移动到其他的文件系统中;   
@@ -2105,8 +2143,9 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 
 #### 硬盘写速度
 普通硬盘的写速度大概100M/s, RAID级别的查看不方便, SSD的速度也不定, 所以用dd测一下最靠谱:  
-`dd if=/dev/zero of=dd.file bs=8k count=128k conv=fdatasync`  
-`dd if=/dev/zero of=dd.file bs=1G count=1 conv=fdatasync`  
+`dd if=/dev/zero of=/tmp/output bs=8k count=128k conv=fdatasync`  
+`dd if=/dev/zero of=/tmp/output bs=1G count=1 conv=fdatasync`  
+`dd if=/dev/zero of=/tmp/output bs=8k count=256k conv=fdatasync; rm -f /tmp/output`  
 上面命令测试了分别以每次8k和1g的大小, 写入1g文件的速度.   
 `if`: 输入文件名,  /dev/zero 设备无穷尽地提供0  
 `of`: 输出文件名  
@@ -2115,9 +2154,25 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 `conv=fdatasync` : 实际写盘, 而不是写入Page Cache  
 
 #### 硬盘读速度
+##### dd
 硬盘读速度的测试同理, 不过要先清理缓存, 否则直接从Page Cache读了.   
 `sh -c "sync && echo 3 > /proc/sys/vm/drop_caches"`  
-`dd if=./dd.file of=/dev/null bs=8k`  
+`dd if=/tmp/output of=/dev/null bs=8k`  
+
+##### hdparm
+`sudo hdparm -Tt /dev/sda`  
+`for i in 1 2 3; do sudo hdparm -tT /dev/sda; done`  
+`sudo hdparm -v /dev/sda` will give information as well.
+
+```
+	
+	sudo hdparm -Tt /dev/sda
+	
+	/dev/sda:
+	Timing cached reads:   12540 MB in  2.00 seconds = 6277.67 MB/sec
+	Timing buffered disk reads: 234 MB in  3.00 seconds =  77.98 MB/sec
+```
+	
 
 ### Network  
 Listening open ports: `netstat -anp | grep PORT`  
@@ -2155,8 +2210,9 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 tcp*, are from bcc/BPF tools  
 
 11 `iftop`  
+12 `nicstat` 
 
-#### 网卡
+##### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding. bonding是个很棒的东西, 可以把多块网卡绑起来, 突破单块网卡的带宽限制
 * 然后检查每块网卡的速度, 比如`ethtool eth0`.
 * 再检查bonding, 比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的, 再留意其捆绑的网卡的速度.
@@ -2170,7 +2226,7 @@ Linux查看网卡数据吞吐量方法
 5. 带宽监控 `nload`, https://linux.cn/article-2871-1.html  
 
 
-#### Network troubleshooting
+##### Network troubleshooting
 [Linux系统排查4——网络篇 - 王智愚 - 博客园](www.cnblogs.com/Security-Darren/p/4700387.html )  
 [Quick HOWTO : Ch04 : Simple Network Troubleshooting](http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch04_:_Simple_Network_Troubleshooting#.V4rx8p7hJz0 )  
 
@@ -2204,7 +2260,17 @@ Linux查看网卡数据吞吐量方法
 	查看路由过程中哪些节点是瓶颈  
 	查看带宽的使用情况  
 
-#### netstat  
+##### traceroute
+`Hop # 	RTT 1 	RTT 2 	RTT 3 	Name/IP Address`
+`10 	81 ms 	74 ms 	74 ms 	205.134.225.38`
+
+`Hop Number` - This is the first column and is simply the number of the hop along the route. In this case, it is the tenth hop.
+
+`RTT Columns` - The next three columns display the round trip time (RTT) for your packet to reach that point and return to your computer. This is listed in milliseconds. There are three columns because the traceroute sends three separate signal packets. This is to display consistency, or a lack thereof, in the route.
+
+`Domain/IP column` - The last column has the IP address of the router. If it is available, the domain name will also be listed.
+
+##### netstat  
 属于net-tools工具集  
 * `-t`、`-u`、`-w`和`-x`分别表示TCP、UDP、RAW和UNIX套接字连接;  
 * `-a` 显示出等待连接（也就是说处于监听模式）的套接字;  
@@ -2220,7 +2286,7 @@ Linux查看网卡数据吞吐量方法
 
 Listening open ports: `netstat -antup | grep PORT`  
 
-#### ss
+##### ss
 short for Socket Statistics, 用来获取socket统计信息,显示和netstat类似的内容, ss命令是iproute工具集中的一员  
 从某种意义上说，iproute工具集几乎可以替代掉net-tools工具集，具体的替代方案是这样的：  
 
@@ -2279,6 +2345,9 @@ TCP Clients & Servers
 UDP Clients & Servers  
 1. `iperf -s -u` to Start a UDP Iperf server  
 2. `iperf -c <SERVER_IP> -u` to Connect your client to your Iperf UDP server  
+
+##### nicstat
+`nicstat` reports network utilization and saturation by network interface
 
 ### 操作系统 `uname -a`
 find out system version: `cat /etc/*-release` or `ls /etc/*-release`  
@@ -2607,6 +2676,8 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 	It is required that your private key files are NOT accessible by others  
 	Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
 `-t` Force pseudo-tty allocation for bash to use as an interactive shell
+
+`sshpass` make ssh with password in command line
 
 `ssh -t user@server "mail && bash"`	Single command to login to SSH and run program
 

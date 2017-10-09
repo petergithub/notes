@@ -16,6 +16,7 @@ Pocket Files: share files and private files http://app.rambax.com/pocketfiles
 Team viewer: desktop share
 
 lzop: lzo file
+jd-gui: jad decompile
 
 ## Application Usage
 ### tig
@@ -32,6 +33,9 @@ shift+S Status view
 1. FF clearing the cookies & cache `Ctrl + Shift + Delete`
 2. Toggle Developer Tools	`F12`, `Ctrl + Shift + I`
 3. Disable Ctrl + Shift + C shortcut in Firefox, refer to https://stackoverflow.com/questions/36007119/how-to-disable-ctrl-shift-c-shortcut-in-firefox
+
+### Chrome
+1. ARC: chrome extension to run APKs
 
 ### Atom
 Atom configuration files with shortcuts: ~/.atom/keymap.cson

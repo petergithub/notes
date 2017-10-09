@@ -19,6 +19,7 @@ get alias `curl -X GET 'http://localhost:9200/p_channel_v1/_alias/?pretty=true'`
 新建一个名叫 weather 的 Index `curl -X PUT 'localhost:9200/weather'`
 删除这个 Index `curl -X DELETE 'localhost:9200/weather'`
 返回所有记录`curl -X GET http://localhost:9200/Index/Type/_search`
+Count by type: `curl "10.0.0.29:9200/p_channel_v1/_search?search_type=count&pretty=true" -d '{"aggs":{"count_by_type":{"terms":{"field":"_type"}}}}'`
 
 查看head `http://localhost:9200/_plugin/head/`
 `curl http://localhost:9200/_cluster/health?pretty`

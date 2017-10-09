@@ -1,14 +1,51 @@
 # Spark Notes
 
-`docker start spark && docker attach spark`  
+```
+docker start spark && docker attach spark
 su - hadoop
 sh /usr/local/bootstrap.sh
-172.17.0.2
+cd $SPARK_HOME && ./sbin/start-master.sh
+cd $SPARK_HOME && ./sbin/start-slave.sh spark://172.17.0.2:7077
+```
+
+mysql root / hadoop
+hadoop / hadoop
+
+hadoop@172.17.0.2
 http://172.17.0.2:8088/cluster/scheduler
 http://172.17.0.2:50070/dfshealth.html#tab-overview
 
 spark://569f44d409fd:7077
 spark://172.17.0.2:7077
+
+Hive-on-MR is deprecated in Hive 2 and may not be available in the future versions. Consider using a different execution engine (i.e. spark, tez) or using Hive 1.X releases.
+javax.jdo.option.ConnectionURL=jdbc:derby:;databaseName=/<file-location>/metastore_db;create=true
+`javax.jdo.option.ConnectionURL=jdbc:derby:;databaseName=/usr/local/apache-hive-2.3.0-bin/metastore_db;create=true`
+Note that the location of the metastore (metastore_db) is a relative path. Therefore, it gets created where you launch Hive from. If you update this property (in your hive-site.xml) to be, say an absolute path to a location, the metastore will be used from that location.
+
+Caused by: org.apache.hadoop.hive.metastore.api.MetaException: Version information not found in metastore.
+vi /usr/local/apache-hive-2.3.0-bin/conf/hive-site.xml
+set datanucleus.schema.autoCreateAll=true
+set hive.metastore.schema.verification=false
+
+hive -hiveconf hive.root.logger=DEBUG,console
+
+$HIVE_HOME/bin/schematool -dbType <db type> -initSchema
+`$HIVE_HOME/bin/schematool -dbType derby -initSchema`
+`$HIVE_HOME/bin/hiveserver2` Start HiveServer2 (thrift server)
+`beeline -u jdbc:hive2://localhost:10000`
+
+`hive --service metastore > /tmp/log/hive/hive.out 2>/tmp/log/hive/hive.log &`  # Hive metastore listens on port 9083 by default `lsof -i :9083`
+`hiveserver2 >/tmp/log/hive/hiveserver2.out 2> /tmp/log/hive/hiveserver2.log &` # Start HiveServer2 (thrift server)
+
+create external table people (
+  name string,
+  age int
+  )
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION '/home/hadoop/people/';
+
 
 ## Shell
 open Spark shell: `$SPARK_HOME/sbin/spark-shell`  
