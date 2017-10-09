@@ -32,6 +32,7 @@
 
 ## uninstall (even install with .debi package from local)
 # sudo apt-get remove <package> && sudo apt-get autoremove
+# sudo apt-get purge <package>
 
 # update the package lists /etc/apt/sources.list from repositories
 # following  to update http://wiki.ubuntu.org.cn/源列表
@@ -105,7 +106,7 @@ sudo add-apt-repository ppa:webupd8team/atom
 sudo apt-get update
 
 # Performance Monitoring Tools: sysstat include sar
-sudo apt-get -y install git tig tmux maven traceroute python-pip sysstat wireshark atom
+sudo apt-get -y install git tig tmux maven traceroute python-pip sysstat dstat wireshark atom
 sudo adduser $USER wireshark
 
 ## update hosts
@@ -151,12 +152,26 @@ sudo add-apt-repository ppa:webupd8team/java
 sudo apt-get update
 sudo apt-get -y install oracle-java7-installer
 #sudo apt-get -y install oracle-java8-installer
+#sudo apt-get -y install oracle-java9-installer
 sudo mkdir -p ~/opt/
-ln -s /usr/lib/jvm/java-8-oracle ~/opt/java
+ln -s /usr/lib/jvm/java-8-oracle ~/opt/java-8-oracle
+ln -s ~/opt/java-8-oracle ~/opt/java
 
-#Managing Java
-#Listing all java installed version
+## Workaround for Not Found Error 404 when installing oracle-java9-installer
+cd /var/lib/dpkg/info
+sudo sed -i 's|SHA256SUM_TGZ="2ef49c97ddcd5e0de20226eea4cca7b0d7de63ddec80eff8291513f6474ca0dc"|SHA256SUM_TGZ="1c6d783a54fcc0673ed1f8c5e8650b1d8977ca3e856a03fba0090198e0f16f6d"|' oracle-java9-installer.*
+sudo sed -i 's|JAVA_VERSION_MINOR=181|JAVA_VERSION_MINOR=181|' oracle-java9-installer.*
+sudo sed -i 's|FILENAME=jdk-${JAVA_VERSION_MAJOR}+${JAVA_VERSION_MINOR}_linux-${dld}_bin.tar.gz|FILENAME=jdk-${JAVA_VERSION_MAJOR}_linux-${dld}_bin.tar.gz|' oracle-java9-installer.*
+sudo sed -i 's|PARTNER_URL=http://download.java.net/java/jdk${JAVA_VERSION_MAJOR}/archive/${JAVA_VERSION_MINOR}/binaries/$FILENAME|PARTNER_URL=http://download.oracle.com/otn-pub/java/jdk/${JAVA_VERSION_MAJOR}+${JAVA_VERSION_MINOR}/$FILENAME|' oracle-java9-installer.*
+
+
+## Managing Java
+## Listing all java installed version
 #sudo update-alternatives --config java
+#sudo update-alternatives --config javac
+## Add new
+#sudo update-alternatives --install /usr/bin/java java /path/to/jdk1.6.0_26/bin/java 300  
+#sudo update-alternatives --install /usr/bin/javac javac /path/to/jdk1.6.0_26/bin/javac 300 
 
 ###### Setting JAVA_HOME environemnt variable #######
 #$ echo $JAVA_HOME
@@ -173,6 +188,7 @@ source ~/.bashrc
 ##install MySQL http://wiki.ubuntu.org.cn/MySQL
 sudo apt-get -y install mysql-server-5.7
 #sudo start mysql #手动的话这样启动
+# sudo service mysql start
 #sudo stop mysql #手动停止
 ##enter MySQL
 #mysql -uroot -p
