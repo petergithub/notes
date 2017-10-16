@@ -4,26 +4,17 @@
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love  
 
 ## TODO
-### email
-
-configuration for mail
-`mail -s "subject" -A /opt/attachment.txt username@gmail.com < /dev/null`
-/etc/mail/sendmail.mc
-
-```
-
-	sendmail pu.shang@tcl.com < /tmp/email.txt
-	# cat /tmp/email.txt
-	Subject: Terminal Email Send
-
-	Email Content line 1
-	Email Content line 2
-```
 
 ## Recent
+`for i in *; do cd $i ;mvn clean; cd /path/to/folder/; done`
+
 为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.  
 vimtutor: vim interactive guide  
 `man readline` to get the introduction to the combination of keys  
+
+man manpath
+MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
+MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/bin        /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
 
 
 `openssl s_client -connect www.example.com:443`
@@ -128,6 +119,22 @@ http://ubuntuforums.org/showthread.php?t=2220062
 If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.  
 less /usr/share/X11/xkb/symbols/us  
 
+### email
+
+configuration for mail
+`mail -s "subject" -A /opt/attachment.txt username@gmail.com < /dev/null`
+/etc/mail/sendmail.mc
+
+```
+
+	sendmail pu.shang@tcl.com < /tmp/email.txt
+	# cat /tmp/email.txt
+	Subject: Terminal Email Send
+
+	Email Content line 1
+	Email Content line 2
+```
+
 ### Move Running Process to Background
 #### ALREADY RUNNING PROCESS INTO BACKGROUND
 1. CTRL+z  
@@ -198,6 +205,15 @@ After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer po
 
 Move around inside of long line: `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines  
 
+##### 快速回跳
+``  :  当前文件上次跳转操作的位置
+`.  :  上次修改操作的地方
+`^  :  上次插入的地方
+`[  :  上次修改或复制的起始位置
+`]  :  上次修改或复制的结束位置
+`<  :  上次高亮选区的起始位置
+`>  :  上次高亮选区的结束位置
+
 #### Selection
 You need to select to the next matching parenthesis. 
 * `v%` if the cursor is on the starting/ending parenthesis 
@@ -205,6 +221,28 @@ You need to select to the next matching parenthesis.
 
 * select text between quotes: `vi"` for double quotes, `vi'` for single quotes
 * select a curly brace block (very common on C-style languages): `viB`, `vi{`
+
+##### i & a
+`i` 命令可以理解为 inside，即选中匹配符号之间不包含匹配符号的内容。而 `a` 则选中包含匹配项的内容。
+```
+	
+	'a)' 或 'ab'  :  一对()
+	'a}' 或 'aB'  :  一对{}
+	a]  :  一对[]
+	a>  :  一对<>
+	a"  :  一对""
+	at  :  一对xml标签
+	
+	iw  :  当前单词
+	aw  :  当前单词及一个空格
+	iW  :  当前字符串
+	aW  :  当前字符串及一个空格
+	is  :  当前句子
+	as  :  当前句子及一个空格
+	ip  :  当前段落
+	ap  :  当前段落及一个空行
+```
+
 
 #### mark and registers
 You can move to the line containing a mark using the ' (single quote) command. Thus 'a moves to the beginning of the line containing the 'a' mark. You can move to the precise location of any mark using the ` (backquote) command. Thus `z will move directly to the exact location of the 'z' mark.
@@ -1914,7 +1952,7 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 * 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的 `cs` in `vmstat`  
 * 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue   
 * wa（wait）: 参考值：小于25%，超过25%的wa的值可以表示磁盘子系统可能没有被正确平衡，也可能是磁盘密集工作负载的结果，系统的磁盘或其它I/o可能有问题，可以通过iostat/sar -C命令进一步分解分析
-* r: 参考值：小于4，队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`  
+* r: 参考值：对于单个处理器来说, r 小于4. 队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`  
 
 如何衡量当前系统是否负载过高?  
 如果每个cpu(可以按CPU核心的数量计算)上当前活动进程数  
@@ -2175,24 +2213,6 @@ identify the directory which is using all your inodes:
 	
 
 ### Network  
-Listening open ports: `netstat -anp | grep PORT`  
-`netstat -antup` 查看已建立的连接进程, 所占用的端口  
-`lsof -i`  
-
-#### 良好状态指标
-* 对于UDP, 接收、发送缓冲区不长时间有等待处理的网络包  
-* 对于TCP, 不会出现因为缓存不足而存在丢包的事，因为网络等其他原因，导致丢了包，协议层也会通过重传机制来保证丢的包到达对方。所以，tcp而言更多的专注重传率 `cat /proc/net/snmp | grep Tcp`
-* 连接数如果超过1024报警 `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`
-##### UDP
-`netstat -lunp` 查看所有监听的UDP端口的网络情况, RecvQ、SendQ为0，或者不长时间有数值是比较正常的。
-`netstat -su` 查看丢包情况（网卡收到了，但是应用层没有处理过来造成的丢包）, packet receive errors 这一项数值增长了，则表明在丢包
-
-##### TCP
-`cat /proc/net/snmp | grep Tcp`, `重传率 = RetransSegs / OutSegs`  
-综上, 重传率 = `cat /proc/net/snmp | grep Tcp | grep -v RetransSegs | awk '{print $13/$12}'`  
-Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts  
-Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 18268679467 14875350 21734 11294887
-
 
 #### Linux Network Checklist
 http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html  
@@ -2210,7 +2230,28 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 tcp*, are from bcc/BPF tools  
 
 11 `iftop`  
-12 `nicstat` 
+12 `nicstat`  
+13 `iperf` Diagnosing network speed
+
+Linux查看网卡数据吞吐量方法  
+1. `iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘: `iptraf -d eth0`  
+2. `watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`.  
+3. 带宽监控 `nload`, https://linux.cn/article-2871-1.html  
+
+#### 良好状态指标
+* 对于UDP, 接收、发送缓冲区不长时间有等待处理的网络包  
+* 对于TCP, 不会出现因为缓存不足而存在丢包的事，因为网络等其他原因，导致丢了包，协议层也会通过重传机制来保证丢的包到达对方。所以，tcp而言更多的专注重传率 `cat /proc/net/snmp | grep Tcp`
+* 连接数如果超过1024报警 `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`
+
+##### UDP
+`netstat -lunp` 查看所有监听的UDP端口的网络情况, RecvQ、SendQ为0，或者不长时间有数值是比较正常的。
+`netstat -su` 查看丢包情况（网卡收到了，但是应用层没有处理过来造成的丢包）, packet receive errors 这一项数值增长了，则表明在丢包
+
+##### TCP
+`cat /proc/net/snmp | grep Tcp`, `重传率 = RetransSegs / OutSegs`  
+综上, 重传率 = `cat /proc/net/snmp | grep Tcp | grep -v RetransSegs | awk '{print $13/$12}'`  
+Tcp: RtoAlgorithm RtoMin RtoMax MaxConn ActiveOpens PassiveOpens AttemptFails EstabResets CurrEstab InSegs OutSegs RetransSegs InErrs OutRsts  
+Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 18268679467 14875350 21734 11294887
 
 ##### 网卡
 * 先用`ifconfig`看看有多少块网卡和bonding. bonding是个很棒的东西, 可以把多块网卡绑起来, 突破单块网卡的带宽限制
@@ -2218,18 +2259,9 @@ tcp*, are from bcc/BPF tools
 * 再检查bonding, 比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的, 再留意其捆绑的网卡的速度.
 * 最后检查测试客户机与服务机之间的带宽, 先简单`ping`或`traceroute` 一下得到RTT时间, `iperf`之类的可稍后.
 
-Linux查看网卡数据吞吐量方法  
-1. iptraf` 工具(http://iptraf.seul.org),提供了每个网卡吞吐量的仪表盘: `iptraf -d eth0`  
-2. watch -n 1 "/sbin/ifconfig eth0 | grep bytes"`.  
-3. `sar -n DEV 2 4` 每2秒钟取1次值, 取4次  
-4. `iperf` Diagnosing network speed  
-5. 带宽监控 `nload`, https://linux.cn/article-2871-1.html  
-
-
 ##### Network troubleshooting
 [Linux系统排查4——网络篇 - 王智愚 - 博客园](www.cnblogs.com/Security-Darren/p/4700387.html )  
 [Quick HOWTO : Ch04 : Simple Network Troubleshooting](http://www.linuxhomenetworking.com/wiki/index.php/Quick_HOWTO_:_Ch04_:_Simple_Network_Troubleshooting#.V4rx8p7hJz0 )  
-
 
 网络排查一般是有一定的思路和顺序的, 其实排查的思路就是根据具体的问题逐段排除故障可能发生的地方, 最终确定问题.  
 
@@ -2284,7 +2316,8 @@ Linux查看网卡数据吞吐量方法
        Show numerical addresses instead of trying to determine symbolic  host,  
        port or user names.  
 
-Listening open ports: `netstat -antup | grep PORT`  
+`netstat -anp | grep PORT` Listening open ports   
+`netstat -antup` 查看已建立的连接进程, 所占用的端口  
 
 ##### ss
 short for Socket Statistics, 用来获取socket统计信息,显示和netstat类似的内容, ss命令是iproute工具集中的一员  
@@ -2427,7 +2460,7 @@ cpu（以百分比表示）
 上述这些CPU时间, 可以让我们很快了解CPU是否出于繁忙状态. 一般情况下, 如果用户时间和系统时间相加非常大, CPU出于忙于执行指令. 如果IO等待时间很长, 那么系统的瓶颈可能在磁盘IO.  
 示例命令的输出可以看见, 大量CPU时间消耗在用户态, 也就是用户应用程序消耗了CPU时间. 这不一定是性能问题, 需要结合r队列, 一起分析.  
 
-####  iostat - Average CPU Load, Disk Activity
+#### iostat - Average CPU Load, Disk Activity
 主要用于查看机器磁盘IO情况. iostat命令属于sysstat工具包  
 `iostat 2 3`  
 参数:  

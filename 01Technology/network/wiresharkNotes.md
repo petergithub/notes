@@ -16,7 +16,7 @@
 ### Display filter
 http.host == login.tclclouds.com
 ip.addr == 124.251.36.121 or ip.addr == 124.251.36.122
-http and ip.addr == 124.251.36.121
+http and ip.addr == 124.251.36.121 and ip.dst ==124.251.43.33
 `tcp.port == portNumber`  
 
 wireshark http数据包过滤条件列表

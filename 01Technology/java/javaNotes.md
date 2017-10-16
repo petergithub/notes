@@ -7,6 +7,7 @@
 每个对象都有一个内置锁?
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
+SpringBoot和Swagger结合提高API开发效率  http://localhost:8080/swagger-ui.html
 
 concurrent: 主内存.寄存器是是运行时?
 
@@ -94,7 +95,7 @@ https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c
 
 `gperf` Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。  
 
-除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file> 这样的参数必须是启动参数的标配。  
+除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file>` 这样的参数必须是启动参数的标配。  
 
 jvm log 时间格式
 打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
