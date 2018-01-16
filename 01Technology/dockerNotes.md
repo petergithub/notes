@@ -2,9 +2,11 @@
 `docker images`	Show all images in your local repository  
 `docker run -i -t <image_id || repository:tag> -bash`	Run a container from a specific image  
 `docker run -itd ubuntu:14.04 /bin/bash`	start a container and running bash
+	`--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
 	`-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上  
 	`-i` 让容器的标准输入保持打开  
 	`-d` 后台运行  
+	`-e` 设置环境变量，与在dockerfile env设置相同效果 `-e MYSQL_ROOT_PASSWORD=root`  
 `exit` 退出
 
 `docker ps`	Show running containers  

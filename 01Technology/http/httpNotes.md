@@ -5,6 +5,12 @@ response.writeHead(200, { "Access-Control-Allow-Origin": "http://yoursite.com"})
 configure Access-Control-Allow-Origin to avoid unknown domain visit
 在开发RESTful API时，要注意CORS功能的实现，直接拿现有的轮子来用即可
 
+HTTP 接口参数:
+1. 首先根据一定的规则生成签名信息，防止信息篡改，对不同传输格式分别进行一下处理，Json格式：一般取指定的字段组成字符串通过MD5生成签名信息，然后放到json中的作为sign的值。
+2. 其次通过RSA加解密算法对要传输的字符串进行加密
+3. 通过URLBase64进行加密
+
+
 ## HTTP长连接
 ### 是什么
 HTTP1.1规定了默认保持长连接（HTTP persistent connection ，也有翻译为持久连接），数据传输完成了保持TCP连接不断开（不发RST包、不四次握手），等待在同域名下继续用这个通道传输数据；相反的就是短连接

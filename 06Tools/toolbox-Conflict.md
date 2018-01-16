@@ -4,7 +4,6 @@ Scala tool: ./kojo
 mongoDB: MongoDB Compass, Robomongo
 Xmind: xmind
 Book: calibre
-vpn: firefly
 
 VLC media player
 ncdu - NCurses Disk Usage: ncdu (NCurses Disk Usage) is a curses-based version of the well-known 'du', and provides a fast way to see what directories are using your disk space.
@@ -33,8 +32,7 @@ shift+S Status view
 ### Firefox
 1. FF clearing the cookies & cache `Ctrl + Shift + Delete`
 2. Toggle Developer Tools	`F12`, `Ctrl + Shift + I`
-3. Disable Ctrl + Shift + C shortcut in firefox, refer to https://stackoverflow.com/questions/36007119/how-to-disable-ctrl-shift-c-shortcut-in-firefox
-4. SwitchOmega rule list URL: https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt
+3. Disable Ctrl + Shift + C shortcut in Firefox, refer to https://stackoverflow.com/questions/36007119/how-to-disable-ctrl-shift-c-shortcut-in-firefox
 
 ### Chrome
 1. ARC: chrome extension to run APKs
@@ -53,7 +51,7 @@ CTRL+\ Tree view toggle
 4. Tools -> Options -> LibreOffice Calc -> General
     -> Press Enter to switch to edit mode
     -> Press Enter to move selection -> Right
-5. Tools -> Auto Correct -> Options -> uncheck "Capitalize first letter of every sentence", uncheck "URL Recognition"
+5. Tools -> Auto Correct -> Options -> uncheck "Capitalize first letter of every sentence"
 6. Format -> Styles -> Styles and Formatting -> Right-click on Default -> Modify -> Font -> update font -> Save
 
 ### LibreOffice Writer
@@ -92,7 +90,7 @@ linux 下读书软件 fbreader
 phpBB-3.1.10 forum
 Gimp: alternatives to Photoshop
 Autokey
-mail client: thunderbird
+mail client: Thunderbird
   plugin: Lightning (for calendar) + EWS, ExQuilla, FireTray, Thunderbird Indicator App
   Exchange EWS Provider (connect with exchange server https://github.com/Ericsson/exchangecalendar/wiki/Exchange-EWS-Provider)
   [link](https://mailsz.tct.tcl.com/EWS/Exchange.asmx) (https://yourcompany.com/owa  Replace the "owa" with "EWS/Exchange.asmx")

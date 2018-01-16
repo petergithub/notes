@@ -22,6 +22,46 @@ Reference: https://www.tutorialspoint.com/hbase/hbase_installation.htm
 `hdfs dfs -put source target` copy files  
 `hdfs dfs -cat /user/hadoop/data.txt` cat path/to/file
 
+### Change replication factor
+[How to change an running HDFS cluster's replication factor?](https://www.systutorials.com/qa/1295/how-to-change-an-running-hdfs-clusters-replication-factor)
+First, the replication factor is client decided.  
+Second, the replication factor is per-file configuration.  
+Hence, the configuration only changes the client and takes effect for new files.  
+For existing files, you need to manually re-set the replication factor: `hadoop fs -setrep -R -w 2 /path/to/file`
+
+set `dfs.replication=2` in `$HADOOP_HOME/etc/hadoop/hdfs-site.xml`
+`hdfs fsck / -blocks -locations -files`  输出中确定一下是否还有block在decommision的机器上
+`hdfs fsck / -files -blocks -racks`
+`hdfs dfsadmin -report`
+
+Check replication: 
+list file: `hadoop fs -ls /path/to/file`
+Get the replication factor using the stat hdfs command tool: `hdfs dfs -stat %r /path/to/file`
+
+### Add DataNode
+1. 启动datanode进程 `sbin/hadoop-daemon.sh start datanode`
+2. 启动nodemanager进程 `sbin/yarn-daemon.sh start nodemanager`
+3. 均衡block `sbin/start-balancer.sh`
+
+### Remove DataNode
+0. 将 replication factor 设置为减少后的节点数 
+1. `echo node_hostname >> $HADOOP_HOME/etc/hadoop/dfs.hosts.exclude.txt`
+
+```
+
+	<property>
+	   <name>dfs.hosts.exclude</name>
+	   <value>$HADOOP_HOME/etc/hadoop/dfs.hosts.exclude.txt</value>
+	   <description>Names a file that contains a list of hosts that are not permitted to connect to the namenode.  The full pathname of the
+	   file must be specified.  If the value is empty, no hosts are excluded.</description>
+	</property>
+```
+2. 重新读取配置 `hadoop dfsadmin  -refreshNodes`
+3. `hdfs dfsadmin -report`
+可以看到该节点会处于`Decommission Status : Decommission in progress`的状态。
+等待数据迁移完成之后，该状态变为 `Decommission Status : Decommissioned`  
+在该节点上停止进程： `hadoop-daemon.sh stop datanode` 删除slaves文件中的对应主机名即可  
+
 ### Verifying Hadoop Installation
 1. Name Node Setup: `hdfs namenode -format` Formatting the HDFS file system via the NameNode   
 2. Verifying Hadoop dfs: `start-dfs.sh`
@@ -120,6 +160,17 @@ https://hbase.apache.org/book.html#quickstart
 	If you want to delete a table or change its settings, as well as in some other situations, you need to disable the table first  
 10. Drop the table: `drop 'test'`
 `hbase> scan 'test-table', {'LIMIT' => 5}` Command like SQL LIMIT in HBase
+
+### Add Node
+1. HMaster节点的配置regionservers `echo node04 >> $HBASE_HOME/conf/regionservers`
+2. 在新节点中通过下面命令启动HRegionServer: `hbase-daemon.sh start regionserver`
+3. 验证HRegionServer：`jps | grep -e HRegionServer -e DataNode -e QuorumPeerMain -e DataNode`
+
+### Remove Node
+1. `graceful_stop.sh node04` 会自动先设置	`balance_switch` 为 false, 然后关闭hbase, 再设置为 true
+2. `hbase-daemon.sh stop regionserver` 需要?
+3. `http://hmaster_ip:16010/master-status` 查看状态
+4. 从文件 `$HBASE_HOME/conf/regionservers` 删掉 `node4`
 
 ## Hive 
 [Apache Hive](https://hive.apache.org/ )

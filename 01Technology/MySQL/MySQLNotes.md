@@ -34,6 +34,10 @@ To produce the set of records unique to Table A and Table B, we perform the same
 mysqlreport --user root --password  
 /etc/mysql/my.cnf ~/.my.cnf  
 
+`ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
+`SET @@auto_increment_increment=10`
+`SHOW FULL COLUMNS FROM tbl`  
+
 `select @@datadir;` select the data directory
 
 `sudo systemctl start/stop/status mysql`
@@ -49,6 +53,53 @@ SELECT UNIX_TIMESTAMP(NOW());
 SELECT FROM_UNIXTIME(1467542031);  
 select SUBSTRING(1456958130210,1,10);  
 
+When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
+
+#### Replication
+[17.1.1.8 Setting Up Replication with Existing Data](https://dev.mysql.com/doc/refman/5.6/en/replication-howto-existingdata.html)
+If `--master-info-repository=TABLE`, the replication coordinates from the master is saved in the table `master_slave_info` in the mysql database
+
+`SHOW SLAVE STATUS`
+1. (`Master_Log_file, Read_Master_Log_Pos`): Coordinates in the master binary log indicating how far the slave I/O thread has read events from that log.
+2. (`Relay_Master_Log_File, Exec_Master_Log_Pos`): Coordinates in the master binary log indicating how far the slave SQL thread has executed events received from that log.
+3. (`Relay_Log_File, Relay_Log_Pos`): Coordinates in the slave relay log indicating how far the slave SQL thread has executed the relay log. These correspond to the preceding coordinates, but are expressed in slave relay log coordinates rather than master binary log coordinates.
+
+#### MySQL installation
+##### CentOS
+
+```
+	
+	# mysql 5.6 
+	wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+	rpm -ivh mysql-community-release-el6-5.noarch.rpm
+	yum install mysql-server
+	# startup
+	/etc/init.d/mysqld start
+	# configure 
+	mysql_secure_installation
+	
+	
+	#UNINSTALL
+	# list pacages installed
+	rpm -qa | grep mysql
+	# uninstall
+	yum remove mysql mysql-server mysql-libs compat-mysql51
+	# remove configuration files
+	rm -rf /var/lib/mysql /etc/my.cnf
+```
+
+#####  Windows
+1. unzip 
+2. `mysqld --defaults-file=..\my.ini --initialize-insecure` to init
+3. `mysqld --console` to start
+4. `mysql -u root --skip-password` to connect
+5. `ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';` to update password
+6. `mysqladmin -u root shutdown` to shutdown mysql server
+
+7. `mysqld --install` to install as a service
+8. `net start/stop  mysql` to start/stop mysql server as a service
+9. `mysqld --remove` to remove mysql service
+
 #### 查询优化
 deferred join延迟关联 select <cols> from profiles inner join (select <primary
 key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as
@@ -58,7 +109,24 @@ x using (<primary key cols>)
 [EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
 [详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
 
-`explain SQL` query;  then `show warings` to get the raw SQL clause
+`explain SQL` query;  then `show warnings` to get the raw SQL clause
+
+##### EXPLAIN列的解释：
+table：显示这一行的数据是关于哪张表的
+
+type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、indexhe和ALL
+
+possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
+
+key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
+
+key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
+
+ref：显示索引的哪一列被使用了，如果可能的话，是一个常数
+
+rows：MYSQL认为必须检查的用来返回请求数据的行数
+
+Extra：关于MYSQL如何解析查询的额外信息。
 ##### Type
 性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
 
@@ -175,18 +243,44 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 `show open tables where in_use>0;`	get the list of locked tables
 `show processlist;`	get the list of the current processes, one of them is locking your table(s)  
 `kill <put_process_id_here>;`	 Kill one of these processes
+Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE user = 'root' \G`  
+[Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)   
+
+[Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
+
+```
+
+	mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root';
+	+------------------------+
+	| concat('KILL ',id,';') |
+	+------------------------+
+	| KILL 3101;             |
+	| KILL 2946;             |
+	+------------------------+
+	2 rows in set (0.00 sec)
+	mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root' into outfile '/tmp/a.txt';
+	Query OK, 2 rows affected (0.00 sec)
+	mysql> source /tmp/a.txt;
+	Query OK, 0 rows affected (0.00 sec)
+```
 
 #### 事务隔离模式
 1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。  
 2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。  
 3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。  
-    但是这种方式又引发了幻想读的问题。因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。  
+    但是这种方式又引发了幻读的问题(MySQL InnoDB 通过 MVCC, Mutipleversion Concurrency Control 解决了幻读问题)。
+    因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。  
 4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。  
+
+[14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
+[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/innodb-lock.html)  
 
 脏读（dirty read）    
 不可重复读（unrepeatable read）   
-幻象读（phantom read）   
-幻象读和不可重复读是两个容易混淆的概念，前者是指读到了其他已经提交事务的新增数据，而后者是指读到了已经提交事务的更改数据（更改或删除），为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）   
+幻读（phantom read）   
+幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
+为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，  
+而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）   
 
 #### 锁机制
 1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写  
@@ -266,37 +360,37 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 `show variables like '%char%'`  
 
 #### 修改密码
-格式：mysqladmin -u用户名 -p旧密码 password 新密码  
-1、给root加个密码ab12。首先在DOS下进入目录mysql\bin，然后键入以下命令  
-mysqladmin -u root -password ab12  
-注：因为开始时root没有密码，所以-p旧密码一项就可以省略了。  
-2、再将root的密码改为djg345。  
-mysqladmin -u root -p ab12 password djg345  
-命令行修改root密码： UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root';  
+格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
+1、给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
+`mysqladmin -u root -password PWD_NEW`  
+注：因为开始时root没有密码，所以-p旧密码一项就可以省略了  
+2、再将root的密码改为PWD_NEW  
+`mysqladmin -u root -pPWD_OLD password PWD_NEW`  
+命令行修改root密码： `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
 
 #### 增加新用户 grant permission
-grant all on dbName.* to USERNAME@host identified by 'pwd';  
-grant all on aotmobile_global.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';  
-grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;  
-show grants for USERNAME@IP; 查看用户权限  
-select * from mysql.user where user='cactiuser' \G    
-SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user; 查看MYSQL数据库中所有用户  
-CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';  
-GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';
-REVOKE [type of permission] ON [database name].[table name] FROM ‘[username]’@‘localhost’;  
-DROP USER ‘demo’@‘localhost’;  
+`grant all on dbName.* to USERNAME@host identified by 'pwd';`  
+`grant all on dbName.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';`  
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;`  
+`show grants for USERNAME@IP;` 查看用户权限  
+`select * from mysql.user where user='cactiuser' \G`    
+`SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
+`CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password'; `   
+`GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';`  
+`REVOKE [type of permission] ON [database name].[table name] FROM ‘[username]’@‘localhost’;`    
+`DROP USER ‘demo’@‘localhost’;`    
 
 （注意：和上面不同，下面的因为是MYSQL环境中的命令，所以后面都带一个分号作为命令结束符）  
-格式：grant select on 数据库.* to 用户名@登录主机 identified by “密码”  
+格式：`grant select on 数据库.* to 用户名@登录主机 identified by "PASSWORD"`  
 1、增加一个用户test1密码为abc，让他可以在任何主机上登录，并对所有数据库有查询、插入、修改、删除的权限。首先用root用户连入MYSQL，然后键入以下命令：  
-grant select,insert,update,delete on *.* to test1@”%” Identified by “abc”;  
+`grant select,insert,update,delete on *.* to test1@”%” Identified by "PWD";`   
 但增加的用户是十分危险的，你想如某个人知道test1的密码，那么他就可以在internet上的任何一台电脑上登录你的mysql数据库并对你的数据可以为所欲为了，解决办法见2。  
 2、增加一个用户test2密码为abc,让他只可以在localhost上登录，并可以对数据库mydb进行查询、插入、修改、删除的操作（localhost指本地主机，即MYSQL数据库所在的那台主机），  
 这样用户即使用知道test2的密码，他也无法从internet上直接访问数据库，只能通过MYSQL主机上的web页来访问了。  
-grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;  
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;`  
 如果你不想test2有密码，可以再打一个命令将密码消掉。  
-grant select,insert,update,delete on mydb.* to test2@localhost identified by “”;  
-mysql> FLUSH PRIVILEGES;  
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by "";`   
+`mysql> FLUSH PRIVILEGES;`  
 
 ### Charset 查看三种MySQL字符集
 MySQL 5.5.3+ UTF8mb4支持emoji  
@@ -320,15 +414,18 @@ http://mysql.rjweb.org/utf8_collations.html
 ##### 创建表的时候指定CHARSET为utf8mb4  
 ```
 
-	CREATE TABLE IF NOT EXISTS table_name (
-	...
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+	CREATE TABLE IF NOT EXISTS mb4 (
+	id INT(3) NOT NULL AUTO_INCREMENT,
+  	name varchar(32) CHARACTER SET utf8mb4 DEFAULT NULL,
+	comment VARCHAR(50) DEFAULT 'test',
+  	PRIMARY KEY (`id`)
+	) ENGINE=MyIsam DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
 ```
 update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`  
 
 update table character:   
 `ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
-`ALTER TABLE table_name modify column_name text charset utf8mb4;`  
+`ALTER TABLE table_name modify column_name varchar(32) charset utf8mb4;`  
 
 update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
 
@@ -384,7 +481,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 	Privileges: select,insert,update,references
 	```
 
-### [数据类型宽度](http://blog.jobbole.com/87318/ ) 
+### [数据类型宽度](http://blog.jobbole.com/87318/ )
 显示宽度只用于显示，并不能限制取值范围和占用空间，例如：INT(3)会占用4个字节的存储空间，并且允许的最大值也不会是999，而是INT整型
 [Numeric Type Attributes](https://dev.mysql.com/doc/refman/5.7/en/numeric-type-attributes.html )
 [MySQL: Why specify display width without using zerofill](https://stackoverflow.com/questions/12592376/mysql-why-specify-display-width-without-using-zerofill )
@@ -396,16 +493,16 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
 备份文件中的“--”字符开头的行为注释语句；以“/*!”开头、以“*/”结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
 
-`mysqldump -u USERNAME -p dbName > dbName.sql`  
+`mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz`  
 `mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`  
-* `-d` 没有数据
+* `--no-data, -d` 没有数据
 * `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
 * `--add-drop-table` 在每个create语句之前增加一个drop table
 * `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
 * `--default-character-set=utf8` 带语言参数导出
 * `--single-transaction`	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
 * `--lock-tables=false , -l`	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
-* `--where/-w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
+* `--where, -w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
 
 
 #### Import/Restore
@@ -516,6 +613,27 @@ https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-
 	FROM `pds_core_menu_items`;
 ```
 
+#### obtains the list of tables without primary key
+https://moiseevigor.github.io/programming/2015/02/17/find-all-tables-without-primary-key-in-mysql/
+```
+
+	USE INFORMATION_SCHEMA;
+	SELECT
+	    TABLES.table_name
+	FROM TABLES
+	LEFT JOIN KEY_COLUMN_USAGE AS c
+	ON (
+	       TABLES.TABLE_NAME = c.TABLE_NAME
+	   AND c.CONSTRAINT_SCHEMA = TABLES.TABLE_SCHEMA
+	   AND c.constraint_name = 'PRIMARY'
+	)
+	WHERE
+	    TABLES.table_schema <> 'information_schema'
+	AND TABLES.table_schema <> 'performance_schema'
+	AND TABLES.table_schema <> 'mysql'
+	AND c.constraint_name IS NULL;
+```
+
 ### Configuration
 #### MySQL Workbench update shortcut Auto-complete
 D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
@@ -561,7 +679,7 @@ exit
 
 ``` sql
 
-	UPDATE st_clearing_statement SET refund_transactions = 0, trade_transactions = 83  
+	UPDATE tbl SET refund_transactions = 0, trade_transactions = 83  
 
 	SELECT
 	    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`,

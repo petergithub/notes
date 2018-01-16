@@ -1,21 +1,20 @@
 [TOC]
 
-学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from strach)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.  
+学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from scratch)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.  
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love  
 
 ## TODO
 
 ## Recent
-`for i in *; do cd $i ;mvn clean; cd /path/to/folder/; done`
+`for i in *; do cd /path/to/folder/$i ;mvn clean; done`
 
-为了方便地键入长命令, 在设置你的编辑器后（例如 export EDITOR=vim）, 键入 ctrl-x ctrl-e 会打开一个编辑器来编辑当前命令. 在 vi 模式下则键入 escape-v 实现相同的功能.  
+为了方便地键入长命令, 在设置你的编辑器后（例如 `export EDITOR=vim`）, 键入 `ctrl-x, ctrl-e` 会打开一个编辑器来编辑当前命令. 在 `vi` 模式下则键入 `escape-v` 实现相同的功能.  
 vimtutor: vim interactive guide  
 `man readline` to get the introduction to the combination of keys  
 
 man manpath
 MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
 MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/bin        /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
-
 
 `openssl s_client -connect www.example.com:443`
 
@@ -35,6 +34,10 @@ move hidden files together:
 expands non-matching globs to zero arguments, rather than to themselves.
 https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin
 http://mywiki.wooledge.org/glob
+
+`trap`命令用于指定在接收到信号后将要采取的动作，常见的用途是在脚本程序被中断时完成清理工作。  
+当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。  
+例如：` trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行  
 
 Convert a number from hexadecimal to decimal: `echo $((0xFF))`
 Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
@@ -110,7 +113,6 @@ get the MD5 hash `echo -n Welcome | md5sum`
 pgrep 和 pkill  
 pgrep -l apache2  
 `ps -A -opid,stime,etime,args` 查看进程的启动时间  
-`du -s * | sort -n | tail`	列出当前目录里最大的10个文件.  
 `last`	To find out when a particular user last logged in to the Linux or Unix server.  
 
 
@@ -118,6 +120,13 @@ Keyboard problems, setting 3rd level chooser and Meta key in Unity
 http://ubuntuforums.org/showthread.php?t=2220062  
 If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.  
 less /usr/share/X11/xkb/symbols/us  
+
+Set locale:  
+`LANG=en_US.UTF-8`  
+`export LANG`  
+
+`locale -a | less` Query all supported locale   
+or `less /usr/share/i18n/SUPPORTED` on a Debian or Ubuntu based system  
 
 ### email
 
@@ -476,7 +485,12 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 `find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
 `find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
 `find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
-`find / -name '*log*' -size +1000M -exec du -h {} \;` find files size more than 1G
+`find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`  File’s data was last modified n*24 hours ago
+`find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
+
+* `+n`     for greater than n,
+* `-n`     for less than n,
+* `n`      for exactly n.
 
 #### 文件个数 count files in directory recursively
 `find . -type f | wc -l`  
@@ -490,6 +504,7 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 `find . -name '*.htm' | xargs sed -i 's/old/new/g'` (替换或者 s#old#new#g)  
 `sed -n '/old/p' $(grep -l old *.htm)`  
 `sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java`  
+`sed -i 's#https://git.com/Serving#git@git.com:Serving/' */.git/config`  
 
 #### 删除.svn文件夹
 `find . -type d -name ".svn" | xargs rm -rf`  
@@ -746,6 +761,9 @@ kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`
 
   `find . -name '*.py' | xargs grep some_function`  
   `cat hosts | xargs -I {} ssh root@{} hostname`  
+  
+execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`  
+`find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`
 
 ### kill
 
@@ -777,8 +795,8 @@ Valid timezones are defined in `/usr/share/zoneinfo/`
 Get Unix time stamp 	`date +%s` 1477998994  
 Convert Unix timestamp to Date `date -d @1467540501`  
 Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`  
-`date -d '1 days ago' "+%Y%m%d_%H"` 20161031_19  
-`date -d '1 hours ago' "+%F"` 2016-11-01  
+`date -d '1 hours ago' "+%Y%m%d_%H"` 20161031_19  
+`date -d '1 days ago' "+%F"` 2016-11-01  
 `date -d now "+%Y%m%d %H:%M:%S"`
 `date +%Y%m%d%H%M%S` 20161101191653  
 
@@ -846,6 +864,7 @@ crontab特殊的符号说明:
 2. "/"代表每的意思, 如"*/5"表示每5个单位  
 3. "-"代表从某个数字到某个数字  
 4. ","分散的数字  
+5. Percent-signs (%) requires escaped with backslash (\)
 
 ```
 
@@ -891,7 +910,24 @@ If you want a command to be run once at system boot, the correct solution is to 
 
 `cat /etc/shells`	get all available shells  
 `xargs echo`  
-在bash的脚本中, 你可以使用 set -x 来debug输出. 使用 set -e 来当有错误发生的时候abort执行. 考虑使用 set -o pipefail 来限制错误. 还可以使用trap来截获信号（如截获ctrl+c）.  
+
+`set` 在bash的脚本中:  https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html  
+`set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
+`set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace	`
+`set -e` 当有错误发生的时候abort执行   
+`set +e` 表示关闭`-e`选项, 同`-o errexit`  
+`set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行    
+`set -euxo pipefail` 放在脚本开头 或者执行时传入 `bash -euxo pipefail script.sh`
+
+`command || exit 1` 只要command有非零返回值，脚本就会停止执行  
+1. `command || { echo "command failed"; exit 1; }`
+2. `if ! command; then echo "command failed"; exit 1; fi`
+3. `command  
+	if [ "$?" -ne 0 ]; then echo "command failed"; exit 1; fi`  
+	
+`command1 && command2`  只有第一个命令成功了，才能继续执行第二个命令
+
+
 在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中  
 
 `read -p "Press [Enter] key to continue"`  
@@ -995,6 +1031,7 @@ Numerical position in $string of first character in $substring that matches.
 向脚本传递参数  
 
 ```
+
 	#! /bin/sh
 	# test.sh
 	echo "$# parameters"; # count of parameters
@@ -1014,6 +1051,7 @@ output:
 if/else流程控制
 
 ```
+
 	if condition
 	then
 	     do something
@@ -1031,6 +1069,7 @@ if/else流程控制
 switch流程控制
 
 ```
+
 	case expression in
 	    pattern1)
 	        do something... ;;
@@ -1044,6 +1083,7 @@ switch流程控制
 
 
 ```
+	
 	if [ a || b && c ]; then
 	　 ....
 	elif ....; then
@@ -1055,6 +1095,7 @@ switch流程控制
 
 
 ```
+
 	if [ a || b && c ]
 	then
 	　 ....
@@ -1064,6 +1105,7 @@ switch流程控制
 ```
 
 ```
+
 	while [ -n "$binnum" ]; do
 	　　...
 	done
@@ -1071,6 +1113,7 @@ switch流程控制
 
 
 ```
+
 	for x in one two three four
 	do
 	    echo number $x
@@ -1100,6 +1143,7 @@ switch流程控制
 
 
 ```
+
 	#! /bin/sh
 	#shell脚本控制jar的启动和停止
 	#启动方法
@@ -1221,7 +1265,7 @@ echo $?	获取上一次命令执行的结果, 0表示成功, 非0表示失败
    1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.  
    2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:  
     输入`du -sh dir`, 按回车执行命令  
-    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行du -sh dir这条命令  like watch -n 1 -d du -sh dir  
+    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行`du -sh dir`这条命令  like `watch -n 1 -d du -sh dir`  
 	其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`  
    3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出  
    4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.  
@@ -1494,9 +1538,6 @@ DEF
 EOF  
 `watch -d -n 1 'df; ls -FlAt /path'` 实时某个目录下查看最新改动过的文件  
 `watch -n 3 ls` 以3秒钟执行一个ls命令  
-`du -sh dirname` 查看目录的大小  
-`du -h --max-depth=1` 显示当前目录中所有子目录的大小  
-`du -a / | sort -rn`
 `cd -` 切换回上一个目录  
 `source .profile` 使profile改动生效  
 `wget -c file` continue stopped download  
@@ -1601,7 +1642,8 @@ https://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html
 tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包  
 一般计算机网卡都工作在非混杂模式下，此时网卡只接受来自网络端口的目的地址指向自己的数据。当网卡工作在混杂模式下时，网卡将来自接口的所有数据都捕获并交给相应的驱动程序。网卡的混杂模式一般在网络管理员分析网络数据作为网络故障诊断手段时用到，同时这个模式也被网络黑客利用来作为网络数据窃听的入口。在Linux操作系统中设置网卡混杂模式时需要管理员权限。在Windows操作系统和Linux操作系统中都有使用混杂模式的抓包工具，比如著名的开源软件Wireshark  
 
-`tcpdump -i eth0 -nn -X ‘port 53’ -c 1`  
+`tcpdump -i eth0 -nn -X 'port 53' -c 1`  
+`tcpdump -i eth1 -s 0 -w /var/tmp/1.cap port 3306` 对 3306 端口进行抓包  
 
 ##### 常用选项
 * `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡  
@@ -1740,48 +1782,14 @@ python -m SimpleHTTPServer  HTTP服务在8000号端口上侦听
 ## Softwares
 
 ### Software List
-chromium browser  
-screenshot: shutter,deepin-scrot  
+screenshot: shutter,deepin-scrot   
+ubuntu上 接收 outlook exchange 郵件？ thunderbird + exquilla 插件  
 
-ubuntu上如何使用郵箱客戶端去接收發送outlook exchange 郵件？ 試試 thunderbird + exquilla 插件  
-HTTPS://HELP.UBUNTU.COM/COMMUNITY/THUNDERBIRDEXCHANGE  
-https://exquilla.zendesk.com/home  
-http://www.5dmail.net/html/2013-5-7/201357111547.htm  
+### Desktop location
 
-### JDK installation
-1. 安装JDK  
-0.1 download  
-	wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-i586.tar.gz"  
-0.2 unzip: tar xzf jdk-8u5-linux-i586.tar.gz  
-0.3 check version: jdk1.8.0_05/bin/java -version  
-
-1.1. 下载Linux x86 jdk-6u26-linux-i586.bin:  
-	sudo cp Downloads/jdk-6u26-linux-i586.bin /opt  
-	cd /opt  
-	sudo chmod +x jdk-6u26-linux-i586.bin  
-1.2. 解压缩安装包进行安装sudo ./jdk-6u26-linux-i586.bin  
-1.3. 接下来要配置环境变量, 修改profile文件.  
-	sudo gedit /etc/profile  
-	在文本中添加以下代码:  
-	#Sun JDK profile  
-	export JAVA_HOME=/opt/jdk1.6.0_26  
-	export JRE_HOME=/opt/jdk1.6.0_26/jre  
-	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib  
-	export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOME/bin  
-1.4. 还要修改另外一个文件environment:  
-	sudo gedit /etc/environment  
-	在文本中添加以下代码:  
-	#Sun JDK environment  
-	export JAVA_HOME=/opt/jdk1.6.0_26  
-	export JRE_Home=/opt/jdk1.6.0_26/jre  
-	export CLASSPATH=.:$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib  
-1.5. 手动配置JDK.  
-	sudo update-alternatives --install /usr/bin/java java /opt/jdk1.6.0_26/bin/java 300  
-	sudo update-alternatives --install /usr/bin/javac javac /opt/jdk1.6.0_26/bin/javac 300  
-1.6. 让系统使用我们安装的JDK.  
-	sudo update-alternatives --config java  
-1.7. 验证安装JDK是否成功.  
-	java -version  
+    $HOME/.local/share/applications
+    /usr/local/share/applications
+    /usr/share/applications
 
 ### eclipse installation
 To install eclipse on ubuntu you need to download it first from http://www.eclipse.org/downloads/ Extract the downloaded file by right click on it and extract here or running the following:  
@@ -1807,20 +1815,23 @@ Create an executable in your path:
 ```
 Make eclipse executable everywhere by creating a symlink:  
 `sudo ln -s /usr/bin/eclipse /bin/eclipse`  
+
 Create the menu icon: `sudo gedit /usr/share/applications/eclipse.desktop` Type in this content and save:  
+
 ```
-[Desktop Entry]
-Encoding=UTF-8
-Name=eclipse
-Comment=eclipse IDE
-Exec=eclipse
-Icon=/home/pu/opt/eclipse/icon.xpm
-Terminal=false
-Type=Application
-Categories=GNOME;Application;Development;
-StartupNotify=true
+
+	[Desktop Entry]
+	Encoding=UTF-8
+	Name=eclipse
+	Comment=eclipse IDE
+	Exec=eclipse
+	Icon=/home/pu/opt/eclipse/icon.xpm
+	Terminal=false
+	Type=Application
+	Categories=GNOME;Application;Development;
+	StartupNotify=true
 ```
-Run for the first time: eclipse -clean  
+Run for the first time: `eclipse -clean`  
 You can now start Eclipse by simply typing eclipse in the terminal or from the GNOME menu Applications -> Programming -> Eclipse  
 
 update tooltips color  
@@ -1833,6 +1844,7 @@ tooltip_fg_color #000000;
 ### Tomcat
 export JPDA_ADDRESS=8000  
 catalina.sh jpda start  
+catalina.sh configtest
 java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n -jar remoting-debug.jar  
 Listeningfor transport dt_socket at address: 8000  
 
@@ -1849,13 +1861,6 @@ https://askubuntu.com/questions/284971/how-to-run-php-web-application-in-lamp-se
 7. PHP Modules: check avaliable libraries: `apt-cache search php5-`, install `sudo apt-get install name of the module`
 
 libapache2-mod-auth-mysql php5-mysql
-
-### Chinese input installation
-1.click dash home, search for "language support"  
-2.click "install/remove language" and add Chinese  
-3.click dash home, search for "keyboard input method"  
-4.under "input method",add Chinese input method  
-5.auto start it: system->administrator->language support->Keyboard input method system, choose ibus  
 
 ## Miscellaneous
 
@@ -2159,8 +2164,11 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 ##### 磁盘满
 `df -h` 查看当前已挂载的所有分区及使用情况  
 `tune2fs -l /dev/sda2 | grep -i "block"`查看系统保留块  
-`du` 查看目录的大小  
 `du -ckx /path/to/file | sort -n > /tmp/dir_space`, `tail /tmp/dir_space`得到根文件系统下最大的10个目录  
+`du -sh dirname` 查看目录的大小  
+`du -h --max-depth=1` 显示当前目录中所有子目录的大小  
+`find / -name '*log*' -size +1000M -exec du -h {} \;` find files size more than 1G
+`du -s * | sort -nr | head | awk '{print $2}' | xargs du -sh` List size top 10 files in current folder
 
 ##### I节点不足
 `df -i` 查看I节点的使用情况  
@@ -2170,7 +2178,7 @@ identify the directory which is using all your inodes:
 * `sudo find / -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n | tail -n 15`
 
 一旦遇到I节点用光的情形, 有以下几种选择:   
-　　1. 删除大量文件  
+　　1. 删除大量文件  `find /path/to/folder -mtime +3 -type f  | xargs rm -f >/dev/null 2>&1`
 　　2. 将大量文件移动到其他的文件系统中;   
 　　3. 将大量的文件压缩成一个文件;   
 　　4. 备份当前文件系统中的所有文件, 重新格式化之前的硬盘, 获得更多的I节点, 再将文件复制回去.  
@@ -2197,7 +2205,8 @@ identify the directory which is using all your inodes:
 `sh -c "sync && echo 3 > /proc/sys/vm/drop_caches"`  
 `dd if=/tmp/output of=/dev/null bs=8k`  
 
-##### hdparm
+##### hdparm 
+`hdparm` get/set SATA/IDE device parameters
 `sudo hdparm -Tt /dev/sda`  
 `for i in 1 2 3; do sudo hdparm -tT /dev/sda; done`  
 `sudo hdparm -v /dev/sda` will give information as well.

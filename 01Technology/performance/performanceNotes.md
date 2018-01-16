@@ -2,6 +2,15 @@
 
 # High performance Notes
 
+## Java Performance (2012)- Charlie Hunt & Binu John
+### The Performance Attributes
+
+* Throughput
+* Latency
+* Footprint: the amount of memory a garbage collector requires
+
+A performance improvement for one of these attributes almost always is at the expense of one or both of the other attributes  
+
 ## 认清性能问题
 [认清性能问题](https://mp.weixin.qq.com/s?__biz=MzAxMTEyOTQ5OQ==&mid=2650610655&idx=1&sn=4f38ef56ff57054ab9745b0725351159&scene=23&srcid=0824IUyLIot4dXFjXdW4wK0I#rd) 陈天 mindwind（译） 瞬息之间
 [Thinking Clearly about Performance](https://queue.acm.org/detail.cfm?id=1854041) Cary Millsap, Method R Corporation

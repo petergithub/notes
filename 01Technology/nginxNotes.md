@@ -28,6 +28,9 @@ Where signal may be one of the following:
     `quit` — graceful shutdown
     `reload` — reloading the configuration file
     `reopen` — reopening the log files
+    
+`nginx -t` Test your configuration file for syntax errors
+`sudo systemctl reload nginx` reload Nginx    
 
 ## Location正则写法
 ### 规则[doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)

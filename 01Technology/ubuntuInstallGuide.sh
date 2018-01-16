@@ -11,6 +11,17 @@
 #root (hd0,0)
 #kernel (hd0,0)/vmlinuz boot=casper iso->scan/filename=(hd0,0)/ubuntu-14.04.2-desktop-i386.iso ro quiet >splash locale=en_US.UTF-8
 #initrd (hd0,0)/initrd.lz
+
+title Ubuntu Live CD to install Ubuntu
+root (hd0,0)
+kernel (hd0,0)/vmlinuz.efi boot=casper iso-scan/filename=(hd0,0)/ubuntu-16.04.1-desktop-amd64.iso ro quiet splash locale=en_US.UTF-8
+initrd (hd0,0)/initrd.lz
+
+title Ubuntu Live CD to install Ubuntu 16.04
+root (hd0,0)
+kernel /vmlinuz.efi boot=casper iso-scan/filename=/ubuntu-16.04.3-desktop-amd64.iso ro quiet splash ignore_uuid locale=en_US.UTF-8
+initrd /initrd.lz
+
 ## 3. restart system with "Ubuntu Live CD to install Ubuntu"
 ## 4. sudo umount -l /isodevice
 ## 5. Click "Install ubuntu"
@@ -23,7 +34,7 @@
 # dpkg -i AdbeRdr*.deb	# install
 ## installed programs: /usr/share/applications/ or ~/.local/share/applications
 ## make it available in "Open with other Application" add %f at the end of line "Exec=command" in /usr/share/applications/pdfedit.desktop
-## apt-get 下载后，软件所在路径是 /var/cache/apt/archives
+## apt-get 下载后，软件所在路径是 /var/cache/apt/archives or /var/cache/
 
 ## dpkg -S packageName     #显示所有包含该软件包的目录
 # apt show maven (apt-cache policy maven)	check the version of package from apt-get
@@ -33,6 +44,11 @@
 ## uninstall (even install with .debi package from local)
 # sudo apt-get remove <package> && sudo apt-get autoremove
 # sudo apt-get purge <package>
+
+## add the Apt repository to your Apt source list directory (/etc/apt/sources.list.d) 
+# echo "deb https://dl.bintray.com/rabbitmq/debian {distribution} main" | sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list
+# for Ubuntu 16.04, the distribution will be xenial like below
+# echo "deb https://dl.bintray.com/rabbitmq/debian xenial main" | sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list
 
 # update the package lists /etc/apt/sources.list from repositories
 # following  to update http://wiki.ubuntu.org.cn/源列表
@@ -47,7 +63,7 @@ sudo apt-get update # This is very important step to update system first.
 # /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
 ########## GVim config: clone configuration files from stash ##########
-sudo apt-get -y install vim-gnome
+##sudo apt-get -y install vim-gnome
 
 ## get customized vim configuration file .vimrc
 # wget --no-check-certificate -O ~/.vimrc https://raw.githubusercontent.com/petergithub/configuration/master/.vimrc
@@ -65,6 +81,7 @@ sudo apt-get -y install vim-gnome
 #echo "set encoding=utf-8" >> .vimrc
 #echo "set fileencoding=utf-8" >> .vimrc
 #echo "set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1" >> .vimrc
+
 
 # :w !sudo tee % ##saving file as sudo when forgot to start vim using sudo
 #echo "command W w !sudo tee % > /dev/null" >> .vimrc	## take W as a shortcut
@@ -86,8 +103,9 @@ sudo apt-add-repository ppa:upubuntu-com/ppa
 sudo apt-get update
 
 ## gdebi lets you install local deb packages resolving and installing its dependencies
-sudo apt-get -y install gdebi ncdu nautilus-gksu xclip
-nautilus -q
+sudo apt-get -y install gdebi ncdu xclip
+#sudo apt-get -y install nautilus-gksu
+#nautilus -q
 
 ## flashplugin-nonfree: flash plugin for firefox
 ## autokey-gtk: quick paste tool
@@ -98,15 +116,17 @@ sudo apt-get -y install p7zip p7zip-full p7zip-rar unrar autokey-gtk trash-cli a
 mkdir bin
 #echo export PATH=.:~/bin:\$PATH >> ~/.bashp
 #echo "Download .bashp from https://github.com/petergithub/configuration/blob/master/.bashp"
+
+sudo mkdir /data && sudo chmod 1777 /data  # sudo chmod o+t /data
 ########## tools END ##########
 
 ########## development tools BEGIN ##########
 # atom 32 bit installation
-sudo add-apt-repository ppa:webupd8team/atom
+sudo add-apt-repository -y ppa:webupd8team/atom
 sudo apt-get update
 
 # Performance Monitoring Tools: sysstat include sar
-sudo apt-get -y install git tig tmux maven traceroute python-pip sysstat dstat wireshark atom
+sudo apt-get -y install git tig curl tmux maven traceroute python-pip sysstat dstat wireshark atom
 sudo adduser $USER wireshark
 
 ## update hosts
@@ -129,14 +149,9 @@ cheat -v && cd .. && rm -r cheat
 
 ########## wine BEGIN ##########
 ## https://wiki.winehq.org/Ubuntu
-sudo apt-get install software-properties-common # install apt-add-repository
 ## winecfg: wine configuration
 sudo dpkg --add-architecture i386  # check by dpkg --print-foreign-architectures
-sudo add-apt-repository ppa:wine/wine-builds 
-sudo apt-get update
 ## if missing PUBKEY add then sudo apt-get update
-# sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys PUBKEY
-## sudo apt-get install wine1.7
 sudo apt-get -y install --install-recommends winehq-staging
 ## 64位系统出错，安装libgtk2.0即可
 sudo apt -y install libgtk2.0-0:i386 lib32z1 lib32ncurses5
@@ -199,7 +214,7 @@ sudo apt-get -y install mysql-server-5.7
 ## sudo apt-get -y install mysql-workbench #version is not the latest
 
 ## install Nginx
-sudo add-apt-repository ppa:nginx/stable
+sudo add-apt-repository -y ppa:nginx/stable
 sudo apt-get update
 sudo apt-get -y install nginx
 
@@ -213,14 +228,16 @@ sudo apt-get -y install unity-tweak-tool
 #sudo apt-get install ccsm # Ubuntu 14.04
 
 # Disable ctrl+alt+down in Ubuntu 16.04 (make it availabel in eclipse)
-sudo apt install compizconfig-settings-manager
+sudo apt install -y compizconfig-settings-manager
 ## Dash->CompizConfig Settings Manager->Desktop->Desktop Wall->Bindings->disable Moving down/up
 
 ###### Chinese input #######
 ## sudo apt-get install fcitx-table-wbpy ## install Chinese input
 
 ## download from http://pinyin.sogou.com/linux/ and config Ctrl + space for sogou
-## 1. System Settings -> Language Support -> Keyboard input method system: fcitx
+## 0. dpkg -i sogou.deb
+## 1. System Settings -> Language Support -> Keyboard input method system: fcitx -> Restart ubuntu
+## 1.1. Dash -> Fcitx Configuration -> click + at the left corner -> add Sogou Pinyin
 ## 2. System Settings -> Keyboard -> Text Entry -> Switch to next source using: empty
 ## 3. Dash -> Fcitx Configuration -> Global Config
 ## 4. Disable "Spell Hint": Dash -> Fcitx Configuration -> Double click "Keyboard-English" -> "Toggle the word hint" field uses "Ctrl+Alt+H" -> hit "Esc" -> OK
@@ -280,15 +297,24 @@ sudo apt-get -y install dconf-tools
 gsettings set org.gnome.desktop.media-handling automount-open false
 #gsettings set org.gnome.desktop.media-handling automount false
 
+## startup
+# Dash -> startup -> add thunderbird, autokey, atom
+
 ########### Linux Tools
 ## Calibre: calibre is a powerful and easy to use e-book manager.
 ## Binary install https://calibre-ebook.com/download_linux
 sudo -v && wget -nv -O- https://download.calibre-ebook.com/linux-installer.py | sudo python -c "import sys; main=lambda:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
 
 ## Disable Desktop Notifications
-sudo add-apt-repository ppa:vlijm/nonotifs
+sudo add-apt-repository -y ppa:vlijm/nonotifs
 sudo apt-get update
 sudo apt-get -y install nonotifs
+
+## Chrome
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt-get update
+sudo apt-get install google-chrome-stable
 
 ## CacheBrowser https://cachebrowser.info/#/download
 #sudo apt-get -y install python-setuptools
@@ -308,7 +334,7 @@ sudo usermod -a -G vboxsf $USER
 sudo apt-get -y install ubuntu-restricted-extras
 
 ## playonlinux
-#sudo add-apt-repository ppa:noobslab/apps && sudo apt-get update
+#sudo add-apt-repository -y ppa:noobslab/apps && sudo apt-get update
 sudo apt-get install playonlinux
 
 ## Transmission 
@@ -319,7 +345,18 @@ sudo snap install <snap name> # To install a snap
 sudo snap remove <snap name> # remove the snap
 other command: list / find <text to search> / revert <snap name> / refresh <snap name> 
 
+## init
+# git
+wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && echo >> ~/.bashrc && echo "if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash; fi" >> ~/.bashrc && source ~/.bashrc
+
+# vim config
+wget --no-check-certificate -O ~/.vimrc https://raw.githubusercontent.com/petergithub/configuration/master/.vimrc
+
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
 #make PREFIX=/path/to/target >& make.log &
 #make PREFIX=/path/to/target install >& make.install.log &
 #用于保存安装信息日志，这样需要卸载的时候方便查看哪些文件安装在了系统目录中，例如/usr/lib下的库文件
+#Install Ubuntu
+#1、引导分区: /boot	256M for personal; 512M for server; try 1G
+#2、交换分区: swap	8G 8192M virtual memory
+#3、系统分区: / 　　　装系统和软件 27G

@@ -9,6 +9,8 @@
 `AtomicInteger`底层实现机制
 SpringBoot和Swagger结合提高API开发效率  http://localhost:8080/swagger-ui.html
 
+-XX:+Pringflagsfinal 打印平台默认值  
+
 concurrent: 主内存.寄存器是是运行时?
 
 	并发Concurrent:
@@ -124,6 +126,7 @@ jmap: Java内存映像工具  (Memory Map)
 jhat: 虚拟机堆转储快照分析工具  (Java Heap Analysis Tool)
 jstack: Java堆栈跟踪工具  (Stack Trace)
 HSDIS: JIT生成代码反汇编  
+`jcmd 4874 VM.command_line` 打印指定线程的启动参数  
 
 #### jmap
 排查GC问题必然会用到的工具，jmap可以告诉你当前JVM内存堆中的对象分布及其关系，当你dump堆之后可以用MAT分析，看看有哪些大对象，或者哪些类的实例特别多。
@@ -191,6 +194,24 @@ http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.3
 一般出现这种情况，都是程序启动需要加载大量的第三方jar包。例如：在一个Tomcat下部署了太多的应用。
 
 从代码的角度，软件开发人员主要关注java.lang.OutOfMemoryError: Java heap space异常，减少不必要的对象创建，同时避免内存泄漏。
+
+#### Guidelines for Calculating Java Heap Sizing
+Refer to Java Performance 
+
+##### Table 7-3 Guidelines for Calculating Java Heap Sizing
+
+Space 					| Command Line Option 			| Occupancy Factor
+----					|---							|---
+Java heap 				| -Xms and -Xmx 				| 3x to 4x old generation space occupancy after full garbage collection 
+Permanent Generation	| -XX:PermSize -XX:MaxPermSize	| 1.2x to 1.5x permanent generation space occupancy after full garbage collection
+Young Generation		| -Xmn 1x to 1.5x				| old generation space occupancy after full garbage collection
+Old Generation 			| Implied from overall Java heap size minus the young generation size | 2x to 3x old generation space occupancy after full garbage collection
+
+##### Refine Young Generation Size
+* The old generation space size should be not be much smaller than 1.5x the live data size
+* Young generation space size should be at least 10% of the Java heap size, the value specified as -Xmx and -Xms.
+* When increasing the Java heap size, be careful not to exceed the amount of physical memory available to the JVM
+
 
 ### Other tools
 #### GCViewer
