@@ -497,7 +497,7 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 `la -lR | grep "^-" | wc -l`  
 #### 文件夹个数 count directories in directory recursively
 `find -mindepth 1 -type d | wc -l`  
-`ls -lR | grep "^d" | wc -l`  
+`ls -lR | grep ^d | wc -l`  
 
 #### 替换多文件中的内容
 `find . -name '*.htm' | xargs sed -n '/old/p'`  (静默替换)  
@@ -660,6 +660,7 @@ awk 中提供下列 关系运算符(Relation Operator)
 	`<=` 小于或等于  
 	`==` 等于  
 	`!=` 不等于  
+	`%` 求余  
 	match `~`  
 	`!~` not match  
 	上列关系运算符除`~`(match)与`!~`(not match)外与 C 语言中之含意一致.  
@@ -667,15 +668,16 @@ awk 中提供下列 关系运算符(Relation Operator)
 	A为字符串, B为正则表达式.  
 	`A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.  
 	`A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.  
+	`.`	通配符, 代表任意个字符
 
 	`||` or, `&&` and, `!` not  
 
 
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`  
-`$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断$0(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).  
+`$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断`$0`(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).  
 
-当Pattern 中被用来比对的字符串为$0时, 可省略$0, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E )
+当Pattern 中被用来比对的字符串为`$0`时, 可省略`$0`, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E )
 
 #### Actions
 
@@ -904,6 +906,40 @@ If you want a command to be run once at system boot, the correct solution is to 
     * system RC scripts (/etc/rc.local)
     * crontab with the `@reboot` special prefix (see manpage)
 
+#### logrotate
+在/etc/logrotate.d/ 文件夹下, 新建nginx文件 内容如下
+`logrotate -d /etc/logrotate.d/nginx` 测试, 不会真的切割文件
+`logrotate -vf /etc/logrotate.d/nginx` 手动切割文件
+
+`rpm -ql logrotate` 查看logrotate的配置文件
+
+```
+
+	/path/to/nginx/access.log  
+	/path/to/nginx/error.log  
+	{
+	daily
+	# rotate 7: 一次将存储7个归档日志。对于第8个归档，时间最久的归档将被删除。
+	rotate 7
+	# missingok 在日志轮循期间，任何错误将被忽略，例如“文件无法找到”之类的错误
+	missingok
+	# dateext 使用日期作为命名格式
+	dateext
+	# compress 在轮循任务完成后，已轮循的归档将使用gzip进行压缩
+	compress
+	# nocompress 如果你不希望对日志文件进行压缩，设置这个参数即可
+	# delaycompress: 总是与compress选项一起用，delaycompress选项指示logrotate不要将最近的归档压缩，压缩将在下一次轮循周期进行。这在你或任何软件仍然需要读取最新归档时很有用
+	delaycompress
+	# notifempty 如果日志文件为空，轮循不会进行
+	notifempty
+	# sharedscripts 表示postrotate脚本在压缩了日志之后只执行一次
+	sharedscripts
+	postrotate
+	    [ -e /usr/local/nginx/logs/nginx.pid ] && kill -USR1 `cat /usr/local/nginx/logs/nginx.pid`
+	endscript
+	}
+```
+[Nginx Log Rotation](https://www.nginx.com/resources/wiki/start/topics/examples/logrotation/)
 
 ### shell
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)  
@@ -918,6 +954,7 @@ If you want a command to be run once at system boot, the correct solution is to 
 `set +e` 表示关闭`-e`选项, 同`-o errexit`  
 `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行    
 `set -euxo pipefail` 放在脚本开头 或者执行时传入 `bash -euxo pipefail script.sh`
+`bash -n scriptname`  # don't run commands; check for syntax errors only
 
 `command || exit 1` 只要command有非零返回值，脚本就会停止执行  
 1. `command || { echo "command failed"; exit 1; }`
@@ -1793,19 +1830,9 @@ ubuntu上 接收 outlook exchange 郵件？ thunderbird + exquilla 插件
 
 ### eclipse installation
 To install eclipse on ubuntu you need to download it first from http://www.eclipse.org/downloads/ Extract the downloaded file by right click on it and extract here or running the following:  
-	tar xzf dir/eclipse-SDK-3.3.1.1-linux-gtk.tar.gz  
-	Where eclipse-SDK-3.3.1.1-linux-gtk is your eclipse-SDK name with version and dir is the directory of eclipse-sdk.  
-	Now move it to the root directory. Apply the following command to do this.  
-		sudo mv dir/eclipse ~
-	Now you are ready to configure your eclipse. To do this follow the following step by step...  
-		sudo mv eclipse /opt/  
-	Take care of the permissions:  
-		sudo chmod -R +r /opt/eclipse  
-		sudo chmod +x /opt/eclipse/eclipse  
+	`tar xzf eclipse-SDK-3.3.1.1-linux-gtk.tar.gz  -d ~/opt/eclipse`
 Create an executable in your path:    
-	sudo touch /usr/bin/eclipse  
-	sudo chmod 755 /usr/bin/eclipse  
-
+	`sudo touch /usr/bin/eclipse; sudo chmod 755 /usr/bin/eclipse`  
 	sudo gedit /usr/bin/eclipse  
 	Copy the following content and save the file:  
 ```shell
@@ -1821,15 +1848,16 @@ Create the menu icon: `sudo gedit /usr/share/applications/eclipse.desktop` Type 
 ```
 
 	[Desktop Entry]
-	Encoding=UTF-8
-	Name=eclipse
+	Name[en_US]=eclipse
+	Categories=Development;Application
 	Comment=eclipse IDE
-	Exec=eclipse
+	Exec=/home/pu/opt/eclipse/eclipse
 	Icon=/home/pu/opt/eclipse/icon.xpm
+	NoDisplay=false
+	StartupNotify=true
 	Terminal=false
 	Type=Application
-	Categories=GNOME;Application;Development;
-	StartupNotify=true
+	Encoding=UTF-8
 ```
 Run for the first time: `eclipse -clean`  
 You can now start Eclipse by simply typing eclipse in the terminal or from the GNOME menu Applications -> Programming -> Eclipse  
@@ -2169,6 +2197,7 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 `du -h --max-depth=1` 显示当前目录中所有子目录的大小  
 `find / -name '*log*' -size +1000M -exec du -h {} \;` find files size more than 1G
 `du -s * | sort -nr | head | awk '{print $2}' | xargs du -sh` List size top 10 files in current folder
+`find /data/logs/* -mtime +8 -type f  | xargs rm -f` delete files which modify time 8 days ago
 
 ##### I节点不足
 `df -i` 查看I节点的使用情况  
@@ -2750,6 +2779,8 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 `ssh -oStrictHostKeyChecking=no user@host` you will not be prompted to accept a host key but with some waring sometimes.  
 `ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null` you will not be prompted to accept a host key and makes warnings disappear  
 
+ssh login log `/var/log/secure` is configured in /etc/ssh/sshd_config
+
 
 ##### Bad owner or permissions on .ssh/config
 chmod 600 .ssh/config  
@@ -2762,6 +2793,9 @@ https://help.ubuntu.com/community/SSH/OpenSSH/Configuring
 2. `sudo service ssh restart`
 3. `less /var/log/syslog`
 4. `$(which sshd) -Ddp 10222`
+
+##### Troubleshooting ssh
+https://docstore.mik.ua/orelly/networking_2ndEd/ssh/ch12_01.htm  
 
 ##### Keep SSH Sessions Alive 保持SSH连接不断线
 1. client: ssh -o ServerAliveInterval=60 username@host  
@@ -2923,8 +2957,9 @@ dpkg --unpack packageName	#Unpack the Package but do not Configure
 dpkg --configure packageName	#Reconfigure a Unpacked Package  
 
 ### update hostname
-vi /etc/hostname  
-vi /etc/hosts  
+`hostname newname`
+`vi /etc/hostname`
+`vi /etc/hosts`    
 
 ### update hosts
 redirect it to ustc:lug.ustc.edu.cn  
@@ -2940,6 +2975,13 @@ sudo resolvconf -u
 cat /etc/resolv.conf  
 
 nameserver 192.168.1.1  
+
+### ca-certificates update
+1. `sudo mkdir /usr/share/ca-certificates/extra`
+2. `sudo cp /path/to/ca.cert /usr/share/ca-certificates/extra/com.ca.crt`
+3. `sudo dpkg-reconfigure ca-certificates` or `sudo update-ca-certificates`
+4. if no cert installed, then `sudo vi /etc/ca-certificates.conf`, add `extra/com.ca.crt`
+then `sudo update-ca-certificates`
 
 ### mount disk
 用mount挂载你的windows分区, 事先以root权限用fdisk -l查看. 你就知道该挂载哪个了  
@@ -2966,6 +3008,11 @@ rw= read/write
 dmask: directory umask  
 fmask: file umask  
 
+#### iso file mount
+`sudo mkdir /mnt/iso`  
+`sudo mount -o loop ubuntu-16.10-server-amd64.iso /mnt/iso`  
+`ls /mnt/iso/`  
+
 #### Permission mapping
 4 	read  
 2 	write  
@@ -2973,11 +3020,6 @@ fmask: file umask
 
 #### NTFS permission The mode is determined by the partition''s mount options
 bash script.sh	#You can always explicitly invoke the script interpreter  
-
-#### iso file mount
-`sudo mkdir /mnt/iso`  
-`sudo mount -o loop ubuntu-16.10-server-amd64.iso /mnt/iso`  
-`ls /mnt/iso/`  
 
 ### Main directories
 [LinuxFilesystemTreeOverview](https://help.ubuntu.com/community/LinuxFilesystemTreeOverview)  

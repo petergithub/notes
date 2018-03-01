@@ -18,7 +18,8 @@ get all config `config get *`
 `redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
 用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
 
-`SCAN cursor [MATCH pattern] [COUNT count]`
+`SCAN cursor [MATCH pattern] [COUNT count]` 
+eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
 `redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
 
 `client list`

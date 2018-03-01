@@ -41,6 +41,10 @@ initrd /initrd.lz
 # apt-get-install package-name=version	# install specified version of package
 # apt-cache search # ------(package 搜索包)
 
+## dpkg --get-selections # List all package installed
+# sudo apt list --installed
+# sudo dpkg -l
+
 ## uninstall (even install with .debi package from local)
 # sudo apt-get remove <package> && sudo apt-get autoremove
 # sudo apt-get purge <package>
@@ -124,6 +128,7 @@ sudo mkdir /data && sudo chmod 1777 /data  # sudo chmod o+t /data
 # atom 32 bit installation
 sudo add-apt-repository -y ppa:webupd8team/atom
 sudo apt-get update
+apm install auto-encoding convert-file-encoding open-path open-recent
 
 # Performance Monitoring Tools: sysstat include sar
 sudo apt-get -y install git tig curl tmux maven traceroute python-pip sysstat dstat wireshark atom
@@ -144,6 +149,8 @@ cheat -v && cd .. && rm -r cheat
 # tcpdump preparation
 # Reference: https://ubuntuforums.org/showthread.php?t=1501339
 (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep enforce) && sudo apt-get -y install apparmor-utils && sudo aa-complain /usr/sbin/tcpdump && (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep complain) && echo setup for tcpdump
+
+sudo pip install shadowsocks
 
 ########## development tools END ##########
 
@@ -232,6 +239,7 @@ sudo apt install -y compizconfig-settings-manager
 ## Dash->CompizConfig Settings Manager->Desktop->Desktop Wall->Bindings->disable Moving down/up
 
 ###### Chinese input #######
+sudo apt install fcitx-googlepinyin
 ## sudo apt-get install fcitx-table-wbpy ## install Chinese input
 
 ## download from http://pinyin.sogou.com/linux/ and config Ctrl + space for sogou

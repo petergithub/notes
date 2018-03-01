@@ -172,6 +172,9 @@ Add hooks for `git merge` and `git checkout`
 download git-completion.bash from source code and load it from .bashrc
 `wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && echo >> ~/.bashrc && echo "if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash; fi" >> ~/.bashrc && source ~/.bashrc`
 
+### git status 中文
+默认中文文件名是 `\xxx\xxx` 等八进制形式 , 是因为 对`0x80`以上的字符进行quote, 只需要 `git config –global core.quotepath false `  
+
 ### git中文乱码解决(git bash中的中文乱码问题)
 ls命令查看当前文件夹下文件时，中文文件、文件名乱码：
 	编辑git安装目录下 git/etc/git-completion.bash ，新增一行 alias ls='ls --show-control-chars --color=auto'
@@ -184,7 +187,7 @@ git log无法显示中文注释：
 	add in gitconfig
 	[gui] encoding = utf-8
 	说明：我们的代码库是统一用的 utf-8，这样设置可以在 git gui 中正常显示代码中的中文。
-	[i18n]commitencoding = GB2312
+	[i18n]commitencoding = utf-8
 	说明：如果没有这一条，虽然我们在本地用 $ git log 看自己的中文修订没问题，但，一、我们的 log 推到服务器后会变成乱码；二、别人在 Linux 下推的中文 log 我们 pull 过来之后看起来也是乱码。这是因为，我们的 commit log 会被先存放在项目的 .git/COMMIT_EDITMSG 文件中；在中文 Windows 里，新建文件用的是 GB2312 的编码；但是 Git 不知道，当成默认的 utf-8 的送出去了，所以就乱码了。有了这条之后，Git 会先将其转换成 utf-8，再发出去，于是就没问题了。
 
 ## Examples

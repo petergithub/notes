@@ -13,6 +13,12 @@ try mysql command with alt+. to input last word in last command
   mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper
   https://bugs.launchpad.net/percona-server/+bug/1266386
 
+mysqld --initialize
+sudo su - mysql -s /bin/sh -c "mysqld_multi start 2 --log=/data/mysqld_multi.log"  
+
+mysqld --defaults-file=D:\ProgramFiles\mysql-5.7.20-winx64\my.ini --initialize
+mysqld --defaults-file=..\my.ini --initialize-insecure
+
 慢日志 pt_query_digest
 pt-duplicate-key-checker tool included with Percona Toolkit,
 validate your planned changes carefully with a tool such as pt-upgrade
@@ -49,9 +55,9 @@ mysqlreport --user root --password
 767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
-SELECT UNIX_TIMESTAMP(NOW());  
-SELECT FROM_UNIXTIME(1467542031);  
-select SUBSTRING(1456958130210,1,10);  
+`SELECT UNIX_TIMESTAMP(NOW());`  
+`SELECT FROM_UNIXTIME(1467542031);`    
+`select SUBSTRING(1456958130210,1,10);`    
 
 When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
 
@@ -64,21 +70,57 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 2. (`Relay_Master_Log_File, Exec_Master_Log_Pos`): Coordinates in the master binary log indicating how far the slave SQL thread has executed events received from that log.
 3. (`Relay_Log_File, Relay_Log_Pos`): Coordinates in the slave relay log indicating how far the slave SQL thread has executed the relay log. These correspond to the preceding coordinates, but are expressed in slave relay log coordinates rather than master binary log coordinates.
 
+#### mysqlbinlog
+[mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
+[mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
+从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/xuyi/binlog2sql)   
+
+`show master status` 查看当前正在写入的binlog文件  
+`show binary logs` Lists the binary log files on the server  
+`show variables like 'expire_logs_days';` 设置binlog的过期时间  
+`flush logs` 刷新log日志，自此刻开始产生一个新编号的binlog日志文件  
+`reset master` 重置(清空)所有binlog日志  
+
+`SHOW BINLOG EVENTS [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];`
+`show binlog events in 'mysql-bin.000021'\G`  
+
+`mysqlbinlog /path/to/binlog > tmpfile.sql`    
+* `--start-position=4`                   起始pos点
+* `--stop-position=1024`                   结束pos点
+* `--start-datetime="2013-11-29 13:18:54"` 起始时间点
+* `--stop-datetime="2013-11-29 13:21:53"`  结束时间点
+* `--database=dbname`                     指定只恢复dbname数据库(一台主机上往往有多个数据库，只限本地log日志)
+* `--base64-output=decode-rows`		 当bin-log的模式设置为row时（binlog_format=row）指定解码
+* `--verbose, -v` 						The output will contain lines beginning with ###,
+	Specify --verbose or -v twice to also display data types and some metadata for each column
+
+* `-u --user=name`              Connect to the remote server as username.连接到远程主机的用户名
+* `-p --password[=name]`        Password to connect to remote server.连接到远程主机的密码
+* `-h --host=name`              Get the binlog from server.从远程主机上获取binlog日志
+
+The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`  
+`SELECT ORDINAL_POSITION,COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, COLUMN_COMMENT, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'tbl_name';`
+
+`mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less`
+`mysqlbinlog binlog_files | mysql -u root -p `  To execute events from the binary log, process mysqlbinlog output using the mysql client
+
+[Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)   
+
 #### MySQL installation
 ##### CentOS
 
 ```
-	
-	# mysql 5.6 
+
+	# mysql 5.6
 	wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
 	rpm -ivh mysql-community-release-el6-5.noarch.rpm
 	yum install mysql-server
 	# startup
 	/etc/init.d/mysqld start
-	# configure 
+	# configure
 	mysql_secure_installation
-	
-	
+
+
 	#UNINSTALL
 	# list pacages installed
 	rpm -qa | grep mysql
@@ -89,7 +131,7 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 ```
 
 #####  Windows
-1. unzip 
+1. unzip
 2. `mysqld --defaults-file=..\my.ini --initialize-insecure` to init
 3. `mysqld --console` to start
 4. `mysql -u root --skip-password` to connect
@@ -112,21 +154,15 @@ x using (<primary key cols>)
 `explain SQL` query;  then `show warnings` to get the raw SQL clause
 
 ##### EXPLAIN列的解释：
-table：显示这一行的数据是关于哪张表的
+table：显示这一行的数据是关于哪张表的  
+type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、indexhe和ALL  
+possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
+key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
+key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
+ref：显示索引的哪一列被使用了，如果可能的话，是一个常数  
+rows：MYSQL认为必须检查的用来返回请求数据的行数  
+Extra：关于MYSQL如何解析查询的额外信息
 
-type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、indexhe和ALL
-
-possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
-
-key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
-
-key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
-
-ref：显示索引的哪一列被使用了，如果可能的话，是一个常数
-
-rows：MYSQL认为必须检查的用来返回请求数据的行数
-
-Extra：关于MYSQL如何解析查询的额外信息。
 ##### Type
 性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
 
@@ -331,19 +367,19 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 
 ### Common command
 连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
-mysql -h110.110.110.110 -u root -p 123;（注:u与root之间可以不用加空格，其它也一样）  
-显示当前数据库服务器中的数据库列表：SHOW DATABASES;  
-USE 库名；  
-建立数据库： CREATE DATABASE 库名;  
-删除数据库： DROP DATABASE 库名;  
-显示数据库中的数据表： SHOW TABLES;  
-显示数据表的结构： DESCRIBE 表名;  
-建立数据表： CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));  
-SHOW CREATE TABLE  
-删除数据表： DROP TABLE 表名；  
-将表中记录清空： DELETE FROM 表名;  
-往表中插入记录： INSERT INTO 表名 VALUES (”hyq”,”M”);  
-更新表中数据： UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';  
+`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）  
+显示当前数据库服务器中的数据库列表：`SHOW DATABASES;`
+`USE 库名;`  
+建立数据库： `CREATE DATABASE 库名;`  
+删除数据库： `DROP DATABASE 库名;`  
+显示数据库中的数据表： `SHOW TABLES;`  
+显示数据表的结构： `DESCRIBE 表名;`  
+建立数据表： `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`  
+`SHOW CREATE TABLE`  
+删除数据表： `DROP TABLE 表名；`  
+将表中记录清空： `DELETE FROM 表名;`  
+往表中插入记录： `INSERT INTO 表名 VALUES (”hyq”,”M”);`  
+更新表中数据： `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
 用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名`  
 
 `ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
@@ -357,17 +393,17 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 显示use的数据库名： `SELECT DATABASE();`   
 
 `show variables where variable_name like '%myisam%'`    
-`show variables like '%char%'`  
+`show variables like 'char%'`  
 
 #### 修改密码
 格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
-1、给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
+1. 给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
 `mysqladmin -u root -password PWD_NEW`  
 注：因为开始时root没有密码，所以-p旧密码一项就可以省略了  
-2、再将root的密码改为PWD_NEW  
+2. 再将root的密码改为PWD_NEW  
 `mysqladmin -u root -pPWD_OLD password PWD_NEW`  
 命令行修改root密码： `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
-
+3. 忘记 root 密码:  https://help.aliyun.com/knowledge_detail/42520.html
 #### 增加新用户 grant permission
 `grant all on dbName.* to USERNAME@host identified by 'pwd';`  
 `grant all on dbName.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';`  
@@ -376,6 +412,7 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 `select * from mysql.user where user='cactiuser' \G`    
 `SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
 `CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password'; `   
+`GRANT SELECT ON databaseName.tableName TO 'user'@'%';`  
 `GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';`  
 `REVOKE [type of permission] ON [database name].[table name] FROM ‘[username]’@‘localhost’;`    
 `DROP USER ‘demo’@‘localhost’;`    
@@ -409,6 +446,21 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 * `utf8_unicode_520_ci` follows an newer Unicode standard. ae = æ
 
 http://mysql.rjweb.org/utf8_collations.html    
+
+[Better Unicode support for MySQL (including emoji)](http://tonyshowoff.com/articles/better-unicode-support-for-mysql-including-emoji/)
+```
+
+	[client]
+	default-character-set = utf8mb4
+
+	[mysql]
+	default-character-set = utf8mb4
+
+	[mysqld]
+	character-set-client-handshake = FALSE
+	character-set-server = utf8mb4
+	collation-server = utf8mb4_unicode_ci
+```
 
 #### Sample
 ##### 创建表的时候指定CHARSET为utf8mb4  
@@ -503,13 +555,16 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 * `--single-transaction`	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
 * `--lock-tables=false , -l`	Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
 * `--where, -w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
-
+* `--insert-ignore`	Write `INSERT IGNORE` statements rather than `INSERT` statements
+* `--force, -f`	Ignore all errors; continue even if an SQL error occurs during a
 
 #### Import/Restore
 `mysql> USE 数据库名;`  
 `mysql> SOURCE d:/mysql.sql;` or  
 `mysql -uroot -p dbName < dbName.sql` or   
 `mysql -uroot -p dbName -e "source /path/to/dbName.sql"`  
+* `--force, -f`	Ignore all errors; continue even if an SQL error occurs  
+* `--skip-column-names, -N`	Do not write column names in results.
 
 #### MySQL Export Table to CSV
 [Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)  
@@ -657,22 +712,22 @@ echo bind "^U" vi-kill-line-prev >> .editrc
 ## Advanced
 
 ### MySQL忘记root密码
-1、在DOS窗口下输入net stop mysql5 或 net stop mysql  
-2、开一个DOS窗口，这个需要切换到mysql的bin目录输入mysqld --skip-grant-tables;  
-3、再开一个DOS窗口，mysql -u root  
-4、输入：  
+1. 在DOS窗口下输入net stop mysql5 或 net stop mysql  
+2. 开一个DOS窗口，这个需要切换到mysql的bin目录输入mysqld --skip-grant-tables;  
+3. 再开一个DOS窗口，mysql -u root  
+4. 输入：  
 use mysql  
 update user set password=password("password") where user="root";  
 flush privileges;  
 exit  
-5、使用任务管理器，找到mysqld-nt的进程，结束进程   
+5. 使用任务管理器，找到mysqld-nt的进程，结束进程   
 
 ### 将文本数据转到数据库中
-1、文本数据应符合的格式：字段数据之间用tab键隔开，null值用\\n来代替.例：  
+1. 文本数据应符合的格式：字段数据之间用tab键隔开，null值用\\n来代替.例：  
 3 rose 大连二中 1976-10-10  
 4 mike 大连一中 1975-12-23  
 假设你把这两组数据存为school.txt文件，放在c盘根目录下。  
-2、数据传入命令 load data local infile “c:\\school.txt” into table 表名;  
+2. 数据传入命令 load data local infile “c:\\school.txt” into table 表名;  
 注意：你最好将文件复制到\\mysql\\bin目录下，并且要先用use命令打表所在的库。  
 
 ### Advanced SQL

@@ -165,6 +165,17 @@ location ~* /js/.*/\.js
 	}
 ```
 
+## 
+### SSL双向认证
+```
+	
+	ssl_certificate  /path/to/server.crt;#server公钥
+	ssl_certificate_key  /path/to/server.key;#server私钥
+	ssl_client_certificate   /path/to/ca.crt;#根级证书公钥，用于验证各个二级client, 使用 CA 证书来验证请求带的客户端证书是否是该 CA 签发的
+	ssl_verify_client on;
+```
+curl 验证 `curl --insecure --key client.key --cert client.crt 'https://test'`  
+
 ## Sample: Location ends with slash
 ### rule
 #### location [doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)

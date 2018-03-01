@@ -148,6 +148,43 @@ https://github.com/swagger-api/swagger-ui
 java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -verbose:gc
 -Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 
+#### RabbitMQ
+
+##### Basic command
+```
+
+	sudo service rabbitmq-server statrt
+	sudo service rabbitmq-server stop
+	sudo service rabbitmq-server status
+	sudo rabbitmqctl status
+```
+
+RabbitMQ has a web management console. To enable web management console run : `sudo rabbitmq-plugins enable rabbitmq_management`
+`http://localhost:15672/   guest / guest`
+
+查看用户 `sudo rabbitmqctl list_users`
+By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
+```
+	
+	sudo rabbitmqctl add_user admin password
+	sudo rabbitmqctl set_user_tags admin administrator
+	sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+```
+
+The OS limits are controlled via a configuration file at `/etc/systemd/system/rabbitmq-server.service.d/limits.conf`, for example:
+
+##### Installation
+install erlang  
+```
+	
+	wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+	sudo dpkg -i erlang-solutions_1.0_all.deb
+	apt update
+	apt install erlang erlang-nox
+```
+
+install rabbitmq `sudo apt-get install rabbitmq-server`  
+
 ### 05 Test
 
 UAT: User Acceptance Test
@@ -159,8 +196,8 @@ UAT: User Acceptance Test
 #### 高并发负载均衡软件 HAProxy
 
 #### 构建高性能的 MySQL 集群系统
-##### 通过KeepAlived搭建 Mysql双主模式的高可用集群系统
-##### 通过MMM构建Mysql高可用集群系统
+##### 通过KeepAlived搭建 MySQL双主模式的高可用集群系统
+##### 通过MMM构建MySQL高可用集群系统
 #####  MySQL读写分离解决方案
 通过amoeba 实现MySQL读写分离
 通过keepalived构建高可用的amoeba服务
