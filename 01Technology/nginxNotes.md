@@ -164,7 +164,13 @@ location ~* /js/.*/\.js
 	    proxy_pass http://tomcat:8080/
 	}
 ```
+### 重定向
+```
 
+	rewrite  ^/test.php  /new  permanent;       //重写向带参数的地址
+	rewrite  ^/test.php  /new?  permanent;      //重定向后不带参数
+	rewrite  ^/test.php   /new?id=$arg_id?  permanent;    //重定向后带指定的参数
+```
 ## 
 ### SSL双向认证
 ```
