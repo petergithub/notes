@@ -6,6 +6,7 @@ git push https://github.com/petergithub/eclipsePluginOpen.git master
 ## Commands
 ### Most recent
 `git log -m --name-only` List all modified files in git merge commit 
+`ssh -v git@gitlab.com` get `Welcome to GitLab, Anonymous!` 
 
 Final release version  
 `git merge --no-ff <branchName>`	使得合并操作总是产生一次新的提交  
