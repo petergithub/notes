@@ -225,6 +225,9 @@ sudo add-apt-repository -y ppa:nginx/stable
 sudo apt-get update
 sudo apt-get -y install nginx
 
+## perf https://github.com/brendangregg/perf-tools
+sudo apt install linux-tools-common gawk
+
 ##check the architecture of containers binaries
 #file /bin/bash
 
