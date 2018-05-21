@@ -185,6 +185,31 @@ install erlang
 
 install rabbitmq `sudo apt-get install rabbitmq-server`  
 
+#### memcached
+
+##### options
+-p <num> 监听的TCP端口 (缺省: 11211)
+
+-d 以守护进程方式运行Memcached
+
+-u <username> 运行Memcached的账户，非root用户
+
+-m <num> 最大的内存使用, 单位是MB，缺省是 64 MB
+
+-c <num> 软连接数量, 缺省是 1024
+
+-v 输出警告和错误信息
+
+-vv 打印客户端的请求和返回信息
+
+-h 打印帮助信息
+
+-i 打印memcached和libevent的版权信息
+
+运行 Memcached 目标：使用11211端口、最大占用512M内存、1024个软连接, 不监听UDP `-U 0`，输出客户端请求，以守护进程方式运行
+
+`/usr/local/bin/memcached -p 11211 -d -u root -m 512 -c 1024 -U 0 -vvv`
+
 ### 05 Test
 
 UAT: User Acceptance Test
@@ -242,6 +267,30 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 ##### JavaMelody
 是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
 [Home](https://github.com/javamelody/javamelody/wiki)
+
+##### clamAV 杀毒软件
+[ClamAV from Ubuntu](https://help.ubuntu.com/community/ClamAV)
+##### usage
+`freshclam` 更新病毒库
+`clamdscan /path/to/file` 扫描病毒
+`clamdscan--remove /path/to/file` 删掉病毒文件
+
+##### installation and startup
+1. vi /etc/yum.repos.d/dag.repo
+```
+
+	#Dag RPM Repository Start
+	[dag]
+	name=Dag RPM Repository for RHEL4
+	baseurl=http://ftp.riken.jp/Linux/dag/redhat/el4/en/$basearch/dag/
+	enabled=1
+	gpgcheck=1
+	#Dag RPM Repository End
+```
+2. `yum -y install clamd`
+3. `service clamd start`
+4. `service clamd status`
+
 
 #### 运维工具组合的进化
 ##### 命令执行与配置管理
