@@ -10,6 +10,7 @@
 SpringBoot和Swagger结合提高API开发效率  http://localhost:8080/swagger-ui.html
 
 -XX:+Pringflagsfinal 打印平台默认值  
+[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)  
 
 concurrent: 主内存.寄存器是是运行时?
 
@@ -102,6 +103,9 @@ https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c
 jvm log 时间格式
 打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
 打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`  
+`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
+`-XX:+HeapDumpOnOutOfMemoryError -XX:ErrorFile=/path/to/hs_err_pid%p.log`  
+[Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)  
 
 ### ClassLoader相关工具
 作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是`-XX:+TraceClassLoading`，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用`jar -tvf *.jar`这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。  
@@ -134,12 +138,21 @@ HSDIS: JIT生成代码反汇编
 常用用法：
 强制FGC：-histo:live
 dump堆：-dump:[live],format=b,file=dump.bin
-
-查看各代内存占用情况：-heap
+`$(ps -ef | grep applicationName | grep -v grep | awk '{print $2}')` 获取pid  
+ 
+查看各代内存占用情况：
+* `jmap -heap`
 * `jmap [pid]`
-* `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小
-* `jmap -dump:live,format=b,file=jmap_pid.dump.bin [pid]` 可以将当前Java进程的内存占用情况导出来，用内存分析工具（例如：Eclipse Memory Analyzer Tool（MAT））来分析。
-* `jmap -dump:format=b,file=/tmp/java_pid.hprof pid` dump出来的堆文件信息可以用MAT、VisualVM、jhat、jprofile等工具查看
+* `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小, `:live` 会触发一次Full GC  
+* `jmap -dump:live,format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程的内存占用情况导出来，用内存分析工具（例如：Eclipse Memory Analyzer Tool（MAT））、VisualVM、jhat、jprofile等工具查看
+* `jmap -histo $(ps -ef | grep applicationName | grep -v grep | awk '{print $2}') | head -20` top 20 内存占用  
+
+#### jcmd
+在JDK 1.7之后，新增了一个命令行工具jcmd。它是一个多功能工具，可以用来导出堆，查看java进程，导出线程信息，执行GC等。
+jcmd拥有jmap的大部分功能，Oracle官方建议使用jcmd代替jmap
+
+* `jcmd pid help` 列出该虚拟机支持的所有命令  
+
 
 #### jstack
 jstack可以告诉你当前所有JVM线程正在做什么，包括用户线程和虚拟机线程，你可以用它来查看线程栈，并且结合Lock信息来检测是否发生了死锁和死锁的线程。  
@@ -417,6 +430,13 @@ Parallel Scavenge收集器与ParNew收集器的一个重要区别是它具有自
 * 分代收集
 * 空间整合:从整体看是基于"标记-整理",从局部看(两个Region之间)是基于"复制"算法,不会产生内存空间碎片
 * 可预测的停顿:除了追求低停顿,还能建立可预测的停顿时间模型,能指定在垃圾收集上的时间不得超过N毫秒
+
+就目前而言、CMS还是默认首选的GC策略、可能在以下场景下G1更适合：  
+
+* 服务端多核CPU、JVM内存占用较大的应用（至少大于4G）
+* 应用在运行过程中会产生大量内存碎片、需要经常压缩空间
+* 想要更可控、可预期的GC停顿周期；防止高并发下应用雪崩现象
+
 
 ##### 3.5.8 理解GC日志
 
