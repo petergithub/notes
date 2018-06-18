@@ -56,7 +56,7 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 2. `top -Hp 12666` 查看该进程下各线程的CPU资源, 可以找到占资源较多的线程pid 为 12666 (12666 用 16 进制表示为 0x321e)
 3. `jstack 12666 | grep nid=0x321e` 查看当前java进程的堆栈状态
 
-### 检查步骤
+### 内存检查步骤
 查看java线程在内存增长时线程数 `jstack PID | grep 'java.lang.Thread.State' | wc -l` 或者 `cat /proc/pid/status | grep Thread`
 
 用pmap查看进程内的内存情况，观察java的heap和stack大小 `pmap -x pid |less`
@@ -66,8 +66,35 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 
 用strace和ltrace查找malloc调用
 
+#### jemalloc
+[native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )  
+[Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )  
+[Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )  
+[Using jemalloc to get to the bottom of a memory leak](https://gdstechnology.blog.gov.uk/2015/12/11/using-jemalloc-to-get-to-the-bottom-of-a-memory-leak/ )
+
+1. Starting your JVM with jemalloc `export LD_PRELOAD=/usr/local/lib/libjemalloc.so`
+2. Configuring the profiler `export MALLOC_CONF=prof:true,lg_prof_interval:30,lg_prof_sample:17,prof_prefix:/path/to/jeprof/output/jeprof`
+3. Run your program
+4. Finding the needle `jeprof --show_bytes --gif /usr/bin/java /path/to/jeprof/output/jeprof.*.heap > out.gif`
+
+#### gperf
+[Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )  
+[perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )  
+[Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )  
+
+1. `export GPERF_HOME=/path/to/gperftools-2.7`
+2. `export LD_PRELOAD=$GPERF_HOME/lib/libtcmalloc.so HEAPCHECK=normal`
+3. `export HEAPPROFILE=/path/to/gperf/output.heap`
+4. Run your program
+3. `$GPERF_HOME/bin/pprof --text /usr/bin/java $HEAPPROFILE.*.heap > gperf.output.text`
+
+#### Valgrind
+[The Valgrind Quick Start Guide](http://valgrind.org/docs/manual/quick-start.html )  
+`valgrind ls -l >& valgrind.log`   
+`valgrind --leak-check=yes myprog arg1 arg2`
+
 ### CPU相关工具 bluedavy
-https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd
+[Java问题排查工具箱](https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd )
 
 碰到一些CPU相关的问题时，通常需要用到的工具：
 
@@ -100,7 +127,7 @@ https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c
 
 除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file>` 这样的参数必须是启动参数的标配。  
 
-jvm log 时间格式
+### jvm log 时间格式
 打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
 打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`  
 `-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
