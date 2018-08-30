@@ -13,6 +13,40 @@
 `host domainName`  
 `host IP`  
 
+#### Protocol（协议）:
+可能的值: ether, fddi, ip, arp, rarp, decnet, lat, sca, moprc, mopdl, tcp and udp.
+如果没有特别指明是什么协议，则默认使用所有支持的协议。
+ 
+#### Direction（方向）:
+可能的值: src, dst, src and dst, src or dst
+如果没有特别指明来源或目的地，则默认使用 “src or dst” 作为关键字。
+例如，”host 10.2.2.2″与”src or dst host 10.2.2.2″是一样的。
+ 
+#### Host(s):
+可能的值： net, port, host, portrange.
+如果没有指定此值，则默认使用”host”关键字。
+例如，”src 10.1.1.1″与”src host 10.1.1.1″相同。
+ 
+#### Logical Operations（逻辑运算）:
+可能的值：not, and, or.
+否(“not”)具有最高的优先级。或(“or”)和与(“and”)具有相同的优先级，运算时从左至右进行。
+例如，
+“not tcp port 3128 and tcp port 23″与”(not tcp port 3128) and tcp port 23″相同。
+“not tcp port 3128 and tcp port 23″与”not (tcp port 3128 and tcp port 23)”不同。
+ 
+#### 例子：
+tcp dst port 3128  //捕捉目的TCP端口为3128的封包。
+ip src host 10.1.1.1  //捕捉来源IP地址为10.1.1.1的封包。
+host 10.1.2.3  //捕捉目的或来源IP地址为10.1.2.3的封包。
+ether host e0-05-c5-44-b1-3c //捕捉目的或来源MAC地址为e0-05-c5-44-b1-3c的封包。如果你想抓本机与所有外网通讯的数据包时，可以将这里的mac地址换成路由的mac地址即可。
+src portrange 2000-2500  //捕捉来源为UDP或TCP，并且端口号在2000至2500范围内的封包。
+not imcp  //显示除了icmp以外的所有封包。（icmp通常被ping工具使用）
+src host 10.7.2.12 and not dst net 10.200.0.0/16 //显示来源IP地址为10.7.2.12，但目的地不是10.200.0.0/16的封包。
+(src host 10.4.1.12 or src net 10.6.0.0/16) and tcp dst portrange 200-10000 and dst net 10.0.0.0/8  //捕捉来源IP为10.4.1.12或者来源网络为10.6.0.0/16，目的地TCP端口号在200至10000之间，并且目的位于网络 10.0.0.0/8内的所有封包。
+src net 192.168.0.0/24
+src net 192.168.0.0 mask 255.255.255.0  //捕捉源地址为192.168.0.0网络内的所有封包。
+ 
+
 ### Display filter
 http.host == login.tclclouds.com
 ip.addr == 124.251.36.121 or ip.addr == 124.251.36.122
@@ -64,3 +98,19 @@ http.request.version == “HTTP/1.1”
 //过滤HTTP/1.1版本的http包，包括请求和响应
 http.response.phrase == “OK”
 //过滤http响应中的phrase
+
+snmp || dns || icmp //显示SNMP或DNS或ICMP封包。
+ip.addr == 10.1.1.1  //显示来源或目的IP地址为10.1.1.1的封包。
+ip.src != 10.1.2.3 or ip.dst != 10.4.5.6  //显示来源不为10.1.2.3或者目的不为10.4.5.6的封包。
+换句话说，显示的封包将会为：
+来源IP：除了10.1.2.3以外任意；目的IP：任意
+以及
+来源IP：任意；目的IP：除了10.4.5.6以外任意
+ip.src != 10.1.2.3 and ip.dst != 10.4.5.6  //显示来源不为10.1.2.3并且目的IP不为10.4.5.6的封包。
+换句话说，显示的封包将会为：
+来源IP：除了10.1.2.3以外任意；同时须满足，目的IP：除了10.4.5.6以外任意
+tcp.port == 25  //显示来源或目的TCP端口号为25的封包。
+tcp.dstport == 25  //显示目的TCP端口号为25的封包。
+tcp.flags  //显示包含TCP标志的封包。
+tcp.flags.syn == 0×02  //显示包含TCP SYN标志的封包。
+如果过滤器的语法是正确的，表达式的背景呈绿色。如果呈红色，说明表达式有误。
