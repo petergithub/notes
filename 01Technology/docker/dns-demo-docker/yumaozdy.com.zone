@@ -1,0 +1,13 @@
+$TTL 86400
+@       IN SOA          ns.yumaozdy.com. root (
+                                        1       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        0 )     ; minimum  
+
+@       IN      NS      ns.yumaozdy.com.
+ns      IN      A       172.18.0.2
+www     IN      A       172.18.0.1
+bbs     IN      A       172.18.0.1
+ttt     IN      A       172.18.0.1
