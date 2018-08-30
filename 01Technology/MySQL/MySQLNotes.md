@@ -3,6 +3,8 @@
 # MySQL Notes
 
 ## TODO
+`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
+`alter table table_name add unique (model,ip);`  
 
 库拆分, 分库, 热备, 散表
 
@@ -74,6 +76,13 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 [mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
 [mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
 从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/xuyi/binlog2sql)   
+`GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`  
+
+bin log location  
+`ps -ef | grep mysql` to `--datadir=/data/local/mysql`  
+`show variables like 'datadir';`  
+`show variables like '%binlog%';`  
+`show variables like 'expire_logs_days';` binlog日志自动删除/过期的天数，默认值为0，表示不自动删除  
 
 `show master status` 查看当前正在写入的binlog文件  
 `show binary logs` Lists the binary log files on the server  
@@ -122,6 +131,8 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 
 	#UNINSTALL
+	# stop
+	/etc/init.d/mysqld stop
 	# list pacages installed
 	rpm -qa | grep mysql
 	# uninstall
@@ -155,7 +166,7 @@ x using (<primary key cols>)
 
 ##### EXPLAIN列的解释：
 table：显示这一行的数据是关于哪张表的  
-type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、indexhe和ALL  
+type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL  
 possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
 key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
 key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
@@ -185,7 +196,7 @@ Extra：关于MYSQL如何解析查询的额外信息
 1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
 2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
 3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
-4. 索引列不能参与计算，保持列“干净”，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);   
+4. 索引列不能参与计算，保持列"干净"，比如from_unixtime(create_time) = ’2014-05-29’就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp(’2014-05-29’);   
 5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
 6.
 
@@ -378,22 +389,47 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `SHOW CREATE TABLE`  
 删除数据表： `DROP TABLE 表名；`  
 将表中记录清空： `DELETE FROM 表名;`  
-往表中插入记录： `INSERT INTO 表名 VALUES (”hyq”,”M”);`  
+往表中插入记录： `INSERT INTO 表名 VALUES ("hyq","M");`  
 更新表中数据： `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
-用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE “D:/mysql.txt” INTO TABLE 表名`  
+
+``` Update MySQL table with another table's data
+	
+	UPDATE tableB
+	INNER JOIN tableA ON tableB.name = tableA.name
+	SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
+	WHERE tableA.name = 'Joe'
+```
+
+用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`  
 
 `ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
 `ALTER TABLE tableName DROP INDEX idx_name;`
+`ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';
 
 append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
 
+字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`  
+字符长度(in byte): `SELECT LENGTH("SQL字符长度") AS LengthOfString;`  
 `SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
 显示当前的user： `SELECT USER();`  
 来查看数据库版本 `SELECT VERSION();`  
-显示use的数据库名： `SELECT DATABASE();`   
+显示use的数据库名 query the current database name： `SELECT DATABASE();`   
 
 `show variables where variable_name like '%myisam%'`    
 `show variables like 'char%'`  
+
+#### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
+1. 和`=`号的相同点
+像常规的=运算符一样，两个值进行比较，结果是0（不等于）或1（相等）; 换句话说：’A'<=>’B’得0 和’a'<=>’a‘得1。
+
+2. 和`=`号的不同点
+和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1  
+和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。  
+顺便说一句，mysql上几乎所有的操作符和函数都是这样工作的，因为和NULL比较基本上都没有意义。
+
+3. 相关操作符
+除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。  
+他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言  
 
 #### 修改密码
 格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
@@ -404,10 +440,11 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 `mysqladmin -u root -pPWD_OLD password PWD_NEW`  
 命令行修改root密码： `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
 3. 忘记 root 密码:  https://help.aliyun.com/knowledge_detail/42520.html
+
 #### 增加新用户 grant permission
 `grant all on dbName.* to USERNAME@host identified by 'pwd';`  
 `grant all on dbName.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';`  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;`  
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
 `show grants for USERNAME@IP;` 查看用户权限  
 `select * from mysql.user where user='cactiuser' \G`    
 `SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
@@ -420,11 +457,11 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 （注意：和上面不同，下面的因为是MYSQL环境中的命令，所以后面都带一个分号作为命令结束符）  
 格式：`grant select on 数据库.* to 用户名@登录主机 identified by "PASSWORD"`  
 1、增加一个用户test1密码为abc，让他可以在任何主机上登录，并对所有数据库有查询、插入、修改、删除的权限。首先用root用户连入MYSQL，然后键入以下命令：  
-`grant select,insert,update,delete on *.* to test1@”%” Identified by "PWD";`   
+`grant select,insert,update,delete on *.* to test1@"%" Identified by "PWD";`   
 但增加的用户是十分危险的，你想如某个人知道test1的密码，那么他就可以在internet上的任何一台电脑上登录你的mysql数据库并对你的数据可以为所欲为了，解决办法见2。  
 2、增加一个用户test2密码为abc,让他只可以在localhost上登录，并可以对数据库mydb进行查询、插入、修改、删除的操作（localhost指本地主机，即MYSQL数据库所在的那台主机），  
 这样用户即使用知道test2的密码，他也无法从internet上直接访问数据库，只能通过MYSQL主机上的web页来访问了。  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by “abc”;`  
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
 如果你不想test2有密码，可以再打一个命令将密码消掉。  
 `grant select,insert,update,delete on mydb.* to test2@localhost identified by "";`   
 `mysql> FLUSH PRIVILEGES;`  
@@ -448,6 +485,7 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 http://mysql.rjweb.org/utf8_collations.html    
 
 [Better Unicode support for MySQL (including emoji)](http://tonyshowoff.com/articles/better-unicode-support-for-mysql-including-emoji/)
+
 ```
 
 	[client]
@@ -543,13 +581,14 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 #### Export/Backup database mysqldump
 MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)  
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
-备份文件中的“--”字符开头的行为注释语句；以“/*!”开头、以“*/”结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
+备份文件中的"--"字符开头的行为注释语句；以/*!"开头、以"*/"结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
 
 `mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz`  
 `mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`  
 * `--no-data, -d` 没有数据
 * `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
 * `--add-drop-table` 在每个create语句之前增加一个drop table
+* `--skip-add-drop-table` without drop table  
 * `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
 * `--default-character-set=utf8` 带语言参数导出
 * `--single-transaction`	This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
@@ -611,7 +650,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 ```
 
 -- 以下为插入字段  
-`INSERT INTO teacher VALUES(”,'jack','大连二中','1975-12-23′);`
+`INSERT INTO teacher VALUES(",'jack','大连二中','1975-12-23′);`
 
 如果你在mysql提示符键入上面的命令也可以，但不方便调试。  
 （1）你可以将以上命令原样写入一个文本文件中，假设为school.sql，然后复制到c:\\下，并在DOS状态进入目录\\mysql\\bin，然后键入以下命令：  
@@ -623,6 +662,7 @@ mysql -uroot -p密码 < c:\\school.sql
 How to get the sizes of the tables of a mysql database?
 https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database
 You can use this query to show the size of a table (although you need to substitute the variables first):
+
 ```
 
 	SELECT
@@ -658,6 +698,7 @@ or this query to list the size of every table in every database, largest first:
 
 #### find out the best prefix length for a given column
 https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-key-length-is-1000-bytes  
+
 ```
 
 	SELECT
@@ -670,6 +711,7 @@ https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-
 
 #### obtains the list of tables without primary key
 https://moiseevigor.github.io/programming/2015/02/17/find-all-tables-without-primary-key-in-mysql/
+
 ```
 
 	USE INFORMATION_SCHEMA;
@@ -697,6 +739,7 @@ D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
 
 #### Autocompletion in the MySQL command-line client
 Edit or create a file called .my.cnf in your home directory, containing:
+
 ```
 
 	[mysql]
@@ -727,7 +770,7 @@ exit
 3 rose 大连二中 1976-10-10  
 4 mike 大连一中 1975-12-23  
 假设你把这两组数据存为school.txt文件，放在c盘根目录下。  
-2. 数据传入命令 load data local infile “c:\\school.txt” into table 表名;  
+2. 数据传入命令 load data local infile "c:\\school.txt" into table 表名;  
 注意：你最好将文件复制到\\mysql\\bin目录下，并且要先用use命令打表所在的库。  
 
 ### Advanced SQL
@@ -828,6 +871,7 @@ select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
 ```
 
 console 1:  
+
 ```
 
 	begin;
@@ -838,6 +882,7 @@ orderId 41 is not a existing row.
 it gets the lock of the whole table;  
 
 console 2:  
+
 ```
 
 	begin;
