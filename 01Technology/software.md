@@ -157,6 +157,11 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 	sudo service rabbitmq-server stop
 	sudo service rabbitmq-server status
 	sudo rabbitmqctl status
+	
+	rabbitmqctl list_vhosts 
+	rabbitmqctl list_queues -p <vhost>
+	rabbitmqctl list_user_permissions username
+	rabbitmqctl purge_queue queue.name.development -p <vhost>
 ```
 
 RabbitMQ has a web management console. To enable web management console run : `sudo rabbitmq-plugins enable rabbitmq_management`
