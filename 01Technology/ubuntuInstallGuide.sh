@@ -111,6 +111,9 @@ sudo apt-get -y install gdebi ncdu xclip
 #sudo apt-get -y install nautilus-gksu
 #nautilus -q
 
+## firefox
+# https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/
+# https://ftp.mozilla.org/pub/firefox/releases/56.0.2/
 ## flashplugin-nonfree: flash plugin for firefox
 ## autokey-gtk: quick paste tool
 sudo apt-get -y install p7zip p7zip-full p7zip-rar unrar autokey-gtk trash-cli adobe-flashplugin flashplugin-nonfree
@@ -268,6 +271,7 @@ sudo snap install electronic-wechat
 #sudo dpkg-reconfigure fontconfig
 #退出重新登录，字体是不是清晰了很多？注意你浏览器地址栏里的“www“，斜线没有了毛边。
 
+
 ## install Adobe reader DEB package 32 or 64-bit
 # nohup wget ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x/9.5.5/enu/AdbeRdr9.5.5-1_i386linux_enu.deb &
 #安装PDF阅读器－－Acrobat7.0
@@ -309,7 +313,7 @@ gsettings set org.gnome.desktop.media-handling automount-open false
 #gsettings set org.gnome.desktop.media-handling automount false
 
 ## startup
-# Dash -> startup -> add thunderbird, autokey, atom
+# Dash -> startup -> add thunderbird, /usr/bin/autokey, atom, firefox, startup.sh
 
 ########### Linux Tools
 ## Calibre: calibre is a powerful and easy to use e-book manager.
@@ -364,6 +368,7 @@ wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercont
 wget --no-check-certificate -O ~/.vimrc https://raw.githubusercontent.com/petergithub/configuration/master/.vimrc
 
 #如果必须要用源码包安装，请在安装的时候指定--prefix安装目录，另外安装的时候请使用
+#configure --prefix=/path/to/target/opt;make;sudo make install 
 #make PREFIX=/path/to/target >& make.log &
 #make PREFIX=/path/to/target install >& make.install.log &
 #用于保存安装信息日志，这样需要卸载的时候方便查看哪些文件安装在了系统目录中，例如/usr/lib下的库文件
