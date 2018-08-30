@@ -147,6 +147,8 @@ When you want to start keeping track again
 停止追踪一个文件 `git rm --cached path/to/file`
 
 ### .gitignore文件的例子:
+[git ignore](https://www.gitignore.io/api/intellij,linux,windows,eclipse,java,scala,osx,maven,gradle,sbt,svn)
+
 ```
 	#此为注释 – 将被 Git 忽略
 	*.a                          #忽略所有 .a 结尾的文件
