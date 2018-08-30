@@ -59,14 +59,14 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 ### 内存检查步骤
 查看java线程在内存增长时线程数 `jstack PID | grep 'java.lang.Thread.State' | wc -l` 或者 `cat /proc/pid/status | grep Thread`
 
-用pmap查看进程内的内存情况，观察java的heap和stack大小 `pmap -x pid |less`
+用pmap查看进程内的内存 `RSS` 情况，观察java的heap和stack大小 `pmap -x pid |less`
 
 使用gdb观察内存块里的内容，发现里面有一些接口的返回值、mc的返回值、还有一些类名等等 `gdb: dump memory /tmp/memory.bin 0x7f6b38000000 0x7f6b38000000+65535000`
 `hexdump -C /tmp/memory.bin` 或 `strings /tmp/memory.bin |less`
 
 用strace和ltrace查找malloc调用
 
-#### jemalloc
+#### jemalloc 查看堆外内存
 [native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )  
 [Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )  
 [Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )  
@@ -77,7 +77,7 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 3. Run your program
 4. Finding the needle `jeprof --show_bytes --gif /usr/bin/java /path/to/jeprof/output/jeprof.*.heap > out.gif`
 
-#### gperf
+#### gperf 查看堆外内存
 [Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )  
 [perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )  
 [Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )  
@@ -92,6 +92,12 @@ http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html
 [The Valgrind Quick Start Guide](http://valgrind.org/docs/manual/quick-start.html )  
 `valgrind ls -l >& valgrind.log`   
 `valgrind --leak-check=yes myprog arg1 arg2`
+
+#### perf
+[perf Examples](http://www.brendangregg.com/perf.html )
+[brendangregg/perf-tools](https://github.com/brendangregg/perf-tools )
+1. `perf mem record sh jni.sh 1000000 10 leak`  or attach a running process with `sudo perf record -g -p <PID>`
+2. `perf mem report`
 
 ### CPU相关工具 bluedavy
 [Java问题排查工具箱](https://mp.weixin.qq.com/s?__biz=MjM5MzYzMzkyMQ==&mid=2649826312&idx=1&sn=d28b3c91ef25a281256c6ccd2fafe0d3&mpshare=1&scene=23&srcid=1031nCrOjtP6QtlUYAL6QWso#rd )
