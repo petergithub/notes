@@ -1,4 +1,9 @@
 云计算之大数据
+
+
+数据仓库工具箱（第3版） https://book.douban.com/subject/26301966
+大圣魔方——美团点评酒旅BI报表工具平台开发实践  https://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651746988&idx=1&sn=58072ac9c8940c99bbe643f79002f2d4&chksm=bd12abe18a6522f7c51a05b4ae5d78f988a93d5e9b55eaf0753dec0ee094236657dc17ba9daf&mpshare=1&scene=23&srcid=1102yuTHkZdAy3dejO4m43KX#rd
+
 http://www.itcast.cn/course/cloud.shtml
 
 学完此阶段可掌握的核心能力：

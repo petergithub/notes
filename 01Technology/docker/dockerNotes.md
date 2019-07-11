@@ -1,6 +1,5 @@
 # Docker Notes
 
-
 `docker run` 只在第一次运行时使用，将镜像放到容器中，以后再次启动这个容器时，使用 `docker start imageName`
 
 docker start docker-mysql-5.6
@@ -8,7 +7,7 @@ docker exec -it docker-mysql-5.6 bash
 
 `docker images` Show all images in your local repository  
 
-`docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container 
+`docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container
 `docker run = docker create + docker start`
 start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
 start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
@@ -48,8 +47,6 @@ start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorf
 
 `docker save <image-id>` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
 `docker export <container-id>` docker export命令创建一个tar文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过docker images –tree命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）。
-
-
 
 拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`  
 

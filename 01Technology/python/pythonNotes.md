@@ -3,11 +3,21 @@
 ## Introduction
 
 ### TODO
+
 IDE: PyCharm
 Editor: vim + vim-flake8
 Python的集成开发环境(IDE)有很多，其中Spyder和Python Notebook最受欢迎
 
+if get permission issue with `pip install gevent==1.1.1`, try `python -m pip install -U "gevent==1.1.1" --user`
+
+`brew switch python 3.6.5_1`  `brew switch python 3.7.0`  
+
+`$ brew unlink python`
+`$ brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb`
+
+
 #### Tabs to Space
+
  对于已保存的文件，可以使用下面的方法进行空格和TAB的替换：
 TAB替换为空格：
 :set ts=4
@@ -22,6 +32,7 @@ TAB替换为空格：
 加!是用于处理非空白字符之后的TAB，即所有的TAB，若不加!，则只处理行首的TAB。
 
 ### [The Python Tutorial](https://docs.python.org/3.5/tutorial/ )
+
 1. When the script name is given as '-' (meaning standard input), sys.argv[0] is set to '-'. When -c command is used, sys.argv[0] is set to '-c'. When -m module is used, sys.argv[0] is set to the full name of the located module. Options found after -c command or -m module are not consumed by the Python interpreter’s option processing but left in sys.argv for the command or module to handle.
 2. In interactive mode, the last printed expression is assigned to the variable `_`
 3. use raw strings by adding an `r` before the first quote  

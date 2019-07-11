@@ -1,6 +1,6 @@
-[TOC]
-
 # High performance Notes
+
+[TOC]
 
 ## Java Performance (2012)- Charlie Hunt & Binu John
 ### The Performance Attributes
@@ -113,6 +113,8 @@ Linux内核提供的一种访问磁盘文件的特殊方式,它可以将内存�
 上文讲述了UNIX环境的五种IO模型。基于这五种模型，在Java中，随着NIO和NIO2.0(AIO)的引入，一般具有三种网络编程模型：BIO,NIO,AIO
 
 #### BIO
+服务器通过一个Acceptor线程负责监听客户端请求和为每个客户端创建一个新的线程进行链路处理。典型的一请求一应答模式。若客户端数量增多，频繁地创建和销毁线程会给服务器打开很大的压力。后改良为用线程池的方式代替新增线程，被称为伪异步IO。
+
 BIO是一个典型的网络编程模型，是通常我们实现一个服务端程序的过程，步骤如下：
 1. 主线程accept请求阻塞
 2. 请求到达，创建新的线程来处理这个套接字，完成对客户端的响应。
@@ -120,6 +122,8 @@ BIO是一个典型的网络编程模型，是通常我们实现一个服务端�
 这种模型有一个很大的问题是：当客户端连接增多时，服务端创建的线程也会暴涨，系统性能会急剧下降。因此，在此模型的基础上，类似于 tomcat的bio connector，采用的是线程池来避免对于每一个客户端都创建一个线程。有些地方把这种方式叫做伪异步IO(把请求抛到线程池中异步等待处理)。
 
 #### NIO
+客户端和服务器之间通过Channel通信。NIO可以在Channel进行读写操作。这些Channel都会被注册在Selector多路复用器上。Selector通过一个线程不停的轮询这些Channel。找出已经准备就绪的Channel执行IO操作。
+
 JDK1.4开始引入了NIO类库，这里的NIO指的是Non-block IO，主要是使用Selector多路复用器来实现。Selector在Linux等主流操作系统上是通过epoll实现的。
 NIO的实现流程，类似于select：
 1. 创建ServerSocketChannel监听客户端连接并绑定监听端口，设置为非阻塞模式。
@@ -132,6 +136,8 @@ NIO的实现流程，类似于select：
 相比BIO，NIO的编程非常复杂。
 
 #### AIO
+从编程模式上来看AIO相对于NIO的区别在于，NIO需要使用者线程不停的轮询IO对象，来确定是否有数据准备好可以读了，而AIO则是在数据准备好之后，才会通知数据使用者，这样使用者就不需要不停地轮询了。当然AIO的异步特性并不是Java实现的伪异步，而是使用了系统底层API的支持
+
 JDK1.7引入NIO2.0，提供了异步文件通道和异步套接字通道的实现，是真正的异步非阻塞I/O, 对应于Unix中的异步I/O。
 1. 创建AsynchronousServerSocketChannel，绑定监听端口
 2. 调用AsynchronousServerSocketChannel的accept方法，传入自己实现的CompletionHandler。包括上一步，都是非阻塞的
@@ -513,7 +519,7 @@ http://wetest.qq.com/lab/view/?id=80
 通常是通过埋点的方式把代码执行切分成一段一段的片段，获取各个节点、各类节点的消耗，用于观察性能情况，定位性能瓶颈点；链路上的埋点，可以配合监控系统统一来看，阿里是自己实现了一个简单的埋点类。
 
 ## 性能测试
-陈皓 [如何严谨地做性能测试](http://coolshell.cn/articles/17381.html?hmsr=toutiao.io&utm_medium=toutiao.io&utm_source=toutiao.io)
+陈皓 [如何严谨地做性能测试](http://coolshell.cn/articles/17381.html )
 
 一般来说，性能测试要统一考虑这么几个因素：Thoughput吞吐量，Latency响应时间，资源利用（CPU/MEM/IO/Bandwidth…），成功率，系统稳定性。
 

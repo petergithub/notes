@@ -2,17 +2,34 @@
 
 ## TODO
 
+Kill all process in shell
+
+```
+mysql -h localhost -u root -p -D picooc -e "show full processlist;" | \
+grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
+mysql -h localhost -u root -p
+```
+
+`SHOW ENGINE INNODB STATUS`
+
+[How to shrink/purge ibdata1 file in MySQL?](https://stackoverflow.com/questions/3456159/how-to-shrink-purge-ibdata1-file-in-mysql)
+
+That ibdata1 isn't shrinking is a particularly annoying feature of MySQL. The ibdata1 file can't actually be shrunk unless you delete all databases, remove the files and reload a dump.
+
+[Why is the ibdata1 file continuously growing in MySQL?](https://www.percona.com/blog/2013/08/20/why-is-the-ibdata1-file-continuously-growing-in-mysql/)
+
+[14.6.1.2 Moving or Copying InnoDB Tables](https://dev.mysql.com/doc/refman/5.6/en/innodb-migration.html)
+
 `INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
-`alter table table_name add unique (model,ip);`  
-`alter table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功';` 
-alter table bpg_info add column `remark` varchar(256) DEFAULT '' COMMENT '备注'
+`alter table table_name add UNIQUE KEY (model,ip);`  
+`alter table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功';`
+`alter table bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
+`ALTER TABLE old_name RENAME new_name;`
+
+`CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
+convert `D0490012475E` to `D0:49:00:12:47:5E`: `update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
 
 SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2007-02-10 00:00:00' ORDER BY `time` ASC LIMIT 1;
-
-查看连接MYSQL数据库的IP信息
-select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
-mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
-mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
 
 库拆分, 分库, 热备, 散表
 
@@ -20,9 +37,8 @@ try mysql command with alt+. to input last word in last command
   editline(libedit) vs. readline
   MySQL 5.7.x on ubuntu 16.04 is compiled using editline library not readline
   ~$ mysql --version
-  mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper
-  https://bugs.launchpad.net/percona-server/+bug/1266386
-
+  mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [MySQL EditLine](https://bugs.launchpad.net/percona-server/+bug/1266386)
+  
 mysqld --initialize
 sudo su - mysql -s /bin/sh -c "mysqld_multi start 2 --log=/data/mysqld_multi.log"  
 
@@ -34,14 +50,14 @@ pt-duplicate-key-checker tool included with Percona Toolkit,
 validate your planned changes carefully with a tool such as pt-upgrade
 二级索引 secondary index
 
-https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/  
+[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)  
 INNER JOIN: match in both Table A and Table B.  
 FULL OUTER JOIN: all records in Table A and Table B  
 LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.  
 
-TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`   
+TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`
 
-`SELECT * FROM TableA FULL OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableA.id IS null OR TableB.id IS null`   
+`SELECT * FROM TableA FULL OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableA.id IS null OR TableB.id IS null`
 To produce the set of records unique to Table A and Table B, we perform the same full outer join, then **exclude the records we don't want from both sides via a where clause**.
 
 `SELECT * FROM TableA CROSS JOIN TableB`  cartesian product, this joins "everything to everything"
@@ -67,8 +83,8 @@ mysqlreport --user root --password
 
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 `SELECT UNIX_TIMESTAMP(NOW());`  
-`SELECT FROM_UNIXTIME(1467542031);`    
-`select SUBSTRING(1456958130210,1,10);`    
+`SELECT FROM_UNIXTIME(1467542031);`
+`select SUBSTRING(1456958130210,1,10);`
 
 When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
 
@@ -113,7 +129,7 @@ When code starts with something like this `/*!50100`, the code following till `*
 
 #### 查询优化
 
-deferred join延迟关联 select <cols> from profiles inner join (select <primary key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as x using (<primary key cols>)
+deferred join延迟关联 `select <cols> from profiles inner join (select <primary key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as x using (<primary key cols>)`
 
 #### explain
 
@@ -160,7 +176,7 @@ Extra：关于MYSQL如何解析查询的额外信息
 
 1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
 2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
-3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录   
+3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录
 4. 索引列不能参与计算，保持列"干净"，比如from_unixtime(create_time) = '2014-05-29'就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp('2014-05-29');
 5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
 
@@ -206,9 +222,9 @@ make a case-sensitive query
 `select * from t1 where name = binary 'YOU'`  
 
 设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
-`*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的   
-`*_cs`: case sensitive collation，区分大小写   
-`*_ci`: case insensitive collation，不区分大小写   
+`*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的
+`*_cs`: case sensitive collation，区分大小写
+`*_ci`: case insensitive collation，不区分大小写
 
 ### MySQL help
 
@@ -225,7 +241,7 @@ make a case-sensitive query
 `tee       (\T)` Set outfile [to_outfile]. Append everything into given outfile.
 `system    (\!)` Execute a system shell command.
 
-`pager less`, `pager less -n -i -S`   
+`pager less`, `pager less -n -i -S`
 From `man less`:  
 `-i` Causes searches to ignore case  
 `-n` Suppresses line numbers
@@ -243,7 +259,7 @@ log to a file the statements you typed and their output, pretty much like the Un
 `end`, `commit`, `rollback`
 
 SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;  
-`SELECT @@global.tx_isolation;`  查看InnoDB系统级别的事务隔离级别   
+`SELECT @@global.tx_isolation;`  查看InnoDB系统级别的事务隔离级别
 `SELECT @@tx_isolation;`  查看InnoDB会话级别的事务隔离级别  
 `SET global transaction isolation level read committed;`  修改InnoDB系统级别的事务隔离级别  
 `SET session transaction isolation level read committed;`  修改InnoDB会话级别的事务隔离级别  
@@ -257,7 +273,7 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 `show processlist;`  get the list of the current processes, one of them is locking your table(s)  
 `kill <put_process_id_here>;`   Kill one of these processes
 Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE user = 'root' \G`  
-[Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)   
+[Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)
 
 [Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
 
@@ -286,30 +302,31 @@ Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' '
 4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。  
 
 [14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
-[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/innodb-lock.html)  
+[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)  
 
-脏读（dirty read）    
-不可重复读（unrepeatable read）   
-幻读（phantom read）   
+脏读（dirty read）
+不可重复读（unrepeatable read）
+幻读（phantom read）
 幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
 为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，  
-而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）   
+而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
 
 #### 锁机制
 
 1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写  
-2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的  
+2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
+
 锁的范围:  
 行锁: 对某行记录加上锁  
 表锁: 对整个表加上锁  
-共享锁(share mode), 排他锁(for update)   
+共享锁(share mode), 排他锁(for update)
 
 不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。  
 `replace into`  相当于delete然后insert，会有对数据进行写的过程。  
-`insert ignore`  会忽略已经存在主键或unique索引的数据，而不会有数据的修改    
+`insert ignore`  会忽略已经存在主键或unique索引的数据，而不会有数据的修改
 使用场景：  
-    如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据    
-    如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间    
+    如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据
+    如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间
 
 ### MySQL调优
 
@@ -330,6 +347,14 @@ mysql线上将采用一master多slave的方式来进行部署
 `show full processlist`;  
 count states of SQL: `mysql -e "show processlist \G" | grep State: | sort | uniq -c | sort -rn`
 
+`pager grep -v Sleep | less; show full processlist;`
+`SELECT * FROM information_schema.processlist WHERE INFO LIKE 'SELECT %';`
+
+查看连接MYSQL数据库的IP信息
+select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
+mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
+mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
+
 ## Basic
 
 ### Admin command
@@ -340,7 +365,7 @@ count states of SQL: `mysql -e "show processlist \G" | grep State: | sort | uniq
 `sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
 `/etc/init/mysql.conf`
 
-find the mysql data directory by `grep datadir /etc/my.cnf` or    
+find the mysql data directory by `grep datadir /etc/my.cnf` or
 `mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
 `mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
@@ -385,9 +410,9 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 `SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
 显示当前的user： `SELECT USER();`  
 来查看数据库版本 `SELECT VERSION();`  
-显示use的数据库名 query the current database name： `SELECT DATABASE();`   
+显示use的数据库名 query the current database name： `SELECT DATABASE();`
 
-`show variables where variable_name like '%myisam%'`    
+`show variables where variable_name like '%myisam%'`
 `show variables like 'char%'`  
 
 #### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
@@ -414,7 +439,7 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 2. 再将root的密码改为PWD_NEW  
 `mysqladmin -u root -pPWD_OLD password PWD_NEW`  
 命令行修改root密码： `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
-3. 忘记 root 密码:  https://help.aliyun.com/knowledge_detail/42520.html
+3. [忘记 root 密码](https://help.aliyun.com/knowledge_detail/42520.html)
 
 ##### Linux
 
@@ -424,7 +449,7 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 3. `mysql`
 4. `UPDATE user SET password = 'root' WHERE User = 'root' ;`  
 5. `flush privileges ;`
-6. 删除`my.cnf`的 `spip-grant-tables` 
+6. 删除`my.cnf`的 `spip-grant-tables`
 7. 重启 MySQL 服务
 
 #### 增加新用户 grant permission
@@ -440,7 +465,7 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 `CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';`
 `GRANT SELECT ON databaseName.tableName TO 'user'@'%';`  
 `GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';`  
-`REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`    
+`REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`
 `revoke select on *.* from 'admin'@'%';`
 
 `DROP USER 'demo'@'localhost';`
@@ -449,13 +474,13 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 （注意：和上面不同，下面的因为是MYSQL环境中的命令，所以后面都带一个分号作为命令结束符）  
 格式：`grant select on 数据库.* to 用户名@登录主机 identified by "PASSWORD"`  
 1、增加一个用户test1密码为abc，让他可以在任何主机上登录，并对所有数据库有查询、插入、修改、删除的权限。首先用root用户连入MYSQL，然后键入以下命令：  
-`grant select,insert,update,delete on *.* to test1@"%" Identified by "PWD";`   
+`grant select,insert,update,delete on *.* to test1@"%" Identified by "PWD";`
 但增加的用户是十分危险的，你想如某个人知道test1的密码，那么他就可以在internet上的任何一台电脑上登录你的mysql数据库并对你的数据可以为所欲为了，解决办法见2。  
 2、增加一个用户test2密码为abc,让他只可以在localhost上登录，并可以对数据库mydb进行查询、插入、修改、删除的操作（localhost指本地主机，即MYSQL数据库所在的那台主机），  
 这样用户即使用知道test2的密码，他也无法从internet上直接访问数据库，只能通过MYSQL主机上的web页来访问了。  
 `grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
 如果你不想test2有密码，可以再打一个命令将密码消掉。  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by "";`   
+`grant select,insert,update,delete on mydb.* to test2@localhost identified by "";`
 `mysql> FLUSH PRIVILEGES;`  
 
 ##### 查看连接MYSQL数据库的IP信息
@@ -481,7 +506,7 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 * `utf8_unicode_ci` follows an old Unicode standard for comparisons. ij=ĳ, but ae != æ
 * `utf8_unicode_520_ci` follows an newer Unicode standard. ae = æ
 
-http://mysql.rjweb.org/utf8_collations.html    
+[utf8_collations](http://mysql.rjweb.org/utf8_collations.html)
 
 [Better Unicode support for MySQL (including emoji)](http://tonyshowoff.com/articles/better-unicode-support-for-mysql-including-emoji/)
 
@@ -514,7 +539,7 @@ http://mysql.rjweb.org/utf8_collations.html
 
 update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`  
 
-update table character:   
+update table character:
 `ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
 `ALTER TABLE table_name modify column_name varchar(32) charset utf8mb4 not null comment 'comment';`  
 
@@ -599,7 +624,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 * `--default-character-set=utf8` 带语言参数导出
 * `--single-transaction`  This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
 * `--lock-tables=false , -l`  Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
-* `--where, -w` export with condition `mysqldump -uroot -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
+* `--where, -w` export with condition `mysqldump -u root -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
 * `--insert-ignore`  Write `INSERT IGNORE` statements rather than `INSERT` statements
 * `--force, -f`  Ignore all errors; continue even if an SQL error occurs during a
 
@@ -769,7 +794,7 @@ echo bind "^U" vi-kill-line-prev >> .editrc
 1. 在DOS窗口下输入net stop mysql5 或 net stop mysql  
 2. 开一个DOS窗口，这个需要切换到mysql的bin目录输入mysqld --skip-grant-tables;  
 3. 再开一个DOS窗口，mysql -u root  
-4. 输入 
+4. 输入
  use mysql  
  update user set password=password("password") where user="root";  
  flush privileges;  
@@ -824,9 +849,9 @@ exit
 `show variables  like '%slow_query_log%'`  Query slow log status
 `set global slow_query_log=1`  Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
 `slow_query_log = 1`  开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）  
-`slow_query_log_file = /tmp/mysql_slow.log`  slow log location, default value: host_name-slow.log   
+`slow_query_log_file = /tmp/mysql_slow.log`  slow log location, default value: host_name-slow.log
 `long_query_time=2`  慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
-`log_queries_not_using_indexes`  未使用索引的查询也被记录到慢查询日志中（可选项）   
+`log_queries_not_using_indexes`  未使用索引的查询也被记录到慢查询日志中（可选项）
 
 #### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )
 
@@ -943,7 +968,7 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 
 [mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
 [mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
-从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/xuyi/binlog2sql)   
+从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/xuyi/binlog2sql)
 `GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`  
 
 bin log location  
@@ -982,7 +1007,7 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 `mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less`
 `mysqlbinlog binlog_files | mysql -u root -p`  To execute events from the binary log, process mysqlbinlog output using the mysql client
 
-[Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)   
+[Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)
 
 ## 构建高性能的 MySQL 集群系统
 
@@ -999,3 +1024,8 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 * MaxScale  
 * Atlas（360）, based on MySQL-Proxy 0.8.2  
 * Cobar（Alibaba）  
+
+## inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具 
+
+[Inception](https://github.com/hanchuanchuan/inception)
+[goInception](https://hanchuanchuan.github.io/goInception/)是一个集审核、执行、备份及生成回滚语句于一身的MySQL运维工具， 通过对执行SQL的语法解析，返回基于自定义规则的审核结果，并提供执行和备份及生成回滚语句的功能

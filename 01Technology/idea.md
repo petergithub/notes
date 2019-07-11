@@ -6,7 +6,7 @@ Ctrl+Shift+A: When you don't know the shortcut for some action, try using the Fi
 Make Project action (`Ctrl+F9`) - it will save the changed files and compile them
 Hide All Windows: `C-S-F12`
 Run application: `Shift+F10`
-Show the list of available intention actions:	Alt+Enter
+Show the list of available intention actions: Alt+Enter
 
 Project: Alt+1
 Version Control: Alt+9

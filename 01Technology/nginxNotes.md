@@ -1,27 +1,41 @@
-[TOC]
-
 # Nginx
-[nginx documentation](https://nginx.org/en/docs ) 
+
+[nginx documentation](https://nginx.org/en/docs )
+
+正向代理代理的对象是客户端, 为客户端收发请求，使真实客户端对服务器不可见。
+反向代理代理的对象是服务端, 为服务器收发请求，使真实服务器对客户端不可见。
+反向代理: 隐藏了真实的服务端
 
 ## Recent
+
 https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
 `$upstream_response_time` 格式会变成2部分 xxxx, xxxx ，可能是什么原因？被拆分的字段代表什么含义？
 这是 `ngx_http_upstream` 的 fail-over 机制在起作用。当 nginx
 尝试了第一个后端节点出现错误时（比如超时），它会自动尝试同一个 upstream {}
 分组中的下一个节点。每个节点的访问时间会以逗号分隔。所以尝试了两个节点便是“xxxx, xxxx”。
+使用$request_body即可打出post的数据
+nginx的limit_conn模块，用来限制瞬时并发连接数
+
+NAXSI means Nginx Anti Xss & Sql Injection.
+WAF Web Application Firewall
+waf rule
+invalid POST format id:13
+"msg:invalid POST boundary" id:14;
+/data/softwares/nginx/conf/rule/uc_account_whitelist.rules
 
 ### timeout 配置
+
 `proxy_connect_timeout` :后端服务器连接的超时时间_发起握手等候响应超时时间  
 `proxy_read_timeout`:连接成功后_等候后端服务器响应时间_其实已经进入后端的排队之中等候处理（也可以说是后端服务器处理请求的时间）  
 `proxy_send_timeout` :后端服务器数据回传时间_就是在规定时间之内后端服务器必须传完所有的数据
 
-
 ## Nginx offical
+
 [nginx documentation](http://nginx.org/en/docs )
 
 NGINX (发音为 “engine X”)
 cd /data/softwares/tengine-2.1/
-`sudo /usr/local/nginx/sbin/nginx` start nginx
+`sudo /usr/local/nginx/sbin/nginx -c /path/to/nginx/conf/nginx.conf` start nginx
 `./sbin/nginx -s <signal>`
 Where signal may be one of the following:
     `stop` — fast shutdown

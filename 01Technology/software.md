@@ -151,17 +151,17 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 #### RabbitMQ
 
 ##### Basic command
-```
 
-	sudo service rabbitmq-server statrt
-	sudo service rabbitmq-server stop
-	sudo service rabbitmq-server status
-	sudo rabbitmqctl status
-	
-	rabbitmqctl list_vhosts 
-	rabbitmqctl list_queues -p <vhost>
-	rabbitmqctl list_user_permissions username
-	rabbitmqctl purge_queue queue.name.development -p <vhost>
+``` shell
+sudo service rabbitmq-server statrt
+sudo service rabbitmq-server stop
+sudo service rabbitmq-server status
+sudo rabbitmqctl status
+
+rabbitmqctl list_vhosts 
+rabbitmqctl list_queues -p <vhost>
+rabbitmqctl list_user_permissions username
+rabbitmqctl purge_queue queue.name.development -p <vhost>
 ```
 
 RabbitMQ has a web management console. To enable web management console run : `sudo rabbitmq-plugins enable rabbitmq_management`
@@ -169,6 +169,7 @@ RabbitMQ has a web management console. To enable web management console run : `s
 
 查看用户 `sudo rabbitmqctl list_users`
 By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
+
 ```
 	
 	sudo rabbitmqctl add_user admin password
@@ -176,9 +177,15 @@ By default, RabbitMQ have a user named guest with password guest. We will create
 	sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
 ```
 
+`rabbitmqctl list_queues -p push-center`  
+`curl -i -u guest:guest "http://localhost:15672/api/overview"`  
+`curl -i -u guest:guest "http://localhost:15672/api/queues/push-center/push.schedule.push.queue.name.publish"`  
+
+
 The OS limits are controlled via a configuration file at `/etc/systemd/system/rabbitmq-server.service.d/limits.conf`, for example:
 
 ##### Installation
+
 install erlang  
 ```
 	

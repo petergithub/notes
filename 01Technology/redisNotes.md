@@ -1,12 +1,66 @@
 # Redis Notes
+
 [TOC]
 
 ## Recent
+
 通过系统当前时间-lru时间，得到键多久没有被访问的秒数: `object idletime <key>`. object idletime命令访问键时，不会改变键的lru属性，即不会影响键的访问时间
 通过`info stats`的`expired_keys`指标记录累计删除的过期键数量
 
+`info keyspace` 的 `expires` 表名设置了过期时间的 key 的数量
+`db3:keys=52,expires=52,avg_ttl=1735032446` 
+
+## Performance
+
+### Redis常用的删除策略有以下三种：
+
+* 被动删除（惰性删除）：当读/写一个已经过期的Key时，会触发惰性删除策略，直接删除掉这个Key;
+* 主动删除（定期删除）：Redis会定期巡检，来清理过期Key；
+* 当内存达到maxmemory配置时候，会触发Key的删除操作；
+
+另外，还有一种基于触发器的删除策略，因为对Redis压力太大，一般没人使用。
+
+> [Redis 数据淘汰机制](http://wiki.jikexueyuan.com/project/redis/data-elimination-mechanism.html)
+
+#### 主动删除
+
+Redis 将 serverCron 作为时间事件来运行，从而确保它每隔一段时间就会自动运行一次， 又因为 serverCron 需要在 Redis 服务器运行期间一直定期运行， 所以它是一个循环时间事件：serverCron 会一直定期执行，直到服务器关闭为止。
+
+从 Redis 2.8 开始， 用户可以通过修改 hz选项来调整 serverCron 的每秒执行次数， 具体信息请参考 redis.conf 文件中关于 hz 选项的说明。
+
+### Redis Memory Analyze
+
+> 数据分布[Redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)
+`sudo pip install rdbtools`
+
+``` sql
+#使用 redis-rdb-tools 生成内存快照
+rdb -c memory dump.rdb > memory.csv;
+
+# 导入rdb到sqlite
+sqlite3 memory.db
+sqlite> create table memory(database int,type varchar(128),key varchar(128),size_in_bytes int,encoding varchar(128),num_elements int,len_largest_element varchar(128));
+sqlite>.mode csv memory
+sqlite>.import memory.csv memory
+sqlite>.quit
+
+
+#查询key个数
+sqlite>select count(*) from memory;
+
+#查询总的内存占用
+sqlite>select sum(size_in_bytes) from memory;
+
+#查询内存占用最高的10个 key
+sqlite>select * from memory order by size_in_bytes desc limit 10;
+
+#查询成员个数1000个以上的 list
+sqlite>select * from memory where type='list' and num_elements > 1000 ;
+```
+
 ## Command
-`./redis-server redis_6379.conf`
+
+startup redis server `./redis-server redis_6379.conf`
 `src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>`
 `-r` 4: repeat 4 times
 `-i` 2: 2 seconds sleep between each PING command
@@ -34,18 +88,17 @@ eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
 `info keyspace`
 `info commandstats` 输出中包含处理过的每一种命令的调用次数、消耗的总 CPU 时间(单位 ms)以及平均 CPU 耗时，这对了解自己的程序所使用的 Redis 操作情况非常有用。
 
-数据分布[Redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)
-sudo pip install redis
-
 ### Setup redis server
 
 1. vi redis.conf
+
 daemonize yes
 dbfilename dump_6379.rdb
 logfile "/data/log/redis_6379.log"
 dir "/data/software/redis-account"
 
-2. 
+2. start
+
 `redis-server redis.master6379.conf --daemonize yes`  redis-server in background as a daemon thread 
 `redis-server sentinel.26379.conf --sentinel --daemonize yes` or `redis-sentinel sentinel.26379.conf --daemonize yes`
 
@@ -54,6 +107,7 @@ restart redis server: `redis-server restart`
 shutdown redis sentinel: `redis-cli -h localhost -p 26379 shutdown`
 
 ### 常规操作命令
+
 字符串(strings),字符串列表(lists),字符串集合(sets),有序字符串集合(sorted sets),哈希(hashes)
 01  exits key              //测试指定key是否存在，返回1表示存在，0不存在  
 02  del key1 key2 ....keyN //删除给定key,返回删除key的数目，0表示给定key都不存在  
@@ -63,6 +117,7 @@ shutdown redis sentinel: `redis-cli -h localhost -p 26379 shutdown`
 06  rename oldkey newkey   //原子的重命名一个key,如果newkey存在，将会被覆盖，返回1表示成功，0失败。可能是oldkey不存在或者和newkey相同  
 07  renamenx oldkey newkey //同上，但是如果newkey存在返回失败  
 08  dbsize                 //返回当前数据库的key数量  
+	ttl key 				  // 返回剩余的过期时间 returns -2 if the key does not exist. returns -1 if the key exists but has no associated expire.
 09  expire key seconds     //为key指定过期时间，单位是秒。返回1成功，0表示key已经设置过过期时间或者不存在  
 10  ttl key                //返回设置过过期时间的key的剩余过期秒数 -1表示key不存在或者没有设置过过期时间  
 11  select db-index        //通过索引选择数据库，默认连接的数据库所有是0,默认数据库数是16个。返回1表示成功，0失败  
