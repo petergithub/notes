@@ -6,7 +6,13 @@
 # https://ftp.mozilla.org/pub/firefox/releases/56.0.2/
 
 ## zsh profile
-echo "export JAVA_HOME=$(/usr/libexec/java_home)" >> ~/.zsh.mac 
+# https://stackoverflow.com/questions/26252591/mac-os-x-and-multiple-java-versions
+# java path: /Library/Java/JavaVirtualMachines/
+echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >> ~/.zsh.mac 
+echo "export JAVA_HOME=$(/usr/libexec/java_home -v11)" >> ~/.zsh.mac 
+
+echo "#default java8" >> ~/.zsh.mac 
+echo "export JAVA_HOME=$JAVA_8_HOME" >> ~/.zsh.mac 
 
 # zsh
 brew install zsh
@@ -24,51 +30,54 @@ brew cask install atom google-chrome
 brew install node
 
 # develop software install
-brew install mysql
-brew services start mysql
-mysql_secure_installation
-mysql -u root -proot
-
-brew cask install mysqlworkbench
-
-# install mysql older version  https://gist.github.com/benlinton/d24471729ed6c2ace731
-brew insall mysql@5.7
-## change to 5.7 version
-# Unlink current mysql version
-brew unlink mysql 
-brew switch mysql@5.7 5.7.23
-# Check older mysql version
-ln -s /usr/local/Cellar/mysql@5.7/5.7.23/bin/mysql /usr/local/bin/mysql
-# Or using the mysql command
-mysql --version
+# download from mysql official website mysql-5.7.23-macos10.13-x86_64.tar.gz
+#brew install mysql
+#brew services start mysql
+#mysql_secure_installation
+#mysql -u root -proot
+#
+#brew cask install mysqlworkbench
+#
+## install mysql older version  https://gist.github.com/benlinton/d24471729ed6c2ace731
+#brew install mysql@5.7
+### change to 5.7 version
+## Unlink current mysql version
+#brew unlink mysql 
+#brew switch mysql@5.7 5.7.23
+## Check older mysql version
+#ln -s /usr/local/Cellar/mysql@5.7/5.7.23/bin/mysql /usr/local/bin/mysql
+## Or using the mysql command
+#mysql --version
 
 
 # other software
 brew install mycli
+# How to replace Mac OS X utilities with GNU core utilities?
+# https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities
+# https://liyang85.com/install-gnu-utilities-on-macos
+# 如果不启用--with-default-names，安装的工具会被添加g前缀，使用的时候就是gsed、gfind、gtar，查看帮助文件就是man gsed
+# replace mac default sed
+brew install gnu-sed --with-default-names 
+brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep --with-default-names 
 brew cask install xmind calibre virtualbox alfred
+# Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
 
 # Visual Studio Code (vscode)
 # use CMD+[1-9] to switch between tabs: Code > Preferences > Keyboard Shortcuts > keybindings.json add line in https://stackoverflow.com/a/46087295/1086907
+# https://stackoverflow.com/questions/39245966/vs-code-possible-to-switch-tabs-files-with-cmdnumbers/41112036
 
 # atom
 # Generate TOC (table of contents) of headlines from parsed markdown file. https://atom.io/packages/markdown-toc
-apm install markdown-toc 
+#apm install markdown-toc 
 
 # docker
 brew cask install docker
 # docker tool for mac
 #brew install docker docker-compose docker-machine xhyve docker-machine-driver-xhyve
 
-
-## Shell jump word-wise left and right in iTerm2 with Alt+F/B
-# Preferences(command+,) > Profiles > Keys -> Click the plus -> add (Alt+F, send escape sequence, f) and (Alt+B, send escape sequence, b)
-# refer to https://apple.stackexchange.com/questions/154292/iterm-going-one-word-backwards-and-forwards
-## Open new tabs in iTerm in the current directory
-# Preference -> General -> Wroking Directory -> Reuse previous session's directory
-
-## Open file with default application 
-# right (or control) click a file of the type you want to change and:
-# "Get Info" -> "Open with:" -> (Select TextMate) -> "Change All"
+# config for docker for mac
+# Docker for mac icon -> Perferences -> Daemon -> Registry mirros -> Add https://registry.docker-cn.com -> Apply & Restart
+# check: docker info | grep -A 1 "Registry Mirrors"
 
 ## software
 # sougou input method
@@ -78,6 +87,46 @@ brew cask install docker
 # [jd-GUI](http://jd.benow.ca)
 # [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
 # [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
+# [Open Web Monitor](http://openwebmonitor.netqon.com/)
+# [kap: screen record to gif](https://getkap.co/)
+# [IINA - The modern media player for macOS](https://iina.io/)
+# [Airtest - UI Auto test]
+# [SwitchHosts - hosts /etc/hosts switch]
+# [Bagel is a little native iOS network debugger](https://github.com/yagiz/Bagel)
+
+## Config
+### Tap to click
+# Preference -> Trackpad -> Point & Click -> Tap to click
+
+### Enable dragging with three fingers
+# Preference -> Accessibility -> Mouse & Trackpad -> Trackpad Options -> Enable dragging
+
+### Shell jump word-wise left and right in iTerm2 with Alt+F/B
+# Preferences(command+,) > Profiles > Keys -> set "Left Alt/Right Key" Esc+
+# refer to https://blog.csdn.net/fungleo/article/details/78055768
+#### Preferences(command+,) > Profiles > Keys -> Click the plus -> add (Alt+F, send escape sequence, f) and (Alt+B, send escape sequence, b)
+#### refer to https://apple.stackexchange.com/questions/154292/iterm-going-one-word-backwards-and-forwards
+## Open new tabs in iTerm in the current directory
+# Preference -> General -> Wroking Directory -> Reuse previous session's directory
+
+### Open file with default application 
+# right (or control) click a file of the type you want to change and:
+# "Get Info" -> "Open with:" -> (Select TextMate) -> "Change All"
+
+### Write to Windows NTFS USB Disk Drives on macOS Mojave and Sierra with FUSE for macOS
+reference: https://coolestguidesontheplanet.com/how-to-write-to-windows-ntfs-external-disk-drives-on-macos-mojave-and-sierra/
+		   https://www.howtogeek.com/236055/how-to-write-to-ntfs-drives-on-a-mac/
+1. Disable SIP(System Integrity Protection) 
+1.1 Reboot Mac into Recovery Mode by rebooting and holding down Command+R
+1.2 Utilities -> Terminal
+1.3 run command: csrutil disable
+1.4 Reboot – (to enable it back after you finish the process)
+2. Install FUSE for macOS https://osxfuse.github.io/
+3. Install ntfs-3g
+brew install ntfs-3g
+sudo mv /sbin/mount_ntfs /sbin/mount_ntfs.orig
+sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
+4. Reboot and re-enable SIP with command: csrutil enable
 
 ## brew command
 # brew install default location: /usr/local/Cellar
@@ -99,4 +148,12 @@ brew cask install docker
 # startup with brew: brew services start nginx
 # brew switch another version: brew switch python 3.6.5_1
 # brew uninstall <package_name>  
+
+## issues
+
+### dyld: Library not loaded: /usr/local/opt/readline/lib/libreadline.7.dylib
+
+1. find readline version: `brew info readline`
+2. switch to the version above: `brew switch readline 8.0.0`
+
 
