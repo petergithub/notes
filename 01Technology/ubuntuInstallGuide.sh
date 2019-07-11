@@ -376,3 +376,8 @@ wget --no-check-certificate -O ~/.vimrc https://raw.githubusercontent.com/peterg
 #1、引导分区: /boot	256M for personal; 512M for server; try 1G
 #2、交换分区: swap	8G 8192M virtual memory
 #3、系统分区: / 　　　装系统和软件 27G
+
+#rpm --install file.rpm
+#rpm 查看安装的Mysql版本 `rpm -qa |grep -i mysql`
+#卸载 `rpm -e MySQL-client-5.1.17-0.glibc23`
+
