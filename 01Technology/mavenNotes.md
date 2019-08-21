@@ -63,6 +63,9 @@ if want to download the sources jar the 2nd time, search and remove all "sources
     mvn deploy:deploy-file ${DEFAULT_PARAMETER} -Durl=file://path/to/your/repository
         options: -Dclassifier add jar is the default value. -Dclassifier=sources (add sources) -Dclassifier=javadoc (add Java doc)
 
+install jar:    `mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=jom -Dversion=0.4.0 -Dpackaging=jar -Dfile=jom-0.4.0.jar`
+install sources:`mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=jom -Dversion=0.4.0 -Dpackaging=jar -Dclassifier=sources -Dfile=jom-0.4.0-sources.jar`
+
 ### Specify the location for the testResource folder
 
 adding this to your pom.xml build section
