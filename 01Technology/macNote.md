@@ -1,11 +1,19 @@
 # Mac Note
 
 System Preferences >> Keyboard >> Shortcuts 的 App Shortcuts 为任何软件菜单里的项目设置快捷键
+`Command+Shift+5` capture screenshot
 `unar -encoding GBK file.zip` 解压缩文件避免乱码
 `md5 -s string`
 `md5 /path/to/file` or `openssl md5 /path/to/file`
 `shasum -a 1 /path/to/file` or `openssl sha1 /path/to/file`
 `shasum -a 256 /path/to/file` or `openssl sha256 /path/to/file`
+
+got error message `find: message_uk.xml: unknown primary or operator` with command `find . -name *_uk.xml` 
+correct with quote: `find . -name '*_uk.xml'`
+
+`gcc -v` `gcc --version`
+`sw_vers -productVersion` return the OS version
+`system_profiler SPSoftwareDataType` more info about OS
 
 ## Development
 
@@ -36,8 +44,6 @@ import class: `Option+Enter`
 `Shift+Esc` moves the focus to the editor and also hides the current (or last active) tool window.
 `F12` key moves the focus from the editor to the last focused tool window.
 `Command+Shift+8` block selection
-"Fully Expand Tree Node" in settings->Keymap set mouse shortcut like `ALT+[Wheel Down]`
-Set "Collapse Node" keyshort to `ALT+[Wheel Up]`
 
 Load/Unload modules is like close project in eclipse
 
@@ -52,15 +58,40 @@ Load/Unload modules is like close project in eclipse
     Option+F8：Evaluate expression
     Option+F9：Run To Cursor
 
-#### Add External Tool
+#### Setup
 
-##### open current path in iTerm
+"Fully Expand Tree Node" in settings->Keymap set mouse shortcut like `ALT+[Wheel Down]`
+Set "Collapse Node" keyshort to `ALT+[Wheel Up]`
+
+##### Config
+
+ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/IdeaIC2019.1
+
+1. To enable repeating j: type this in the mac terminal: `defaults write -g ApplePressAndHoldEnabled -bool false`
+2. Preference -> KeyMap -> completion ->
+    `Ctrl+Space` to `Shift+Space`
+    `Ctrl+F` disable (for vim)
+3. Code completion match case: Preference > Editor > General > Code Completion > Match case: uncheck
+4. Preferences -> Editor -> General -> Show quick documentation on mouse move
+5. Preferences -> Editor -> General -> Smart Keys -> Jump outside closing bracket/quote with Tab
+6. Preference | Code Style | Java | Imports | Set Class count to use import with ‘*’ and Names count to use static import with ‘*’ fields as 999
+
+##### Vim
+
+config path: `~/.ideavimrc`
+Allocating conflicting keystrokes to IdeaVim: Preference -> Editor -> Vim Emulation -> Set Handler as IDE for (CTRL+C, CTRL+R, CTRL+T)
+[IdeaVIM Reference Manual SCROLL](http://ideavim.sourceforge.net/vim/scroll.html)
+`zz` line [count] at center of window (default cursor line) 
+
+##### Add External Tool
+
+###### open current path in iTerm
 
 1. Preferences -> Tools -> External Tools -> Add -> Program: open -> Arguments: -a iTerm $FileDir$
 2. Preferences -> Apperarance & Behavior -> Menus and Toolbars -> Main Toolbar -> Add
 3. Keymap -> search "iTerm" -> Add keyboard shortcut "Command+Shift+i"
 
-### [Directories used](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519)
+##### [Directories used](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519)
 
 PRODUCT: IdeaIC2018.3
     Configuration (idea.config.path): `~/Library/Preferences/<PRODUCT><VERSION>`
@@ -72,34 +103,18 @@ PRODUCT: IdeaIC2018.3
     Help > Edit Custom Properties > create default idea.properties under idea.config.path: ~/Library/Preferences/IdeaIC2019.1/idea.properties
     soft link: ~/Library/Preferences/IdeaIC2019.1 -> to ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1
 
-### Plugin
+##### Plugin
 
 [Free MyBatis plugin](https://plugins.jetbrains.com/plugin/8321-free-mybatis-plugin)
 [Smart Tomcat](https://plugins.jetbrains.com/plugin/9492-smart-tomcat)
+[IdeaVimExtension](https://plugins.jetbrains.com/plugin/9615-ideavimextension): switch to English input method in normal mode and restore input method in insert mode.
 GsonFormat: 把json格式的内容转成Object
-JRebel for IntelliJ: 热部署插件
 RestfulToolkit: `Command+back slash`
 [Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
 [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\`
 Grep Console: highlight the editor - nice for analyzing logs
 Maven Helper, Key Promoter, GenerateAllSetter
-
-### Config
-
-ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/IdeaIC2019.1
-
-1. To enable repeating j: type this in the mac terminal: `defaults write -g ApplePressAndHoldEnabled -bool false`
-2. Preference -> KeyMap -> completion ->
-    `Ctrl+Space` to `Shift+Space`
-    `Ctrl+F` disable (for vim)
-3. Code completion match case: Preference > Editor > General > Code Completion > Match case: uncheck
-4. Preferences > Editor > General > Show quick documentation on mouse move
-
-#### Vim
-
-config path: `~/.ideavimrc`
-[SCROLL](http://ideavim.sourceforge.net/vim/scroll.html)
-`zz` line [count] at center of window (default cursor line) 
+JRebel for IntelliJ: 热部署插件
 
 ### vs code
 
@@ -109,6 +124,10 @@ Customize shortcut: `System Preference -> Keyboard -> Shortcuts -> App Shortcuts
 File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 
 add to PATH environment: `command palette -> shell command install`
+
+#### Plugin
+
+[VSCodeVim](https://github.com/VSCodeVim/Vim) config with [Input Method](https://github.com/VSCodeVim/Vim#input-method)
 
 ### Mac common
 
@@ -192,6 +211,9 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 3. 客户端设置代理 [链接](http://ip:8001)
  [代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)  
  [AnyProxy](http://anyproxy.io/cn)
+
+### WPS
+COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown) 切换到上/下一个工作表 Sheet
 
 ## Manage
 

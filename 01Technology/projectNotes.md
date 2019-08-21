@@ -5,8 +5,10 @@
 ## Project management
 
 ### Document management
+
 Folder structure:
-```
+
+``` text
 AppName Template
 ├── Digital-Final
 │   ├── 01 Project Management
@@ -97,7 +99,9 @@ For each phase, we’ll use the STOP / START / CONTINUE method to guide our less
 返回list时带上下一条ID, 然后请求数据时带上ID 查询用ID做条件减少翻页
 
 ## Process
-### Handover process 
+
+### Handover process
+
 Project Management
 	1. 有几个功能模块
 	2. 已有用户,主要用户联系人

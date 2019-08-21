@@ -1,5 +1,9 @@
 # Toolbox
 
+## macOS remember list
+
+mathpix: converting equations in images to LaTeX
+
 ## Ubuntu remember list
 
 Scala tool: ./kojo
