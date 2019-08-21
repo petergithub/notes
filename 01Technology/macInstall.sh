@@ -110,7 +110,7 @@ brew cask install docker
 # Preference -> General -> Wroking Directory -> Reuse previous session's directory
 
 ### Open file with default application 
-# right (or control) click a file of the type you want to change and:
+# Command+I or right (or control) click a file of the type you want to change and:
 # "Get Info" -> "Open with:" -> (Select TextMate) -> "Change All"
 
 ### Write to Windows NTFS USB Disk Drives on macOS Mojave and Sierra with FUSE for macOS
@@ -127,6 +127,7 @@ brew install ntfs-3g
 sudo mv /sbin/mount_ntfs /sbin/mount_ntfs.orig
 sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
 4. Reboot and re-enable SIP with command: csrutil enable
+5. Check status: csrutil status
 
 ## brew command
 # brew install default location: /usr/local/Cellar
