@@ -27,14 +27,15 @@ java HelloWorld
 mac:
 name: lib<name>.dylib or lib<name>.jnilib
 cc -c -I $JAVA_HOME/include -I $JAVA_HOME/include/darwin HelloWorld.c
-cc -dynamiclib -framework JavaVM HelloWorld.o -o libhelloworld.jnilib
-合并成一个命令 `cc -dynamiclib -I $JAVA_HOME/include -I $JAVA_HOME/include/darwin -framework JavaVM ./jni/HelloJNI.c -o libhelloworld.jnilib`
-合并成一个命令 `cc -dynamiclib -I $JAVA_HOME/include -I $JAVA_HOME/include/darwin -framework JavaVM ./jni/HelloJNI.c -o libHelloJNI.dylib`
+cc -dynamiclib -framework JavaVM -o libhelloworld.jnilib HelloWorld.o
+合并成一个命令 `cc -dynamiclib -I $JAVA_HOME/include -I $JAVA_HOME/include/darwin -framework JavaVM -o libHelloJNI.dylib ./jni/HelloJNI.c`
+合并成一个命令 `cc -dynamiclib -I $JAVA_HOME/include -I $JAVA_HOME/include/darwin -framework JavaVM -o libHelloJNI.dylib ./jni/HelloJNI.c`
 
 centos:
 name: lib<name>.so
 compile to `.o`: `cc -c -I $JAVA_HOME/include -I $JAVA_HOME/include/linux HelloWorld.c`
-`cc -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared HelloWorld.c -o libHelloWorld.so`
+`cc -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libHelloWorld.so HelloWorld.c`
+`g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libHelloWorld.so HelloWorld.cpp`
 
 windows:
 name: name.dll

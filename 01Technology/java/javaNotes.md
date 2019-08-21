@@ -48,8 +48,7 @@ attach：jdk1.6新增功能，通过attach机制，可以在jvm运行中，通�
 
 instrument：jdk1.5新增功能，通过instrument俗称javaagent技术，可以修改jvm加载的字节码
 
-然后arthas和其他诊断工具一样，都是先通过attach链接上目标应用，通过instrument动态修改应用程序的字节码达到不重启应用而监控应用的目的
-
+然后 arthas 和其他诊断工具一样，都是先通过attach链接上目标应用，通过instrument动态修改应用程序的字节码达到不重启应用而监控应用的目的
 
 ## Java 8
 
@@ -96,7 +95,7 @@ Solution: This exception usually arises when the socket operations performed on 
 
 用strace和ltrace查找malloc调用
 
-#### jemalloc 查看堆外内存
+#### jemalloc 查看堆外内存 anon
 
 [native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )  
 [Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )  
@@ -233,8 +232,9 @@ dump堆：-dump:[live],format=b,file=dump.bin
 
 * `jmap -heap [pid]`
 * `jmap [pid]`
-* `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小, `:live` 会触发一次Full GC  
-* `jmap -dump:live,format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程的内存占用情况导出来
+* `jmap -dump:format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程的内存占用情况导出来
+* `jmap -dump:live,format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程存活对象在内存中占用情况导出来, `:live` 会触发一次Full GC  
+* `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小
 * `jmap -histo $(ps -ef | grep applicationName | grep -v grep | awk '{print $2}') | head -20` top 20 内存占用  
 
 浅堆（Shallow Heap）: 对象的浅堆指它在内存中的大小
