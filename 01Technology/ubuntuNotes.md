@@ -15,7 +15,7 @@ emacs save and quit: `Ctrl+x, Ctrl+c`
 `SCRIPT_PATH=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname ${S})`  
 
 [Fastest way(s) to move the cursor on a terminal command line](https://stackoverflow.com/questions/657130/fastest-ways-to-move-the-cursor-on-a-terminal-command-line?rq=1)
-Use `Ctrl+x` followed by `Ctrl+e` to open the current line in the editor specified by $FCEDIT or $EDITOR or emacs (tried in that order). 
+Use `Ctrl+x` followed by `Ctrl+e` to open the current line in the editor specified by $FCEDIT or $EDITOR or emacs (tried in that order).
 `bindkey` get all keybinding
 
 tr
@@ -31,7 +31,7 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 
 `ldd --version` get glibc version  
 
-`sysctl -a` display all 
+`sysctl -a` display all
 `sysctl -p` make effective
 
 为了方便地键入长命令, 在设置你的编辑器后（例如 `export EDITOR=vim`）, 键入 `ctrl-x, ctrl-e` 会打开一个编辑器来编辑当前命令. 在 `vi` 模式下则键入 `escape-v` 实现相同的功能.  
@@ -72,13 +72,11 @@ man readline to get more information:
 Question: Cancel failed reverse-i-search in bash but keep what I typed in  
 
 `mv {short,very_long}.txt` will move short.txt to very_long.txt  
-`CTRL+r`: 逆向搜索命令历史 reverse-i-search in bash  
-`CTRL+s` or `C-S-r`: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)  
 `Alt + d`, `esc +d`   Delete the Word after the cursor.  
 `esc+t` transpose two adjacent words  
 `CTRL+h`: show hidden files  
 `nautilus`: open your home folder  
-`location`: make a command can be call anywhere   
+`location`: make a command can be call anywhere
 /usr/share/icons/ubuntu-mono-dark/mimes/16  
 tweak get the theme ubuntu-mono-dark  
 `ln -sfn` update a symbolic link  
@@ -93,12 +91,10 @@ M-1 is meta-1 (Alt-1 in Ubuntu)
 C-1 is control-1  
 `yum provides /usr/bin/ab`  discover which package contains the program `ab`  
 
-
 man top  
 `fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.  
 `sudo service network-manager start`  
 [network-manager](http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb)
-
 
 send 100 requests with a concurrency of 50 requests to an URL  
 `ab -n 100 -c 50 http://www.example.com/`  
@@ -147,22 +143,6 @@ Set locale:
 
 `locale -a | less` Query all supported locale
 or `less /usr/share/i18n/SUPPORTED` on a Debian or Ubuntu based system  
-
-### email
-
-configuration for mail
-`mail -s "subject" -A /opt/attachment.txt username@gmail.com < /dev/null`
-/etc/mail/sendmail.mc
-
-``` bash
-
-    sendmail pu.shang@tcl.com < /tmp/email.txt
-    # cat /tmp/email.txt
-    Subject: Terminal Email Send
-
-    Email Content line 1
-    Email Content line 2
-```
 
 ### Move Running Process to Background
 
@@ -246,17 +226,17 @@ Move around inside of long line: `gj` and `gk` move up and down one displayed li
 
 ``  :  当前文件上次跳转操作的位置
 `.  :  上次修改操作的地方
-`^  :  上次插入的地方
+\`^  :  上次插入的地方
 `[  :  上次修改或复制的起始位置
-`]  :  上次修改或复制的结束位置
+\`]  :  上次修改或复制的结束位置
 `<  :  上次高亮选区的起始位置
-`>  :  上次高亮选区的结束位置
+\`>  :  上次高亮选区的结束位置
 
 #### Selection
 
 You need to select to the next matching parenthesis.
 
-* `v%` if the cursor is on the starting/ending parenthesis 
+* `v%` if the cursor is on the starting/ending parenthesis
 * `vib` if the cursor is inside the parenthesis block
 
 * select text between quotes: `vi"` for double quotes, `vi'` for single quotes
@@ -294,13 +274,13 @@ I can use any of the 26 "named" registers by prefixing the "object" reference wi
 #### Basic vi
 
 VIM - main help file  `:help`  
-find help on just about any subject, by giving an argument to the `:help` command. `:help w`, `:help c_CTRL-D`, `:help user-manual`    
+find help on just about any subject, by giving an argument to the `:help` command. `:help w`, `:help c_CTRL-D`, `:help user-manual`
 切换大小写 `~`  
 `:sp`    split window above and below
 `:sh`    暂时退出vi到系统下, 结束时按CTRL+d则回到vi
 `.` 命令重复上次的修改.  
 `:!command`  executes an external command  
-`:r !command`    将命令command的输出结果放到当前行 如`:r! ls -ltr`    
+`:r !command`    将命令command的输出结果放到当前行 如`:r! ls -ltr`
 read the output of an external command.  For example, `:r !ls`  reads the output of the `ls` command and puts it below the cursor  
 
 `:r FILENAME`  retrieves disk file FILENAME and puts it below the cursor position  
@@ -312,7 +292,7 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 `.` 命令重复上次的修改.  
 修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.  
 重复修改一个单词.  
-如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令.    
+如果是在整个文件中, 你可以使用:`s`（substitute）命令. 如果只是几个地方需要修改, 一种快速的方法是使用`*`命令去找到下一个出现的单词, 使用`cw`命令修改它. 然后输入`n`去找到下一个单词, 输入英文逗点 . 去重复`cw`命令
 
 改变与替换操作命令  
 `r` 替换光标所在的字符  
@@ -327,7 +307,7 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 `yw`    只有当当前光标处于单词的第一个字母时才是"复制整个单词"(包含末尾的空格)  
 `yiw`    不管当前光标处于单词的哪个字母, 都是复制整个单词(不包括末尾的空格)  
 `diw`    删除当前光标所在的word(不包括空白字符), 意为Delete Inner Word 两个符号之间的单词  
-`dt<LETTER>`    删除所有的内容, 直到遇到<LETTER>  
+`dt<LETTER>`    删除所有的内容, 直到遇到 LETTER
 `daw`    删除当前光标所在的word(包括空白字符), 意为Delete A Word  
 `guw`    光标下的单词变为小写  
 `gUw`    光标下的单词变为大写  
@@ -344,16 +324,16 @@ replace a character by a newline in Vim: Use `\r` instead of `\n`.
 
 Recording 记录功能: 命令模式下按`q`, 再按一个字母`a`做名字, 就进入了记录模式, 再按`q`停止记录.  
 Replay 回放记录: 在命令模式下按`@`, 再按下记录名字`a`. 连续回放可以在`@`前加次数.  
-To playback your keystrokes, press `@` followed by the letter previously chosen. Typing `@@` repeats the last playback.     
+To playback your keystrokes, press `@` followed by the letter previously chosen. Typing `@@` repeats the last playback.
 
 #### 文件对比 合并 多窗口
 
 `diff -u`  
-`vimdiff  FILE_LEFT  FILE_RIGHT`   
+`vimdiff  FILE_LEFT  FILE_RIGHT`
 `:qa` (quit all)同时退出两个文件  
 `:wa` (write all)  
 `:wqa` (write, then quit all)  
-`:qa!` (force to quit all)   
+`:qa!` (force to quit all)
 
 `CTRL+w K`(把当前窗口移到最上边)  
 `CTRL+w H`(把当前窗口移到最左边)  
@@ -398,7 +378,7 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `\U`     匹配[^A-Z]  
 `\w`     匹配单词字母, 等同于[0-9A-Za-z_]  
 `\W`     匹配单词字母之外的任意字符, 等同于[^0-9A-Za-z_]  
-`\t`     匹配<TAB>字符  
+`\t`     匹配 TAB 字符  
 `\s`     匹配空白字符, 等同于[\t]  
 `\S`     匹配非空白字符, 等同于[^\t]  
 
@@ -457,7 +437,7 @@ for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?
 less `&pattern` is like `grep` in `less`  
 Display only lines which match the pattern; lines which do not match the pattern are not displayed.  If pattern is empty (if you type `&` immediately followed by ENTER), any filtering is turned off, and all lines are displayed  
 `&eth[01]`  will display lines containing eth0 or eth1  
-`&arp.*eth0` will display lines containing arp followed by eth0    
+`&arp.*eth0` will display lines containing arp followed by eth0
 `&arp|dns`  will display lines containing arp or dns  
 `!` can invert any of the above: `&!event`  
 
@@ -506,7 +486,7 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
     `echo "ab_c" | sed 's/_[a-z]/\u&/g'`  
     `echo "ab_c" | sed 's/_[a-z]/\U&\E/g'`  
 删除一个以上空格, 用一个空格代替    `s/[ ] [ ] [ ] */[ ]/g`  
-删除行首空格 `s/^[ ][ ] *//g`   
+删除行首空格 `s/^[ ][ ] *//g`
 删除句点后跟两个或更多空格, 代之以一个空格 `s/\ .[ ][ ] */[ ]/g`  
 删除以句点结尾行  `s/\ . $//g`  
 删除包含a b c d的行  `-e/abcd/d`  
@@ -520,7 +500,7 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`  
 `rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除  
 
-`find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)    
+`find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
 `find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`  
 `find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行  
 `find . -name dfc.properties`  
@@ -569,7 +549,7 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 
 ##### sed: 1: "/path/to/file.txt": extra characters at the end of l command
 
-Unlike Ubuntu, BSD/macOS requires the extension to be explicitly specified. The workaround is to set an empty string:   
+Unlike Ubuntu, BSD/macOS requires the extension to be explicitly specified. The workaround is to set an empty string:  
 `sed -i '' 's/megatron/pony/g' /path/to/file.txt`
 
 #### 删除.svn文件夹
@@ -713,7 +693,7 @@ $1 $0上第一个字段的数据
 $2 $0上第二个字段的数据  
 `awk 'pattern' '{print}'` or `awk 'pattern' '{print $0}'`    print the whole line matched the pattern  
 
-内建变量(Built-in Variables)   
+内建变量(Built-in Variables)  
 `NF` (Number of Fields)     整数, 其值表$0上所存在的字段数目  
 `NR` (Number of Records)    整数, 其值表awk已读入的数据行数目  
 `FILENAME`                awk正在处理的数据文件文件名  
@@ -737,10 +717,10 @@ awk 会先Evaluate该 Pattern 的值, 若 Pattern 判断后的值为true (或不
 
 执行awk时, 它会反复进行下列四步骤.  
 
-    自动从指定的数据文件中读取一个数据行.  
-    自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...  
-    依次执行程序中 所有 的 Pattern { Actions } 指令.  
-    当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4.  
+自动从指定的数据文件中读取一个数据行.  
+自动更新(Update)相关的内建变量之值. 如 : NF, NR, $0...  
+依次执行程序中 所有 的 Pattern { Actions } 指令.  
+当执行完程序中所有 Pattern { Actions } 时, 若数据文件中还有未读取的数据, 则反复执行步骤1到步骤4.  
 
 awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这个循环 (Loop).  
 
@@ -748,24 +728,24 @@ awk会自动重复进行上述4个步骤, 使用者不须于程序中编写这�
 
 awk 中提供下列 关系运算符(Relation Operator)  
 
-    运算符 含意  
-    `>` 大于  
-    `<` 小于  
-    `>=` 大于或等于  
-    `<=` 小于或等于  
-    `==` 等于  
-    `!=` 不等于  
-    `%` 求余  
-    match `~`  :包含
-    `!~` not match  
-    上列关系运算符除`~`(match)与`!~`(not match)外与 C 语言中之含意一致.  
-    (match)`~` 与`!~`(match) 如下 :
-    A为字符串, B为正则表达式.  
-    `A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.  
-    `A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.  
-    `.`    通配符, 代表任意个字符
+运算符 含意  
+`>` 大于  
+`<` 小于  
+`>=` 大于或等于  
+`<=` 小于或等于  
+`==` 等于  
+`!=` 不等于  
+`%` 求余  
+match `~`  :包含
+`!~` not match  
+上列关系运算符除`~`(match)与`!~`(not match)外与 C 语言中之含意一致.  
+(match)`~` 与`!~`(match) 如下 :
+A为字符串, B为正则表达式.  
+`A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.  
+`A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.  
+`.`    通配符, 代表任意个字符
 
-    `||` or, `&&` and, `!` not  
+`||` or, `&&` and, `!` not  
 
 例如 :
 `$0 ~ /program[0-9]+\.c/ { print $0 }`  
@@ -775,21 +755,21 @@ awk 中提供下列 关系运算符(Relation Operator)
 
 #### Actions
 
-    Actions 是由下列指令(statement)所组成 :  
-    表达式 ( function calls, assignments..)  
-    print 表达式列表  
-    printf( 格式化字符串, 表达式列表)  
-    if( 表达式 ) 语句 [else 语句]  
-    while( 表达式 ) 语句  
-    do 语句 while( 表达式)  
-    for( 表达式; 表达式; 表达式) 语句  
-    for( variable in array) 语句  
-    delete  
-    break  
-    continue  
-    next  
-    exit [表达式]  
-    语句  
+Actions 是由下列指令(statement)所组成 :  
+表达式 ( function calls, assignments..)  
+print 表达式列表  
+printf( 格式化字符串, 表达式列表)  
+if( 表达式 ) 语句 [else 语句]  
+while( 表达式 ) 语句  
+do 语句 while( 表达式)  
+for( 表达式; 表达式; 表达式) 语句  
+for( variable in array) 语句  
+delete  
+break  
+continue  
+next  
+exit [表达式]  
+语句  
 
 awk 中大部分指令与 C 语言中的用法一致  
 例子: [awk-conditional-statements](http://www.thegeekstuff.com/2010/02/awk-conditional-statements)  
@@ -867,7 +847,7 @@ replace: `seq 3| xargs -I % echo http://example.com/persons/%.tar`
 
 ### kill
 
-refer to https://unix.stackexchange.com/questions/169898/what-does-kill-0-do  
+refer to [what-does-kill-0-do](https://unix.stackexchange.com/questions/169898/what-does-kill-0-do)  
 > man 2 kill  
 ...  
 If sig is 0, then no signal is sent, but error checking is still performed; this can be used to check for the existence of a process ID or process group ID.
@@ -905,7 +885,8 @@ Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 >The offset is positive if the local timezone is west of the Prime Meridian and negative if it is east  
 
 example: timezone `UTC+0800` is `TZ=UTC-8` or `TZ=Asia/Shanghai`
-```
+
+```bash
 ~$ TZ=Asia/Shanghai date -R
 Wed, 30 Aug 2017 13:58:05 +0800
 ~$ TZ=UTC-8 date -R
@@ -1017,8 +998,8 @@ rsyslog
 `at` want a command to run once at a later date, `at 4:01pm`  
 If you want a command to be run once at system boot, the correct solution is to use either
 
-    * system RC scripts (/etc/rc.local)
-    * crontab with the `@reboot` special prefix (see manpage)
+* system RC scripts (/etc/rc.local)
+* crontab with the `@reboot` special prefix (see manpage)
 
 #### logrotate
 
@@ -1189,11 +1170,13 @@ positional parameter: space, line return
 2. $、\、'、和"这几个字符是特殊字符 (shell 引号嵌套 使用转义 \" \')  
 
 单引号 ' '
-1. 单引号里的任何字符都会原样输出, 单引号字符串中的变量是无效的  
+
+1. 单引号里的任何字符都会原样输出, 单引号字符串中的变量是无效的
 2. 单引号字串中不能出现单引号（对单引号使用转义符后也不行）  
 
 反引号 `
-1. 反引号括起来的字符串被shell解释为命令行, 在执行时, shell首先执行该命令行, 并以它的标准输出结果取代整个反引号（包括两个反引号）部分  
+
+1. 反引号括起来的字符串被shell解释为命令行, 在执行时, shell首先执行该命令行, 并以它的标准输出结果取代整个反引号（包括两个反引号）部分
 2. 反引号和$()是对等的, $()能够内嵌使用, 而且避免了转义符的麻烦  
 
 [ ] 两边要加空格  
@@ -1383,63 +1366,66 @@ Add comments for multi-lines
     press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.  
 编辑命令  
 
-    * CTRL+a : 移到命令行首  
-    * CTRL+e : 移到命令行尾  
-    * ALT+f : 按单词前移（右向）  
-    * ALT+b : 按单词后移（左向）  
-    * CTRL+xx: 在命令行首和光标之间移动  
-    * CTRL+u : 从光标处删除至命令行首  
-    * CTRL+k : 从光标处删除至命令行尾  
-    * CTRL+w : 从光标处删除至字首  
-    * ALT+d : 从光标处删除至字尾  
-    * CTRL+d : 删除光标处的字符  
-    * CTRL+h : 删除光标前的字符  
-    * CTRL+y : 粘贴至光标后  
-    * ALT+c : 从光标处更改为首字母大写的单词  
-    * ALT+u : 从光标处更改为全部大写的单词  
-    * ALT+l : 从光标处更改为全部小写的单词  
-    * CTRL+t : 交换光标处和之前的字符  
-    * ALT+t : 交换光标处和之前的单词  
-    * ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]  
+* CTRL+a : 移到命令行首
+* CTRL+e : 移到命令行尾  
+* ALT+f : 按单词前移（右向）  
+* ALT+b : 按单词后移（左向）  
+* CTRL+xx: 在命令行首和光标之间移动  
+* CTRL+u : 从光标处删除至命令行首  
+* CTRL+k : 从光标处删除至命令行尾  
+* CTRL+w : 从光标处删除至字首  
+* ALT+d : 从光标处删除至字尾  
+* CTRL+d : 删除光标处的字符  
+* CTRL+h : 删除光标前的字符  
+* CTRL+y : 粘贴至光标后  
+* ALT+c : 从光标处更改为首字母大写的单词  
+* ALT+u : 从光标处更改为全部大写的单词  
+* ALT+l : 从光标处更改为全部小写的单词  
+* CTRL+t : 交换光标处和之前的字符  
+* ALT+t : 交换光标处和之前的单词  
+* ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
+
 重新执行命令  
 
-    * CTRL+r: 逆向搜索命令历史 reverse-i-search in bash  
-    * CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)  
-    * CTRL+g: 从历史搜索模式退出  
-    * CTRL+p: 历史中的上一条命令  
-    * CTRL+n: 历史中的下一条命令  
-    * ALT+.: 使用上一条命令的最后一个参数  
+* CTRL+r: 逆向搜索命令历史 reverse-i-search in bash  
+* CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)  
+* CTRL+g: 从历史搜索模式退出  
+* CTRL+p: 历史中的上一条命令  
+* CTRL+n: 历史中的下一条命令  
+* ALT+.: 使用上一条命令的最后一个参数
+
 控制命令  
 
-    * CTRL+l: 清屏  
-    * CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令  
-    * CTRL+s: 阻止屏幕输出  
-    * CTRL+q: 允许屏幕输出  
-    * CTRL+c: 终止命令  
-    * CTRL+z: 挂起命令  
+* CTRL+l: 清屏  
+* CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令  
+* CTRL+s: 阻止屏幕输出  
+* CTRL+q: 允许屏幕输出  
+* CTRL+c: 终止命令  
+* CTRL+z: 挂起命令  
+
 Bang (!) 命令  
 
-    * `!!` or `!-1` : 执行上一条命令 Run the last command-name   
-    * `!-2` : 执行倒数第二条命令  
-    * `!-3` : 执行倒数第三条命令   
-    * `!!:1` or `!^`: to call 1st arg, `echo !!:1`         
-    * `!!:2`    to call 2nd arg, `echo !!:2`  
-    * `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同  
-    * `!$:p`: 打印输出 !$ 的内容  
-    * `!*`: 上一条命令的所有参数  
-    * `!*:p`: 打印输出 `!*` 的内容  
+* `!!` or `!-1` : 执行上一条命令 Run the last command-name
+* `!-2` : 执行倒数第二条命令  
+* `!-3` : 执行倒数第三条命令
+* `!!:1` or `!^`: to call 1st arg, `echo !!:1`
+* `!!:2`    to call 2nd arg, `echo !!:2`  
+* `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同  
+* `!$:p`: 打印输出 !$ 的内容  
+* `!*`: 上一条命令的所有参数  
+* `!*:p`: 打印输出 `!*` 的内容  
 
-    * `!blah`: 执行最近的以 blah 开头的命令, 如 !ls  
-    * `!blah:p`: 仅打印输出, 而不执行  
-    * `^blah`: 删除上一条命令中的 blah  
-    * `^blah^foo`: 将上一条命令中的 blah 替换为 foo  
-    * `^blah^foo^`: 将上一条命令中所有的 blah 都替换为 foo  
+* `!blah`: 执行最近的以 blah 开头的命令, 如 !ls  
+* `!blah:p`: 仅打印输出, 而不执行  
+* `^blah`: 删除上一条命令中的 blah  
+* `^blah^foo`: 将上一条命令中的 blah 替换为 foo  
+* `^blah^foo^`: 将上一条命令中所有的 blah 都替换为 foo  
 
-    * `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响  
-    * `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建    
+* `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响  
+* `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
 
 Bash History: Correct / Repeat The Last Command With a Substitution  
-$ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new, quick substitution    
+$ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new, quick substitution
 echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败  
 `sudo su -` change to root user  
 `su - username`(load new env) vs. `su username`  
@@ -1459,8 +1445,8 @@ echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
     or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`  
     After that `C-s` would work in the given terminal.  
     Set it in ~/.bashrc to make it work in every terminal.  
-        refer to http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r and http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr  
-   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  
+        refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)  
+   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  echo "export EDITOR=vim" >> ~/.bashrc
 
 ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.  
 undo     CTRL+/  
@@ -1476,18 +1462,19 @@ add one line in .bashrc
 
 #### file carriage return & line feed 换行
 
-两个字符: 一个字符<Return>来移到第一列, 另一个字符<Line feed>来新增一行  
+两个字符: 一个字符`Return`来移到第一列, 另一个字符`Line feed`来新增一行  
 UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Mac人则认同`<Return> (CR) \r`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF) \r\n`  
 在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".  
+
 1. $ dos2unix myfile.txt  
 2. vi `:%s/^M$//g` #去掉行尾的^M.  
     `:%s/^M//g` #去掉所有的^M.  
 3. `sed -e 's/^M//n/g' myfile.txt` // evluate  
  `sed -i 's/^M//n/g' myfile.txt` // replace  
 
-显示换行 `:set list` 进入<list mode>, 可以看到以`$`表示的换行符和以`^I`表示的制表符.  
-vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望  
-退出<list mode> `:set nolist`  
+vi下显示回车换行符等特殊符号
+显示换行 `:set list` 进入`list mode`, 可以看到以`$`表示的换行符和以`^I`表示的制表符.  
+退出`list mode` `:set nolist`  
 
 删除换行  
 可以用以下命令删除换行符:  `:%s/\n//g`  
@@ -1499,9 +1486,9 @@ vi下显示回车换行符等特殊符号 - 有何不可 - 不要辜负 期望
 `:set fileformat?` 检测到的文件格式会被存放在fileformat选项中  
 `:set fileformat=unix` 将文件转换为UNIX格式的文件  
 
-在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以<EOL>为结束符的  
-`:set endofline` 设置文件以<EOL>结束符结尾  
-`:set noendofline` 设置文件不以<EOL>结束符来结尾  
+在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以`EOL`为结束符的  
+`:set endofline` 设置文件以`EOL`结束符结尾  
+`:set noendofline` 设置文件不以`EOL`结束符来结尾  
 
 ### zip jar tar
 
@@ -1649,7 +1636,9 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 
 ##### Print request time detail
 
+``` shell
     curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com  
+```
 
 Time to domain lookup: `time_namelookup`  
 TCP handshake: `time_connect`  
@@ -1657,6 +1646,7 @@ SSL handshake: `time_appconnect`
 Time to first byte: `time_starttransfer`  
 Total time: `time_total`  
 
+``` shell
     curl -w "
     namelookup: %{time_namelookup}
     tcp:        %{time_connect}
@@ -1666,10 +1656,12 @@ Total time: `time_total`
     starttransfer:%{time_starttransfer}
     ----------
     time_total: %{time_total}\n" -so /dev/null https://www.baidu.com
+```
 
 [Timing Details With cURL](https://josephscott.org/archives/2011/10/timing-details-with-curl/)  
 Step one: create a new file, curl-format.txt, and paste in:  
 
+``` shell
     \n
         time_namelookup:  %{time_namelookup}\n
            time_connect:  %{time_connect}\n
@@ -1680,6 +1672,8 @@ Step one: create a new file, curl-format.txt, and paste in:
                         ----------\n
              time_total:  %{time_total}\n
     \n
+```
+
 Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`  
 
 * `-w "@curl-format.txt"` tells cURL to use our format file  
@@ -1687,6 +1681,7 @@ Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://exa
 
 And here is what you get back:  
 
+``` shell
        time_namelookup:  0.001
           time_connect:  0.037
        time_appconnect:  0.000
@@ -1695,6 +1690,7 @@ And here is what you get back:
     time_starttransfer:  0.092
                        ----------
             time_total:  0.164
+```
 
 #### options
 
@@ -1721,11 +1717,27 @@ And here is what you get back:
 
 ### mail
 
-mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null  
-mail -s "Got permission" username@gmail.com < /dev/null  
+`mail -s "subject" -a /opt/attachment.txt username@gmail.com < /dev/null`
+check attachment file size limit `postconf -d | grep message_size_limit` or `grep message_size_limit /etc/postfix/main.cf`
+wipe the limit by `postconf -e message_size_limit=0`
+mail log `/var/log/maillog`
+
 mutt -s "Sample" -a /file/path/file user@local.com < /tmp/msg    send email  
 mutt -s "gpseqnum" -a gpseqnumInUsed.csv.zip username@gmail.com < /tmp/msg    send email  
 sendmail user@example.com  < /tmp/email.txt  
+
+configuration for mail
+/etc/mail/sendmail.mc
+
+``` bash
+
+    sendmail username@gmail.com < /tmp/email.txt
+    # cat /tmp/email.txt
+    Subject: Terminal Email Send
+
+    Email Content line 1
+    Email Content line 2
+```
 
 ### help
 
@@ -1787,10 +1799,9 @@ n(到达下一个窗口) p(到达上一个窗口)
 , Rename the current window  
 
 If the window name keeps renaming, create file `.tmux.conf` with content below  
-`set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"` or `DISABLE_AUTO_TITLE=true` in .zshrc for zsh    
+`set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"` or `DISABLE_AUTO_TITLE=true` in .zshrc for zsh
 echo "set-option -g allow-rename off" > ~/.tmux.conf
 Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`  
-
 
 #### panel operation
 
@@ -1804,7 +1815,7 @@ space 调整panel摆放方式
 CTRL+方向键     以1个单元格为单位移动边缘以调整当前面板大小  
 ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大小  
 
-#### Example: tmux scripts:
+#### Example: tmux scripts
 
 ``` shell
 
@@ -1869,7 +1880,7 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 * `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡  
 * `-c` 是Count的含义，设置tcpdump抓几个包  
 * `-nn` 当tcpdump遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。比如，众所周知21端口是FTP端口，我们希望显示21，而非tcpdump自作聪明的将它显示成FTP  
-* `-X` 把协议头和包内容都原原本本的显示出来（tcpdump会以16进制和ASCII的形式显示），这在进行协议分析时是绝对的利器. 对具体的数据包解释见: http://roclinux.cn/?p=2820  
+* `-X` 把协议头和包内容都原原本本的显示出来（tcpdump会以16进制和ASCII的形式显示），这在进行协议分析时是绝对的利器. 对具体的数据包解释见[链接](http://roclinux.cn/?p=2820)  
 * `-XX` tcpdump会从以太网部分就开始显示网络包内容，而不是仅从网络层协议开始显示  
 * `-e` 增加以太网帧头部信息输出  
 * `-s` 设置包大小限制值，如果你要追求高性能，建议把这个值调低，这样可以有效避免在大流量情况下的丢包现象  
@@ -1915,6 +1926,7 @@ Common usage:
 
 `man pcap-filter` packet filter syntax  
 表达式是大体可以分成三种过滤条件  
+
 * 类型: 主要包括host，net，port  
 * 方向: 主要包括src，dst，dst or src，dst and src  
 * 协议: 主要包括fddi，ip，arp，rarp，tcp，udp等类型  
@@ -1924,7 +1936,7 @@ Common usage:
 1. `host`：指定主机名或IP地址，例如’host roclinux.cn’或’host 202.112.18.34′  
 2. `net` ：指定网络段，例如’arp net 128.3’或’dst net 128.3′  
 3. `portrange`：指定端口区域，例如’src or dst portrange 6000-6008′  
-4. `protocol [ expr : size]`   
+4. `protocol [ expr : size]`
     `protocol`指定协议名称，比如ip、tcp and udp、ether, fddi, arp, rarp, decnet, lat, sca, moprc, mopdl.
     `expr`用来指定数据报偏移量，表示从某个协议的数据报的第多少位开始提取内容，默认的起始位置是0；  
     `size`表示从偏移量的位置开始提取多少个字节，可以设置为1、2、4, 默认提取1个字节  
@@ -2016,9 +2028,9 @@ ubuntu上 接收 outlook exchange 郵件？ thunderbird + exquilla 插件
 
 ### Desktop location
 
-    $HOME/.local/share/applications
-    /usr/local/share/applications
-    /usr/share/applications
+$HOME/.local/share/applications
+/usr/local/share/applications
+/usr/share/applications
 
 [update tooltips color](http://askubuntu.com/questions/70599/how-to-change-tooltip-background-color-in-unity)  
 grep -r tooltip_[fb]g_color /usr/share/themes/Ambiance: find all files to update  
@@ -2063,7 +2075,7 @@ libapache2-mod-auth-mysql php5-mysql
 `sed -n '10,33p' < file.txt` print 10 up to 33 line  
 `sed -n '1p;3p' < file.txt` print 1st and 3rd line  
 
-### Missing clock menu bar fix:
+### Missing clock menu bar fix
 
 killall unity-panel-service  
 
@@ -2080,7 +2092,7 @@ gMTP connect to android from Ubuntu
 
 ### Ubuntu死机
 
-1. 重启桌面方法 
+1. 重启桌面方法  
  `sudo restart lightdm`restarting the GUI gnome-system-monitor or `ALT+CTRL+F1`进入命令行Console, kill Xorg的进程`ps -t tty7`后(tty7中跑的是图形桌面进程),Ubuntu将自动重新启动Xorg, 缺点是重新启动了Xorg的进程, 死机前原来正在运行的程序和数据无法恢复！  
 2. When a single program stops working: `ALT+F2`, type `xkill`  
 
@@ -2093,9 +2105,7 @@ gMTP connect to android from Ubuntu
 [Linux Performance](http://www.brendangregg.com/linuxperf.html )  
 [The USE Method](http://www.brendangregg.com/usemethod.html )  
 
-#### Linux Perf Analysis in 60s Checklist
-
-http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html  
+#### [Linux Perf Analysis in 60s Checklist](http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html)  
 
 1. `uptime` ⟶  load averages  
 2. `dmesg -T | tail` ⟶  kernel errors  
@@ -2129,9 +2139,7 @@ http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html
 
 ### CPU
 
-#### Linux CPU Checklist
-
-http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html  
+#### [Linux CPU Checklist](http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html)  
 
 1. `uptime` ⟶  load averages  
 2. `vmstat 1` ⟶  system-wide utilization, run q length  
@@ -2151,14 +2159,15 @@ http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.
 
 * CPU利用率：User Time <= 70%，System Time <= 35%，User Time + System Time <= 70% (同时可以结合idle值来看，也就是%id，如果%id<=70% 则表示IO的压力较大) `top`输出  
 * 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的 `cs` in `vmstat`  
-* 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue   
+* 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue
 * wa（wait）: 参考值：小于25%，超过25%的wa的值可以表示磁盘子系统可能没有被正确平衡，也可能是磁盘密集工作负载的结果，系统的磁盘或其它I/o可能有问题，可以通过iostat/sar -C命令进一步分解分析
 * r: 参考值：对于单个处理器来说, r 小于4. 队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`  
 
 如何衡量当前系统是否负载过高?  
 如果每个cpu(可以按CPU核心的数量计算)上当前活动进程数  
-* 不大于3，则系统性能良好;   
-* 不大于4，表示可以接受;   
+
+* 不大于3，则系统性能良好;
+* 不大于4，表示可以接受;
 * 如大于5，则系统性能问题严重  
 当负载为8.13,如果有2个cpu核心,则8.13/2=4.065, 此系统性能可以接受
 
@@ -2179,7 +2188,7 @@ system time。指CPU在内核运行的时间
 nice time。指系统花费在调整进程优先级上的时间  
 idle time。系统处于空闲期，等待进程运行  
 waiting time。指CPU花费在等待I/O操作上的总时间，与blocked相似  
-steal time。指当前CPU被强制（involuntary wait ）等待另外虚拟的CPU处理完毕时花费的时间，此时 hypervisor 在为另一个虚拟处理器服务   
+steal time。指当前CPU被强制（involuntary wait ）等待另外虚拟的CPU处理完毕时花费的时间，此时 hypervisor 在为另一个虚拟处理器服务
 Softirq time 、Hardirq time。分别对应系统在处理软硬中断时候所花费的CPU时间  
 
 #### top uptime
@@ -2196,15 +2205,15 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 `RES`是常驻内存, 是进程切实使用的物理内存量  
 第3行: 当前的CPU运行情况:  
  `us, user`: 非nice用户进程占用CPU的比率  
-　　　　`sy, system`: 内核、内核进程占用CPU的比率;   
-　　　　`ni, nice`: 如果一些用户进程修改过优先级, 这里显示这些进程占用CPU时间的比率;   
-　　　　`id`: CPU空闲比率, 如果系统缓慢而这个值很高, 说明系统慢的原因不是CPU负载高;   
+　　　　`sy, system`: 内核、内核进程占用CPU的比率;
+　　　　`ni, nice`: 如果一些用户进程修改过优先级, 这里显示这些进程占用CPU时间的比率;
+　　　　`id`: CPU空闲比率, 如果系统缓慢而这个值很高, 说明系统慢的原因不是CPU负载高;
 　　　　`wa, IO-wait`: CPU等待执行I/O操作的时间比率, 该指标可以用来排查磁盘I/O的问题, 通常结合wa和id判断  
-　　　　`hi`: CPU处理硬件终端所占时间的比率;   
-　　　　`si`: CPU处理软件终端所占时间的比率;   
-　　　　`st`: 流逝的时间, 虚拟机中的其他任务所占CPU时间的比率;   
+　　　　`hi`: CPU处理硬件终端所占时间的比率;
+　　　　`si`: CPU处理软件终端所占时间的比率;
+　　　　`st`: 流逝的时间, 虚拟机中的其他任务所占CPU时间的比率;
 
-　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有较低的id, 说明CPU空转时间很少;   
+　用户进程占比高, wa低, 说明系统缓慢的原因在于进程占用大量CPU, 通常还会伴有较低的id, 说明CPU空转时间很少;
 　　wa低, id高, 可以排除CPU资源瓶颈的可能  
 　　wa高, 说明I/O占用了大量的CPU时间, 需要检查交换空间的使用, 交换空间位于磁盘上, 性能远低于内存, 当内存耗尽开始使用交换空间时, 将会给性能带来严重影响, 所以对于性能要求较高的服务器, 一般建议关闭交换空间. 另一方面, 如果内存充足, 但wa很高, 说明需要检查哪个进程占用了大量的I/O资源.  
 
@@ -2212,7 +2221,6 @@ top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输�
 `Shift+M` sort by Memory utilization
 `Shift+H` toggle the visibility of threads  
 `Shift+K` see kernel threads  
-
 
 `skill` 和 `snice`  
 如果您发现了一个占用大量 CPU 和内存的进程，但又不想停止它，该怎么办  
@@ -2302,7 +2310,7 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
     `# vim /etc/security/limits.conf`  
 
     `user1 hard as 1000` （用户user1所有累加起来, 内存不超过1000kiB）  
-    `user1 soft as 800` （用户user1一次运行, 内存不超过800kiB）　　  
+    `user1 soft as 800` （用户user1一次运行, 内存不超过800kiB）
 
 5. 大量连续内存数据:  
     `# vim /etc/sysctl.conf`  
@@ -2317,7 +2325,7 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
     `min_free_kbytes`: 该文件表示强制Linux VM最低保留多少空闲内存（Kbytes）.  
 
 7. 脏页  
- 　　脏页是指已经更改但尚未刷到硬盘的内存页, 由pdflush往硬盘上面刷.   
+ 　　脏页是指已经更改但尚未刷到硬盘的内存页, 由pdflush往硬盘上面刷.
 `vm.dirty_background_radio=10` （当脏页占内存10%, pdflush工作）  
 `vm.dirty_radio=40` （当进程自身脏页占内存40%, 进程自己处理脏页, 将其写入磁盘）  
 `vm.dirty_expire_centisecs=3000` （脏页老化时间为30秒 3000/100=30秒）  
@@ -2326,7 +2334,7 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 ### Disk & I/O
 
 `df -hT`    查看大小、分区、文件系统类型  
-硬盘是否SCSI: /dev/sd<X>就是scsi的, hd<X>就是普通的.  
+硬盘是否SCSI: /dev/sdX就是scsi的, hdX就是普通的.  
 `cat /sys/block/sda/queue/rotational`    硬盘是否SSD, 0是SSD, 1是传统硬盘  
 
 #### Disk 良好状态指标
@@ -2355,7 +2363,7 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 8. `cat /sys/devices/…/ioerr_cnt` ⟶  (if available) errors
 9. `smartctl -l error /dev/sda1` ⟶  (if available) errors
 
-#### 当磁盘无法写入的时候, 一般有以下可能:
+#### 当磁盘无法写入的时候, 一般有以下可能
 
 [Linux系统排查3——I/O篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4700386.html)  
 
@@ -2409,7 +2417,7 @@ identify the directory which is using all your inodes:
 `dd if=/dev/zero of=/tmp/output bs=8k count=128k conv=fdatasync`  
 `dd if=/dev/zero of=/tmp/output bs=1G count=1 conv=fdatasync`  
 `dd if=/dev/zero of=/tmp/output bs=8k count=256k conv=fdatasync; rm -f /tmp/output`  
-上面命令测试了分别以每次8k和1g的大小, 写入1g文件的速度.   
+上面命令测试了分别以每次8k和1g的大小, 写入1g文件的速度.
 `if`: 输入文件名,  /dev/zero 设备无穷尽地提供0  
 `of`: 输出文件名  
 `bs`: 块大小  
@@ -2420,7 +2428,7 @@ identify the directory which is using all your inodes:
 
 ##### dd
 
-硬盘读速度的测试同理, 不过要先清理缓存, 否则直接从Page Cache读了.   
+硬盘读速度的测试同理, 不过要先清理缓存, 否则直接从Page Cache读了.
 `sh -c "sync && echo 3 > /proc/sys/vm/drop_caches"`  
 `dd if=/tmp/output of=/dev/null bs=8k`  
 
@@ -2537,8 +2545,8 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
             ping得通, 说明路由工作正常, ping不通可能是因为网络不通或者某个网关限制了ICMP协议包  
         2. `sudo tcptraceroute 113.106.202.46`  
     远程端口是否开放  
-        1. 使用telnet检测远程主机的端口开放情况 `telnet IP PORT`,   
-            telnet无法连接包含两种可能: 1是端口确实没有开放, 2是防火墙过滤了连接.   
+        1. 使用telnet检测远程主机的端口开放情况 `telnet IP PORT`
+            telnet无法连接包含两种可能: 1是端口确实没有开放, 2是防火墙过滤了连接.
         2. `nmap HOST`, `nmap -p PORT IP` 可以了解端口无法连接的原因是端口关闭还是防火墙过滤了  
       本地端口 `# netstat -lnp | grep PORT`  
       查看防火墙规则: `iptables -L`  
@@ -2596,7 +2604,7 @@ VLAN             |    vconfig            |     ip link
 组播             |    ipmaddr            |     ip maddr
 统计             |    netstat            |    ss
 
-* `ss -l` 查看所有打开的网络端口, `-pl`参数，会列出具体的程序名称   
+* `ss -l` 查看所有打开的网络端口, `-pl`参数，会列出具体的程序名称
 * `ss -a` 查看所有的socket连接  
     `-ta` 只查看TCP sockets  
     `-ua` 只查看UDP sockets  
@@ -2689,7 +2697,7 @@ dstat: 默认, 已有足够信息
 
 * `-w, --wide`             wide output  
 * `-S, --unit <char>`      define display unit  
-* `-M` switch shows the output in megabytes to make it easier to read   
+* `-M` switch shows the output in megabytes to make it easier to read
 
 ``` bash
 
@@ -2737,7 +2745,7 @@ cpu（以百分比表示）
 * wa: 等待IO时间  
 
 `vmstat(8)` 命令, 每行会输出一些系统核心指标, 这些指标可以让我们更详细的了解系统状态. 后面跟的参数2, 表示每2秒输出一次统计信息, 表头提示了每一列的含义, 介绍和性能调优相关的列:
-`r`: 等待在CPU资源的进程数. 这个数据比平均负载更加能够体现CPU负载情况, 数据中不包含等待IO的进程. 如果这个数值大于机器CPU核数, 那么机器的CPU资源已经饱和.   
+`r`: 等待在CPU资源的进程数. 这个数据比平均负载更加能够体现CPU负载情况, 数据中不包含等待IO的进程. 如果这个数值大于机器CPU核数, 那么机器的CPU资源已经饱和.
 `free`: 系统可用内存数（以千字节为单位）, 如果剩余内存不足, 也会导致系统性能问题.  
 `si, so`: 交换区写入和读取的数量. 如果这个数据不为0, 说明系统已经在使用交换区（swap）, 机器物理内存已经不足  
 `us, sy, id, wa, st`: 这些都代表了CPU时间的消耗, 它们分别表示用户时间（user）、系统（内核）时间（sys）、空闲时间（idle）、IO等待时间（wait）和被偷走的时间（stolen, 一般被其他虚拟机消耗）.
@@ -3015,7 +3023,7 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `-t` Force pseudo-tty allocation for bash to use as an interactive shell
 `-o PreferredAuthentications=password` login with password,  默认会依次尝试 GSSAPI-based认证, host-based认证, public key认证, challenge response认证, password认证 这几种认证方式. PreferredAuthentications 可以修改顺序
 `-o PublicAuthentication=no`表示关闭公钥认证方式. 这样就能保证当服务端不支持密码认证时,也不会使用公钥认证.
-`--login` set up the login environment 
+`--login` set up the login environment
 
 `sshpass` make ssh with password in command line
 
@@ -3231,18 +3239,18 @@ c:\>plink 192.168.6.200 ls '-l'
 
 #### Steps to Create a New Sudo User
 
-add a new user `adduser username`    
+add a new user `adduser username`
 add the user to the sudo group `usermod -aG sudo username`
-
 
 ### Software manage
 
 dpkg -i AdbeRdr*.deb  #install  
 abort installation or recover from failed installing by apt-get  
-sudo dpkg -r <package name>  
+sudo dpkg -r packageName
 
 uninstall qq  
-1. find the name: dpkg -l | grep package  
+
+1. find the name: dpkg -l | grep package
 2. sudo dpkg -r qq-for-wine 或 sudo dpkg -P qq-for-wine  
 sudo apt-get remove acroread;sudo apt-get autoremove  #uninstall  
 
@@ -3291,13 +3299,13 @@ dpkg --configure packageName    #Reconfigure a Unpacked Package
 
 `hostname newname`
 `vi /etc/hostname`
-`vi /etc/hosts`    
+`vi /etc/hosts`
 
 ### update hosts
 
 redirect it to ustc:lug.ustc.edu.cn  
 var url = request.url.replace('googleapis.com', 'lug.ustc.edu.cn');  
-refer to https://github.com/justjavac/ReplaceGoogleCDN  
+refer to [ReplaceGoogleCDN](https://github.com/justjavac/ReplaceGoogleCDN)  
 vi /etc/hosts  
 202.141.162.123 www.ajax.googleapis.com  
 202.141.162.123 ajax.googleapis.com  
@@ -3384,19 +3392,19 @@ Here, only the most important directories in the system will be presented.
 ~/share all softwares  
 ~/opt softwares  
 
-### Source code
+### [Source code](https://peteris.rocks/blog/htop/#source-code)
 
-https://peteris.rocks/blog/htop/#source-code  
-```
-
+``` bash
     $ which uptime
     /usr/bin/uptime
     $ dpkg -S /usr/bin/uptime
     procps: /usr/bin/uptime
 ```
+
 Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.  
 You can then go to packages.ubuntu.com and search for the package there.  
-Here is the page for procps: http://packages.ubuntu.com/source/xenial/procps  
+Here is the page for [procps](http://packages.ubuntu.com/source/xenial/procps)  
 If you scroll to the bottom of the page, you'll see links to the source code repositories:  
+
 * Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
-* Debian Package Source Repository (Browsable) https://anonscm.debian.org/cgit/collab-maint/procps.git/
+* Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
