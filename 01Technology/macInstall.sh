@@ -1,5 +1,6 @@
 # install package
 # refer to [高效程序员的MacBook工作环境配置](http://www.codeceo.com/article/programmer-macbook-workplace.html)
+# automator [给MAC应用设置系统热键(快捷键)启动](https://www.jianshu.com/p/b83f54888ff9)
 # TODO: 
 
 # firefox 56.0.2 https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/

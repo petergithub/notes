@@ -74,7 +74,27 @@ ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/Idea
 3. Code completion match case: Preference > Editor > General > Code Completion > Match case: uncheck
 4. Preferences -> Editor -> General -> Show quick documentation on mouse move
 5. Preferences -> Editor -> General -> Smart Keys -> Jump outside closing bracket/quote with Tab
-6. Preference | Code Style | Java | Imports | Set Class count to use import with ‘*’ and Names count to use static import with ‘*’ fields as 999
+6. Preference | Code Style | Java | Imports | Set Class count to use import with '*' and Names count to use static import with '*' fields as 999
+7. "Apropos" terminal pops up when typing cmd+shift+A to get actions: System Preferences | Keyboard | Shortcuts | Services | disable Search man Page Index in Terminal
+8. Preferences -> Editor -> File and code templates -> Includes tab (on the right). There is a template header
+/**
+ * @author Myname
+ */
+9. Live template: Preferences -> Editor -> Live template, location: ~/Library/Preferences/IdeaIC2018.3/templates/user.xml
+example:
+	log.enter
+$LOGGER$.debug("Enter $METHOD_NAME$ $EXPR_COPY$ {}", $EXPR$);
+LOGGER resolveLoggerInstance   Default: log
+METHOD_NAME methodName()
+EXPR variableOfType("")
+EXPR_COPY escapeString(EXPR)
+
+log.enter.multiple
+$LOGGER$.debug("Enter $METHOD_NAME$ $PARAMS_FORMAT$", $PARAMS$);
+METHOD_NAME methodName()
+PARAMS_FORMAT groovyScript("_1.collect{it+' {}'}.join(' ')", methodParameters())
+PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
+
 
 ##### Vim
 
@@ -214,6 +234,7 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 
 ### WPS
 COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown) 切换到上/下一个工作表 Sheet
+Cloud document storage location: /Users/pu/Library/Containers/com.kingsoft.wpsoffice.mac/Data/Library/Application Support/Kingsoft/WPS Cloud Files/userdata/qing/filecache
 
 ## Manage
 
