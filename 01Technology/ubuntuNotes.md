@@ -2945,6 +2945,7 @@ Find Out CPU is 32bit or 64bit?
 ### Network Command
 
 `nmap -A -T4 IP` scan all open ports from the IP  
+`nmap -Pn IP`
 
 `ip addr` = `ip a`  
 `ip addr show eth0`  

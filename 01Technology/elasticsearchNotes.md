@@ -9,7 +9,7 @@ Elasticsearch -> Indices   -> Types  -> Documents -> Fields
 
 请尽可能多的使用过滤式查询。
 start elasticsearch:  
-`cd elasticsearch-<version>`   
+`cd elasticsearch-<version>`  
 `./bin/elasticsearch` or  
 `./bin/elasticsearch -d` run it in the background as a daemon  
 
@@ -36,17 +36,19 @@ curl -X GET "localhost:9200/_search?explain" -H 'Content-Type: application/json'
 '
 ```
 
-设置局域网 IP 访问 ES: `vi config/elasticsearch.yml` -> ` network.host: 0.0.0.0 `
+设置局域网 IP 访问 ES: `vi config/elasticsearch.yml` -> `network.host: 0.0.0.0`
 [kibana URL](http://localhost:5601/app/kibana#/dev_tools/console)
 
 [head 插件](https://github.com/mobz/elasticsearch-head):
 
-    git clone git://github.com/mobz/elasticsearch-head.git
-    cd elasticsearch-head
-    npm install
-    npm run start
+```shell
+git clone git://github.com/mobz/elasticsearch-head.git
+cd elasticsearch-head
+npm install
+npm run start
 
-    open http://localhost:9100/
+open http://localhost:9100/
+```
 
 查看head `http://localhost:9200/_plugin/head/`
 
@@ -104,7 +106,7 @@ GET /_search
 [更复杂的搜索](https://www.elastic.co/guide/cn/elasticsearch/guide/cn/_more_complicated_searches.html)
 `range` 过滤器 ， 它能找到年龄大于 30 的文档，其中 gt 表示_大于(`_great than`)
 
-```
+``` shell
 GET /megacorp/employee/_search
 {
     "query" : {
@@ -125,8 +127,10 @@ GET /megacorp/employee/_search
 ```
 
 #### Combining Filters
+
 ##### Bool Filter
-```
+
+``` shell
 {
    "bool" : {
       "must" :     [],
@@ -135,13 +139,12 @@ GET /megacorp/employee/_search
       "filter":    []
    }
 }
-```
+
 * `must`  All of these clauses must match. The equivalent of `AND`.
 * `must_not`  All of these clauses must not match. The equivalent of `NOT`.
 * `should`  At least one of these clauses must match. The equivalent of `OR`.
 * `filter`  Clauses that must match, but are run in non-scoring, filtering mode.
 
-```
 GET /my_store/products/_search
 {
    "query" : {
@@ -163,7 +166,8 @@ GET /my_store/products/_search
 ```
 
 ##### Nesting Boolean Queries
-```
+
+``` shell
 SELECT document
 FROM   products
 WHERE  productID      = "KDKE-B-9947-#kL5"
@@ -192,9 +196,11 @@ GET /my_store/products/_search
    }
 }
 
-```       
-##### Finding Multiple Exact Values
 ```
+
+##### Finding Multiple Exact Values
+
+``` shell
 {
         "terms" : {
         "price" : [20, 30]
@@ -203,12 +209,13 @@ GET /my_store/products/_search
 ```
 
 ##### [Ranges](https://www.elastic.co/guide/en/elasticsearch/guide/current/_ranges.html)
+
 * `gt`: > greater than
 * `lt`: < less than
 * `gte`: >= greater than or equal to
 * `lte`: <= less than or equal to
 
-```
+``` shell
 SELECT document
 FROM   products
 WHERE  price BETWEEN 20 AND 40
@@ -231,7 +238,8 @@ GET /my_store/products/_search
 ```
 
 Ranges on Dates:
-```  
+
+``` shell
 "range" : {
     "timestamp" : {
         "gt" : "2014-01-01 00:00:00",
@@ -241,10 +249,11 @@ Ranges on Dates:
 ```
 
 ##### [Dealing with Null Values](https://www.elastic.co/guide/en/elasticsearch/guide/current/_dealing_with_null_values.html)
+
 `exists`: is
 `missing`: is not
 
-```
+``` shell
 SELECT tags
 FROM   posts
 WHERE  tags IS NOT NULL
@@ -279,7 +288,7 @@ GET /my_index/posts/_search
 
 #### [Multifield Search](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-query-strings.html)
 
-```
+``` shell
 GET /_search
 {
   "query": {
@@ -294,9 +303,9 @@ GET /_search
 ```
 
 #### [Best Fields](https://www.elastic.co/guide/en/elasticsearch/guide/current/_best_fields.html#dis-max-query)
+
 `dis_max` Query
 Instead of the bool query, we can use the `dis_max` or Disjunction Max Query. Disjunction means or (while conjunction means and) so the Disjunction Max Query simply means return documents that match any of these queries, and return the score of the best matching query
-
 
 ### [分析](https://www.elastic.co/guide/cn/elasticsearch/guide/cn/_analytics.html)
 
@@ -306,7 +315,7 @@ Elasticsearch 有一个功能叫聚合（aggregations）, 与 SQL 中的 GROUP B
 Metrics
 `sum`, `avg`, `min`, `mean`, `max`
 
-```
+``` shell
 SQL: group by interests  
 GET /megacorp/employee/_search
 {
@@ -350,7 +359,7 @@ GET /cars/transactions/_search?search_type=count
 
 `curl -XPOST 'http://example.com/p_channel_v2/device_roi_statistics/_search?pretty'  -d '{"query":{"bool":{"must":{"term":{"app_key":"UnmYb2"}},"should":[{"term":{"android_id":"5dbeb56a02d3033c"}},{"term":{"android_id":"195a35544d1fd132"}}],"minimum_should_match":"1"}},"aggregations":{"revenue_1a":{"sum":{"field":"revenue_1"}}}}'`
 
-```
+``` shell
 {
   "query": {
     "bool": {
@@ -382,5 +391,6 @@ GET /cars/transactions/_search?search_type=count
     }
   }
 }
-```
+
+``` shell
 `constant_score` 查询以非评分模式来执行

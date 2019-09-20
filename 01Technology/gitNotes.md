@@ -12,7 +12,7 @@
 
 ### Most recent
 
-`git checkout -b hotfix/handleAbortException upstream/master` create a new branch from upstream
+`git checkout -b hotfix upstream/master` create a new branch from upstream
 `git log -m --name-only` List all modified files in git merge commit
 `git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git rev-list --all | xargs git grep <string>`
