@@ -39,7 +39,7 @@ mvn eclipse:eclipse (eclipse:clean, idea:idea)        create (clear) configurati
         -DdownloadSources  -DdownloadJavadocs (default value:-DdownloadSources=true -DdownloadJavadocs=true)
 mvn clean清空生成的文件
 mvn compile编译    mvn test-compile编译项目测试代码        mvn test编译并测试
-mvn test -skipping compile -skipping test-compile    只测试而不编译, 也不测试编译(-skipping 的灵活运用, 当然也可以用于其他组合命令) 
+mvn test -skipping compile -skipping test-compile    只测试而不编译, 也不测试编译(-skipping 的灵活运用, 当然也可以用于其他组合命令)
 mvn test -Dtest=TestChannelService  执行指定测试类
 mvn test -Dtest=xxxxTest#testＭethodA   执行指定测试类里的方法testＭethodA
 `mvn test -Dtest=TestClass#testMethod -pl moduleName` run only single test in multi-module project
@@ -104,6 +104,81 @@ Rerfer:
         </includes>
     </configuration>
 </plugin>
+```
+
+### Maven 自动化部署
+
+[Maven Release Plugin](http://maven.apache.org/maven-release/maven-release-plugin/index.html)
+[Guide to using the release plugin](https://maven.apache.org/guides/mini/guide-releasing.html)
+[极客学院 Maven - 自动化部署](https://wiki.jikexueyuan.com/project/maven/deployment-automation.html)
+[Maven最佳实践：版本管理](https://blog.csdn.net/iteye_11035/article/details/81717447)
+
+git connection `<connection>scm:git:git@gitlab.com:username/testMavenRelease.git</connection>`
+
+`mvn release:prepare -Prelease -Darguments="-DskipTests" -DautoVersionSubmodules=true -Dusername=YOUR GITHUB ID -DdryRun=true`
+
+[Performing a Non-interactive Release](http://maven.apache.org/maven-release/maven-release-plugin/examples/non-interactive-release.html)
+release prepare without prompts: `mvn --batch-mode release:prepare` or `mvn -B release:prepare` This will assume defaults for anything that you would normally be prompted for.
+`mvn --batch-mode -Dtag=v1.3 release:prepare -DreleaseVersion=1.2 -DdevelopmentVersion=2.0-SNAPSHOT release:perform`
+
+``` shell
+# for Jenkins
+# release version to maven repository
+releaseVersion=1.0-RELEASE
+# next development version
+developmentVersion=1.1-SNAPSHOT
+mvn --batch-mode release:clean release:prepare release:perform -Dtag=v${releaseVersion} -DreleaseVersion=${releaseVersion} -DdevelopmentVersion=${developmentVersion}
+```
+
+#### maven-release-plugin pom.xml template
+
+``` xml
+<!-- template -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>test</groupId>
+   <artifactId>mavenRelease</artifactId>
+   <version>1.0-SNAPSHOT</version>
+   <packaging>jar</packaging>
+   <scm>
+      <url>https://gitlab.com/username/testMavenRelease</url>
+      <connection>scm:git:git@gitlab.com:username/testMavenRelease.git</connection>
+      <developerConnection>scm:git:git@gitlab.com:username/testMavenRelease.git</developerConnection>
+     <tag>HEAD</tag>
+  </scm>
+  <build>
+      <plugins>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
+            <configuration>
+               <useReleaseProfile>false</useReleaseProfile>
+               <goals>deploy</goals>
+               <scmCommentPrefix>[maven-release-checkin]-</scmCommentPrefix>
+               <!--
+                 <tagNameFormat>v@{project.version}</tagNameFormat>
+                 -->
+                 <autoVersionSubmodules>true</autoVersionSubmodules>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+  <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+        <repository>
+            <id>maven-releases</id>
+            <name>RepositoryProxy</name>
+            <url>http://maven.com/repository/maven-releases/</url>
+        </repository>
+        <!-- use the following if you ARE using a snapshot version. -->
+        <snapshotRepository>
+            <id>maven-snapshots</id>
+            <name>RepositoryProxySnap</name>
+            <url>http://maven.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+```
 
 ### Command
 
@@ -117,7 +192,7 @@ mvn help:describe -Dfull 输出完整的带有参数的目标列
     -Dplugin=help 使用help插件的describe目标来输出Maven Help插件的信息
     -Dplugin=compiler -Dmojo=compile    列出了Compiler插件的compile目标的所有信息
     -Dplugin=exec    列出所有Maven exec插件可用的目标
-mvn help:effective-pom see how all of the current project’s ancestor POMs are contributing to the effective POM.它暴露了 Maven的默认设置
+`mvn help:effective-pom` see how all of the current project’s ancestor POMs are contributing to the effective POM.它暴露了 Maven的默认设置
 mvn install -X 想要查看完整的依赖踪迹, 包含那些因为冲突或者其它原因而被拒绝引入的构件, 打开 Maven的调试标记运行
 mvn install -Dmaven.test.skip=true 给任何目标添加maven.test.skip 属性就能跳过测试
 mvn dependency:resolve 打印出已解决依赖的列表
@@ -183,13 +258,15 @@ setting.xml change local reponsitory
 ```
 
 ### Example springside
-springside define version in parent/pom.xml <dependencyManagement>
-那么经过验证，scope写在子项目中的<dependencies> 下的<dependency>中，或是写在父项目中的<dependencyManagement>中，都是可以的。
+
+springside define version in parent/pom.xml `<dependencyManagement>`
+那么经过验证，scope写在子项目中的`<dependencies>` 下的`<dependency>`中，或是写在父项目中的`<dependencyManagement>`中，都是可以的。
 但有一点需要注意，dependencies 和 dependencyManagement 的区别在于：
 前者，即使在子项目中不写该依赖项，那么子项目仍然会从父项目中继承该依赖项。
 后者，如果在子项目中不写该依赖项，那么子项目中是不会从父项目继承该依赖项的；只有在子项目中写了该依赖项，才会从父项目中继承该项，并且version 和 scope 都读取自 父pom。
 
 ## Sonotype Nexus3
+
 [sonatype/nexus3 docker image](https://hub.docker.com/r/sonatype/nexus3/)
 
 `docker run -d -p 8081:8081 --name nexus2 -v /Users/pu/workspace/dockerWorkspace/sonatype-nexus2/sonatype-work:/sonatype-work sonatype/nexus`
