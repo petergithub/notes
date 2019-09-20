@@ -1,10 +1,38 @@
 # Tensorflow Note
 
-## [Install](https://www.tensorflow.org/install/pip#1-install-the-python-development-environment-on-your-system)
+## Question
+
+1. activation function selection: sigmoid, softmax, relu
+2. L1 regularization, L2 regularization
+
+## Process
+
+1. Generalization
+2. build a model
+3. Train, evaluate and predict
+
+## Keras
+
+[Trains a simple deep NN on the MNIST dataset](https://github.com/keras-team/keras/blob/master/examples/mnist_mlp.py)
+
+1. 数据集获取 `mnist.load_data()`
+2. 定义模型 `model = Sequential()`
+3. 模型评估 `model.compile(loss='categorical_crossentropy', optimizer=RMSprop(), metrics=['accuracy']) # 评估指标`
+4. 训练模型 `history = model.fit(x_train, y_train, batch_size=100, epochs=20, verbose=1, validation_data=(x_test, y_test))`
+    `score = model.evaluate(x_test, y_test, verbose=0)`
+
+## Install
+
+### [Install by conda]
+
+`conda create --name tf1.14 python=3.6 tensorflow==1.14.0 keras==2.2.4`
+`conda create --name 2.0rc python=3.6 tensorflow==2.0.0-rc0 keras==2.2.4`
+
+### [Install](https://www.tensorflow.org/install/pip#1-install-the-python-development-environment-on-your-system)
 
 Create a new virtual environment by choosing a Python interpreter and making a ./venv directory to hold it:
 `virtualenv --system-site-packages -p python3 ~/venv`
-Activate the virtual environment `source ~/venv/bin/activate  # sh, bash, ksh, or zsh`
+`source ~/venv/bin/activate  # sh, bash, ksh, or zsh` Activate the virtual environment
 
 Install packages within a virtual environment without affecting the host system setup. Start by upgrading pip:
 `pip install --upgrade pip`
@@ -13,8 +41,11 @@ Install packages within a virtual environment without affecting the host system 
 And to exit virtualenv later:
 `deactivate  # don't exit until you're done using TensorFlow`
 
-Virtualenv install: `pip install --upgrade tensorflow`
+Virtualenv install: `pip install --upgrade tensorflow` or `pip install tensorflow==2.0.0-beta1`
 Verify the install: `python3 -c "import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))"`
+
+`pip install tensorflow==1.14.0`
+`pip install keras==2.2.4-tf`
 
 ## Machine Learning Crash Course
 
@@ -57,18 +88,18 @@ where:
 
 ### First Steps with TensorFlow: Toolkit
 
-```python
-import tensorflow as tf
+    ```python
+    import tensorflow as tf
 
-# Set up a linear classifier.
-classifier = tf.estimator.LinearClassifier(feature_columns)
+    # Set up a linear classifier.
+    classifier = tf.estimator.LinearClassifier(feature_columns)
 
-# Train the model on some example data.
-classifier.train(input_fn=train_input_fn, steps=2000)
+    # Train the model on some example data.
+    classifier.train(input_fn=train_input_fn, steps=2000)
 
-# Use it to predict.
-predictions = classifier.predict(input_fn=predict_input_fn)
-```
+    # Use it to predict.
+    predictions = classifier.predict(input_fn=predict_input_fn)
+    ```
 
 ### Generalization: Peril of Overfitting
 
@@ -96,4 +127,5 @@ Scaling means converting floating-point feature values from their natural range 
 #### Handling extreme outliers
 
 [bin boundaries](https://developers.google.cn/machine-learning/crash-course/representation/cleaning-data)
-[bucketing](https://developers.google.cn/machine-learning/glossary/#bucketing): Converting a (usually continuous) feature into multiple binary features called buckets or bins, typically based on value range
+[bucketing](https://developers.google.cn/machine-learning/glossary/#bucketing)
+ Converting a (usually continuous) feature into multiple binary features called buckets or bins, typically based on value range
