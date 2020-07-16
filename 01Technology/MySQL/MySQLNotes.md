@@ -4,8 +4,8 @@
 
 Kill all process in shell
 
-```
-mysql -h localhost -u root -p -D picooc -e "show full processlist;" | \
+``` shell
+mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
 grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
 mysql -h localhost -u root -p
 ```
@@ -19,12 +19,6 @@ That ibdata1 isn't shrinking is a particularly annoying feature of MySQL. The ib
 [Why is the ibdata1 file continuously growing in MySQL?](https://www.percona.com/blog/2013/08/20/why-is-the-ibdata1-file-continuously-growing-in-mysql/)
 
 [14.6.1.2 Moving or Copying InnoDB Tables](https://dev.mysql.com/doc/refman/5.6/en/innodb-migration.html)
-
-`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
-`alter table table_name add UNIQUE KEY (model,ip);`  
-`alter table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功';`
-`alter table bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
-`ALTER TABLE old_name RENAME new_name;`
 
 `CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
 convert `D0490012475E` to `D0:49:00:12:47:5E`: `update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
@@ -65,7 +59,8 @@ To produce the set of records unique to Table A and Table B, we perform the same
 ## Recent
 
 mysqlreport --user root --password  
-/etc/mysql/my.cnf ~/.my.cnf  
+查找 my.cnf 位置: mysql --help | grep /my.cnf | xargs ls
+/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf ~/.my.cnf
 
 `ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
 `SET @@auto_increment_increment=10`
@@ -81,10 +76,11 @@ mysqlreport --user root --password
 
 767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 
-updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 `SELECT UNIX_TIMESTAMP(NOW());`  
 `SELECT FROM_UNIXTIME(1467542031);`
 `select SUBSTRING(1456958130210,1,10);`
+`select date_add(now(), interval 1 day);` # - 加1天
+`select date_sub(now(), interval 1 day);` # - 减1天
 
 When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
 
@@ -213,6 +209,10 @@ mysql query escape %前面加两个反斜杠，比如
   SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
   SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
 
+DATE_FORMAT(NOW(),'%b %d %Y %h:%i %p'); //Dec 29 2008 11:45 PM
+DATE_FORMAT(NOW(),'%m-%d-%Y') //12-29-2008
+DATE_FORMAT(NOW(),'%d %b %y') //29 Dec 08
+DATE_FORMAT(NOW(),'%d %b %Y %T:%f') //29 Dec 2008 16:25:46.635
 ```
 
 ### case-sensitive
@@ -386,12 +386,12 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 往表中插入记录： `INSERT INTO 表名 VALUES ("hyq","M");`  
 更新表中数据： `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
 
-``` Update MySQL table with another table's data
-  
-  UPDATE tableB
-  INNER JOIN tableA ON tableB.name = tableA.name
-  SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
-  WHERE tableA.name = 'Joe'
+``` SQL
+-- Update MySQL table with another table's data
+UPDATE tableB
+INNER JOIN tableA ON tableB.name = tableA.name
+SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
+WHERE tableA.name = 'Joe'
 ```
 
 用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`  
@@ -399,6 +399,14 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
 `ALTER TABLE tableName DROP INDEX idx_name;`
 `ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
+updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
+
+`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
+`ALTER table table_name add UNIQUE KEY (model,ip);`  
+`ALTER table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功' after ANOTHER_COLUMN_NAME;`
+`ALTER table bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
+`ALTER TABLE old_name RENAME new_name;`
+`ALTER TABLE table_name ENGINE=InnoDB;`
 
 按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
 计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`  
@@ -454,17 +462,15 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 
 #### 增加新用户 grant permission
 
-`SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;`
-
-`grant all on dbName.* to USERNAME@host identified by 'pwd';`  
+`SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
 `grant all on dbName.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';`  
 `grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
 `show grants for USERNAME@IP;` 查看用户权限  
 `select * from mysql.user where user='cactiuser' \G`
-`SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
 `CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';`
 `GRANT SELECT ON databaseName.tableName TO 'user'@'%';`  
 `GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';`  
+`ALTER USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dev';`
 `REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`
 `revoke select on *.* from 'admin'@'%';`
 
@@ -1008,6 +1014,11 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 `mysqlbinlog binlog_files | mysql -u root -p`  To execute events from the binary log, process mysqlbinlog output using the mysql client
 
 [Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)
+
+#### relay log
+
+[MySQL 5.7 Reference Manual - The Slave Relay Log](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-relaylog.html)
+当slave不再使用时，通过`reset slave`来取消relaylog
 
 ## 构建高性能的 MySQL 集群系统
 
