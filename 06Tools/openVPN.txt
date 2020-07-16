@@ -1,0 +1,86 @@
+
+openVPN https://neversec.top/20190515/openvqn.html
+https://github.com/kylemanna/docker-openvpn
+openVPN 参数 https://jkzhao.github.io/2016/09/06/vpn%E7%AE%80%E4%BB%8B%E5%8F%8Aopenvpn%E6%90%AD%E5%BB%BA/
+
+OVPN_DATA="ovpn-data-example"
+
+docker stop openvpn; docker rm openvpn
+
+1. 配置数据卷，生成配置文件。预计网段人数不多，使用192.168.0.0/24网段，但需要注意的是在配置固定IP时，掩码必须为/30，因此固定IP需要注意正确配置。
+#配置数据卷
+export OVPN_DATA=/data/docker/openvpn/openvpn-data
+docker volume create --name $OVPN_DATA
+
+#生成配置文件
+#-d 取消默认配置     -c 打开c2c模式     -u 指定当前IP
+#-s 划分服务器子网     -C 指定算法
+docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_genconfig -d -c -C 'AES-256-CBC' -u udp://1.119.139.139 -s 10.0.100.0/24
+docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_genconfig -d -c -C 'AES-256-CBC' -u udp://1.119.139.139 -s 172.17.100.0/24
+
+2. 生成密钥文件，输入密钥和CA名称
+
+docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn ovpn_initpki
+1111
+
+
+3. 运行容器
+
+#开启特权
+docker run -v $OVPN_DATA:/etc/openvpn -e TZ=Asia/Shanghai -d -p 1194:1194/udp --restart=on-failure:10 --cap-add=NET_ADMIN --name=openvpn --privileged=true kylemanna/openvpn
+
+status /var/log/openvpn/openvpn-status.log
+log /var/log/openvpn/openvpn.log
+docker run -v /data/docker/openvpn/openvpn-data:/etc/openvpn -v /data/docker/openvpn/openvpn-log:/var/log/openvpn -e TZ=Asia/Shanghai -d -p 1194:1194/udp --restart=on-failure:10 --cap-add=NET_ADMIN --name=openvpn --privileged=true kylemanna/openvpn
+
+
+#登陆docker
+docker run -v /data/docker/openvpn/openvpn-data:/etc/openvpn -e TZ=Asia/Shanghai -it --rm kylemanna/openvpn bash -l
+
+用户操作
+添加用户
+
+1. 生成证书
+#生成客户端证书，输入密钥
+docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass
+#需要配置密码则删掉nopass
+docker run -v $OVPN_DATA:/etc/openvpn --rm -it kylemanna/openvpn easyrsa build-client-full testuser nopass
+1111
+
+2. 导出证书
+
+#将用户证书导出到本地文件
+docker run -v $OVPN_DATA:/etc/openvpn --rm kylemanna/openvpn ovpn_getclient testuser > testuser.ovpn
+
+查看已颁发客户端证书
+docker run --rm -it -v $OVPN_DATA:/etc/openvpn kylemanna/openvpn ovpn_listclients
+
+
+这时发现ping不通192.168.60.254等内网其它地址 
+需要在内网路由器上加一条静态路由，目的网络为VPN网段 10.8.0.0/24，下一跳为VPN服务器的内网地址 192.168.60.113
+需要在内网路由器上加一条静态路由，目的网络为VPN网段 10.0.100.0/24，下一跳为VPN服务器的内网地址 172.17.0.23
+需要在内网路由器上加一条静态路由，目的网络为VPN网段 172.17.100.0/24，下一跳为VPN服务器的内网地址 172.17.0.23
+
+ip route add 172.17.100.0/24 via 172.17.0.23 dev p4p1
+ip route del 192.168.0.0/24 via 172.16.15.253 dev eth0
+
+Start OpenVPN server process
+docker run -v $OVPN_DATA:/etc/openvpn -d -p 1194:1194/udp --cap-add=NET_ADMIN kylemanna/openvpn
+
+Generate a client certificate without a passphrase
+docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm -it kylemanna/openvpn easyrsa build-client-full CLIENTNAME nopass
+
+Retrieve the client configuration with embedded certificates
+docker run -v $OVPN_DATA:/etc/openvpn --log-driver=none --rm kylemanna/openvpn ovpn_getclient CLIENTNAME > CLIENTNAME.ovpn
+
+通过命令的帮助获得：openvpn help
+docker run --rm kylemanna/openvpn openvpn --help
+http://registry.cn-qingdao.aliyuncs.com/k8s_detailyang_mirror/kube-apiserver-amd64 
+
+tcpdump -i docker0 -lXvvenns 1500 \( host 172.18.0.3 or host 172.18.0.1  or host 172.18.0.2\) -w tcpdump.log.bin &
+172.18.0.1 02:42:6b:ed:8d:07 (172.17.0.23)
+172.18.0.2 02:42:ac:12:00:02 ?
+172.18.0.3 ?   02:42:ac:12:00:03 (kylemanna/openvpn)
+
+
+08:45:17.766069 ARP, Reply bogon is-at 02:42:6b:ed:8d:07 (oui Unknown), length 28
