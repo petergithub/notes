@@ -113,7 +113,6 @@ type: Windows Displays the contents of a text file or files.
 nslookup http://wsyc.lqwang.com/
 tracert http://haijia.bjxueche.net/
 
-
 ## Network tools
 ### putty显示中文
 在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.
@@ -151,6 +150,10 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 
 #### RabbitMQ
 
+##### [Troubleshooting Guidance](https://www.rabbitmq.com/troubleshooting.html)
+
+crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
+
 ##### Basic command
 
 ``` shell
@@ -158,42 +161,43 @@ sudo service rabbitmq-server statrt
 sudo service rabbitmq-server stop
 sudo service rabbitmq-server status
 sudo rabbitmqctl status
+rabbitmqctl environment # 环境信息
 
-rabbitmqctl list_vhosts 
+rabbitmqctl list_vhosts
 rabbitmqctl list_queues -p <vhost>
+rabbitmqctl list_consumers -p <vhost>
+rabbitmqctl list_exchanges -p push-center
 rabbitmqctl list_user_permissions username
 rabbitmqctl purge_queue queue.name.development -p <vhost>
+curl -X DELETE -i -u guest:guest "http://localhost:15672/api/queues/local/gongzhonghao.refreshAccessToken.queue.name.development"
+```
+
+查看用户 `sudo rabbitmqctl list_users`
+By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
+
+``` shell
+sudo rabbitmqctl add_user admin password
+sudo rabbitmqctl set_user_tags admin administrator
+sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
 ```
 
 RabbitMQ has a web management console. To enable web management console run : `sudo rabbitmq-plugins enable rabbitmq_management`
 `http://localhost:15672/   guest / guest`
 
-查看用户 `sudo rabbitmqctl list_users`
-By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
-
-```
-	
-	sudo rabbitmqctl add_user admin password
-	sudo rabbitmqctl set_user_tags admin administrator
-	sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
-```
-
-`rabbitmqctl list_queues -p push-center`  
 `curl -i -u guest:guest "http://localhost:15672/api/overview"`  
 `curl -i -u guest:guest "http://localhost:15672/api/queues/push-center/push.schedule.push.queue.name.publish"`  
-
 
 The OS limits are controlled via a configuration file at `/etc/systemd/system/rabbitmq-server.service.d/limits.conf`, for example:
 
 ##### Installation
 
 install erlang  
-```
-	
-	wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-	sudo dpkg -i erlang-solutions_1.0_all.deb
-	apt update
-	apt install erlang erlang-nox
+
+``` shell
+wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+sudo dpkg -i erlang-solutions_1.0_all.deb
+apt update
+apt install erlang erlang-nox
 ```
 
 install rabbitmq `sudo apt-get install rabbitmq-server`  
@@ -201,6 +205,7 @@ install rabbitmq `sudo apt-get install rabbitmq-server`
 #### memcached
 
 ##### options
+
 -p <num> 监听的TCP端口 (缺省: 11211)
 
 -d 以守护进程方式运行Memcached
