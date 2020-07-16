@@ -8,6 +8,8 @@ IDE: PyCharm
 Editor: vim + vim-flake8
 Python的集成开发环境(IDE)有很多，其中Spyder和Python Notebook最受欢迎
 
+文件编码 `# encoding:utf-8`
+
 `sudo python -m pip install package`
 
 `brew switch python 3.6.5_1`  `brew switch python 3.7.0`  
@@ -73,6 +75,20 @@ Install packages within a virtual environment without affecting the host system 
 `pip -V` check version
 `pip install --upgrade pip`
 `pip list  # show packages installed within the virtual environment`
+
+`pip freeze > requirements.txt` generate a requirements.txt file
+`pip install -r requirements.txt` # Install from our fancy new file
+
+``` shell
+# https://github.com/Damnever/pigar
+pip install pigar
+# Generate requirements.txt for current directory.
+$ pigar
+
+# Generating requirements.txt for given directory in given file.
+$ pigar -p ../dev-requirements.txt -P ../
+
+```
 
 And to exit virtualenv later:
 `deactivate  # don't exit until you're done using python`
@@ -163,4 +179,21 @@ time0 = time.perf_counter()
 
 print(time.perf_counter() - time0)
 
+```
+
+## Web
+
+### Deploy
+
+[python web 部署：nginx + gunicorn + supervisor + flask 部署笔记](https://www.jianshu.com/p/be9dd421fb8d)
+[Flask + Docker 无脑部署新手教程](https://zhuanlan.zhihu.com/p/78432719)
+
+### Flask
+
+`gunicron -w4 -b0.0.0.0:8000 myapp:app`
+
+```shell
+pkill -f gunicorn
+gunicorn --worker-class gevent --timeout 30 --graceful-timeout 20 --max-requests-jitter 2000 --max-requests 1500 -w 6 --log-level DEBUG --access-logfile gunicorn_access.log --error-logfile gunicorn_error.log -D --bind 127.0.0.1:5000 manager:app
+echo "gunicorn start!!!"
 ```
