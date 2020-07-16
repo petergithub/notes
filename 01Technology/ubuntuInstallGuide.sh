@@ -135,6 +135,7 @@ apm install auto-encoding convert-file-encoding open-path open-recent
 
 # Performance Monitoring Tools: sysstat include sar
 sudo apt-get -y install git tig curl tmux maven traceroute python-pip sysstat dstat wireshark atom
+git config --global core.quotepath false
 sudo adduser $USER wireshark
 
 ## update hosts

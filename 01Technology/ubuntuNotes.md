@@ -10,6 +10,7 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 ## Recent
 
 emacs save and quit: `Ctrl+x, Ctrl+c`
+[Emacs Basics](http://ergoemacs.org/emacs/emacs_basics.html)
 
 `for i in *; do cd /path/to/folder/$i ;mvn clean; done`  
 `SCRIPT_PATH=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname ${S})`  
@@ -56,7 +57,7 @@ move hidden files together:
 
 `shopt | grep on` will print a list of all the enabled options.
 `man bash` search `shopt`
-`dotglob` If set, Bash includes filenames beginning with a ‘.’ in the results of filename expansion.
+`dotglob` If set, Bash includes filenames beginning with a `.` in the results of filename expansion.
 `nullglob` If set, Bash allows filename patterns which match no files to expand to a null string, rather than themselves.
 expands non-matching globs to zero arguments, rather than to themselves.
 [The-Shopt-Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin), [glob](http://mywiki.wooledge.org/glob)
@@ -503,7 +504,6 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 `find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
 `find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`  
 `find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行  
-`find . -name dfc.properties`  
 `find . -name '*.xml' -o -name '*.java'` matches multiple patterns  
 `Operators`  Operators join together the other items within the expression.  
 `-o` (meaning logical OR) and `-a` (meaning logical AND).  Where an operator is missing, `-a` is assumed  
@@ -607,7 +607,7 @@ Vim中查看文件编码 `:set fileencoding`
 `w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0  
 `ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root  
 `ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format  
-`awk '/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses  
+`f'/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses  
 `awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件  
 `awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS  
 `echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`  
@@ -630,6 +630,8 @@ Print every line that has at least one field: `awk 'NF > 0' data`
 tomcat `localhost_access_log` filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`  
 
 awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`  
+ with `'\''` you close the opening `'`, then print a literal `'` by escaping it and finally open the ' again.
+escape square brackets: Brackets `[` need double escape `\\`: `\\[`
 
 awk 16进制转换
 
@@ -701,6 +703,8 @@ $2 $0上第二个字段的数据
 `RS` (Record Separator)    awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.  
 `awk -v RS=""` 按空白行切分文件成Records  
 `awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records  
+`awk -F '[= ]'` 同时以=和空格作为分隔符
+`awk -F '[\\[\\]]'` 和 `awk -F "[\\\[\\\]]"` 转义 `[`和`]` 同时以这两个字符作为分隔符
 `ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者  
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`    print each filed number  
 
@@ -879,7 +883,7 @@ Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
 `date -d '1 hours ago' "+%Y%m%d_%H"` 20161031_19  
 `date -d '1 days ago' "+%F"` 2016-11-01  
 `date -d now "+%Y%m%d %H:%M:%S"`
-`date +%Y%m%d%H%M%S` 20161101191653  
+`date +%Y%m%d%H%M%S.%N` 20161101191653.792204176
 
 `man timezone`  
 >The offset is positive if the local timezone is west of the Prime Meridian and negative if it is east  
@@ -1933,9 +1937,9 @@ Common usage:
 除了这三种类型的关键字之外，其他重要的关键字如下：gateway， broadcast，less， greater  
 还有三种逻辑运算，取非运算 `not` or `!`， 与运算是`and` or `&&`, 或运算是`or` or `||`  
 
-1. `host`：指定主机名或IP地址，例如’host roclinux.cn’或’host 202.112.18.34′  
-2. `net` ：指定网络段，例如’arp net 128.3’或’dst net 128.3′  
-3. `portrange`：指定端口区域，例如’src or dst portrange 6000-6008′  
+1. `host`：指定主机名或IP地址，例如`host roclinux.cn`或`host 202.112.18.34`  
+2. `net` ：指定网络段，例如`arp net 128.3`或`dst net 128.3`  
+3. `portrange`：指定端口区域，例如`src or dst portrange 6000-6008`  
 4. `protocol [ expr : size]`
     `protocol`指定协议名称，比如ip、tcp and udp、ether, fddi, arp, rarp, decnet, lat, sca, moprc, mopdl.
     `expr`用来指定数据报偏移量，表示从某个协议的数据报的第多少位开始提取内容，默认的起始位置是0；  
@@ -1975,7 +1979,7 @@ FD – Represents the file descriptor. Some of the values of FDs are,
 * txt – Text file  
 * mem – Memory mapped file  
 * mmap – Memory mapped device  
-* NUMBER – Represent the actual file descriptor. The character after the number i.e ‘1u’, represents the mode in which the file is opened. r for read, w for write, u for read and write.  
+* NUMBER – Represent the actual file descriptor. The character after the number i.e `1u`, represents the mode in which the file is opened. r for read, w for write, u for read and write.  
 
 TYPE – Specifies the type of the file. Some of the values of TYPEs are,  
 
@@ -2004,7 +2008,7 @@ List opened files based on process names starting with: `lsof -c ssh -c init`
 can give multiple -c switch on a single command line.  
 List processes using a mount point: `lsof /home`, `lsof +D /home/`  
 List files opened by a specific user: `lsof -u username`  
-Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the ‘^’ to exclude only the particular user as follows: `lsof -u ^username`  
+Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the `^` to exclude only the particular user as follows: `lsof -u ^username`  
 List all open files by a specific process: `lsof -p 1753`  
 Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`  
 Execute lsof in repeat mode: `lsof -u username -c init -a -r5`  
@@ -2058,6 +2062,29 @@ Listeningfor transport dt_socket at address: 8000
 7. PHP Modules: check avaliable libraries: `apt-cache search php5-`, install `sudo apt-get install name of the module`
 
 libapache2-mod-auth-mysql php5-mysql
+
+### inotifywait
+
+`yum install -y inotify-tools`
+命令参数说明
+`-m` 选项表示 monitor ，即开启监视
+`-r` 选项表示递归监视，但是会比较慢一些，若监视/etc 目录，其中的子目录下修改文件也是能被监控到。
+`-e` 选项指定要监控的“事件”(events)包括了：`access, modify,  attrib,  close_write,  close_nowrite, close, open,  moved_to,  moved_from, move,  move_self,  create, delete, delete_self, unmount`
+
+如果修改了/etc/passwd文件，则把这个事件记录在文件/root/modify_passwd.txt里
+inotifywait -m /etc/passwd -e modify > /root/modify_passwd.txt
+
+```shell
+#!/bin/bash
+SRC=/path/to/watch/   # 同步的路径，请根据实际情况修改
+inotifywait --exclude '\.(part|swp)' -r -mq -e  modify,move_self,create,delete,move,close_write $SRC |
+  while read event;
+    do
+    rsync -vazu --progress  --password-file=/etc/rsyncd_rsync.secret  $SRC  rsync@10.208.1.1::gri ##这里执行同步的命令，可以改为其他的命令
+  done
+
+# execute: nohup watch.sh > /dev/null 2>&1 &
+```  
 
 ## Miscellaneous
 
@@ -2474,30 +2501,6 @@ Linux查看网卡数据吞吐量方法
 4. `yum install nethogs -y`  查看某一网卡上进程级流量信息  
 5. `sudo ntop -i enp0s25 -d -L -w 3002`  
 6. `ntopng -d -L -w 3001` 使用web 页面 `http://localhost:3001` 访问 默认密码 admin / admin
-
-#### 防火墙
-
-##### CentOS 6.5 使用 SystemV init 管理的旧系统：
-
-防火墙状态 `service iptables status`
-关闭防火墙 `sudo service iptables stop`
-重启防火墙 `service iptables restart`
-去掉开机启动 `sudo chkconfig --del iptables`
-查看防火墙信息 `/etc/init.d/iptables status`
-
-##### 开放8080端口
-
-``` shell
-vi /etc/sysconfig/iptables
-
-# 增加以下代码
--A RH-Firewall-1-INPUT -m state --state NEW -m tcp -p tcp --dport 8080 -j ACCEPT
-```
-
-##### CentOS 7 使用 systemd 管理的新系统：
-
-sudo systemctl stop iptables
-sudo systemctl disable iptables
 
 #### Network 良好状态指标
 
@@ -2954,6 +2957,7 @@ Find Out CPU is 32bit or 64bit?
 #### Restart network
 
 `sudo service network-manager restart`  
+网卡的启动与关闭 `ifconfig en0 up/down`
 
 #### vi /etc/sysconfig/network-scripts/ifcfg-eth0
 
@@ -3211,6 +3215,14 @@ alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@host1 
 ssh root@MachineB 'bash -s' < local_script.sh    #run local shell script on a remote machine  
 trace kinit with `KRB5_TRACE=/dev/stdout kinit username`  
 
+#### pssh
+
+`pssh -ih /path/to/host.txt date` Pass list of hosts using a file
+`pssh -iH "host1 host2" -l root date` Pass list of hosts manually
+`pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
+    Using `-o` or `--outdir` you can save standard output to files
+    Using `-e` or `--errdir` you can save standard error to files
+
 #### SCP
 
 `scp client_file user@host:filepath`    上传文件到服务器端  
@@ -3241,7 +3253,7 @@ c:\>plink 192.168.6.200 ls '-l'
 #### Steps to Create a New Sudo User
 
 add a new user `adduser username`
-add the user to the sudo group `usermod -aG sudo username`
+add the user to the sudo group `usermod -aG wheel username`
 
 ### Software manage
 
