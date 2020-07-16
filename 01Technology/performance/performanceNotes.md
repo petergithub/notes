@@ -11,6 +11,16 @@
 
 A performance improvement for one of these attributes almost always is at the expense of one or both of the other attributes  
 
+## 服务器搭建
+
+### 用 Linux 服务器的互联网小公司业务量上去之后常遇到的问题
+
+[[踩坑总结] nf_conntrack: table full, dropping packet](http://keithmo.me/post/2018/08/25/conntrack-tuning/)
+
+第 1 位：进程可用的 FD 不足，
+第 2 位：IP 临时端口不足 + TIME_WAIT 状态的连接过多导致无法建立新连接
+第 3 位: netfilter/conntrack 相关内核参数
+
 ## 认清性能问题
 [认清性能问题](https://mp.weixin.qq.com/s?__biz=MzAxMTEyOTQ5OQ==&mid=2650610655&idx=1&sn=4f38ef56ff57054ab9745b0725351159&scene=23&srcid=0824IUyLIot4dXFjXdW4wK0I#rd) 陈天 mindwind（译） 瞬息之间
 [Thinking Clearly about Performance](https://queue.acm.org/detail.cfm?id=1854041) Cary Millsap, Method R Corporation
