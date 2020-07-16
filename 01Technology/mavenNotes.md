@@ -66,6 +66,10 @@ if want to download the sources jar the 2nd time, search and remove all "sources
 install jar:    `mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=jom -Dversion=0.4.0 -Dpackaging=jar -Dfile=jom-0.4.0.jar`
 install sources:`mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=jom -Dversion=0.4.0 -Dpackaging=jar -Dclassifier=sources -Dfile=jom-0.4.0-sources.jar`
 
+deploy root-pom.pom to snapshots 库:
+`mvn deploy:deploy-file -DgroupId=com -DartifactId=root-pom -Dversion=1.0.1-SNAPSHOT -Dpackaging=pom -DrepositoryId=maven-snapshots -Drepo.login=user -Drepo.pwd=password -Durl=http://maven.com/repository/maven-snapshots -Dfile=root-pom.pom`
+
+
 ### Specify the location for the testResource folder
 
 adding this to your pom.xml build section
@@ -198,6 +202,9 @@ mvn install -Dmaven.test.skip=true 给任何目标添加maven.test.skip 属性�
 mvn dependency:resolve 打印出已解决依赖的列表
 mvn dependency:tree 打印整个依赖树
 mvn dependency:list -e -U -X
+
+下载单个 jar `mvn dependency:get -Dartifact=org.riversun:random-forest-codegen:1.0.0 -Ddest=./`
+删掉当前 POM 文件中所有依赖文件 `mvn dependency:purge-local-repository -DreResolve=false` 解决依赖更新后但版本号不变,导致的依赖文件没有下载最新版本
 
 ### Proxy
 
