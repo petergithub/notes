@@ -26,7 +26,7 @@
 ### [Install by conda]
 
 `conda create --name tf1.14 python=3.6 tensorflow==1.14.0 keras==2.2.4`
-`conda create --name 2.0rc python=3.6 tensorflow==2.0.0-rc0 keras==2.2.4`
+`conda create --name tf2.0 python=3.6 tensorflow==2.0.0 keras==2.2.4`
 
 ### [Install](https://www.tensorflow.org/install/pip#1-install-the-python-development-environment-on-your-system)
 
