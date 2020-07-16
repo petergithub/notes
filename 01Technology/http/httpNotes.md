@@ -49,3 +49,4 @@ https CDN方式, 私钥不需要提供给CDN
 https SSL增加的时间大概多少 time(ssl) = 3 * time(tcp)
 HTTP耗时 = TCP握手(三个包)
 HTTPs耗时 = TCP握手(三个包) + SSL握手(需要9个包)
+

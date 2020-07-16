@@ -84,6 +84,13 @@ CSR (Certificate Signing Request)
 
 `openssl req -new -key example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`  
 
+#### Convert private key version
+
+Newer versions of OpenSSL say `BEGIN PRIVATE KEY` because they contain the private key + an OID that identifies the key type (this is known as PKCS8 format). Old versions of OpenSSL say `BEGIN RSA PRIVATE KEY`
+To get the old-style key (known as either PKCS1 or traditional OpenSSL format) you can do this:
+`openssl rsa -in server.key -out server_new.key`
+Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocrypt -in privkey.pem`
+
 #### Checking Using OpenSSL
 
 [The Most Common OpenSSL Commands](https://www.sslshopper.com/article-most-common-openssl-commands.html)
