@@ -24,10 +24,15 @@ the main php-fpm configuration file `/etc/php/7.0/fpm/php.ini`
 show version `php -v`  
 show configuration file path: `php -i | grep php.ini` reload `nginx -s reload` make it effective after edit php.ini
 log path: `/var/log/php`
+`/var/log/php-fpm/error.log`
 
 `php -r 'phpinfo()';`
+
+restart PHP processor: 
 `php-fpm restart`;
-restart PHP processor: `sudo systemctl restart php7.0-fpm`
+`service php-fpm restart`
+`/etc/init.d/php-fpm restart`
+`sudo systemctl restart php7.0-fpm`
 
 Configure Nginx: `sudo vi /etc/nginx/sites-enabled/default`
 
