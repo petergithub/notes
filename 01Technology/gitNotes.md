@@ -17,6 +17,7 @@
 `git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git rev-list --all | xargs git grep <string>`
 `ssh -v git@gitlab.com` get `Welcome to GitLab, Anonymous!`
+`ssh -v shangpu@git.picooc.com` get `Welcome to GitLab, Anonymous!`
 
 `HEAD^` 上一个版本
 `HEAD^^` `HEAD~2` 倒数第2个版本
@@ -31,7 +32,7 @@ Final release version
 
 `git log -g branchName` show Git branch created time just for local fetch/create time  
 `git log --name-only` show changed file name only  
-`git show <commit-id>` show difference for a commit   
+`git show <commit-id>` show difference for a commit
 `git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git  
 `git log --follow [file]`    显示某个文件的版本历史，包括文件改名  
 `git whatchanged [file]`    显示某个文件的版本历史，包括文件改名  
@@ -46,7 +47,7 @@ Final release version
 # Replace master branch entirely from another latestBranch:
 
 git checkout latestBranch  
-git merge -s ours master  
+git merge -s ours master --allow-unrelated-histories
 git checkout master  
 git merge latestBranch  
 ```
@@ -204,7 +205,7 @@ download git-completion.bash from source code and load it from .bashrc
 
 ### git status 中文
 
-默认中文文件名是 `\xxx\xxx` 等八进制形式 , 是因为 对`0x80`以上的字符进行quote, 只需要 `git config –global core.quotepath false`  
+默认中文文件名是 `\xxx\xxx` 等八进制形式 , 是因为 对`0x80`以上的字符进行quote, 只需要 `git config --global core.quotepath false`  
 
 ### git中文乱码解决(git bash中的中文乱码问题)
 
