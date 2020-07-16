@@ -6,9 +6,13 @@
 反向代理代理的对象是服务端, 为服务器收发请求，使真实服务器对客户端不可见。
 反向代理: 隐藏了真实的服务端
 
+正向代理和反向代理最关键的两点区别：
+    是否指定目标服务器
+    客户端是否要做设置
+
 ## Recent
 
-https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ
+[关于$upstream_response_time，$request_time以及nginx配置设置在应用中的问题](https://groups.google.com/forum/#!msg/openresty/sGVZbJRs4lU/5Nxgb_rITGYJ)
 `$upstream_response_time` 格式会变成2部分 xxxx, xxxx ，可能是什么原因？被拆分的字段代表什么含义？
 这是 `ngx_http_upstream` 的 fail-over 机制在起作用。当 nginx
 尝试了第一个后端节点出现错误时（比如超时），它会自动尝试同一个 upstream {}
@@ -42,14 +46,15 @@ Where signal may be one of the following:
     `quit` — graceful shutdown
     `reload` — reloading the configuration file
     `reopen` — reopening the log files
-    
+
 `nginx -t` Test your configuration file for syntax errors
-`sudo systemctl reload nginx` reload Nginx    
+`sudo systemctl reload nginx` reload Nginx
 
 ## Location正则写法
+
 ### 规则[doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)
 
-```
+``` shell
 location optional_modifier location_match {
     . . .
 }
@@ -61,29 +66,29 @@ location optional_modifier location_match {
 4. ~*: If a tilde and asterisk modifier is used, the location block will be interpreted as a case-insensitive regular expression match.
 5. ^~: If a carat and tilde modifier is present, and if this block is selected as the best non-regular expression match, regular expression matching will not take place.
 
-1. =	表示精确匹配 如 A 中只匹配根目录结尾的请求，后面不能带任何字符串。
-2. ^~	表示uri以某个常规字符串开头，不是正则匹配
-3. ~	表示区分大小写的正则匹配;
-4. ~*	表示不区分大小写的正则匹配
-5. /	通用匹配, 如果没有其它匹配,任何请求都会匹配到
+#### 规则
+
+1. =    表示精确匹配 如 A 中只匹配根目录结尾的请求，后面不能带任何字符串。
+2. ^~    表示uri以某个常规字符串开头，不是正则匹配
+3. ~    表示区分大小写的正则匹配;
+4. ~*    表示不区分大小写的正则匹配
+5. /    通用匹配, 如果没有其它匹配,任何请求都会匹配到
 顺序 no优先级：
 (location =) > (location 完整路径) > (location ^~ 路径) > (location ~,~* 正则顺序) > (location 部分起始路径) > (/)
 
-###一个示例：
+### 一个示例
 
-```
-	
-	location /settlementWeb {
-             proxy_pass   http://localhost:3000;
-             proxy_redirect off;
-             proxy_set_header Host $host;
-             proxy_set_header X-Real-IP $remote_addr;
-             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
+``` shell
+location /settlementWeb {
+    proxy_pass   http://localhost:3000;
+    proxy_redirect off;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
 ```
 
-
-```
+``` shell
 location  = / {
   # 精确匹配 / ，主机名后面不能带任何字符串
   [ configuration A ]
@@ -136,6 +141,7 @@ location ~ /images/abc/ {
 
 location ~* /js/.*/\.js
 ```
+
 按照上面的location写法，以下的匹配示例成立：
 
 - / -> config A
@@ -154,54 +160,60 @@ location ~* /js/.*/\.js
 - /documents/Abc.jpg -> config CC
     最长匹配到C，往下正则顺序匹配到CC，不会往下到E
 
-###实际使用建议
-```
-	所以实际使用中，个人觉得至少有三个匹配规则定义，如下：
-	#直接匹配网站根，通过域名访问网站首页比较频繁，使用这个会加速处理，官网如是说。
-	#这里是直接转发给后端应用服务器了，也可以是一个静态首页
-	# 第一个必选规则
-	location = / {
-	    proxy_pass http://tomcat:8080/index
-	}
-	# 第二个必选规则是处理静态文件请求，这是nginx作为http服务器的强项
-	# 有两种配置模式，目录匹配或后缀匹配,任选其一或搭配使用
-	location ^~ /static/ {
-	    root /webroot/static/;
-	}
-	location ~* \.(gif|jpg|jpeg|png|css|js|ico)$ {
-	    root /webroot/res/;
-	}
-	#第三个规则就是通用规则，用来转发动态请求到后端应用服务器
-	#非静态文件请求就默认是动态请求，自己根据实际把握
-	#毕竟目前的一些框架的流行，带.php,.jsp后缀的情况很少了
-	location / {
-	    proxy_pass http://tomcat:8080/
-	}
-```
-### 重定向
+### 实际使用建议
+
+``` shell
+所以实际使用中，个人觉得至少有三个匹配规则定义，如下：
+#直接匹配网站根，通过域名访问网站首页比较频繁，使用这个会加速处理，官网如是说。
+#这里是直接转发给后端应用服务器了，也可以是一个静态首页
+# 第一个必选规则
+location = / {
+    proxy_pass http://tomcat:8080/index
+}
+# 第二个必选规则是处理静态文件请求，这是nginx作为http服务器的强项
+# 有两种配置模式，目录匹配或后缀匹配,任选其一或搭配使用
+location ^~ /static/ {
+    root /webroot/static/;
+}
+location ~* \.(gif|jpg|jpeg|png|css|js|ico)$ {
+    root /webroot/res/;
+}
+#第三个规则就是通用规则，用来转发动态请求到后端应用服务器
+#非静态文件请求就默认是动态请求，自己根据实际把握
+#毕竟目前的一些框架的流行，带.php,.jsp后缀的情况很少了
+location / {
+    proxy_pass http://tomcat:8080/
+}
 ```
 
-	rewrite  ^/test.php  /new  permanent;       //重写向带参数的地址
-	rewrite  ^/test.php  /new?  permanent;      //重定向后不带参数
-	rewrite  ^/test.php   /new?id=$arg_id?  permanent;    //重定向后带指定的参数
+### 重定向
+
+``` shell
+    rewrite  ^/test.php  /new  permanent;       //重写向带参数的地址
+    rewrite  ^/test.php  /new?  permanent;      //重定向后不带参数
+    rewrite  ^/test.php   /new?id=$arg_id?  permanent;    //重定向后带指定的参数
 ```
-## 
+
+## Sample
+
 ### SSL双向认证
+
+``` shell
+ssl_certificate  /path/to/server.crt;#server公钥
+ssl_certificate_key  /path/to/server.key;#server私钥
+ssl_client_certificate   /path/to/ca.crt;#根级证书公钥，用于验证各个二级client, 使用 CA 证书来验证请求带的客户端证书是否是该 CA 签发的
+ssl_verify_client on;
 ```
-	
-	ssl_certificate  /path/to/server.crt;#server公钥
-	ssl_certificate_key  /path/to/server.key;#server私钥
-	ssl_client_certificate   /path/to/ca.crt;#根级证书公钥，用于验证各个二级client, 使用 CA 证书来验证请求带的客户端证书是否是该 CA 签发的
-	ssl_verify_client on;
-```
+
 curl 验证 `curl --insecure --key client.key --cert client.crt 'https://test'`  
 
-## Sample: Location ends with slash
-### rule
+### Location ends with slash
+
 #### location [doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)
+
 If a location is defined by a prefix string that ends with the slash character, and requests are processed by one of `proxy_pass, fastcgi_pass, uwsgi_pass, scgi_pass, or memcached_pass`, then the special processing is performed. In response to a request with URI equal to this string, but without the trailing slash, a permanent redirect with the code 301 will be returned to the requested URI with the slash appended. If this is not desired, an exact match of the URI and location could be defined like this:
 
-```
+``` shell
     location /user/ {
         proxy_pass http://user.example.com;
     }
@@ -212,133 +224,160 @@ If a location is defined by a prefix string that ends with the slash character, 
 
 #### proxy_pass [doc](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass)
 
+``` shell
+Syntax:     proxy_pass URL;
+Default:     —
+Context:     location, if in location, limit_except
+
 ```
-Syntax: 	proxy_pass URL;
-Default: 	—
-Context: 	location, if in location, limit_except
-```
+
 Sets the protocol and address of a proxied server and an optional URI to which a location should be mapped. As a protocol, “http” or “https” can be specified. The address can be specified as a domain name or IP address, and an optional port:
-	`proxy_pass http://localhost:8000/uri/;`
+    `proxy_pass http://localhost:8000/uri/;`
 
 or as a UNIX-domain socket path specified after the word “unix” and enclosed in colons:
-	`proxy_pass http://unix:/tmp/backend.socket:/uri/;`
+    `proxy_pass http://unix:/tmp/backend.socket:/uri/;`
 
 If a domain name resolves to several addresses, all of them will be used in a round-robin fashion. In addition, an address can be specified as a server group.
 
 A request URI is passed to the server as follows:
 
-- If the proxy_pass directive is specified **with a URI**, then when a request is passed to the server, the part of a normalized request URI matching the location is replaced by a URI specified in the directive:
-```
+- If the proxy_pass directive is specified **with a URI**, then when a request is passed to the server, the part of a normalized request URI   matching the location is replaced by a URI specified in the directive:
+
+``` shell
         location /name/ {
             proxy_pass http://127.0.0.1/remote/;
         }
 ```
 
 - If proxy_pass is specified **without a URI**, the request URI is passed to the server in the same form as sent by a client when the original request is processed, or the full normalized request URI is passed when processing the changed URI:  
-```
+
+``` shell
         location /some/path/ {
             proxy_pass http://127.0.0.1;
         }
 ```
 
 ### Sample 1 NginX trailing slash in proxy pass url
+
 [NginX trailing slash in proxy pass url](http://stackoverflow.com/questions/22759345/nginx-trailing-slash-in-proxy-pass-url)
 Here is an example with trailing slash in location, but no trailig slash in proxy_pass.
-```
+
+``` shell
 location /one/ {
     proxy_pass http://127.0.0.1:8080/two;
     ...
 }
 ```
-if one go to address http://yourserver.com/one/path/here?param=1 nginx will proxy request to http://127.0.0.1/twopath/here?param=1. See how two and path concatenates.
+
+if one go to address [URL1](http://yourserver.com/one/path/here?param=1) nginx will proxy request to [URL1](http://127.0.0.1/twopath/here?param=1). See how two and path concatenates.
 
 ### Sample 2 practice nginx configuration
-URL: http://localhost/webProject
+
+[URL](http://localhost/webProject)
 
 #### Both of location and proxy_pass end with slash
-```
+
+``` shell
         location /webProject/ {
  49              proxy_pass   http://localhost:3000/;
  54         }
 ```
+
 Nginx log:
-```
+
+``` log
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/ HTTP/1.1" 302 114 "-"
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/login?rurl=%2F HTTP/1.1" 304 0 "-"
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/css/jquery-ui.min.css HTTP/1.1" 304 0 "http://localhost/webProject/login?rurl=%2F"
 ```
+
 Node log:
-```
+
+``` log
 GET /
 GET /login?rurl=%2F
 GET /css/jquery-ui.min.css
 ```
 
 #### location ends with slash and proxy_pass not
-```
-		location /webProject/ {
+
+``` shell
+        location /webProject/ {
  49              proxy_pass   http://localhost:3000;
  54         }
 ```
+
 Nginx log:
-```
+
+``` log
 [16/Oct/2015:11:36:49 +0800] "GET /webProject/ HTTP/1.1" 302 146 "-"
 [16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2F HTTP/1.1" 302 222 "-"
 [16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F HTTP/1.1" 302 314 "-"
 ```
+
 Node log:
-```
+
+``` log
 GET /webProject/
 GET /webProject/login?rurl=%2FsettlementWeb%2F
 GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F
 ```
 
 #### proxy_pass ends with slash and location not
-```
+
+``` shell
         location /webProject {
  49              proxy_pass   http://localhost:3000/;
  54         }
 ```
+
 Nginx log:
-```
+
+``` log
 [16/Oct/2015:11:42:07 +0800] "GET /webProject/ HTTP/1.1" 302 120 "-"
 [16/Oct/2015:11:42:07 +0800] "GET /webProject/login?rurl=%2F%2F HTTP/1.1" 302 170 "-"
 [16/Oct/2015:11:42:07 +0800] "GET /webProject/login?rurl=%2F%2Flogin%3Frurl%3D%252F%252F HTTP/1.1" 302 236 "-"
 ```
+
 Node log:
-```
+
+``` log
 GET //
 GET //login?rurl=%2F%2F
 GET //login?rurl=%2F%2Flogin%3Frurl%3D%252F%252F
 ```
 
 #### None of location and proxy_pass ends with slash
-```
+
+``` shell
          location /webProject {
  49              proxy_pass   http://localhost:3000;
  54         }
 ```
+
 Nginx log:
-```
+
+``` log
 [16/Oct/2015:11:45:18 +0800] "GET /webProject/ HTTP/1.1" 302 146 "-"
 [16/Oct/2015:11:45:18 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2F HTTP/1.1" 302 222 "-"
 [16/Oct/2015:11:45:18 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F HTTP/1.1" 302 314 "-"
 ```
+
 Node log:
-```
+
+``` log
 GET /webProject/
 GET /webProject/login?rurl=%2FsettlementWeb%2F
 GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F
 ```
 
-### Adding cross-origin resource sharing (CORS) support 
+### Adding cross-origin resource sharing (CORS) support
 
 test with `curl`: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`  
 
-https://gist.github.com/Stanback/7145487
+[URL](https://gist.github.com/Stanback/7145487)
 
-```
-	
+``` shell
 #
 # CORS header support
 #
@@ -357,18 +396,18 @@ https://gist.github.com/Stanback/7145487
 
 set $cors '';
 #if ($http_origin ~ '^https?://(localhost|www\.yourdomain\.com|www\.yourotherdomain\.com)') {
-# use wildcard for subdomain 
+# use wildcard for subdomain
 if ($http_origin ~* https?://(localhost|[^/]*\.example\.com$)) {
-        set $cors 'true';
+    set $cors 'true';
 }
 
 if ($cors = 'true') {
-        add_header 'Access-Control-Allow-Origin' "$http_origin" always;
-        add_header 'Access-Control-Allow-Credentials' 'true' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
-        add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With' always;
-        # required to be able to read Authorization header in frontend
-        #add_header 'Access-Control-Expose-Headers' 'Authorization' always;
+    add_header 'Access-Control-Allow-Origin' "$http_origin" always;
+    add_header 'Access-Control-Allow-Credentials' 'true' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'Accept,Authorization,Cache-Control,Content-Type,DNT,If-Modified-Since,Keep-Alive,Origin,User-Agent,X-Requested-With' always;
+    # required to be able to read Authorization header in frontend
+    #add_header 'Access-Control-Expose-Headers' 'Authorization' always;
 }
 
 if ($request_method = 'OPTIONS') {
@@ -382,6 +421,4 @@ if ($request_method = 'OPTIONS') {
     add_header 'Content-Length' 0;
     return 204;
 }
-``` 
-
-
+```
