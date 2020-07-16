@@ -8,7 +8,8 @@
 通过`info stats`的`expired_keys`指标记录累计删除的过期键数量
 
 `info keyspace` 的 `expires` 表名设置了过期时间的 key 的数量
-`db3:keys=52,expires=52,avg_ttl=1735032446` 
+`db3:keys=52,expires=52,avg_ttl=1735032446`
+EvictedKeys 因内存满而淘汰的key总数
 
 ## Performance
 
@@ -17,6 +18,14 @@
 * 被动删除（惰性删除）：当读/写一个已经过期的Key时，会触发惰性删除策略，直接删除掉这个Key;
 * 主动删除（定期删除）：Redis会定期巡检，来清理过期Key；
 * 当内存达到maxmemory配置时候，会触发Key的删除操作；
+
+Redis 提供 6 种数据淘汰策略：
+    volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用 的数据淘汰
+    volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数 据淘汰
+    volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据 淘汰
+    allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
+    allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
+    no-enviction（驱逐）：禁止驱逐数据
 
 另外，还有一种基于触发器的删除策略，因为对Redis压力太大，一般没人使用。
 
@@ -72,7 +81,7 @@ get all config `config get *`
 `redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
 用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
 
-`SCAN cursor [MATCH pattern] [COUNT count]` 
+`SCAN cursor [MATCH pattern] [COUNT count]`
 eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
 `redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
 
