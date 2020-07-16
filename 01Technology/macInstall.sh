@@ -22,6 +22,7 @@ chsh -s $(which zsh)
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 # sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="alanpeabody"/' ~/.zshrc
 # sed -i 's/# DISABLE_AUTO_TITLE="true"/DISABLE_AUTO_TITLE="true"/' ~/.zshrc
+# sed -i 's/# ENABLE_CORRECTION="true"/ENABLE_CORRECTION="true"/' ~/.zshrc
 ## Disable 'Would you like to check for updates' prompt: add DISABLE_AUTO_UPDATE="true" on your .zshrc before the source $ZSH/oh-my-zsh.sh line
 # source ~/.zshrc
 
@@ -88,6 +89,7 @@ brew cask install docker
 # [jd-GUI](http://jd.benow.ca)
 # [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
 # [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
+# [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac
 # [Open Web Monitor](http://openwebmonitor.netqon.com/)
 # [kap: screen record to gif](https://getkap.co/)
 # [IINA - The modern media player for macOS](https://iina.io/)
@@ -143,6 +145,7 @@ sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
 # brew unlink <package_name>      # 将软件在`/usr/local`目录下的软链接删除。
 # brew info                       # 显示软件的信息 
 # brew deps                       # 显示包依赖
+# brew services start <package_name>	# 设置自启动
 # check software info from brew: brew info mysql
 # install with brew: brew install tig autojump
 # search with brew cask: brew cask search chrome
