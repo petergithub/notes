@@ -2,14 +2,17 @@
 
 ## Recent
 
-对象的内置锁?
-每个对象都有一个内置锁?
+锁降级
+JEP draft: Concurrent Monitor Deflation http://openjdk.java.net/jeps/8183909
+不可不说的Java“锁”事 https://tech.meituan.com/2018/11/15/java-lock.html
+Java偏向锁是如何撤销的？ https://www.zhihu.com/question/57774162
+Java Language Specification Chapter 17. Threads and Locks https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
+Synchronization and Object Locking https://wiki.openjdk.java.net/display/HotSpot/Synchronization
+
+对象的内置锁? 每个对象都有一个内置锁?
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
 SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swagger-ui.html)
-
--XX:+Pringflagsfinal 打印平台默认值  
-[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)  
 
 concurrent: 主内存.寄存器是是运行时?
 
@@ -23,7 +26,14 @@ concurrent: 主内存.寄存器是是运行时?
     /      \
 >-------------->>
 
-#### [Arthas](https://github.com/alibaba/arthas)
+### 常用参数
+
+`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
+`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
+-XX:+Pringflagsfinal 打印平台默认值  
+[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)  
+
+### [Arthas](https://github.com/alibaba/arthas)
 
 [Quick Start](https://alibaba.github.io/arthas/en/quick-start.html)
 download: `wget https://alibaba.github.io/arthas/arthas-boot.jar`
@@ -31,18 +41,25 @@ startup: `java -jar arthas-boot.jar`
 
 [watch](https://alibaba.github.io/arthas/en/quick-start.html#watch)
 watch Demo$Counter method {params,returnObj}
-watch com.picooc.serving.dict.EnvironmentEnum isAbroad {params,returnObj}
+watch com.company.EnvironmentEnum isAbroad {params,returnObj} -x 3
+watch com.company.Service method {params,returnObj} "params[0]==1 && params[1]==new java.sql.Timestamp(1572424327000L)" -x 3
 
-[trace](https://alibaba.github.io/arthas/trace.html)
-trace Demo$Counter getFactoryInfo #cost>10
+[trace](https://alibaba.github.io/arthas/trace.html) 方法内部调用路径，并输出方法路径上的每个节点上耗时
+trace Demo$Counter getFactoryInfo #cost>10 -n 1
+`#cost > 10` 只会展示耗时大于10ms的调用路径
+`-n` 参数指定捕捉结果的次数
+
+`trace -E com.test.ClassA|org.test.ClassB method1|method2|method3` 用正则表匹配路径上的多个类和函数，一定程度上达到多层trace的效果
 
 sc Demo$Counter
 
-##### Demo
+[Arthas的一些特殊用法文档说明 #71](https://github.com/alibaba/arthas/issues/71)
+
+#### Demo
 
 [阿里巴巴问题排查神器Arthas使用实践](https://mp.weixin.qq.com/s?__biz=MzI3NzE0NjcwMg==&mid=2650122813&idx=1&sn=3e419623e06cfc7900929bb6e88bcd24&chksm=f36bb71cc41c3e0a4fb7420498839af553db3073a4e02c5c67eca8d6e0f5d1f916673cb41d37&mpshare=1&scene=23&srcid=1216OroF3DROBapRZwxoMpkF#rd)
 
-##### 原理
+#### 原理
 
 attach：jdk1.6新增功能，通过attach机制，可以在jvm运行中，通过pid关联应用
 
@@ -94,6 +111,18 @@ Solution: This exception usually arises when the socket operations performed on 
 `hexdump -C /tmp/memory.bin` 或 `strings /tmp/memory.bin |less`
 
 用strace和ltrace查找malloc调用
+
+#### Native Memory Tracking (NMT)
+
+* java8 给HotSpot VM引入了 NMT 特性，可以用于追踪JVM的内部内存使用
+* Enable NMT `-XX:NativeMemoryTracking=[off | summary | detail]`
+* Use jcmd to Access NMT Data `jcmd <pid> VM.native_memory [summary | detail | baseline | summary.diff | detail.diff | shutdown] [scale= KB | MB | GB]`
+* [Oracle Technology Network - Native Memory Tracking](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/nmt-8.html)
+* [Java Platform, Standard Edition Troubleshooting Guide - 2.7 Native Memory Tracking](https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr007.html)
+
+* 使用`-XX:NativeMemoryTracking=summary`可以用于开启NMT，其中该值默认为off，可以设置summary、detail来开启；开启的话，大概会增加5%-10%的性能消耗；使用-XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics可以在jvm shutdown的时候输出整体的native memory统计；其他的可以使用`jcmd pid VM.native_memory`相关命令进行查看、diff、shutdown等
+* 整个memory主要包含了Java Heap、Class、Thread、Code、GC、Compiler、Internal、Other、Symbol、Native Memory Tracking、Arena Chunk这几部分；其中reserved表示应用可用的内存大小，committed表示应用正在使用的内存大小
+* [聊聊HotSpot VM的Native Memory Tracking](https://cloud.tencent.com/developer/article/1406522)
 
 #### jemalloc 查看堆外内存 anon
 
@@ -178,7 +207,7 @@ Solution: This exception usually arises when the socket operations performed on 
 
 **Retained set** of X is the set of objects which would be removed by GC when X is garbage collected.
 
-**Retained heap** of X is the sum of shallow sizes of all objects in the retained set of X, i.e. memory kept alive by X. 
+**Retained heap** of X is the sum of shallow sizes of all objects in the retained set of X, i.e. memory kept alive by X.
 
 ### jvm log 时间格式
 
@@ -186,7 +215,7 @@ Solution: This exception usually arises when the socket operations performed on 
 打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`  
 `-Xloggc` 需要使用绝对路径  
 `-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
-`-XX:+HeapDumpOnOutOfMemoryError -XX:ErrorFile=/path/to/hs_err_pid%p.log`  
+`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`  
 [Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)  
 
 ### ClassLoader相关工具
@@ -644,15 +673,13 @@ GC日志开头的"［GC"和"［Full GC"：说明了这次垃圾收集的停顿�
 * 动态对象年龄判定
 * 空间分配担保
 
-``` Fake code
     Minor GC之前,虚拟机会先检查老年代最大可用连续空间是否大于新生代对象总空间,  
-        如果大于,则Minor GC是安全的  
-        如果不大于,则会查看HandlePromotionFailure设置值是否允许担保失败,  
-            如果允许,则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小  
-                如果大于,将进行一次Minor GC,尽管这次是有风险的
-                如果小于,那要改为进行Full GC.  
-            如果不允许冒险,那要改为进行Full GC.  
-```
+    如果大于,则Minor GC是安全的  
+    如果不大于,则会查看HandlePromotionFailure设置值是否允许担保失败,  
+        如果允许,则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小  
+            如果大于,将进行一次Minor GC,尽管这次是有风险的
+            如果小于,那要改为进行Full GC.  
+        如果不允许冒险,那要改为进行Full GC.  
 
 ### 第４章 虚拟机监控工具
 
