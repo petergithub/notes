@@ -1,31 +1,37 @@
 # Docker Notes
 
+## Command
+
+### Common
+
 `docker run` 只在第一次运行时使用，将镜像放到容器中，以后再次启动这个容器时，使用 `docker start imageName`
 
-docker start docker-mysql-5.6
-docker exec -it docker-mysql-5.6 bash
+`docker start docker-mysql-5.6`
+`docker exec -it docker-mysql-5.6 bash`
+`[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
 
-`docker images` Show all images in your local repository  
+[Networking features in Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/networking/)
+connect from a container to a service on the host: connect to the special DNS name `host.docker.internal`, which resolves to the internal IP address used by the host. This is for development purpose and will not work in a production environment outside of Docker for Mac.
+
+### Basic
 
 `docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container
 `docker run = docker create + docker start`
-start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
-start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
-start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorflow`
 
 * `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
 * `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上  
 * `-i` 让容器的标准输入保持打开  
 * `-p` [host:]port:dockerPort
-* `-d` 后台运行  
-* `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e MYSQL_ROOT_PASSWORD=root`  
+* `-d` 后台运行
+* `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`  
 * `--rm` 在容器终止运行后自动删除容器文件  
 * `-v, --volume "/path/to/host/machine:/path/to/container`
+* `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
 
 `docker start -i <image_id>` Start a existed container  
 `docker attach <container_id>` Attach a running container
 `docker exec -it [containerID] /bin/bash` 进入一个正在运行的 docker 容器  
-`[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
+`docker inspect containerID` 查看信息
 
 `exit` 退出
 `docker stop <hash>` Gracefully stop the specified container
@@ -37,8 +43,15 @@ start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorf
 * `-n, --last int` Show n last created containers (includes all states) (default -1)  
 * `-l, --latest` Show the latest created container (includes all states)  
 
+`docker system df` 磁盘占用
+
+### image
+
+`docker images` Show all images in your local repository
+
 `docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`  
 `docker tag server:latest myname/server:latest` Rename image  
+`docker tag IMAGE[:TAG] [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]`
 
 `docker rm <container_id/contaner_name>`  
 `docker rm $(docker ps -a -q | grep -v $(docker ps -q))` Remove all containers from this machine except the running one
@@ -46,13 +59,69 @@ start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorf
 `docker rmi <image_id/image_name ...>`  
 
 `docker save <image-id>` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
-`docker export <container-id>` docker export命令创建一个tar文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过docker images –tree命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）。
+`docker export <container-id>` `docker export`命令创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
+
+#### build image with Dockerfile
+
+`docker image build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`  
+
+[Dockerfile最佳实践](https://zhuanlan.zhihu.com/p/75013836)
+将标准日志与错误日志分别输出到stdout与stderr
+
+日志输出到标准输出与错误输出，方便查看与采集日志。参考 Nginx 的 dockerfile ：
+
+``` shell
+#forward request and error logs to docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+```
+
+### 和系统交互
 
 拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`  
 
-## Usage
+### Docker 中国官方镜像
 
-### centOS
+[Docker 镜像加速](https://www.runoob.com/docker/docker-mirror-acceleration.html)
+
+#### `docker pull registry.docker-cn.com/myname/myrepo:mytag`
+
+#### global setting
+
+`vi /etc/docker/daemon.json`
+{
+    "registry-mirrors": ["http://hub-mirror.c.163.com"]
+}
+
+`systemctl restart docker.service`
+
+`docker info | grep -A 2 Mirrors` 检查加速器是否生效
+
+``` html
+国内加速站点
+https://registry.docker-cn.com
+http://hub-mirror.c.163.com
+https://mirror.ccs.tencentyun.com
+```
+
+### Troubleshooting
+
+#### Troubleshooting Network
+
+[Troubleshooting Container Networking](https://success.docker.com/article/troubleshooting-container-networking)
+`docker run -it --rm --network container:issue-container-name nicolaka/netshoot`
+
+## Sample
+
+start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
+start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
+start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorflow`
+
+### CentOS
+
+#### Common package
+
+`yum install -y less initscripts rsyslog`
 
 #### Dockerfile
 
@@ -106,3 +175,56 @@ docker的端口映射是通过-p参数来实现的.
 例如下面 , 将端口6379映射到6378  
 `docker run -d -p [host:]6378:6379 --name port-redis redis`
 `docker run -d -p 8083:8080 7c34bafd1150` (使用imagesid启动tomcat)
+
+## Docker Compose
+
+[Install](https://docs.docker.com/compose/install/)
+[Get started with Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+[Command-line completion](https://docs.docker.com/compose/completion/)
+
+Create a file called docker-compose.yml
+`docker-compose up` start up your application
+`docker-compose down` Stop the application
+`docker-compose up -d` run your services in the background
+`docker-compose --help` see other available commands
+`docker-compose down --volumes` bring everything down, removing the containers entirely
+
+## Install
+
+[Docker CentOS](https://docs.docker.com/install/linux/docker-ce/centos/)
+[how-to-install-and-use-docker-on-centos-7](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-centos-7)
+
+``` shell
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl enable docker
+sudo usermod -aG docker $(whoami)
+sudo systemctl start docker
+sudo docker run hello-world
+```
+
+### Configure logging drivers
+
+全局配置控制 docker 运行时产生的日志文件大小
+[JSON File logging driver](https://docs.docker.com/config/containers/logging/json-file/)
+[Configure logging drivers](https://docs.docker.com/config/containers/logging/configure/)
+
+/etc/docker/daemon.json
+
+``` json
+{
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "500m",
+    "max-file": "10",
+    "labels": "production_status",
+    "env": "os,customer"
+  }
+}
+```
+
+[How to setup log rotation for a Docker container](https://www.freecodecamp.org/news/how-to-setup-log-rotation-for-a-docker-container-a508093912b2/)
+如果不配置
+By default, the stdout and stderr of the container are written in a JSON file located in /var/lib/docker/containers/[container-id]/[container-id]-json.log

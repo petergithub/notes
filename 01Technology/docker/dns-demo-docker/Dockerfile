@@ -14,7 +14,8 @@ rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 # Install anything. The service you want to start must be a SystemD service.
 
-RUN yum install -y bind bind-utils iproute
+RUN yum install -y bind bind-utils iproute initscripts
+RUN touch /etc/sysconfig/network
 COPY named.conf /etc/named.conf
 COPY named.rfc1912.zones /etc/named.rfc1912.zones
 COPY yumaozdy.com.zone /var/named/yumaozdy.com.zone
