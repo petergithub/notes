@@ -88,6 +88,7 @@ print ("end " + tojson(date1.toLocaleString()))
 创建集合 `db.createCollection(COLLECTION_NAME, options)`
 重命名 `db.COLLECTION_NAME.renameCollection("NEW_NAME")`
 集合的删除 `db.COLLECTION_NAME.drop()`  
+copy a collection from one database to new_database `db.<collection_name>.find().forEach(function(d){ db.getSiblingDB('<new_database>')['<collection_name>'].insert(d); });`
 
 #### query
 
