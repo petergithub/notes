@@ -437,6 +437,16 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
  除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。  
  他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言  
 
+#### SET table_name as variable
+
+```sql
+SET @tableName = 'user';
+SET @s = concat('select id from ', @tableName, ' where id = 770');
+PREPARE stmt1 FROM @s;
+EXECUTE stmt1;
+DEALLOCATE PREPARE stmt1;
+```
+
 #### 修改密码
 
 格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
