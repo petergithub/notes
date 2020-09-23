@@ -5,19 +5,6 @@
 MongoDB单文档大小限制是16M
 MongoDB limits the data size of individual BSON objects/documents. At the time of this writing the limit is 16MB.并不是技术上的限制，只是一个规定而已
 
-export and import data collection
-`mongoexport --host <hostname> --port 27017 --db test  --collection <collectionName> --out <filename>.json`
-`mongoimport --file <filename>.json`
-
-options:
-  -h [ --host ] arg         mongo host to connect
-  -u [ --username ] arg     username
-  -p [ --password ] arg     password
-  -d [ --db ] arg           database to use
-  -c [ --collection ] arg   collection to use (some commands)
-  -q [ --query ] arg        query filter, as a JSON string
-  -o [ --out ] arg          output file; if not specified, stdout is used
-
 ## Commands
 
 ### Start Server & Connection
@@ -30,7 +17,8 @@ options:
 `--eval` execute command
 `--nodb` start mongo client without using a database
 
-`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME--authenticationDatabase=admin`
+`mongo mongodb://user:pwd@localhost:27017/DATABASE_NAME?authSource=admin`
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --authenticationDatabase=admin`
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet script.js`  
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'printjson(db.currentOp())' | less`  
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'db.users.find({a:'b'}).pretty().shellPrint()' | less`  
@@ -42,6 +30,7 @@ runCommand syntax: `db.runCommand()`
 dropping a collection(drop database) `db.DATABASE_NAME.drop()` or `db.runCommand({"drop" : "DATABASE_NAME"})`
 `> help`  
 `load("/path/to/script.js")`  
+Getting timestamp from mongodb id `ObjectId("507c7f79bcf86cd7994f6c0e").getTimestamp()`
 
 #### format
 
@@ -75,8 +64,10 @@ print ("end " + tojson(date1.toLocaleString()))
 查看数据库 `show dbs` == `db.getMongo().getDBs()`
 查看当前正在使用的数据库 `db`  
 切换数据库 `use DATABASE_NAME` == `db.getSisterDB("DATABASE_NAME")`
-删除数据库 删除数据库首先使用use命令切换到要删除的数据库，然后使用`db.dropDatabase()`  
+删除数据库 删除数据库首先使用`use`命令切换到要删除的数据库，然后使用`db.dropDatabase()`  
 `db.stats()`
+
+`db.copyDatabase(fromdb, todb, fromhost, username, password, mechanism)` Copies a database either from one mongod instance to the current mongod instance or within the current mongod.
 
 #### collection
 
@@ -101,13 +92,16 @@ limit()指定查询结果数量  `db.COLLECTION_NAME.find().limit(NUMBER)`
 skip()指定查询偏移量 `db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)`  
 sort()实现查询结果排序 `db.COLLECTION_NAME.find().sort({KEY:1})` 排序方式为可选值为：1和-1，1表示使用升序排列，-1表示降序排序  
 
+db.collection.remove({query})
+
 ### Query Criteria 查询条件
 
 `"$lt","$lte","$gt","$gte", "$ne"`分别对应`<,<=,>,>=,<>`  
 查询birthday日期是`1990-1-1`之前的人 `db.users.find({"birthday":{"$lt":new Date("1990/01/01")}})`  
 查询`age >=18  <=30`: `db.users.find({"age":{"$gte":18,"$lte":30}})`
 `db.users.find({"name":{"$ne":"refactor1"}})`  
-`db.collections.findOne({"gateWayPayInfo.gateWayPayorderInfo.outOrderId" : "20150809173033000000000000005503"});`  
+`db.collections.findOne({"gateWayPayInfo.gateWayPayorderInfo.outOrderId" : "20150809173033000000000000005503"});`
+`db.inventory.find( { qty: { $ne: 20 } } )`
 `db.notes.find({"title": {'$regex': "夏天来啦", "$options": 'i'})`
 
 search with `special_||vertial_bar`:
@@ -115,6 +109,8 @@ search with `special_||vertial_bar`:
         `db.notes.find({"title" : {"$regex":"special_||vertial_bar".replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&")}})`
 
 `db.getCollection('notes_records').distinct("last_update_time_format", {"id" : "5ed4d78c0000000001001be8"})`
+
+`db.monthlyBudget.find( { $expr: { $gt: [ "$spent" , "$budget" ] } } )`
 
 #### 使用"$in","$nin","$or", "$not", $and 查询
 
@@ -181,6 +177,8 @@ use a regular expression to do case insensitive matching, Joe or joe
 If we want to match not only various capitalizations of joe, but also joey  
 `> db.users.find({"name" : /joey?/i})`
 
+`db.test.find({$or: [{platform_user_id: {'$regex': "123031", "$options": 'i'}}, {nickname: {'$regex': "123031", "$options": 'i'}}]})`
+
 #### Querying Arrays
 
 Arrays are always 0-indexed  
@@ -228,6 +226,12 @@ return pages in the middle of the results by taking an offset and the number of 
 use "$elemMatch" to force MongoDB to compare both clauses with a single array element:  
 `db.test.find({"x" : {"$elemMatch" : {"$gt" : 10, "$lt" : 20}})`  
 
+###### [$elemMatch projection](https://docs.mongodb.com/manual/reference/operator/projection/elemMatch/)
+
+The `$elemMatch` operator limits the contents of an `<array>` field from the query results to contain only the first element matching the `$elemMatch` condition.
+
+`db.getCollection('keyword_search_result').find({ "keyword" : "身材",notes:{$elemMatch:{"id" : "5efdbd6000000000010031d0"}}},{"notes.index":1, "notes": {$elemMatch: {id: "5e92b2630000000001000b0b"}}, "notes.id":1})`
+
 #### Querying on Embedded Documents
 
 have a document that looks like this:
@@ -244,9 +248,20 @@ have a document that looks like this:
 
 Query: `db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})`  
 
+##### Query an Array of Embedded Documents
+
+[Query for a Document Nested in an Array](https://docs.mongodb.com/manual/tutorial/query-array-of-documents/)
+
+`db.test.find({"products.product_id": {$exists: true}}, {products:1}).count()`
+`db.test.find({"products.product_id": 20}, {products:1}).count()`
+`db.test.find({"products.0.product_id": 20})` 查找数组内第一个元素的 product_id =20
+`db.test.find({"products.1.product_id": 20})` 查找数组内第二个元素的 product_id =20
+
 ### $where Queries
 
 ### aggregate
+
+[Aggregation](https://docs.mongodb.com/manual/core/aggregation-pipeline/)
 
 ``` js
 db.note_delta.aggregate([
@@ -263,6 +278,19 @@ db.note_delta.aggregate([
             'comments_count': {$sum: '$comments_count'}, 'shared_count': {$sum: '$shared_count'}, 'fans_count': {$sum: '$fans_count'}
         }
     }
+    ])
+
+# group by mutiple fileds
+db.broadcaster.aggregate([
+        {$match: {"status": {$in: [0,1,2]}
+                 }
+        },
+        { $group: {_id: {
+            medium_id: "$medium_id",
+            status: "$status"
+            },
+            count: { $sum: NumberInt(1)}}},
+        {$sort: {"_id.status": 1, "count": 1}}
     ])
 
 # 平均值
@@ -299,6 +327,22 @@ db.coll.find().sort( {"a":1} ).skip(count / 2 - 1).limit(2);
 
 // # join 操作  
 // https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/
+SELECT *, <output array field>
+FROM collection
+WHERE <output array field> IN (SELECT *
+                               FROM <collection to join>
+                               WHERE <foreignField>= <collection.localField>);
+
+{
+   $lookup:
+     {
+       from: <collection to join>,
+       localField: <field from the input documents>,
+       foreignField: <field from the documents of the "from" collection>,
+       as: <output array field>
+     }
+}
+
 # select operator_id, user_id, follow_users.fans
     from users_operator_follow, users
     where operator_id= 1253 and follow_status = 1 and user_id = users.id
@@ -314,6 +358,43 @@ db.users_operator_follow.aggregate([{$match: {"operator_id" : 1253, "follow_stat
   },
   {$project: {"operator_id" : 1, "user_id" : 1, "follow_status" : 1, "follow_users":{"id" : 1,"fans" : 1,"follows" : 1}}}
 ])
+
+
+
+SELECT *, <output array field>
+FROM collection
+WHERE <output array field> IN (SELECT <documents as determined from the pipeline>
+                               FROM <collection to join>
+                               WHERE <pipeline> );
+{
+   $lookup:
+     {
+       from: <collection to join>,
+       let: { <var_1>: <expression>, …, <var_n>: <expression> },
+       pipeline: [ <pipeline to execute on the collection to join> ],
+       as: <output array field>
+     }
+}
+
+// 根据表达式排序
+db.notes.aggregate([
+    {$match:{ kind:1,
+        "time_put_in_format": {'$gte': ISODate("2020-06-27T20:00:00.000+08:00"), '$lte': ISODate("2020-07-27T00:00:00.000+08:00")},
+         $expr: {$and:[
+                    {$gt: [{$subtract: ["$liked_and_collected", "$custom_put_in_liked_and_collected"]}, 100]} ,
+                    {$lte: [{$subtract: ["$liked_and_collected", "$custom_put_in_liked_and_collected"]}, 1000]} ,
+               ]
+           }
+    }},
+    {$project:{
+        'id':1,'time_put_in_format':1,'liked_and_collected':1, 'custom_put_in_liked_and_collected':1,
+        'subtract_liked_and_collected': {$subtract: ["$liked_and_collected", "$custom_put_in_liked_and_collected"]}
+        }
+    },
+    {$sort:{"liked_and_collected":1, "substract":-1}
+    }
+])
+
 
 ```
 
@@ -366,6 +447,8 @@ db.blog.find()
 post.comment=[]
 db.blog.update({"title":"title"},post)
 
+`db.getCollection('operator').insert({created: Date(), updated:ISODate()})`  created 是字符串, updated 是 `ISODate("2020-09-11T14:09:38.639+08:00")`
+
 joe={"name","joe"}
 joe.relationships={"friends":2,"enemies":3}
 db.users.insert(joe)
@@ -375,25 +458,74 @@ delete joe.name
 db.users.update({"name":"joe"},joe)
 db.users.update({"name":"joe"},{"$set":{"age":20}})
 
-更新多个文档: db.tasks.update({}, {$set:{"mode":"0"}},{multi:true})
+更新多个文档: `db.tasks.update({}, {$set:{"mode":"0"}},{multi:true})`
+Rename a Field `db.students.updateMany( {}, { $rename: { <field1>: <newName1>, <field2>: <newName2> } } )`
+
+更新自一个字段
+
+```sh
+db.getCollection('tbk').find({}).forEach(
+   function(item){
+       db.getCollection('tbk').update({"_id":item._id},{$set:{"data_create_time":item.data_createtime}})
+   }
+)
+```
 
 `{ "_id" : ObjectId("55b61a2634a254ddb211bf32"), "relationships" : { "friends" : 2, "enemies" : 3 }, "username" : "joe" }`
 
-#### Drop column $unset
+#### Drop column delete field $unset
 
-db.coll.update({filter}, {$unset: {column_name:""}})
+db.coll.update({filter}, {$unset: {column_name: ""}})
 
 db.notes_operator_favorite.update({ status: 1 }, { $unset: { status: ""} })
 
 #### Convert type of a field
 
-[$type](https://docs.mongodb.com/manual/reference/operator/query/type/)
+[$type](https://docs.mongodb.com/manual/reference/operator/query/type/#available-types)
 
 ``` shell
-db.users_operator_follow.find( {operator_id:{$type:2}} ).forEach( function (x) { //$type:2 string
+db.users_operator_follow.find( {operator_id:{$type: "string"}} ).forEach( function (x) { //$type:2 string
   x.operator_id = new NumberInt(x.operator_id); // convert field to NumberInt
   db.users_operator_follow.save(x);
 });
+```
+
+#### Array update
+
+[`$[<identifier>]`](https://docs.mongodb.com/manual/reference/operator/update/positional-filtered/)
+
+```JavaScript
+db.collection.updateMany(
+   { <query conditions> },
+   { <update operator>: { "<array>.$[<identifier>]" : value } },
+   { arrayFilters: [ { <identifier>: <condition> } ] }
+)
+
+//documents
+{
+    "_id" : ObjectId("5f5a01be085a11b1c155f671"),
+    "products" : [
+        {
+            "product_commission_rate" : 20,
+            "product_id" : 20,
+            "product_name" : "minic充电款体脂秤",
+            "product_price" : 80,
+            "product_tb_id" : "521066652216"
+        }
+    ]
+}
+
+//sql
+db.test.update(
+   { },
+   { $set: { "products.$[elem].product_tb_id" : "111111" } },
+   {
+     multi: true,
+     arrayFilters: [ { "elem.product_id": 20 } ]
+   }
+)
+
+db.test.update({"products.product_id": 20}, {$set: {"products.0.product_tb_id" : "111111"}}, {multi:true})
 ```
 
 ### Dump & Restore
@@ -405,6 +537,20 @@ mongodump -h dbhost -u user -p pwd --authenticationDatabase=admin -d dbname -o d
 mongorestore
 mongorestore -h 127.0.0.1:27017 -d dbName /path/to/dbName
 mongorestore -h 127.0.0.1:27017 -u user -p pwd --authenticationDatabase=admin -d dbname dbname_bak
+
+export and import data collection
+[mongoexport](https://docs.mongodb.com/v3.6/reference/program/mongoexport/#cmdoption-mongoexport-uri)
+`mongoexport --uri 'mongodb://username:pwd@localhost:27017/db?authsource=admin' --type=csv --collection coll --fields _id,name,url --query='{}' --out rec.csv`
+`mongoimport --file <filename>.json`
+
+options:
+  -h [ --host ] arg         mongo host to connect
+  -u [ --username ] arg     username
+  -p [ --password ] arg     password
+  -d [ --db ] arg           database to use
+  -c [ --collection ] arg   collection to use (some commands)
+  -q [ --query ] arg        query filter, as a JSON string
+  -o [ --out ] arg          output file; if not specified, stdout is used
 
 ### Advanced commands
 
@@ -463,6 +609,8 @@ db.createUser(
 
 ## Profile 优化
 
+[MongoDB Performance](https://docs.mongodb.com/manual/administration/analyzing-mongodb-performance)
+
 ### Command
 
 `mongotop -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`  
@@ -470,11 +618,40 @@ db.createUser(
 [mongottop](https://docs.mongodb.com/manual/reference/program/mongotop/ )  
 [mongostat](https://docs.mongodb.com/manual/reference/program/mongostat/#fields )  
 
+`db.currentOp()` Seeing the Current Operations 寻找有问题的操作
 `db.runCommand( { serverStatus: 1 } )`  
 `db.COLLECTION_NAME.stats()`  
-
-`db.currentOp()` Seeing the Current Operations 寻找有问题的操作 [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )  
 `db.killOp(<opid>)` get opid from `db.currentOp()`  
+`db.runCommand( { serverStatus: 1, workingSet: 1 } )` collect the statistics about your server and analyze your server stats.
+In output of the serverStatus command you should pay attention to:
+    mem contains info about the current memory usage (virtual and phyisical i.e. resident)
+    workingSet section contains values useful for estimating the size of the working set, which is the amount of data that MongoDB uses actively.
+    extra_info - especially the page_faults counter
+
+#### [Database Profiling](https://docs.mongodb.com/manual/administration/analyzing-mongodb-performance/#database-profiling )
+
+`db.getProfilingStatus()` 查看当前的分析级别和慢查询阈值
+`db.setProfilingLevel(1, 1000)`  设置分析级别为 1, 并且记录 1000 毫秒以上的慢查询
+`db.setProfilingLevel(2)` Level 2 means “profile everything.”  
+`db.system.profile.find( {millis: {$gt: 5}})`  
+`db.system.profile.find().pretty()`  
+
+#### [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )  
+
+`db.currentOp()` Seeing the Current Operations 寻找有问题的操作
+重点关注以下几个字段:
+    `opid` 操作的唯一标识符。如果有需要，可以通过db.killOp(opid)直接终止该操作。 
+    `secs_running` 表示该操作已经执行的时间，单位为秒。如果该字段返回的值特别大，需要查看请求是否合理。
+    `ns` 该操作目标集合。
+    `op` 表示操作的类型。通常是查询、插入、更新、删除中的一种。
+    `locks` 跟锁相关的信息
+
+`db.currentOp({"active" : true, "secs_running":{$gt: 10}})`
+
+#### 分析MongoDB数据库的慢请求
+
+全表扫描（关键字： COLLSCAN、 docsExamined ）docsExamined的值，可以查看到一个查询扫描了多少文档。该值越大，请求所占用的CPU开销越大。
+不合理的索引（关键字： IXSCAN、keysExamined ）keysExamined字段，可以查看到一个使用了索引的查询，扫描了多少条索引。该值越大，CPU开销越大。
 
 #### [explain](https://docs.mongodb.com/manual/reference/explain-results/ )
 
@@ -530,14 +707,6 @@ db.createUser(
 `"nscanned" : 6632` The number of index entries looked at if an index was used. If this was a table scan, it is the number of documents examined.  
 
 Refer to P100, Using explain() and hint(), MongoDB权威指南第2版 MongoDB The Definitive Guide  
-
-#### [Database Profiling](https://docs.mongodb.com/manual/administration/analyzing-mongodb-performance/#database-profiling )
-
-`db.getProfilingLevel()` 查看当前的分析级别  
-`db.setProfilingLevel(1)`  
-`db.setProfilingLevel(2)` Level 2 means “profile everything.”  
-`db.system.profile.find( { millis : { $gt : 5 } } )`  
-`db.system.profile.find().pretty()`  
 
 ### [Troubleshooting MongoDB 100% CPU load and slow queries](https://medium.com/@igorkhomenko/troubleshooting-mongodb-100-cpu-load-and-slow-queries-da622c6e1339)
 
