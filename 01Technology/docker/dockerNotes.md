@@ -116,6 +116,8 @@ https://mirror.ccs.tencentyun.com
 start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
 start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
 start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorflow`
+`docker run --name redis -p 6379:6379 -d redis`
+`docker run --name mongo -d mongo:4.2.7`
 
 ### CentOS
 
