@@ -156,7 +156,7 @@ crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
 
 ##### Basic command
 
-``` shell
+``` bash
 service rabbitmq-server statrt
 service rabbitmq-server stop
 service rabbitmq-server status
@@ -175,7 +175,7 @@ curl -X DELETE -i -u guest:guest "http://localhost:15672/api/queues/local/gongzh
 查看用户 `rabbitmqctl list_users`
 By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
 
-``` shell
+``` bash
 rabbitmqctl add_user admin password
 rabbitmqctl set_user_tags admin administrator
 rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
@@ -196,7 +196,7 @@ The OS limits are controlled via a configuration file at `/etc/systemd/system/ra
 
 install erlang  
 
-``` shell
+``` bash
 wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
 dpkg -i erlang-solutions_1.0_all.deb
 apt update
