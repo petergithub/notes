@@ -980,6 +980,16 @@ log path: `/var/log/messages` or `/var/log/cron*`
 2. 脚本执行要用到java或其他环境变量时，通过source命令引入环境变量  `source $HOME/.bash_profile`
 3. 在crontab 脚本行 加入`source /etc/profile;`
 
+`10 1 * * 6,0 /usr/local/etc/rc.d/lighttpd restart` 表示每周六、周日的1 : 10重启lighttpd
+`* */1 * * * /usr/local/etc/rc.d/lighttpd restart` 每一小时重启lighttpd
+`* 23-7/1 * * * /usr/local/etc/rc.d/lighttpd restart` 晚上11点到早上7点之间，每隔一小时重启lighttpd
+`0 11 4 * mon-wed /usr/local/etc/rc.d/lighttpd restart` 每月的4号与每周一到周三的11点重启lighttpd
+Question mark (?)
+    In some implementations, used instead of '*' for leaving either day-of-month or day-of-week blank. Other cron implementations substitute "?" with the start-up time of the cron daemon, so that ? ? `* * * * would be updated to 25 8 * * * *` if cron started-up on 8:25am, and would run at this time every day until restarted again.[20]
+
+Slash (/)
+Note that frequencies in general cannot be expressed; only step values which evenly divide their range express accurate frequencies (for minutes and seconds, that's /2, /3, /4, /5, /6, /10, /12, /15, /20 and /30 because 60 is evenly divisible by those numbers; for hours, that's /2, /3, /4, /6, /8 and /12); all other possible "steps" and all other fields yield inconsistent "short" periods at the end of the time-unit before it "resets" to the next minute, second, or day; for example, entering */5 for the day field sometimes executes after 1, 2, or 3 days, depending on the month and leap year; this is because cron is stateless (it does not remember the time of the last execution nor count the difference between it and now, required for accurate frequency counting—instead, cron is a mere pattern-matcher).
+
 当手动执行脚本OK，但是crontab死活不执行时。这时必须大胆怀疑是环境变量惹的祸，并可以尝试在crontab中直接引入环境变量解决问题。如：
 `0 * * * * . /etc/profile; sh /path/to/script.sh`  
 
@@ -1697,6 +1707,18 @@ And here is what you get back:
 ```
 
 #### options
+
+### wget
+
+``` shell
+wget http://127.0.0.1 \
+    -q -O --header="Content-Type:application/json" 
+    --post-file=foo.json \
+
+wget 'http://www.example.com:9000/json' \
+    -O --header='Content-Type:application/json' \
+    --post-data='{"some data to post..."}'
+```
 
 ### rsync
 
@@ -3377,7 +3399,7 @@ fmask: file umask
 2     write  
 1     execute  
 
-#### NTFS permission The mode is determined by the partition''s mount options
+#### NTFS permission The mode is determined by the partition's mount options
 
 bash script.sh    #You can always explicitly invoke the script interpreter  
 
