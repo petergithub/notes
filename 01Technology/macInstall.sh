@@ -51,6 +51,14 @@ brew install node
 ## Or using the mysql command
 #mysql --version
 
+## nginx
+#Docroot is: /usr/local/var/www
+#The default port has been set in /usr/local/etc/nginx/nginx.conf to 8080 so that
+#nginx can run without sudo.
+#nginx will load all files in /usr/local/etc/nginx/servers/.
+#To have launchd start nginx now and restart at login:  brew services start nginx
+#Or, if you don't want/need a background service you can just run: nginx
+
 
 # other software
 brew install mycli
@@ -65,8 +73,16 @@ brew cask install xmind calibre virtualbox alfred
 # Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
 
 # Visual Studio Code (vscode)
-# use CMD+[1-9] to switch between tabs: Code > Preferences > Keyboard Shortcuts > keybindings.json add line in https://stackoverflow.com/a/46087295/1086907
-# https://stackoverflow.com/questions/39245966/vs-code-possible-to-switch-tabs-files-with-cmdnumbers/41112036
+# Customize shortcut:
+# 1. "Control space" -> "Shift space"
+# 2. "duplicate selection" -> "command+D"
+# 3. use CMD+[1-9] to switch between tabs: Code > Preferences > Keyboard Shortcuts > keybindings.json add line in https://stackoverflow.com/a/46087295/1086907
+#    https://stackoverflow.com/questions/39245966/vs-code-possible-to-switch-tabs-files-with-cmdnumbers/41112036
+# File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
+# add to PATH environment: `command palette -> shell command install`
+#### VScode Plugin
+# [VSCodeVim](https://github.com/VSCodeVim/Vim) config with [Input Method](https://github.com/VSCodeVim/Vim#input-method)
+
 
 # atom
 # Generate TOC (table of contents) of headlines from parsed markdown file. https://atom.io/packages/markdown-toc

@@ -1,6 +1,6 @@
 # Mac Note
 
-System Preferences >> Keyboard >> Shortcuts 的 App Shortcuts 为任何软件菜单里的项目设置快捷键
+`System Preference -> Keyboard -> Shortcuts -> App Shortcuts -> +` 为任何软件菜单里的项目设置快捷键
 `Command+Shift+5` capture screenshot
 `unar -encoding GBK file.zip` 解压缩文件避免乱码
 `md5 -s string`
@@ -78,7 +78,7 @@ ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/Idea
 7. "Apropos" terminal pops up when typing cmd+shift+A to get actions: System Preferences | Keyboard | Shortcuts | Services | disable Search man Page Index in Terminal
 8. Preferences -> Editor -> File and code templates -> Includes tab (on the right). There is a template header
 
-```code
+``` code
     /**
     * @author Myname
     */
@@ -144,14 +144,9 @@ JRebel for IntelliJ: 热部署插件
 
 `Command+Shift+P` open command palette
 `Shift+Option+Click` block selection
-Customize shortcut: `System Preference -> Keyboard -> Shortcuts -> App Shortcuts -> +`
 File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 
 add to PATH environment: `command palette -> shell command install`
-
-#### VScode Plugin
-
-[VSCodeVim](https://github.com/VSCodeVim/Vim) config with [Input Method](https://github.com/VSCodeVim/Vim#input-method)
 
 ### Mac common
 
@@ -304,6 +299,12 @@ restart the service  `sudo pfctl -f /etc/pf.conf`
 ### Issue
 
 #### dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
-
 `ls -al /usr/local/Cellar/openssl`
+
+[dyld: Library not loaded error on macOS (OpenSSL missing) #86](https://github.com/kelaberetiv/TagUI/issues/86#issue-303370944)
+This error is happening because macOS decided to drop OpenSSL and switched to LibreSSL. Furthermore, macOS Homebrew switched from OpenSSL v.1.0 to v1.1, breaking many other apps that are dependent on OpenSSL v1.0. 
+`brew uninstall openssl; brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb`
+
 `brew switch openssl 1.0.2s`
+
+
