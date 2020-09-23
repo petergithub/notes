@@ -157,10 +157,10 @@ crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
 ##### Basic command
 
 ``` shell
-sudo service rabbitmq-server statrt
-sudo service rabbitmq-server stop
-sudo service rabbitmq-server status
-sudo rabbitmqctl status
+service rabbitmq-server statrt
+service rabbitmq-server stop
+service rabbitmq-server status
+rabbitmqctl status
 rabbitmqctl environment # 环境信息
 
 rabbitmqctl list_vhosts
@@ -172,16 +172,19 @@ rabbitmqctl purge_queue queue.name.development -p <vhost>
 curl -X DELETE -i -u guest:guest "http://localhost:15672/api/queues/local/gongzhonghao.refreshAccessToken.queue.name.development"
 ```
 
-查看用户 `sudo rabbitmqctl list_users`
+查看用户 `rabbitmqctl list_users`
 By default, RabbitMQ have a user named guest with password guest. We will create own administrator account on RabbitMQ server, change password :
 
 ``` shell
-sudo rabbitmqctl add_user admin password
-sudo rabbitmqctl set_user_tags admin administrator
-sudo rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+rabbitmqctl add_user admin password
+rabbitmqctl set_user_tags admin administrator
+rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
+
+rabbitmqctl add_vhost vhost_name
+rabbitmqctl set_permissions -p vhost_name admin ".*" ".*" ".*"
 ```
 
-RabbitMQ has a web management console. To enable web management console run : `sudo rabbitmq-plugins enable rabbitmq_management`
+RabbitMQ has a web management console. To enable web management console run : `rabbitmq-plugins enable rabbitmq_management`
 `http://localhost:15672/   guest / guest`
 
 `curl -i -u guest:guest "http://localhost:15672/api/overview"`  
@@ -195,12 +198,12 @@ install erlang
 
 ``` shell
 wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-sudo dpkg -i erlang-solutions_1.0_all.deb
+dpkg -i erlang-solutions_1.0_all.deb
 apt update
 apt install erlang erlang-nox
 ```
 
-install rabbitmq `sudo apt-get install rabbitmq-server`  
+install rabbitmq `apt-get install rabbitmq-server`  
 
 #### memcached
 
