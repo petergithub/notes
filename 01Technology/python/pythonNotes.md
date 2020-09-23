@@ -35,6 +35,13 @@ index-url = http://mirrors.aliyun.com/pypi/simple/
 trusted-host=mirrors.aliyun.com
 ```
 
+[config-file](https://pip.pypa.io/en/stable/user_guide/#config-file)
+If multiple configuration files are found by pip then they are combined in the following order:
+
+1. The global file is read
+2. The per-user file is read
+3. The virtualenv-specific file is read
+
 ### [Conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 
 [Command reference](https://conda.io/projects/conda/en/latest/commands.html)
@@ -78,6 +85,7 @@ Install packages within a virtual environment without affecting the host system 
 
 `pip freeze > requirements.txt` generate a requirements.txt file
 `pip install -r requirements.txt` # Install from our fancy new file
+`pip uninstall somepackage`
 
 ``` shell
 # https://github.com/Damnever/pigar
