@@ -25,7 +25,6 @@ Enable: `setenforce enforcing`
 关闭防火墙 `service iptables stop`
 重启防火墙 `service iptables restart`
 去掉开机启动 `chkconfig --del iptables`
-查看防火墙信息 `service iptables status`
 
 #### 开放端口
 
@@ -128,10 +127,10 @@ hostnamectl set-hostname new-hostname
 说明：CentOS 7.x默认安装好之后是没有自动开启网络连接的，所以需要我们自己配置。
 在命令行输入 `vi /etc/sysconfig/network-scripts/ifcfg-ens33`  #编辑配置文件，添加修改或添加以下内容。
 
-``` shell
+``` bash
 ONBOOT=yes  #开启自动启用网络连接
 BOOTPROTO=static #启用静态IP地址
-IPADDR=172.17.0.23
+IPADDR=172.17.0.22
 GATEWAY=172.17.0.1   #设置网关
 NETMASK=255.255.254.0
 DNS1=114.114.114.114
@@ -144,14 +143,48 @@ DNS2=8.8.8.8
 `ping www.baidu.com`  #测试网络是否正常
 `ip addr`  #查看IP地址
 
+### 自定义yum源、NTP服务和DNS服务
+
+```sh
+#!/bin/sh
+# Modify DNS
+echo "nameserver 8.8.8.8" | tee /etc/resolv.conf
+
+# Modify yum repo and update
+
+# example 1 https://help.aliyun.com/document_detail/120851.html
+sudo mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+sudo wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+sudo yum clean all && sudo yum makecache
+
+# example 2
+rm -rf /etc/yum.repos.d/*
+touch myrepo.repo
+echo "[base]" | tee /etc/yum.repos.d/myrepo.repo
+echo "name=myrepo" | tee -a /etc/yum.repos.d/myrepo.repo
+echo "baseurl=http://mirror.centos.org/centos" | tee -a /etc/yum.repos.d/myrepo.repo
+echo "gpgcheck=0" | tee -a /etc/yum.repos.d/myrepo.repo
+echo "enabled=1" | tee -a /etc/yum.repos.d/myrepo.repo
+
+
+yum update -y
+# Modify NTP Server
+echo "server ntp1.aliyun.com" | tee /etc/ntp.conf
+systemctl restart ntpd.service
+```
+
 ## Software
 
 ### yum
 
+```bash
 yum remove git
 yum clean all
 yum install git
 yum reinstall git
+# search for what package
+yum provides git
+```
 
 `yum install {package-name-1} {package-name-2}` install the specified packages [ RPM(s) ]
 `yum localinstall foo.rpm` `yum https://server1.cyberciti.biz/foo.rpm` To install a package from a local file called foo.rpm or http, or ftp mirror:
@@ -194,7 +227,7 @@ yum reinstall git
 
 [How to install latest version of git on CentOS 7.x/6.x](https://stackoverflow.com/questions/21820715/how-to-install-latest-version-of-git-on-centos-7-x-6-x)
 
-``` shell
+``` bash
 yum install -y http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm
 - or -
 yum install -y http://opensource.wandisco.com/centos/7/git/x86_64/wandisco-git-release-7-1.noarch.rpm
@@ -243,7 +276,7 @@ git --version
 
 #### localectl 查看本地化设置
 
-```shell
+```bash
 # 查看本地化设置
 $ localectl
 
@@ -254,7 +287,7 @@ $ sudo localectl set-keymap en_GB
 
 #### timedatectl 查看时区设置
 
-```shell
+```bash
 # 查看当前时区设置
 $ timedatectl
 
@@ -269,7 +302,7 @@ $ sudo timedatectl set-time HH:MM:SS
 
 #### loginctl 查看登录用户
 
-```shell
+```bash
 # 列出当前session
 $ loginctl list-sessions
 
