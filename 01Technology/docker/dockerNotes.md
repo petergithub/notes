@@ -57,13 +57,17 @@ connect from a container to a service on the host: connect to the special DNS na
 `docker rm $(docker ps -a -q | grep -v $(docker ps -q))` Remove all containers from this machine except the running one
 `docker rm $(docker ps -a -q)` Remove all containers from this machine
 `docker rmi <image_id/image_name ...>`  
+`docker image prune` clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. [Prune unused Docker objects](https://docs.docker.com/config/pruning/)
 
-`docker save <image-id>` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
-`docker export <container-id>` `docker export`命令创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
+`docker save <image-id> -o filename` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
+`docker load -i filename` Load an image from a tar archive or STDIN
+
+`docker export <container-id>` 将 container 创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
+`docker import`
 
 #### build image with Dockerfile
 
-`docker image build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`  
+`docker build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`  
 
 [Dockerfile最佳实践](https://zhuanlan.zhihu.com/p/75013836)
 将标准日志与错误日志分别输出到stdout与stderr
@@ -159,9 +163,9 @@ CMD ["/usr/sbin/init"]
 
 or  
 Transferring a Docker image via SSH, bzipping the content on the fly, put pv in the middle of the pipe to see how the transfer is going  
-`docker save <image> | bzip2 | pv | ssh user@host 'bunzip2 | docker load'`	
+`docker save <image> | bzip2 | pv | ssh user@host 'bunzip2 | docker load'`
 
-#### Docker commit the changes you make to the container and then run it.
+#### Docker commit the changes you make to the container and then run it
 
 1. `sudo docker pull ubuntu`
 2. `sudo docker run ubuntu apt-get install -y ping`

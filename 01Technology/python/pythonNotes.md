@@ -2,11 +2,10 @@
 
 ## Introduction
 
-### TODO
+### Recent
 
-IDE: PyCharm
-Editor: vim + vim-flake8
-Python的集成开发环境(IDE)有很多，其中Spyder和Python Notebook最受欢迎
+requests.exceptions.SSLError: HTTPSConnectionPool(host='pypi.org', port=443): Max retries exceeded with url: /pypi/loguru/json (Caused by SSLError("Can't connect to HTTPS URL because the SSL module is not available.",))
+`pip install pyopenssl`
 
 文件编码 `# encoding:utf-8`
 
@@ -26,8 +25,9 @@ use proxy `pip install -i http://pypi.douban.com/simple  --proxy http://localhos
 
 [configuration](https://pip.pypa.io/en/stable/user_guide/#configuration)
 
-``` shell
-vi ~/.config/pip/pip.conf //linux or MacOS
+`vi ~/.config/pip/pip.conf //linux or MacOS`
+
+``` config
 [global]
 timeout = 6000
 index-url = http://mirrors.aliyun.com/pypi/simple/
@@ -55,6 +55,7 @@ If multiple configuration files are found by pip then they are combined in the f
 `conda info --envs` list of all your environments
 `conda activate` Change your current environment back to the default (base)
 `conda deactivate` deactive conda
+`conda remove --name ENVNAME --all` Delete an entire environment
 
 #### Manage packages
 
@@ -87,7 +88,7 @@ Install packages within a virtual environment without affecting the host system 
 `pip install -r requirements.txt` # Install from our fancy new file
 `pip uninstall somepackage`
 
-``` shell
+``` bash
 # https://github.com/Damnever/pigar
 pip install pigar
 # Generate requirements.txt for current directory.
@@ -100,6 +101,44 @@ $ pigar -p ../dev-requirements.txt -P ../
 
 And to exit virtualenv later:
 `deactivate  # don't exit until you're done using python`
+
+### requirement.txt
+
+#### [Version specifiers](https://www.python.org/dev/peps/pep-0440/#version-specifiers)
+
+The comparison operator determines the kind of version clause:
+~=: Compatible release clause
+==: Version matching clause
+!=: Version exclusion clause
+<=, >=: Inclusive ordered comparison clause
+<, >: Exclusive ordered comparison clause
+===: Arbitrary equality clause.
+[Compatible release](https://www.python.org/dev/peps/pep-0440/#compatible-release)
+
+example:
+-r base.txt # base.txt下面的所有包
+pypinyin==0.12.0 # 指定版本（最日常的写法）
+django-querycount>=0.5.0 # 大于某个版本
+django-debug-toolbar>=1.3.1,<=1.3.3 # 版本范围
+ipython # 默认（存在不替换，不存在安装最新版）
+SomeProject~=1.4.2  # To install a version that’s compatible with a certain version
+
+#### 第三方工具生成
+
+pip freeze 会附带上一些不需要的包，以及某些包依赖的包~
+pipreqs 自动分析项目中引用的包。对Django项目自动构建的时候忽略了Mysql包，版本也很奇怪；而且联网搜索的时候遇到404就报错跳出了?
+pigar 功能同上，会显示包被项目文件引用的地方（搜索下就能解决的问题啊= =感觉是伪需求），404的问题也存在
+pip-tools 通过第三方文件生成requirements.txt，讲道理为什么不直接写呢，要通过第三方包来做一层转换
+
+#### 推荐用法
+
+一般项目会分为开发环境，测试环境，生产环境等……依赖的包会不同。推荐在文件夹下为每个环境建立一个requirements.txt文件。公有的包存在base.txt供引用
+
+➜ meeting git:(sync) ✗ tree requirements -h
+requirements
+├── [ 286] base.txt
+├── [ 80] local.txt
+└── [ 28] production.txt
 
 ### permission issue
 

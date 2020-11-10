@@ -17,7 +17,6 @@
 `git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git rev-list --all | xargs git grep <string>`
 `ssh -v git@gitlab.com` get `Welcome to GitLab, Anonymous!`
-`ssh -v shangpu@git.picooc.com` get `Welcome to GitLab, Anonymous!`
 
 `HEAD^` 上一个版本
 `HEAD^^` `HEAD~2` 倒数第2个版本

@@ -54,18 +54,22 @@ Load/Unload modules is like close project in eclipse
 
 #### 调试快捷键
 
-    F7：Step into
-    F8：Step over
-    F9：Run
-    Shift+F7：Smart step into（弹出对话框让你选择进入哪个方法）
-    Shift+F8：Step out
-    Ctrl+F8 / Command+F8：Toggle Breakpoint
-    Option+F8：Evaluate expression
-    Option+F9：Run To Cursor
+F7：Step into
+F8：Step over
+F9：Run
+Shift+F7：Smart step into（弹出对话框让你选择进入哪个方法）
+Shift+F8：Step out
+Ctrl+F8 / Command+F8：Toggle Breakpoint
+Option+F8：Evaluate expression
+Option+F9：Run To Cursor
 
 ##### Config
 
 ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/IdeaIC2019.1
+pycharm: Directories Used by PyCharm https://www.jetbrains.com/help/pycharm/directories-used-by-the-ide-to-store-settings-caches-plugins-and-logs.html
+ Configuration directory: ~/Library/Application Support/JetBrains/PyCharmCE2020.1
+ Plugins directory:     ~/Library/Application Support/JetBrains/<product><version>/plugins
+ Logs directory:     ~/Library/Logs/JetBrains/<product><version>
 
 1. To enable repeating j: type this in the mac terminal: `defaults write -g ApplePressAndHoldEnabled -bool false`
 2. Preference -> KeyMap -> completion ->
@@ -78,10 +82,10 @@ ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/Idea
 7. "Apropos" terminal pops up when typing cmd+shift+A to get actions: System Preferences | Keyboard | Shortcuts | Services | disable Search man Page Index in Terminal
 8. Preferences -> Editor -> File and code templates -> Includes tab (on the right). There is a template header
 
-``` code
-    /**
-    * @author Myname
-    */
+```java
+/**
+* @author Myname
+*/
 ```
 
 9. Live template: Preferences -> Editor -> Live template, location: ~/Library/Preferences/IdeaIC2018.3/templates/user.xml
@@ -117,14 +121,14 @@ Allocating conflicting keystrokes to IdeaVim: Preference -> Editor -> Vim Emulat
 ##### [Directories used](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519)
 
 PRODUCT: IdeaIC2018.3
-    Configuration (idea.config.path): `~/Library/Preferences/<PRODUCT><VERSION>`
-    Caches (idea.system.path): `~/Library/Caches/<PRODUCT><VERSION>`
-    Plugins (idea.plugins.path): `~/Library/Application Support/<PRODUCT><VERSION>`
-    Logs (idea.log.path): `~/Library/Logs/<PRODUCT><VERSION>`
-    Location of user-defined keymaps: `~/Library/Preferences/IdeaIC2018.2/keymaps/`
+Configuration (idea.config.path): `~/Library/Preferences/<PRODUCT><VERSION>`
+Caches (idea.system.path): `~/Library/Caches/<PRODUCT><VERSION>`
+Plugins (idea.plugins.path): `~/Library/Application Support/<PRODUCT><VERSION>`
+Logs (idea.log.path): `~/Library/Logs/<PRODUCT><VERSION>`
+Location of user-defined keymaps: `~/Library/Preferences/IdeaIC2018.2/keymaps/`
 
-    Help > Edit Custom Properties > create default idea.properties under idea.config.path: ~/Library/Preferences/IdeaIC2019.1/idea.properties
-    soft link: ~/Library/Preferences/IdeaIC2019.1 -> to ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1
+Help > Edit Custom Properties > create default idea.properties under idea.config.path: ~/Library/Preferences/IdeaIC2019.1/idea.properties
+soft link: ~/Library/Preferences/IdeaIC2019.1 -> to ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1
 
 ##### Plugin
 
@@ -142,8 +146,19 @@ JRebel for IntelliJ: 热部署插件
 
 ### vs code
 
+`Command+P` 快速跳转文件
+    `?` 其他用法输
+    `@/#{symbol}` 跳转到 当前文件/workspace 中的 symbol
+    `:{Number}` 跳转到任意行
 `Command+Shift+P` open command palette
-`Shift+Option+Click` block selection
+`Command+Shift+N` open a new window
+`Command+Shift+\` 跳转到匹配的括号
+`Command+\` split editor
+
+`Shift+Option+鼠标拖动` block selection
+`Command+Option+上下键` 在连续的多列上，同时出现光标
+`Option + 鼠标点击任意位置` 在任意位置，同时出现光标
+`Cmd + Shift + L` 在选中文本的所有相同内容处，出现光标
 File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 
 add to PATH environment: `command palette -> shell command install`

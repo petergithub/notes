@@ -635,7 +635,7 @@ escape square brackets: Brackets `[` need double escape `\\`: `\\[`
 
 awk 16进制转换
 
-``` shell
+``` bash
 echo "D0490012475E" | awk '{
     p0=("0x" $1);
     p1=(substr($1,1,2) ":" substr($1,3,2) ":" substr($1,5,2) ":" substr($1,7,2) ":" substr($1,9,2) ":" substr($1,11,2))
@@ -659,7 +659,7 @@ awk还支持命令文件 `awk -f awk_file data_file`
 
 Initialization and Final Action  
 
-``` shell
+``` bash
 
     Syntax:
     BEGIN { Actions}
@@ -671,7 +671,7 @@ Initialization and Final Action
 
 example:  
 
-``` shell
+``` bash
 
     $ awk 'BEGIN {print "Name\tDesignation\tDepartment\tSalary";}
     > {print $2,"\t",$3,"\t",$4,"\t",$NF;}
@@ -789,7 +789,7 @@ awk 中大部分指令与 C 语言中的用法一致
 
 2. Awk If Else If  
 
-    ``` shell
+    ``` bash
 
         $ cat grade.awk
         {
@@ -809,7 +809,7 @@ awk 中大部分指令与 C 语言中的用法一致
 
 3. Awk Ternary ( ?: )
 
-``` shell
+``` bash
 
     $ awk 'ORS=NR%3?",":"\n"' student-marks
     Jones 2143 78 84 77,Gondrol 2321 56 58 45,RinRao 2122 38 37
@@ -830,19 +830,25 @@ awk 中大部分指令与 C 语言中的用法一致
 
 ### xargs 工具的经典用法示例
 
-``` shell
+``` bash
 find some-file-criteria some-file-path | xargs some-great-command-that-needs-filename-arguments  
 kill -9 `ps -ef |grep GA | grep -v grep | awk '{print $2}'`  
 kill $(ps -aef | grep java | grep apache-tomcat-7.0.27 | awk '{print $2}')  
 kill -9 `netstat -ap |grep 6800 |awk '{print $7}'|awk -F "/" '{print $1}'`  
+
+find . -size +1M | xargs -I {} rm "{}"
+
+find . -name "*Conflict*" | xargs -I {} trash "{}"
+find . -print0 -name "*conflict*" | xargs -I {} trash {}
 ```
 
 `-L` Use at most max-lines nonblank input  lines  per  command  line.  每行使用的非空字符串最大个数  
+`-0`      Change xargs to expect NUL (``\0'') characters as separators, instead of spaces and newlines.  This is expected to be used in concert with the -print0 function in find(1).
 
-控制每行参数个数`-L`和最大并行数`-P`. 如果你不确定它们是否会按你想的那样工作, 先使用 xargs echo 查看一下. 此外, 使用 -I{} 会很方便. 例如:  
+控制每行参数个数`-L`和最大并行数`-P`. 如果你不确定它们是否会按你想的那样工作, 先使用 xargs echo 查看一下. 此外, 使用 `-I {}` 会很方便. 例如:  
 
-  `find . -name '*.py' | xargs grep some_function`  
-  `cat hosts | xargs -I {} ssh root@{} hostname`  
+`find . -name '*.py' | xargs grep some_function`  
+`cat hosts | xargs -I {} ssh root@{} hostname`  
   
 execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`  
 `find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`
@@ -903,7 +909,7 @@ Tue, 29 Aug 2017 21:58:33 -0800
 
 #### 日期自增
 
-``` shell
+``` bash
 
     #! /bin/bash
     # 日期自增
@@ -922,7 +928,7 @@ Tue, 29 Aug 2017 21:58:33 -0800
 在Shell中我们可以利用date命令比较两个日期的大小, 方法是先把日期转换成时间戳格式, 再进行比较.  
 date 的+%s可以将日期转换成时间戳格式,看下面的例子:  
 
-``` shell
+``` bash
 
     #!/bin/bash
     # 时间比较
@@ -957,7 +963,7 @@ crontab特殊的符号说明
 4. ","分散的数字  
 5. Percent-signs (%) requires escaped with backslash (\)
 
-``` shell
+``` bash
 
     Graphically:
 
@@ -1023,7 +1029,7 @@ If you want a command to be run once at system boot, the correct solution is to 
 
 `rpm -ql logrotate` 查看logrotate的配置文件
 
-``` shell
+``` bash
 
     /path/to/nginx/access.log  
     /path/to/other/*.log  
@@ -1146,7 +1152,7 @@ Operator    Meaning    Example
 These are similar to the Bash comparison operators && and ||, used within double brackets. `[[ condition1 && condition2 ]]`  
 The `-o` and `-a` operators work with the test command or occur within single test brackets.
 
-``` shell
+``` bash
     if [ "$expr1" -a "$expr2" ]
     # if  "$expr1" -a "$expr2"
     then
@@ -1615,6 +1621,14 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 * `-w, --write-out "@curl-format.txt"`    tells cURL to use our format file  
 * `-m, --max-time <seconds>`    超时时间. Maximum time in seconds that you allow the whole operation to  take.
 * `-F, --form`  `-F "filename=@file.tar.gz"` 上传文件
+* `-G, --get`  make all data specified with -d, --data, --data-binary or --data-urlencode to be used in an HTTP GET request instead of the POST request that otherwise would be used. The data will be appended to the URL with a '?' separator.
+* `--data-urlencode <data>` (HTTP) This posts data, similar to the other -d, --data options with the exception that this performs URL-encoding.
+
+#### encode
+
+unicode编码，所以想转成utf8看中文
+printf %b '\u6df1\u5733'
+echo '["\u6df1\u5733"]' | jq .
 
 #### Sample
 
@@ -1627,6 +1641,15 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 * socks5 proxy `curl -v https://ww.example.com --socks5-hostname localhost:7070`
 * 上传文件 `curl -F "key=value" -F "filename1=@file1.tar.gz -F "filename1=@file1.tar.gz" http://localhost/upload`
 * 上传文件数组 `curl -F "key=value" -F "files[]=@file1.tar.gz -F "files[]=@file1.tar.gz" http://localhost/upload`
+* `curl -G`
+
+    ```bash
+    curl -G \
+        --data-urlencode "p1=value 1" \
+        --data-urlencode "p2=value 2" \
+        http://example.com
+        # http://example.com?p1=value%201&p2=value%202
+    ```
 
 ##### 分段下载
 
@@ -1650,7 +1673,7 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 
 ##### Print request time detail
 
-``` shell
+``` bash
     curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com  
 ```
 
@@ -1660,7 +1683,7 @@ SSL handshake: `time_appconnect`
 Time to first byte: `time_starttransfer`  
 Total time: `time_total`  
 
-``` shell
+``` bash
     curl -w "
     namelookup: %{time_namelookup}
     tcp:        %{time_connect}
@@ -1675,7 +1698,7 @@ Total time: `time_total`
 [Timing Details With cURL](https://josephscott.org/archives/2011/10/timing-details-with-curl/)  
 Step one: create a new file, curl-format.txt, and paste in:  
 
-``` shell
+``` bash
     \n
         time_namelookup:  %{time_namelookup}\n
            time_connect:  %{time_connect}\n
@@ -1695,7 +1718,7 @@ Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://exa
 
 And here is what you get back:  
 
-``` shell
+``` bash
        time_namelookup:  0.001
           time_connect:  0.037
        time_appconnect:  0.000
@@ -1710,7 +1733,7 @@ And here is what you get back:
 
 ### wget
 
-``` shell
+``` bash
 wget http://127.0.0.1 \
     -q -O --header="Content-Type:application/json" 
     --post-file=foo.json \
@@ -1843,7 +1866,7 @@ ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大�
 
 #### Example: tmux scripts
 
-``` shell
+``` bash
 
     #!/bin/bash
     SESSION_NAME=session0
@@ -1985,7 +2008,7 @@ Common usage:
 
 `lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.  
 
-``` shell
+``` bash
 
     $ lsof
     COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
@@ -2488,7 +2511,7 @@ identify the directory which is using all your inodes:
 `for i in 1 2 3; do sudo hdparm -tT /dev/sda; done`  
 `sudo hdparm -v /dev/sda` will give information as well.
 
-``` shell
+``` bash
     sudo hdparm -Tt /dev/sda
     /dev/sda:
     Timing cached reads:   12540 MB in  2.00 seconds = 6277.67 MB/sec
@@ -2637,7 +2660,7 @@ VLAN             |    vconfig            |     ip link
     `-xa` 只查看UNIX sockets
 * `ss -s` 查看当前服务器的网络连接统计  
 
-``` shell
+``` bash
     Total: 295 (kernel 312)
     TCP:   48 (estab 1, closed 31, orphaned 0, synrecv 0, timewait 0/0), ports 13
 
@@ -2871,7 +2894,7 @@ cpu（以百分比表示）
     * `txcmp/s`: 每秒钟发送的压缩数据包  
     * `rxmcst/s`: 每秒钟接收的多播数据包  
 
-    ``` shell
+    ``` bash
 
         $ sar -n DEV 2 3
         Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015     _x86_64_    (32 CPU)
@@ -2889,7 +2912,7 @@ cpu（以百分比表示）
 
 3. 查看TCP连接状态 `sar -n TCP,ETCP 1`  
 
-    ``` shell
+    ``` bash
         $ sar -n TCP,ETCP 2 5
         Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)
         12:17:19 AM  active/s passive/s    iseg/s    oseg/s
@@ -2917,7 +2940,7 @@ To easily display all the permissions on a path, you can use `namei -om /path/to
 linux中除了常见的读（r）、写（w）、执行（x）权限以外, 还有3个特殊的权限, 分别是setuid、setgid和stick bit  
 setuid、setgid实例, /usr/bin/passwd 与/etc/passwd文件的权限  
 
-``` shell
+``` bash
 sudo ls -l /usr/bin/passwd /etc/passwd
 -rw-r--r-- 1 root root  1549 08-19 13:54 /etc/passwd
 -rwsr-xr-x 1 root root 22984 2007-01-07 /usr/bin/passwd
@@ -2927,7 +2950,7 @@ sudo ls -l /usr/bin/passwd /etc/passwd
 
 stick bit （粘贴位） 实例, 查看/tmp目录的权限  
 
-``` shell
+``` bash
 sudo ls -dl /tmp
 drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 ```
@@ -2950,7 +2973,7 @@ drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 将三个特殊位的用八进制数值表示, 放于 u/g/o 位之前. 其中 suid :4 sgid:2  sticky:1  
 也可以这样设:  
 
-``` shell
+``` bash
 setuid:chmod 4755 xxx
 setgid:chmod 2755 xxx
 stick bit:chmod 1755 xxx
@@ -3111,7 +3134,7 @@ chmod 600 .ssh/config
 > This is usually caused by inadvertently offering multiple ssh keys to the server. The server will reject any key after too many keys have been offered.
 > To prevent irrelevant keys from being offered, you have to explicitly specify this in every host entry in the ~/.ssh/config (on the client machine) file by adding IdentitiesOnly like so
 
-``` shell
+``` bash
 -o 'IdentitiesOnly yes'
 
 Host www.somehost.com
@@ -3184,7 +3207,7 @@ Classic SSH Jumphost configuration
 
 A configuration like this will allow you to proxy through HOST A.  
 
-``` shell
+``` bash
 
     $ cat .ssh/config
     Host host-a
@@ -3214,7 +3237,7 @@ Starting from OpenSSH 7.3, released August 2016, ssh support ProxyJump
 
 `ssh -J host1,host2,host3 user@host4.internal` A key thing to understand here is that this is not the same as ssh host1 then user@host1:~$ ssh host2, the -J jump parameter uses forwarding trickery so that the localhost is establishing the session with the next host in the chain.
 
-``` shell
+``` bash
     Host host2
         HostName 172.17.1.172
         Port 22

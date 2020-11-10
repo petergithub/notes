@@ -27,9 +27,9 @@ sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/i
 # source ~/.zshrc
 
 # common software install begin
-brew install tig autojump iproute2mac tldr jq
-brew cask install atom google-chrome
-brew install node
+brew install tig autojump iproute2mac tldr jq trash
+brew cask install google-chrome
+#brew install node
 
 # develop software install
 # download from mysql official website mysql-5.7.23-macos10.13-x86_64.tar.gz
@@ -62,31 +62,48 @@ brew install node
 
 # other software
 brew install mycli
+
 # How to replace Mac OS X utilities with GNU core utilities?
 # https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities
 # https://liyang85.com/install-gnu-utilities-on-macos
 # 如果不启用--with-default-names，安装的工具会被添加g前缀，使用的时候就是gsed、gfind、gtar，查看帮助文件就是man gsed
 # replace mac default sed
-brew install gnu-sed --with-default-names 
 brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep --with-default-names 
-brew cask install xmind calibre virtualbox alfred
-# Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
+
+### karabiner-elements ⌘ ⇧
+##keyboard mapping https://karabiner-elements.pqrs.org/docs/
+## 配置文件放到~/.config/karabiner/assets/complex_modifications目录下
+## refer https://v2ex.com/t/565667 短按左 Shift ⇧（英文快捷键) , 短按右 Shift ⇧（中文快捷键）
+## Complex modifications > parameters > to_if_alone_timeout_millisenconds 500, to_if_held_down_threshold_milliseconds 100
+### VirtualBox
+## Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
+brew cask install xmind calibre virtualbox alfred karabiner-elements
 
 # Visual Studio Code (vscode)
-# Customize shortcut:
+## Setting for IntelliSense https://code.visualstudio.com/docs/editor/intellisense
+# Tab Completion: By default, tab completion is disabled. Use the editor.tabCompletion setting to enable it
+#
+## Customize shortcut:
 # 1. "Control space" -> "Shift space"
 # 2. "duplicate selection" -> "command+D"
 # 3. use CMD+[1-9] to switch between tabs: Code > Preferences > Keyboard Shortcuts > keybindings.json add line in https://stackoverflow.com/a/46087295/1086907
 #    https://stackoverflow.com/questions/39245966/vs-code-possible-to-switch-tabs-files-with-cmdnumbers/41112036
+#
 # File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 # add to PATH environment: `command palette -> shell command install`
+#
+# Open iTerm external
+# User Setting: Command+Shift+P
+#"terminal.external.osxExec": "iTerm.app",
+#"terminal.integrated.fontFamily": "Meslo LG S DZ for Powerline",
+#"terminal.explorerKind": "external",
+# shortcut Ctrl+Shift+I
+#
 #### VScode Plugin
 # [VSCodeVim](https://github.com/VSCodeVim/Vim) config with [Input Method](https://github.com/VSCodeVim/Vim#input-method)
+# change input method for VSCodeVim required im-select
+# curl -Ls https://raw.githubusercontent.com/daipeihust/im-select/master/install_mac.sh | sh
 
-
-# atom
-# Generate TOC (table of contents) of headlines from parsed markdown file. https://atom.io/packages/markdown-toc
-#apm install markdown-toc 
 
 # docker
 brew cask install docker
@@ -105,7 +122,7 @@ brew cask install docker
 # [jd-GUI](http://jd.benow.ca)
 # [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
 # [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
-# [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac
+# [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac, Command+drag; start with open -a /Applications/Vanilla.app in a script ~/.script/mac_startup.sh
 # [Open Web Monitor](http://openwebmonitor.netqon.com/)
 # [kap: screen record to gif](https://getkap.co/)
 # [IINA - The modern media player for macOS](https://iina.io/)
@@ -131,6 +148,12 @@ brew cask install docker
 ### Open file with default application 
 # Command+I or right (or control) click a file of the type you want to change and:
 # "Get Info" -> "Open with:" -> (Select TextMate) -> "Change All"
+
+### Disable/change shortcut 
+# Open Apple menu | System Preferences | Keyboard | Shortcuts | Services
+# uncheck Search man Page Index in Terminal 
+# uncheck Make New Sticky Note 
+
 
 ### Write to Windows NTFS USB Disk Drives on macOS Mojave and Sierra with FUSE for macOS
 reference: https://coolestguidesontheplanet.com/how-to-write-to-windows-ntfs-external-disk-drives-on-macos-mojave-and-sierra/
@@ -165,7 +188,7 @@ sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
 # check software info from brew: brew info mysql
 # install with brew: brew install tig autojump
 # search with brew cask: brew cask search chrome
-# install with brew cask: brew cask install atom google-chrome
+# install with brew cask: brew cask install google-chrome
 # startup with brew: brew services start nginx
 # brew switch another version: brew switch python 3.6.5_1
 # brew uninstall <package_name>  

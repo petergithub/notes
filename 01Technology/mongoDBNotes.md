@@ -56,7 +56,6 @@ print (tojson(result))
 
 var date1 = Date()
 print ("end " + tojson(date1.toLocaleString()))
-~
 ```
 
 #### db
@@ -79,7 +78,12 @@ print ("end " + tojson(date1.toLocaleString()))
 创建集合 `db.createCollection(COLLECTION_NAME, options)`
 重命名 `db.COLLECTION_NAME.renameCollection("NEW_NAME")`
 集合的删除 `db.COLLECTION_NAME.drop()`  
-copy a collection from one database to new_database `db.<collection_name>.find().forEach(function(d){ db.getSiblingDB('<new_database>')['<collection_name>'].insert(d); });`
+duplicate collection in the same database
+    fastest: `mongodump -d db -c source_collection`, `mongorestore -d db -c targetcollection --dir=dump/<db>/<target_collection.bson>`
+    fast: `db.source_collection.aggregate([{ $match: {} }, { $out: "target_collection" }])`
+    slow: `db.getCollection('source_collection').find().forEach(function(docs){ db.getCollection('target_collection').insert(docs); })`
+    slow, MongoDB 4.0 or earlier versions: `db.collection.copyTo(newCollection)`
+copy a collection from one database to new_database `db.collection_name.find().forEach(function(d){ db.getSiblingDB('new_database')['collection_name'].insert(d); });`
 
 #### query
 
@@ -108,7 +112,7 @@ search with `special_||vertial_bar`:
         `db.notes.find({"title" : {"$regex":"special_\\|\\|vertial_bar"}})` or
         `db.notes.find({"title" : {"$regex":"special_||vertial_bar".replace(/[-[\]{}()*+?.,\\/^$|#\s]/g, "\\$&")}})`
 
-`db.getCollection('notes_records').distinct("last_update_time_format", {"id" : "5ed4d78c0000000001001be8"})`
+`db.getCollection('notes_records').distinct("updated", {"id" : "5ed4d78c0000000001001be8"})`
 
 `db.monthlyBudget.find( { $expr: { $gt: [ "$spent" , "$budget" ] } } )`
 
@@ -163,11 +167,15 @@ The $inc operator increments a field by a specified value and has the following 
 ```
 
 If we only want to find keys whose value is null  
-`> db.c.find({"z" : {"$in" : [null], "$exists" : true}})`
-
-`db.inventory.find( { price: { $not: { $eq: null } } } )`
+`db.c.find({"z" : {"$in" : [null], "$exists" : false}})` or `db.inventory.find( { price: { $eq: null } } )`
+find documents whose value is not null
+`db.c.find({"z" : {"$in" : [null], "$exists" : true}})` or `db.inventory.find( { price: { $not: { $eq: null } } } )`
 
 #### Regular Expressions
+
+模糊查询
+`select * from student where  name like '%joe%'` 对应 `db.student.find( {name: {$regex:/joe/}})`
+`select * from student where  name regexp 'joe'` 对应 `db.student.find( {name:/joe/})`
 
 MongoDB uses the Perl Compatible Regular Expression (PCRE) library to match regular
 expressions  
@@ -178,6 +186,15 @@ If we want to match not only various capitalizations of joe, but also joey
 `> db.users.find({"name" : /joey?/i})`
 
 `db.test.find({$or: [{platform_user_id: {'$regex': "123031", "$options": 'i'}}, {nickname: {'$regex': "123031", "$options": 'i'}}]})`
+
+##### options
+
+包括 i, m, x以及S四个选项，其含义如下
+
+- `i` 忽略大小写，`{<field>{$regex/pattern/i}}`，设置i选项后，模式中的字母会进行大小写不敏感匹配。
+- `m` 多行匹配模式，`{<field>{$regex/pattern/,$options:'m'}`，m选项会更改^和$元字符的默认行为，分别使用与行的开头和结尾匹配，而不是与输入字符串的开头和结尾匹配。
+- `x` 忽略非转义的空白字符，`{<field>:{$regex:/pattern/,$options:'m'}`，设置x选项后，正则表达式中的非转义的空白字符将被忽略，同时井号(#)被解释为注释的开头注，只能显式位于option选项中。
+- `s` 单行匹配模式`{<field>:{$regex:/pattern/,$options:'s'}`，设置s选项后，会改变模式中的点号(.)元字符的默认行为，它会匹配所有字符，包括换行符(\n)，只能显式位于option选项中。
 
 #### Querying Arrays
 
@@ -264,7 +281,15 @@ Query: `db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})`
 [Aggregation](https://docs.mongodb.com/manual/core/aggregation-pipeline/)
 
 ``` js
-db.note_delta.aggregate([
+// group by 数据, 多于一个的数据
+db.coll.aggregate([
+        {$match:{}},
+        { $group: {_id: "$uid",
+            count: { $sum: NumberInt(1)}}},
+        {$sort: {"count": -1}}
+    ])
+
+db.coll.aggregate([
     {$match:
         {$or: [
             {'note_id': '5ea269ec00000000010082a5'},
@@ -281,7 +306,7 @@ db.note_delta.aggregate([
     ])
 
 # group by mutiple fileds
-db.broadcaster.aggregate([
+db.coll.aggregate([
         {$match: {"status": {$in: [0,1,2]}
                  }
         },
@@ -461,23 +486,42 @@ db.users.update({"name":"joe"},{"$set":{"age":20}})
 更新多个文档: `db.tasks.update({}, {$set:{"mode":"0"}},{multi:true})`
 Rename a Field `db.students.updateMany( {}, { $rename: { <field1>: <newName1>, <field2>: <newName2> } } )`
 
-更新自一个字段
+```js
+//replace substring in mongodb document
+db.coll.find({"platform_user_id": {'$regex': "oldString", "$options": 'i'}}).forEach(function(e,i) {
+    e.platform_user_id=e.platform_user_id.replace("oldString","newString");
+    db.coll.save(e);
+});
 
-```sh
-db.getCollection('tbk').find({}).forEach(
+// 更新自一个字段
+db.target_coll.find({}).forEach(
    function(item){
-       db.getCollection('tbk').update({"_id":item._id},{$set:{"data_create_time":item.data_createtime}})
+       db.target_coll.update({"_id":item._id},{$set:{"data_create_time":item.data_createtime}})
    }
+)
+
+// update a collection based on another collection
+db.target_coll.find().forEach(function (doc1) {
+    var doc2 = db.source_coll.findOne({ id: doc1.id }, { name: 1 });
+    if (doc2 != null) {
+        doc1.name = doc2.name;
+        db.target_coll.save(doc1);
+    }
+});
+
+db.source_coll.find().forEach(
+  doc=>
+      db.target_coll.update(
+        {"_id": doc._id},
+        {$set: {"field_to_update": doc.field}}
+      )
 )
 ```
 
-`{ "_id" : ObjectId("55b61a2634a254ddb211bf32"), "relationships" : { "friends" : 2, "enemies" : 3 }, "username" : "joe" }`
-
 #### Drop column delete field $unset
 
-db.coll.update({filter}, {$unset: {column_name: ""}})
-
-db.notes_operator_favorite.update({ status: 1 }, { $unset: { status: ""} })
+update single: `db.coll.update({filter}, {$unset: {column_name: ""}})`
+update all: `db.coll.updateMany({filter}, {$unset: {column_name: ""}})`
 
 #### Convert type of a field
 
@@ -542,6 +586,12 @@ export and import data collection
 [mongoexport](https://docs.mongodb.com/v3.6/reference/program/mongoexport/#cmdoption-mongoexport-uri)
 `mongoexport --uri 'mongodb://username:pwd@localhost:27017/db?authsource=admin' --type=csv --collection coll --fields _id,name,url --query='{}' --out rec.csv`
 `mongoimport --file <filename>.json`
+
+```bash
+# export with all keys
+keys=`mongo mongodb://username:pwd@localhost:27017/live?authSource=admin --eval "var keys = ''; for(var key in db.coll.findOne()) { keys += key + ','; }; keys;" --quiet`
+mongoexport --uri 'mongodb://username:pwd@localhost:27017/live?authSource=admin' --type=csv --collection coll --fields "$keys" --query='{}' --out coll.csv
+```
 
 options:
   -h [ --host ] arg         mongo host to connect
@@ -633,8 +683,9 @@ In output of the serverStatus command you should pay attention to:
 `db.getProfilingStatus()` 查看当前的分析级别和慢查询阈值
 `db.setProfilingLevel(1, 1000)`  设置分析级别为 1, 并且记录 1000 毫秒以上的慢查询
 `db.setProfilingLevel(2)` Level 2 means “profile everything.”  
-`db.system.profile.find( {millis: {$gt: 5}})`  
+`db.system.profile.find( {millis: {$gt: 5}})`  获取5ms以上的慢查询记录
 `db.system.profile.find().pretty()`  
+`db.system.profile.find({millis: {$gt: 500}, ts: {$gt: ISODate("2020-09-25T15:14:29.352+08:00")}, {op:1,ns:1,command:1,millis:1,planSummary:1,ts:1}).sort({millis:-1})`
 
 #### [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )  
 
@@ -646,7 +697,7 @@ In output of the serverStatus command you should pay attention to:
     `op` 表示操作的类型。通常是查询、插入、更新、删除中的一种。
     `locks` 跟锁相关的信息
 
-`db.currentOp({"active" : true, "secs_running":{$gt: 10}})`
+`db.currentOp({"active" : true, "secs_running":{$gt: 3}})`
 
 #### 分析MongoDB数据库的慢请求
 
@@ -655,7 +706,9 @@ In output of the serverStatus command you should pay attention to:
 
 #### [explain](https://docs.mongodb.com/manual/reference/explain-results/ )
 
-`db.collection.find().explain()`  
+`db.collection.find().explain()`
+`db.collection.explain().aggregate([])`
+[Return Information on Aggregation Pipeline Operation](https://docs.mongodb.com/manual/reference/method/db.collection.aggregate/#example-aggregate-method-explain-option)
 方法的参数如下：  
     verbose：{String}，可选参数。指定冗长模式的解释输出，方式指定后会影响explain()的行为及输出信息。  
     可选值有："queryPlanner"、"executionStats"、"allPlansExecution"，默认为"queryPlanner"
@@ -712,7 +765,7 @@ Refer to P100, Using explain() and hint(), MongoDB权威指南第2版 MongoDB Th
 
 #### 1: db.currentOp()
 
-`db.currentOp({“secs_running”: {$gte: 3}})` return a list of operations in progress that take more than 3 seconds to perform
+`db.currentOp({secs_running: {$gte: 3}})` return a list of operations in progress that take more than 3 seconds to perform
 
 #### #2: Profiler
 

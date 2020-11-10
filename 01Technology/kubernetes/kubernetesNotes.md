@@ -6,6 +6,7 @@
 
 Meaning of memory，Mi表示（1Mi=1024x1024）,M表示（1M=1000x1000）（其它单位类推， 如Ki/K Gi/G）
 For example, the following represent roughly the same value: `128974848, 129e6, 129M, 123Mi`
+1 (byte), 1k (kilobyte) or 1Ki (kibibyte), 1M (megabyte) or 1Mi (mebibyte)
 
 Meaning of CPU:
 The expression 0.1 is equivalent to the expression 100m, which can be read as "one hundred millicpu". Some people say "one hundred millicores", and this is understood to mean the same thing. A request with a decimal point, like 0.1, is converted to 100m by the API, and precision finer than 1m is not allowed. For this reason, the form 100m might be preferred.
@@ -18,8 +19,9 @@ The expression 0.1 is equivalent to the expression 100m, which can be read as "o
   `--sort-by=<jsonpath_exp>` sort the resource list, `--sort-by=.metadata.name`
 [Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
 
+`kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers`
 [JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
-`kubectl get pods -A -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[].resources.requests.cpu}{"\n"}{end}'`
+`kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
 
 ### Debug
 
@@ -42,24 +44,26 @@ k get events -o yaml|less
 `kubectl api-resources` Print the supported API resources on the server
 
 `kubectl cluster-info` Displaying cluster information
-`kubectl get pods/services/deployment`
+`kubectl get nodes/pods/secrets/services/deployment`
     `-o wide` request additional columns to display
-    `-o yaml`
+    `-o yaml` get a YAML descriptor of an existing pod
     `-o json`
     `--show-labels`
     `-L, --label-columns=[]` switch and have each displayed in its own column `-L creation_method,env`
     `-l, --selector=''`
     `-A, --all-namespaces=false` If present, list the requested object(s) across all namespaces
     `-w, --watch` watch for changes
+    `--v 6` verbose logging
 
-`kubectl get nodes/services/secrets`
-`kubectl get pods kubia-zxzij -o yaml` get a YAML descriptor of an existing pod
-`kubectl get pods --selector=labelName=labelValue`
-`kubectl get pods -l creation_method=manual`
+`kubectl get pods --selector='labelName=labelValue'`
     `'!env'`
     `'env'`
     `env in (prod,devel)`
     `env notin (prod,devel)`
+
+`kubectl create`
+  `-f, --filename=[]` Filename, directory, or URL to files to use to create the resource
+  `--record` record the command
 
 `kubectl delete pods pod_name`
   `--force` force to delete
@@ -102,9 +106,21 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 `kubectl cordon <node>` marks the node as unschedulable (but doesn’t do anything with pods running on that node).
 `kubectl drain <node>` marks the node as unschedulable and then evicts all the pods from the node.
 
+`kubectl patch pvc test-pvc -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'` resize pvc
+
 ### pod
 
 `k port-forward pod-name 8001:5000` 本地端口 8001 转发到 pod 的端口 5000
+
+#### [Assign Pods to Nodes](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
+
+`nodeName: foo-node # schedule pod to specific node`
+
+```yaml
+nodeSelector:
+  svrtype: newweb
+
+```
 
 ### service
 
@@ -116,6 +132,16 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 ### deployment
 
 `k rollout history deployment  deployment-name` deployment 历史记录
+`kubectl set image deployment kubia nodejs=luksa/kubia:v3` Changes the container image defined in a Pod
+`kubectl rollout status deployment kubia` the progress of the rollout
+`kubectl rollout history deployment kubia` displaying a deployment’s rollout history
+`kubectl rollout undo deployment kubia` undoing a rollout
+`kubectl rollout undo deployment kubia --to-revision=1`
+
+deployment strategies:
+
+* RollingUpdate
+* Recreate
 
 ### Label
 
@@ -230,11 +256,12 @@ withKubeConfig([credentialsId: 'k8s_config_prd'
                 }
 ```
 
-### useful image
+## Useful image
 
 `kubectl run mysql-client --image=mysql:5.6 -it --rm --restart=Never -- mysql`
 `kubectl run dnsutils --image=tutum/dnsutils -it --rm`
 `kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
+`kubectl run -it curl --image=tutum/curl --rm --restart=Never`
 `kubectl run nginx --image=nginx -it --rm`
 `kubectl run busybox --image=busybox -it --rm`  busybox: BusyBox combines tiny versions of many common UNIX utilities
 `kubectl run alpine --image=alpine -it --rm`  alpine: A minimal Docker image based on Alpine Linux
