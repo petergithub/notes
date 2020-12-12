@@ -139,6 +139,7 @@ GsonFormat: 把json格式的内容转成Object
 RestfulToolkit: `Command+back slash`
 [Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
 [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\`
+Rainbow Brackets
 Grep Console: highlight the editor - nice for analyzing logs
 Maven Helper, Key Promoter, Spring Assistant, GenerateAllSetter
 JRebel for IntelliJ: 热部署插件

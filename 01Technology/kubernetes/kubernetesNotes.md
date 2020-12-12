@@ -1,5 +1,10 @@
 # kubernetesNotes
 
+## Recent
+
+batch delete `kdelp $(kgp -l | grep Evicted | awk '{print $1}')`
+kubelet summary API `http://localhost:8001/api/v1/nodes/node-name/proxy/stats/summary`
+
 ## Concept
 
 ### [Requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
@@ -35,6 +40,8 @@ k get events -o yaml|less
 `kubectl cluster-info dump`
 
 ### Command
+
+[kubectl Overview](https://jamesdefabia.github.io/docs/user-guide/kubectl-overview/)
 
 `kubectl help get`
 
@@ -118,7 +125,7 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 
 ```yaml
 nodeSelector:
-  svrtype: newweb
+  svrtype: web
 
 ```
 
@@ -153,6 +160,7 @@ deployment strategies:
 
 ### namespaces
 
+`kubectl create ns name`
 `kubectl get ns`
 `kubectl get pod --namespace kube-system`
 
@@ -185,8 +193,11 @@ deployment strategies:
 `kubectl create configmap my-config --from-file=config-file.conf`
 `kubectl create configmap my-config --from-file=/path/to/dir`
 
+PATCH `kubectl patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'`
+
 CREATING A TLS CERTIFICATE FOR THE INGRESS
 `kubectl create secret tls tls-secret --cert=tls.cert --key=tls.key`
+`kubectl create secret generic fortune-https --from-file=https.key --from-file=https.cert --from-file=foo`
 
 `exec` form—For example, `ENTRYPOINT ["node", "app.js"]`: runs the node process directly (not inside a shell)
 `shell` form—For example, `ENTRYPOINT node app.js`: used the shell form
@@ -256,9 +267,55 @@ withKubeConfig([credentialsId: 'k8s_config_prd'
                 }
 ```
 
+### Network
+
+[从零开始入门 K8s | 理解 CNI 和 CNI 插件](https://developer.aliyun.com/article/748866)
+[kubernetes网络模型之“小而美”flannel](https://zhuanlan.zhihu.com/p/79270447)
+
+Kubernetes 对集群网络有以下要求：
+所有的 Pod 之间可以在不使用 NAT 网络地址转换的情况下相互通信；所有的 Node 之间可以在不使用 NAT 网络地址转换的情况下相互通信；每个 Pod 看到的自己的 IP 和其他 Pod 看到的一致。
+
+#### Kubernetes CNI
+
+CNI，它的全称是 Container Network Interface，即容器网络的 API 接口。
+
+它是 K8s 中标准的一个调用网络实现的接口。Kubelet 通过这个标准的 API 来调用不同的网络插件以实现不同的网络配置方式，实现了这个接口的就是 CNI 插件，它实现了一系列的 CNI API 接口。常见的 CNI 插件包括 Calico、flannel、Terway、Weave Net 以及 Contiv。
+
+插件负责为接口配置和管理IP地址，并且通常提供与IP管理、每个容器的IP分配、以及多主机连接相关的功能。容器运行时会调用网络插件，从而在容器启动时分配IP地址并配置网络，并在删除容器时再次调用它以清理这些资源。
+
+K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为：
+
+1. 首先在每个结点上配置 CNI 配置文件(/etc/cni/net.d/xxnet.conf)，其中 xxnet.conf 是某一个网络配置文件的名称；
+2. 安装 CNI 配置文件中所对应的二进制插件；
+3. 在这个节点上创建 Pod 之后，Kubelet 就会根据 CNI 配置文件执行前两步所安装的 CNI 插件；
+4. 上步执行完之后，Pod 的网络就配置完成了。
+
+#### 阿里云Kubernetes托管版开启 hairpin 模式
+
+据客服回复目前(2020-11-20)没有简单的配置方式, 但发现下面的方式暂时有效果:
+
+1. 确认网络插件类型是 csi
+`ps aux | grep kubelet | grep /usr/bin/kubelet | grep network-plugin`
+
+2. 找到配置文件位置 `ls /etc/cni/net.d/*flannel.conf`
+在每台 node 机器上的配置文件 /etc/cni/net.d/10-flannel.conf 增加  "hairpinMode": true
+
+```yaml
+{
+  "name": "cb0",
+  "cniVersion":"0.3.0",
+  "type": "flannel",
+  "delegate": {
+    # "hairpinMode": true,
+    "isDefaultGateway": true
+  }
+}
+```
+
 ## Useful image
 
 `kubectl run mysql-client --image=mysql:5.6 -it --rm --restart=Never -- mysql`
+`kubectl run redis-client --image=redis:6.0.9 -it --rm --restart=Never -- bash`
 `kubectl run dnsutils --image=tutum/dnsutils -it --rm`
 `kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
 `kubectl run -it curl --image=tutum/curl --rm --restart=Never`
@@ -283,6 +340,7 @@ helm uninstall gitlab
 kube-shell `pip install kube-shell --user -U`
 `brew install kubectx`
 切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
+[Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
 
 终极工具k9s
 
@@ -303,11 +361,11 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 阿里云 kubernetes 配置
 
-1. 配置 service: 容器服务 -> 路由与负载均衡 -> 服务 -> nginx-ingress-lb -> 更新 增加端口
-   port 是暴露的公网端口(控制台叫做 服务端口), targetPort 是 service 端口(控制台叫做 容器端口)
-2. 配置 configmap: 容器服务 -> 应用配置-> 配置项 -> tcp-services -> 添加 22:kube-ops/gitlab:22
-"service port: 'namespace/serviceName:service port'"
-通过 ingress 动态读取tcp-services 暴露端口
+1. 配置 configmap: 容器服务 -> 应用配置-> 配置项 -> tcp-services -> 添加 名称: config-name, 值: namespace/serviceName:service port, 注意名称config-name 需要配置到 ingress 容器端口, 例如 22:kube-ops/gitlab:22
+2. 配置 service: 容器服务 -> 路由与负载均衡 -> 服务 -> nginx-ingress-lb -> 更新 增加端口
+   port 是暴露的公网端口(控制台叫做 服务端口), targetPort 是 configmap 名称 (控制台叫做 容器端口), 这里容器端口只能是数字, 所以反过来限制第一步的 config-name 只能用数字
+
+然后 ingress 会动态读取tcp-services 暴露端口
 tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
 
 reference:

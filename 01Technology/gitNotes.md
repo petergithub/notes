@@ -8,6 +8,8 @@
 1. 特定业务开发需要单独拉分支的，一般不要做merge master操作；需要同步master代码的时候，从master新拉分支，再从新分支merge之前的开发分支。
 2. 本地commit之后在push 之前，必须执行pull --rebase，尽量确保提交commit树简单清晰，不要把冲突留到merge时大量爆发，在本地rebase时处理掉自己的代码冲突。
 
+git merge --squash --no-ff
+
 ## Commands
 
 ### Most recent

@@ -600,6 +600,7 @@ Vim中查看文件编码 `:set fileencoding`
 `ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者  
 `ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`    print each filed number  
 `awk -F ':' 'NR >3 {print $1}' demo.txt`  # 输出第三行以后的行  
+`ls -1 | awk 'ORS=","' | head -c -1` 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter  或者 `ls -1 | paste -sd "," -`
 
 `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
 `awk '$5 ~ /ldb/ {print}' f.txt` #第五列匹配ldb

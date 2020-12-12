@@ -2,6 +2,11 @@
 
 ## Command
 
+### Recent
+
+`docker ps -a --format "table {{.Size}}\t{{.Names}}"` disk utilization
+`docker ps --size`
+
 ### Common
 
 `docker run` 只在第一次运行时使用，将镜像放到容器中，以后再次启动这个容器时，使用 `docker start imageName`

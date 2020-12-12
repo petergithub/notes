@@ -2,9 +2,18 @@
 
 ## TODO
 
-Kill all process in shell
+[15.22 InnoDB Limits](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html)
+[4.9 Environment Variables](https://dev.mysql.com/doc/refman/8.0/en/environment-variables.html)
+
+[3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
+`\edit \e` Open a command in the default system editor then present it in MySQL Shell.
+`\pager \P` Configure the pager which MySQL Shell uses to display text.
+
+`\nopager` Disable any pager which MySQL Shell was configured to use.
+`\system \!` Run the specified operating system command and display the results in MySQL Shell. 
 
 ``` shell
+# Kill all process in shell
 mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
 grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
 mysql -h localhost -u root -p
@@ -88,7 +97,7 @@ When code starts with something like this `/*!50100`, the code following till `*
 
 #### CentOS
 
-``` mysql
+``` bash
   # mysql 5.6
   wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
   rpm -ivh mysql-community-release-el6-5.noarch.rpm
@@ -191,23 +200,23 @@ mysql query escape %前面加两个反斜杠，比如
 
 ### datetime query
 
-``` mysql
+``` sql
 
-  mysql> SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
+SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
   +---------------------------------------+
   | UNIX_TIMESTAMP('2009-02-14 07:31:30') |
   +---------------------------------------+
   |                            1234567890 |
   +---------------------------------------+
-  mysql> SELECT FROM_UNIXTIME(1234567890);
+SELECT FROM_UNIXTIME(1234567890);
   +---------------------------+
   | FROM_UNIXTIME(1234567890) |
   +---------------------------+
   | 2009-02-14 07:31:30      |
   +---------------------------+
 
-  SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
-  SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
+SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
+SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
 
 DATE_FORMAT(NOW(),'%b %d %Y %h:%i %p'); //Dec 29 2008 11:45 PM
 DATE_FORMAT(NOW(),'%m-%d-%Y') //12-29-2008
@@ -277,7 +286,7 @@ Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' '
 
 [Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
 
-``` mysql
+``` sql
   mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root';
   +------------------------+
   | concat('KILL ',id,';') |
@@ -357,6 +366,16 @@ mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{prin
 
 ## Basic
 
+### Documents
+
+[MySQL 8.0 Release Notes](https://dev.mysql.com/doc/relnotes/mysql/8.0/en/)
+[MySQL 8.0 Reference Manual](https://dev.mysql.com/doc/refman/8.0/en/)
+[MySQL Internals Manual](https://dev.mysql.com/doc/internals/en/)
+
+[3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
+
+[MySQL Documentation Home](https://dev.mysql.com/doc/)
+
 ### Admin command
 
 `./mysqld_safe` start MySQL server  
@@ -366,8 +385,8 @@ mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{prin
 `/etc/init/mysql.conf`
 
 find the mysql data directory by `grep datadir /etc/my.cnf` or
-`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
-`mysql -uUSER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
+`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
+`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 ### Common command
 
@@ -398,15 +417,16 @@ WHERE tableA.name = 'Joe'
 
 `ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
 `ALTER TABLE tableName DROP INDEX idx_name;`
+`ALTER table table_name add UNIQUE KEY (model,ip);`  
 `ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
 updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 
-`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
-`ALTER table table_name add UNIQUE KEY (model,ip);`  
 `ALTER table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功' after ANOTHER_COLUMN_NAME;`
 `ALTER table bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
 `ALTER TABLE old_name RENAME new_name;`
 `ALTER TABLE table_name ENGINE=InnoDB;`
+
+`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
 
 按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
 计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`  
@@ -526,7 +546,7 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 
 [Better Unicode support for MySQL (including emoji)](http://tonyshowoff.com/articles/better-unicode-support-for-mysql-including-emoji/)
 
-``` mysql
+``` config
 
   [client]
   default-character-set = utf8mb4
@@ -544,7 +564,7 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 
 ##### 创建表的时候指定CHARSET为utf8mb4
 
-``` mysql
+``` sql
   CREATE TABLE IF NOT EXISTS mb4 (
   id INT(3) NOT NULL AUTO_INCREMENT,
     name varchar(32) CHARACTER SET utf8mb4 DEFAULT NULL,
@@ -660,7 +680,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 `mysql -uroot -proot -D account -s -e "select id,username from user_0 limit 10 INTO OUTFILE '/tmp/user.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'"`
 `mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`  
 
-``` mysql
+``` sql
 
 SELECT
 orderNumber, status, orderDate, requiredDate, comments
@@ -714,19 +734,18 @@ mysql -uroot -p密码 < c:\\school.sql
 [How to get the sizes of the tables of a mysql datab](https://stackoverflow.com/questions/9620198/how-to-get-the-sizes-of-the-tables-of-a-mysql-database)
 You can use this query to show the size of a table (although you need to substitute the variables first):
 
-``` mysql
-
-  SELECT
-      table_name AS TableName,
-      round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
-  FROM information_schema.TABLES
-  WHERE table_schema = "$DB_NAME"
-      AND table_name = "$TABLE_NAME";
+``` sql
+SELECT
+    table_name AS TableName,
+    round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
+FROM information_schema.TABLES
+WHERE table_schema = "$DB_NAME"
+    AND table_name = "$TABLE_NAME";
 ```
 
 or this query to list the size of every table in every database, largest first:
 
-``` mysql
+``` sql
 
   SELECT
        table_schema as DatabaseName,
@@ -738,7 +757,7 @@ or this query to list the size of every table in every database, largest first:
 
 #### find the selectivity of several prefix lengths in one query
 
-``` mysql
+``` sql
 
   SELECT COUNT(DISTINCT LEFT(city, 3))/COUNT(*) AS sel3,
    COUNT(DISTINCT LEFT(city, 4))/COUNT(*) AS sel4,
@@ -750,7 +769,7 @@ or this query to list the size of every table in every database, largest first:
 
 #### [find out the best prefix length for a given column](https://stackoverflow.com/questions/8746207/1071-specified-key-was-too-long-max-key-length-is-1000-bytes)
 
-``` mysql
+``` sql
 
   SELECT
    ROUND(SUM(LENGTH(`menu_link`)<10)*100/COUNT(*),2) AS length_10,
@@ -762,7 +781,7 @@ or this query to list the size of every table in every database, largest first:
 
 #### [obtains the list of tables without primary key](https://moiseevigor.github.io/programming/2015/02/17/find-all-tables-without-primary-key-in-mysql/)
 
-``` mysql
+``` sql
 
   USE INFORMATION_SCHEMA;
   SELECT
@@ -781,6 +800,50 @@ or this query to list the size of every table in every database, largest first:
   AND c.constraint_name IS NULL;
 ```
 
+#### [Remove duplicates using only a MySQL query](https://stackoverflow.com/questions/3383898/remove-duplicates-using-only-a-mysql-query?noredirect=1&lq=1)
+
+```sql
+-- This will leave the ones with the highest URL_ID for a particular URL_ADDR
+-- (The derived table 'X' is to avoid the error "You can't specify target table 'tablename' for update in FROM clause")
+DELETE FROM table
+WHERE URL_ID NOT IN 
+    (SELECT ID FROM 
+       (SELECT MAX(URL_ID) AS ID 
+        FROM table 
+        WHERE URL_ID IS NOT NULL
+        GROUP BY URL_ADDR ) X)   /*Sounds like you would need to GROUP BY a 
+                                   calculated form - e.g. using REPLACE to 
+                                  strip out www see Daniel's answer*/
+
+
+-- Another case:
+CREATE TABLE mytb (url_id int, url_addr varchar(100));
+
+INSERT INTO mytb VALUES (1, 'www.google.com');
+INSERT INTO mytb VALUES (2, 'www.microsoft.com');
+INSERT INTO mytb VALUES (3, 'www.apple.com');
+INSERT INTO mytb VALUES (4, 'www.google.com');
+INSERT INTO mytb VALUES (5, 'www.cnn.com');
+INSERT INTO mytb VALUES (6, 'www.apple.com');
+
+-- Then we can use the multiple-table DELETE syntax as follows:
+
+DELETE t2
+FROM   mytb t1
+JOIN   mytb t2 ON (t2.url_addr = t1.url_addr AND t2.url_id > t1.url_id);
+
+-- ... which will delete duplicate entries, leaving only the first url based on url_id:
+
+-- If the duplicate URLs will not have the same format, you may want to apply the REPLACE() function to remove www. or http:// parts. For example:
+
+DELETE t2
+FROM   mytb t1
+JOIN   mytb t2 ON 
+  (REPLACE(t2.url_addr, 'www.', '') = REPLACE(t1.url_addr, 'www.', '') AND 
+                   t2.url_id > t1.url_id);
+
+```
+
 ### Configuration
 
 #### MySQL Workbench update shortcut Auto-complete
@@ -792,7 +855,7 @@ D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
 
 Edit or create a file called .my.cnf in your home directory, containing:
 
-``` mysql
+``` config
   [mysql]
   auto-rehash
 ```
@@ -920,7 +983,7 @@ If your id column were an auto-increment column, then SELECT ... FOR UPDATE with
 select nonexistent orderId, which is not a index column, it will lock the whole table;  
 select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;  
 
-``` mysql
+``` sql
   CREATE TABLE `test_sql_type` (
     `id` bigint(32) NOT NULL AUTO_INCREMENT,
     `orderId` int(8) DEFAULT NULL COMMENT 'another int',
@@ -930,7 +993,7 @@ select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
 
 console 1:  
 
-``` mysql
+``` sql
   begin;
   select * from test_sql_type where orderId = 41 for update;
 ```
@@ -940,7 +1003,7 @@ it gets the lock of the whole table;
 
 console 2:  
 
-``` mysql
+``` sql
   begin;
   select * from test_sql_type where orderId = 41 for update;
   **pending**
