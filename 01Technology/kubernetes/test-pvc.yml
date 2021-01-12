@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment                    # Type of the kubernetes resource
+metadata:
+  name: test-pvc
+  namespace: temp
+  labels:
+    name: test-pvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: test-pvc
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: test-pvc
+      labels:
+        name: test-pvc
+    spec:
+      containers:
+        - name: test-pvc
+          image: busybox
+          imagePullPolicy: IfNotPresent
+          command: ["sleep", "9999999"]
+          livenessProbe:
+            exec:
+              command:
+              - ls
+              - /
+            # This pod takes a very long time to start up. Be cautious when
+            # lowering this value to avoid Pod death during startup.
+            initialDelaySeconds: 1
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          readinessProbe:
+            exec:
+              command:
+              - ls
+              - /
+            initialDelaySeconds: 1
+            timeoutSeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          volumeMounts:
+            - name: test-pvc-data
+              mountPath: /data
+      volumes:
+        - name: test-pvc-data
+          persistentVolumeClaim:
+            claimName: test-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+  namespace: temp
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "alicloud-disk-efficiency"  # 阿里云集群中。默认使用csi作为存储卷插件
+spec:
+  storageClassName: alicloud-disk-efficiency
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: temp
+  labels:
+    name: temp
