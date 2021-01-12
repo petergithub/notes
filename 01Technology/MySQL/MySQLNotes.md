@@ -376,6 +376,125 @@ mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{prin
 
 [MySQL Documentation Home](https://dev.mysql.com/doc/)
 
+### DataType
+
+[Data Type Storage Requirements](https://dev.mysql.com/doc/refman/8.0/en/storage-requirements.html#data-types-storage-reqs-strings)
+
+#### Integer Types
+
+[Integer Types (Exact Value) - INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT](https://dev.mysql.com/doc/refman/8.0/en/integer-types.html)
+
+Type | Storage (Bytes) | Minimum Value Signed | Minimum Value Unsigned | Maximum Value Signed | Maximum Value Unsigned
+---|---|---|---|---|---|---
+TINYINT | 1 | -128 | 0 | 127 | 255
+SMALLINT | 2 | -32768 | 0 | 32767 | 65535
+MEDIUMINT | 3 | -8388608 | 0 | 8388607 | 16777215
+INT | 4 | -2147483648 | 0 | 2147483647 | 4294967295
+BIGINT | 8 | -263 | 0 | 263-1 | 264-1
+ 
+#### String Type Storage Requirements
+
+In the following table, M represents the declared column length in characters for nonbinary string types and bytes for binary string types. L represents the actual length in bytes of a given string value.
+
+Data Type | Storage Required
+---|---|---|---|---|---|---
+CHAR(M) | The compact family of InnoDB row formats optimize storage for variable-length character sets. See COMPACT Row Format Storage Characteristics. Otherwise, M × w bytes, <= M <= 255, where w is the number of bytes required for the maximum-length character in the character set.
+BINARY(M) | M bytes, 0 <= M <= 255
+VARCHAR(M), VARBINARY(M) | L + 1 bytes if column values require 0 − 255 bytes, L + 2 bytes if values may require more than 255 bytes
+TINYBLOB, TINYTEXT | L + 1 bytes, where L < 28
+BLOB, TEXT | L + 2 bytes, where L < 216
+
+#### JSON
+
+[JSON Function Reference](https://dev.mysql.com/doc/refman/8.0/en/json-function-reference.html)
+
+```SQL
+SELECT id,type,product FROM t where type = '["直播"]';
+SELECT id,type,product FROM t where "直播" MEMBER OF (type);
+SELECT id,type,product FROM t where JSON_CONTAINS(type, '["直播"]');
+SELECT id,type,product FROM t where JSON_SEARCH(type, 'one', "直播");
+```
+
+#### [Functions That Search JSON Values](https://dev.mysql.com/doc/refman/8.0/en/json-search-functions.html)
+
+##### JSON_CONTAINS(target, candidate[, path])
+
+Indicates by returning 1 or 0 whether a given candidate JSON document is contained within a target JSON document
+
+``` SQL
+mysql> SET @j = '{"a": 1, "b": 2, "c": {"d": 4}}';
+mysql> SET @j2 = '1';
+mysql> SELECT JSON_CONTAINS(@j, @j2, '$.a');
++-------------------------------+
+| JSON_CONTAINS(@j, @j2, '$.a') |
++-------------------------------+
+|                             1 |
++-------------------------------+
+```
+
+##### JSON_EXTRACT(json_doc, path[, path] ...)
+
+Returns data from a JSON document, selected from the parts of the document matched by the path arguments
+
+```SQL
+mysql> SELECT JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]', '$[0]');
++----------------------------------------------------+
+| JSON_EXTRACT('[10, 20, [30, 40]]', '$[1]', '$[0]') |
++----------------------------------------------------+
+| [20, 10]                                           |
++----------------------------------------------------+
+```
+
+The `->` operator serves as an alias for the `JSON_EXTRACT()`: `JSON_EXTRACT(c, "$.id")` == `c->"$.id"`
+`UPDATE jemp SET n=1 WHERE c->"$.id" = "4";`
+the `->>` operator in addition unquotes the extracted result `JSON_UNQUOTE(JSON_EXTRACT(column, path))`. In other words, given a JSON column value column and a path expression path. The `->>` operator can be used wherever JSON_UNQUOTE(JSON_EXTRACT()) would be allowed.
+`column->>path` == `JSON_UNQUOTE(JSON_EXTRACT(column, path))`
+
+##### JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
+
+```SQL
+mysql> SET @j = '["abc", [{"k": "10"}, "def"], {"x":"abc"}, {"y":"bcd"}]';
+
+mysql> SELECT JSON_SEARCH(@j, 'one', 'abc');
++-------------------------------+
+| JSON_SEARCH(@j, 'one', 'abc') |
++-------------------------------+
+| "$[0]"                        |
++-------------------------------+
+
+mysql> SELECT JSON_SEARCH(@j, 'all', 'abc');
++-------------------------------+
+| JSON_SEARCH(@j, 'all', 'abc') |
++-------------------------------+
+| ["$[0]"", "$[2].x"]            |
++-------------------------------+
+```
+
+##### [JSON Utility Functions](https://dev.mysql.com/doc/refman/8.0/en/json-utility-functions.html)
+
+```SQL
+mysql> SELECT JSON_PRETTY('123'); # scalar
+mysql> SELECT JSON_PRETTY("[1,3,5]"); # array
++------------------------+
+| JSON_PRETTY("[1,3,5]") |
++------------------------+
+| [
+  1,
+  3,
+  5
+]      |
++------------------------+
+
+mysql> SELECT JSON_PRETTY('{"a":"10","b":"15","x":"25"}'); # object
+```
+
+##### Other
+
+
+`JSON_KEYS(json_doc[, path])`: Returns the keys from the top-level value of a JSON object as a JSON array
+`JSON_OVERLAPS(json_doc1, json_doc2)`: Compares two JSON documents. Returns true (1) if the two document have any key-value pairs or array elements in common
+`value MEMBER OF(json_array)`: Returns true (1) if value is an element of json_array, otherwise returns false (0). value must be a scalar or a JSON document; if it is a scalar, the operator attempts to treat it as an element of a JSON array.
+
 ### Admin command
 
 `./mysqld_safe` start MySQL server  
@@ -1113,3 +1232,18 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 [Inception](https://github.com/hanchuanchuan/inception)
 [goInception](https://hanchuanchuan.github.io/goInception/)是一个集审核、执行、备份及生成回滚语句于一身的MySQL运维工具， 通过对执行SQL的语法解析，返回基于自定义规则的审核结果，并提供执行和备份及生成回滚语句的功能
+
+## NDB: Network Database
+
+[InnoDB和NDB，MySQL群集和InnoDB群集之间有什么区别？](https://www.cnblogs.com/margiex/p/12706567.html)
+[23.1.6.1 Differences Between the NDB and InnoDB Storage Engines](https://dev.mysql.com/doc/refman/8.0/en/mysql-cluster-ndb-innodb-engines.html)
+
+也称为NDB CLUSTER, 是另一种存储引擎，但是它主要存储数据在内存中，并且独立于MySQL Server实例。它是MySQL Cluster使用的存储引擎。 NDB代表“网络数据库”。
+
+### MySQL NDB Cluster (或 MySQL Cluster)
+
+MySQL NDB Cluster (或 MySQL Cluster) 与MySQL Server（人们普遍认知的MySQL）是完全不同的产品，它使用非共享架构，通过多台服务器构建成集群，实现多点读写的关系型数据库。它具有在线维护功能，并且排除单一故障，具有非常高的可用性。此外，它的主要数据保存在内存中，可以高速处理大量的事务，是面向实时性应用程序的一款数据库产品。
+
+### InnoDB Cluster
+
+几乎与MySQL Cluster完全无关，并且是从MySQL 5.7 开始作为一组插件实现的。其中之一是“组复制”插件，该插件使组中的MySQL服务器能够在它们之间复制数据。
