@@ -189,6 +189,7 @@ commond+下箭头可以直达页面底部
 
 Create new folder: `Command+Shift+n`
 `Command-Option-P` to show or hide the path bar
+`Command-Option-C` 复制文件夹路径
 `Command-/` to show or hide the status bar
 `Command-Option-S` show or hide Finder's sidebar
 `Command+Shift+G` 快捷键可以完成到达某路径的操作

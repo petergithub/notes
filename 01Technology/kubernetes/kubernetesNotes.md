@@ -368,6 +368,8 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 然后 ingress 会动态读取tcp-services 暴露端口
 tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
 
+`kubectl patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'`
+
 reference:
 [玩转Kubernetes TCP Ingress](https://developer.aliyun.com/article/603225)
 [Exposing TCP and UDP services](https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services)

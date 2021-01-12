@@ -85,6 +85,20 @@ duplicate collection in the same database
     slow, MongoDB 4.0 or earlier versions: `db.collection.copyTo(newCollection)`
 copy a collection from one database to new_database `db.collection_name.find().forEach(function(d){ db.getSiblingDB('new_database')['collection_name'].insert(d); });`
 
+```bash
+# drop many collections
+delete_collection_list = ["collection1", "collection2", "collection3", "collection4", "collection5", "collection6"]
+delete_collection_list.forEach( function (collection) {
+    if (db.getCollectionNames().indexOf(collection)>=0) {
+        db.getCollection(collection).drop();
+        print("Deleted Collection: "+ collection);
+    }
+  })
+
+# drop all collection in the database
+db.getCollectionNames().forEach(c=>db[c].drop())  
+```
+
 #### query
 
 `db.COLLECTION_NAME.find({key1:value1, key2:value2}, { field1: <value>, field2: <value> ... })`  [db.collection.find()](https://docs.mongodb.com/manual/reference/method/db.collection.find/)
@@ -305,7 +319,7 @@ db.coll.aggregate([
     }
     ])
 
-# group by mutiple fileds
+// group by multiple fileds
 db.coll.aggregate([
         {$match: {"status": {$in: [0,1,2]}
                  }
@@ -317,6 +331,12 @@ db.coll.aggregate([
             count: { $sum: NumberInt(1)}}},
         {$sort: {"_id.status": 1, "count": 1}}
     ])
+
+// distinct by multiple fileds and count
+db.myCollection.aggregate( 
+   {$group : {_id : "$myIndexedNonUniqueField"} }, 
+   {$group: {_id:1, count: {$sum : 1 }}})
+   .result[0].count;
 
 # 平均值
 db.getCollection('notes').aggregate(
