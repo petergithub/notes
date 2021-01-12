@@ -3,21 +3,8 @@
 ## TODO
 
 [15.22 InnoDB Limits](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html)
+767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 [4.9 Environment Variables](https://dev.mysql.com/doc/refman/8.0/en/environment-variables.html)
-
-[3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
-`\edit \e` Open a command in the default system editor then present it in MySQL Shell.
-`\pager \P` Configure the pager which MySQL Shell uses to display text.
-
-`\nopager` Disable any pager which MySQL Shell was configured to use.
-`\system \!` Run the specified operating system command and display the results in MySQL Shell. 
-
-``` shell
-# Kill all process in shell
-mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
-grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
-mysql -h localhost -u root -p
-```
 
 `SHOW ENGINE INNODB STATUS`
 
@@ -28,238 +15,20 @@ That ibdata1 isn't shrinking is a particularly annoying feature of MySQL. The ib
 [Why is the ibdata1 file continuously growing in MySQL?](https://www.percona.com/blog/2013/08/20/why-is-the-ibdata1-file-continuously-growing-in-mysql/)
 
 [14.6.1.2 Moving or Copying InnoDB Tables](https://dev.mysql.com/doc/refman/5.6/en/innodb-migration.html)
-
-`CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
-convert `D0490012475E` to `D0:49:00:12:47:5E`: `update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
-
-SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2007-02-10 00:00:00' ORDER BY `time` ASC LIMIT 1;
-
 库拆分, 分库, 热备, 散表
-
-try mysql command with alt+. to input last word in last command
-  editline(libedit) vs. readline
-  MySQL 5.7.x on ubuntu 16.04 is compiled using editline library not readline
-  ~$ mysql --version
-  mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [MySQL EditLine](https://bugs.launchpad.net/percona-server/+bug/1266386)
-  
-mysqld --initialize
-sudo su - mysql -s /bin/sh -c "mysqld_multi start 2 --log=/data/mysqld_multi.log"  
-
-mysqld --defaults-file=D:\ProgramFiles\mysql-5.7.20-winx64\my.ini --initialize
-mysqld --defaults-file=..\my.ini --initialize-insecure
-
 慢日志 pt_query_digest
 pt-duplicate-key-checker tool included with Percona Toolkit,
 validate your planned changes carefully with a tool such as pt-upgrade
 二级索引 secondary index
 
-[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)  
-INNER JOIN: match in both Table A and Table B.  
-FULL OUTER JOIN: all records in Table A and Table B  
-LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.  
-
-TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`
-
-`SELECT * FROM TableA FULL OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableA.id IS null OR TableB.id IS null`
-To produce the set of records unique to Table A and Table B, we perform the same full outer join, then **exclude the records we don't want from both sides via a where clause**.
-
-`SELECT * FROM TableA CROSS JOIN TableB`  cartesian product, this joins "everything to everything"
-
 ## Recent
 
 mysqlreport --user root --password  
-查找 my.cnf 位置: mysql --help | grep /my.cnf | xargs ls
-/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf ~/.my.cnf
 
 `ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
 `SET @@auto_increment_increment=10`
 `SHOW FULL COLUMNS FROM tbl`  
 
-`select @@datadir;` select the data directory
-
-`sudo systemctl start/stop/status mysql`
-
-`sudo systemctl status mysql`
-`sudo systemctl start mysql`
-`sudo systemctl stop mysql`
-
-767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
-
-`SELECT UNIX_TIMESTAMP(NOW());`  
-`SELECT FROM_UNIXTIME(1467542031);`
-`select SUBSTRING(1456958130210,1,10);`
-`select date_add(now(), interval 1 day);` # - 加1天
-`select date_sub(now(), interval 1 day);` # - 减1天
-
-When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
-
-### MySQL installation
-
-#### CentOS
-
-``` bash
-  # mysql 5.6
-  wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
-  rpm -ivh mysql-community-release-el6-5.noarch.rpm
-  yum install mysql-server
-  # startup
-  /etc/init.d/mysqld start
-  # configure
-  mysql_secure_installation
-
-
-  #UNINSTALL
-  # stop
-  /etc/init.d/mysqld stop
-  # list pacages installed
-  rpm -qa | grep mysql
-  # uninstall
-  yum remove mysql mysql-server mysql-libs compat-mysql51
-  # remove configuration files
-  rm -rf /var/lib/mysql /etc/my.cnf
-```
-
-#### Windows
-
-1. unzip
-2. `mysqld --defaults-file=..\my.ini --initialize-insecure` to init
-3. `mysqld --console` to start
-4. `mysql -u root --skip-password` to connect
-5. `ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';` to update password
-6. `mysqladmin -u root shutdown` to shutdown mysql server
-
-7. `mysqld --install` to install as a service
-8. `net start/stop  mysql` to start/stop mysql server as a service
-9. `mysqld --remove` to remove mysql service
-
-#### 查询优化
-
-deferred join延迟关联 `select <cols> from profiles inner join (select <primary key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as x using (<primary key cols>)`
-
-#### explain
-
-[EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
-[详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
-
-`explain SQL` query;  then `show warnings` to get the raw SQL clause
-
-##### EXPLAIN列的解释
-
-table：显示这一行的数据是关于哪张表的  
-type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL  
-possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
-key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
-key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
-ref：显示索引的哪一列被使用了，如果可能的话，是一个常数  
-rows：MYSQL认为必须检查的用来返回请求数据的行数  
-Extra：关于MYSQL如何解析查询的额外信息
-
-##### Type
-
-性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
-
-##### 需要强调rows是核心指标  
-
-绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说  
-
-* rows<1000，是在可接受的范围内的。
-* rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
-* rows大于1万时，应慎重考虑SQL的设计，优化SQL
-
-这个没有绝对值可参考，一般来说越小越好，，如果100万数据量的数据库，rows是70万，通过这个可以判断sql的查询性能很差，如果100万条数据量的数据库，rows是1万，从我个人的角度，还是能接受的。
-
-##### extra 列
-
-该列包含MySQL解决查询的详细信息
-
-* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现  
-* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中  
-
-当执行计划Extra 出现Using filesort 、Using temporary 时，可以考虑是否需要进行sql优化和调整索引，最后再调整my.cnf 中与排序或者临时表相关的参数，如sort_buffer_size或者tmp_table_size.
-
-#### 建立索引原则
-
-1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
-2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
-3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录
-4. 索引列不能参与计算，保持列"干净"，比如from_unixtime(create_time) = '2014-05-29'就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp('2014-05-29');
-5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
-
-MySQL压力测试  
-
-1. mysqlslap的介绍及使用  
-2. sysbench  
-3. tpcc-mysql  
-
-HA: percona xtradb cluster, galera cluster
-
-To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`  
-To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`  
-mysql query escape %前面加两个反斜杠，比如  
-`select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'`  
-
-### datetime query
-
-``` sql
-
-SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
-  +---------------------------------------+
-  | UNIX_TIMESTAMP('2009-02-14 07:31:30') |
-  +---------------------------------------+
-  |                            1234567890 |
-  +---------------------------------------+
-SELECT FROM_UNIXTIME(1234567890);
-  +---------------------------+
-  | FROM_UNIXTIME(1234567890) |
-  +---------------------------+
-  | 2009-02-14 07:31:30      |
-  +---------------------------+
-
-SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
-SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
-
-DATE_FORMAT(NOW(),'%b %d %Y %h:%i %p'); //Dec 29 2008 11:45 PM
-DATE_FORMAT(NOW(),'%m-%d-%Y') //12-29-2008
-DATE_FORMAT(NOW(),'%d %b %y') //29 Dec 08
-DATE_FORMAT(NOW(),'%d %b %Y %T:%f') //29 Dec 2008 16:25:46.635
-```
-
-### case-sensitive
-
-make a case-sensitive query  
-`select *  from table where BINARY column = 'value'`  
-`select * from t1 where name = binary 'YOU'`  
-
-设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
-`*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的
-`*_cs`: case sensitive collation，区分大小写
-`*_ci`: case insensitive collation，不区分大小写
-
-### MySQL help
-
-`help` to get List of all MySQL commands
-
-[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
-[mysql Commands](https://dev.mysql.com/doc/refman/5.7/en/mysql-commands.html )
-`clear     (\c)` Clear the current input statement.  
-`status    (\s)` Get status information from the server.  
-`edit      (\e)` Edit command with $EDITOR.
-`ego       (\G)` Send command to mysql server, display result vertically.
-`nopager   (\n)` Disable pager, print to stdout.
-`pager     (\P)` Set PAGER [to_pager]. Print the query results via PAGER.
-`tee       (\T)` Set outfile [to_outfile]. Append everything into given outfile.
-`system    (\!)` Execute a system shell command.
-
-`pager less`, `pager less -n -i -S`
-From `man less`:  
-`-i` Causes searches to ignore case  
-`-n` Suppresses line numbers
-`-S` Causes lines longer than the screen width to be chopped rather than folded.  
-
-`edit`   it will open your default text editor with the text of the last query. The default text editor is vi, Or type `\e` to edit the statement in the buffer, like CTRL+X,E in bash  
-
-`tee queries.log`  Logging to file 'queries.log'  
-log to a file the statements you typed and their output, pretty much like the Unix `tee` command:  
 
 ### Transaction
 
@@ -348,25 +117,7 @@ Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' '
 例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8  
 mysql线上将采用一master多slave的方式来进行部署  
 
-#### check database status
-
-1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
-2. 看看索引是不是对的，看看哪些SQL本身是有问题的
-
-`show full processlist`;  
-count states of SQL: `mysql -e "show processlist \G" | grep State: | sort | uniq -c | sort -rn`
-
-`pager grep -v Sleep | less; show full processlist;`
-`SELECT * FROM information_schema.processlist WHERE INFO LIKE 'SELECT %';`
-
-查看连接MYSQL数据库的IP信息
-select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
-mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
-mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
-
-## Basic
-
-### Documents
+## Documents
 
 [MySQL 8.0 Release Notes](https://dev.mysql.com/doc/relnotes/mysql/8.0/en/)
 [MySQL 8.0 Reference Manual](https://dev.mysql.com/doc/refman/8.0/en/)
@@ -376,11 +127,45 @@ mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{prin
 
 [MySQL Documentation Home](https://dev.mysql.com/doc/)
 
-### DataType
+## Query
+
+### JOIN
+
+[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)  
+INNER JOIN: match in both Table A and Table B.  
+FULL OUTER JOIN: all records in Table A and Table B  
+LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.  
+
+TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`
+
+`SELECT * FROM TableA FULL OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableA.id IS null OR TableB.id IS null`
+To produce the set of records unique to Table A and Table B, we perform the same full outer join, then **exclude the records we don't want from both sides via a where clause**.
+
+`SELECT * FROM TableA CROSS JOIN TableB`  cartesian product, this joins "everything to everything"
+
+### Case-sensitive
+
+make a case-sensitive query  
+`select *  from table where BINARY column = 'value'`  
+`select * from t1 where name = binary 'YOU'`  
+
+设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
+`*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的
+`*_cs`: case sensitive collation，区分大小写
+`*_ci`: case insensitive collation，不区分大小写
+
+### Other
+
+`CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
+convert `D0490012475E` to `D0:49:00:12:47:5E`: `update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
+
+SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2007-02-10 00:00:00' ORDER BY `time` ASC LIMIT 1;
+
+## DataType
 
 [Data Type Storage Requirements](https://dev.mysql.com/doc/refman/8.0/en/storage-requirements.html#data-types-storage-reqs-strings)
 
-#### Integer Types
+### Integer Types
 
 [Integer Types (Exact Value) - INTEGER, INT, SMALLINT, TINYINT, MEDIUMINT, BIGINT](https://dev.mysql.com/doc/refman/8.0/en/integer-types.html)
 
@@ -391,8 +176,8 @@ SMALLINT | 2 | -32768 | 0 | 32767 | 65535
 MEDIUMINT | 3 | -8388608 | 0 | 8388607 | 16777215
 INT | 4 | -2147483648 | 0 | 2147483647 | 4294967295
 BIGINT | 8 | -263 | 0 | 263-1 | 264-1
- 
-#### String Type Storage Requirements
+
+### String Type Storage Requirements
 
 In the following table, M represents the declared column length in characters for nonbinary string types and bytes for binary string types. L represents the actual length in bytes of a given string value.
 
@@ -404,7 +189,39 @@ VARCHAR(M), VARBINARY(M) | L + 1 bytes if column values require 0 − 255 bytes,
 TINYBLOB, TINYTEXT | L + 1 bytes, where L < 28
 BLOB, TEXT | L + 2 bytes, where L < 216
 
-#### JSON
+### Datetime
+
+`SELECT UNIX_TIMESTAMP(NOW());`  
+`SELECT FROM_UNIXTIME(1467542031);`
+`select SUBSTRING(1456958130210,1,10);`
+`select DATE_ADD(now(), INTERVAL 1 day);` # - 加1天
+`select DATE_SUB(now(), INTERVAL 1 day);` # - 减1天
+
+``` SQL
+
+SELECT UNIX_TIMESTAMP('2009-02-14 07:31:30');
+  +---------------------------------------+
+  | UNIX_TIMESTAMP('2009-02-14 07:31:30') |
+  +---------------------------------------+
+  |                            1234567890 |
+  +---------------------------------------+
+SELECT FROM_UNIXTIME(1234567890);
+  +---------------------------+
+  | FROM_UNIXTIME(1234567890) |
+  +---------------------------+
+  | 2009-02-14 07:31:30      |
+  +---------------------------+
+
+SELECT FROM_UNIXTIME(SUBSTRING(1234567890123, 1, 10));
+SELECT FROM_UNIXTIME(LEFT(1234567890123,10));
+
+DATE_FORMAT(NOW(),'%b %d %Y %h:%i %p'); //Dec 29 2008 11:45 PM
+DATE_FORMAT(NOW(),'%m-%d-%Y') //12-29-2008
+DATE_FORMAT(NOW(),'%d %b %y') //29 Dec 08
+DATE_FORMAT(NOW(),'%d %b %Y %T:%f') //29 Dec 2008 16:25:46.635
+```
+
+### JSON
 
 [JSON Function Reference](https://dev.mysql.com/doc/refman/8.0/en/json-function-reference.html)
 
@@ -415,9 +232,9 @@ SELECT id,type,product FROM t where JSON_CONTAINS(type, '["直播"]');
 SELECT id,type,product FROM t where JSON_SEARCH(type, 'one', "直播");
 ```
 
-#### [Functions That Search JSON Values](https://dev.mysql.com/doc/refman/8.0/en/json-search-functions.html)
+### [Functions That Search JSON Values](https://dev.mysql.com/doc/refman/8.0/en/json-search-functions.html)
 
-##### JSON_CONTAINS(target, candidate[, path])
+#### JSON_CONTAINS(target, candidate[, path])
 
 Indicates by returning 1 or 0 whether a given candidate JSON document is contained within a target JSON document
 
@@ -432,7 +249,7 @@ mysql> SELECT JSON_CONTAINS(@j, @j2, '$.a');
 +-------------------------------+
 ```
 
-##### JSON_EXTRACT(json_doc, path[, path] ...)
+#### JSON_EXTRACT(json_doc, path[, path] ...)
 
 Returns data from a JSON document, selected from the parts of the document matched by the path arguments
 
@@ -450,7 +267,7 @@ The `->` operator serves as an alias for the `JSON_EXTRACT()`: `JSON_EXTRACT(c, 
 the `->>` operator in addition unquotes the extracted result `JSON_UNQUOTE(JSON_EXTRACT(column, path))`. In other words, given a JSON column value column and a path expression path. The `->>` operator can be used wherever JSON_UNQUOTE(JSON_EXTRACT()) would be allowed.
 `column->>path` == `JSON_UNQUOTE(JSON_EXTRACT(column, path))`
 
-##### JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
+#### JSON_SEARCH(json_doc, one_or_all, search_str[, escape_char[, path] ...])
 
 ```SQL
 mysql> SET @j = '["abc", [{"k": "10"}, "def"], {"x":"abc"}, {"y":"bcd"}]';
@@ -470,7 +287,7 @@ mysql> SELECT JSON_SEARCH(@j, 'all', 'abc');
 +-------------------------------+
 ```
 
-##### [JSON Utility Functions](https://dev.mysql.com/doc/refman/8.0/en/json-utility-functions.html)
+#### [JSON Utility Functions](https://dev.mysql.com/doc/refman/8.0/en/json-utility-functions.html)
 
 ```SQL
 mysql> SELECT JSON_PRETTY('123'); # scalar
@@ -488,24 +305,12 @@ mysql> SELECT JSON_PRETTY("[1,3,5]"); # array
 mysql> SELECT JSON_PRETTY('{"a":"10","b":"15","x":"25"}'); # object
 ```
 
-##### Other
-
+#### Other
 
 `JSON_KEYS(json_doc[, path])`: Returns the keys from the top-level value of a JSON object as a JSON array
 `JSON_OVERLAPS(json_doc1, json_doc2)`: Compares two JSON documents. Returns true (1) if the two document have any key-value pairs or array elements in common
 `value MEMBER OF(json_array)`: Returns true (1) if value is an element of json_array, otherwise returns false (0). value must be a scalar or a JSON document; if it is a scalar, the operator attempts to treat it as an element of a JSON array.
 
-### Admin command
-
-`./mysqld_safe` start MySQL server  
-`service mysql stop`, `service mysql start` Ubuntu start MySQL
-`sudo /etc/init.d/mysql start`  start mysql server on ubuntu
-`sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
-`/etc/init/mysql.conf`
-
-find the mysql data directory by `grep datadir /etc/my.cnf` or
-`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
-`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 ### Common command
 
@@ -1021,6 +826,133 @@ exit
 
 ```
 
+## Shell
+
+mysqld --initialize
+sudo su - mysql -s /bin/sh -c "mysqld_multi start 2 --log=/data/mysqld_multi.log"  
+
+mysqld --defaults-file=D:\ProgramFiles\mysql-5.7.20-winx64\my.ini --initialize
+mysqld --defaults-file=..\my.ini --initialize-insecure
+
+### start/stop
+
+`sudo systemctl start/stop/status mysql`
+`sudo systemctl status mysql`
+`sudo systemctl start mysql`
+`sudo systemctl stop mysql`
+
+`./mysqld_safe` start MySQL server  
+`service mysql stop`, `service mysql start` Ubuntu start MySQL
+`sudo /etc/init.d/mysql start`  start mysql server on ubuntu
+`sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
+
+### manage
+
+#### check database status
+
+1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
+2. 看看索引是不是对的，看看哪些SQL本身是有问题的
+
+```SQL
+pager grep -v Sleep | less; show full processlist;
+SELECT * FROM information_schema.processlist WHERE INFO LIKE 'SELECT %';
+```
+
+``` shell
+# count states of SQL
+mysql -e "show full processlist \G" | grep State: | sort | uniq -c | sort -rn
+
+# Kill all process in shell
+mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
+grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
+mysql -h localhost -u root -p
+
+# 查看连接MYSQL数据库的IP信息
+select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
+mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
+mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
+```
+
+#### 查找 my.cnf 位置
+
+`/etc/init/mysql.conf`
+mysql --help | grep /my.cnf | xargs ls
+/etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf ~/.my.cnf
+find the mysql data directory by `grep datadir /etc/my.cnf` or
+`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
+`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
+
+`select @@datadir;` select the data directory
+
+### Installation
+
+#### CentOS
+
+``` bash
+  # mysql 5.6
+  wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm
+  rpm -ivh mysql-community-release-el6-5.noarch.rpm
+  yum install mysql-server
+  # startup
+  /etc/init.d/mysqld start
+  # configure
+  mysql_secure_installation
+
+
+  #UNINSTALL
+  # stop
+  /etc/init.d/mysqld stop
+  # list pacages installed
+  rpm -qa | grep mysql
+  # uninstall
+  yum remove mysql mysql-server mysql-libs compat-mysql51
+  # remove configuration files
+  rm -rf /var/lib/mysql /etc/my.cnf
+```
+
+#### Windows
+
+1. unzip
+2. `mysqld --defaults-file=..\my.ini --initialize-insecure` to init
+3. `mysqld --console` to start
+4. `mysql -u root --skip-password` to connect
+5. `ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';` to update password
+6. `mysqladmin -u root shutdown` to shutdown mysql server
+
+7. `mysqld --install` to install as a service
+8. `net start/stop  mysql` to start/stop mysql server as a service
+9. `mysqld --remove` to remove mysql service
+
+### MySQL Shell Commands
+
+[3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
+[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
+
+`help` to get List of all MySQL commands
+`clear     (\c)` Clear the current input statement.  
+`status    (\s)` Get status information from the server.  
+`edit      (\e)` Edit command with $EDITOR. like CTRL+X,E in bash  
+`ego       (\G)` Send command to mysql server, display result vertically.
+`nopager   (\n)` Disable pager, print to stdout.
+`pager     (\P)` Set PAGER [to_pager]. Print the query results via PAGER.
+`tee       (\T)` Set outfile [to_outfile]. Append everything into given outfile.
+`system    (\!)` Execute a system shell command.
+
+`pager less`, `pager less -n -i -S`
+From `man less`:  
+`-i` Causes searches to ignore case  
+`-n` Suppresses line numbers
+`-S` Causes lines longer than the screen width to be chopped rather than folded.  
+
+When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
+
+#### editline(libedit) vs. readline
+
+try mysql command with `alt+.` to input last word in last command
+MySQL 5.7.x on ubuntu 16.04 is compiled using editline library not readline
+`mysql --version`
+mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [MySQL EditLine](https://bugs.launchpad.net/percona-server/+bug/1266386)
+
 ## MySQL线上常见故障剖析
 
 –活动进程(Process list)  
@@ -1151,7 +1083,73 @@ The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM cust
 第六才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
 mysql数据库一般都是按照这个步骤去演化的，成本也是由低到高；
 
-### Replication
+### 查询优化
+
+deferred join延迟关联 `select <cols> from profiles inner join (select <primary key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as x using (<primary key cols>)`
+
+### explain
+
+[EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
+[详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
+
+`explain SQL` query;  then `show warnings` to get the raw SQL clause
+
+#### EXPLAIN列的解释
+
+table：显示这一行的数据是关于哪张表的  
+type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL  
+possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
+key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
+key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
+ref：显示索引的哪一列被使用了，如果可能的话，是一个常数  
+rows：MYSQL认为必须检查的用来返回请求数据的行数  
+Extra：关于MYSQL如何解析查询的额外信息
+
+#### Type
+
+性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
+
+#### 需要强调rows是核心指标  
+
+绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说  
+
+* rows<1000，是在可接受的范围内的。
+* rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
+* rows大于1万时，应慎重考虑SQL的设计，优化SQL
+
+这个没有绝对值可参考，一般来说越小越好，，如果100万数据量的数据库，rows是70万，通过这个可以判断sql的查询性能很差，如果100万条数据量的数据库，rows是1万，从我个人的角度，还是能接受的。
+
+#### extra 列
+
+该列包含MySQL解决查询的详细信息
+
+* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现  
+* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中  
+
+当执行计划Extra 出现Using filesort 、Using temporary 时，可以考虑是否需要进行sql优化和调整索引，最后再调整my.cnf 中与排序或者临时表相关的参数，如sort_buffer_size或者tmp_table_size.
+
+### 建立索引原则
+
+1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
+2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
+3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录
+4. 索引列不能参与计算，保持列"干净"，比如from_unixtime(create_time) = '2014-05-29'就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp('2014-05-29');
+5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
+
+### MySQL压力测试  
+
+1. mysqlslap的介绍及使用  
+2. sysbench  
+3. tpcc-mysql  
+
+### index
+
+To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`  
+To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`  
+mysql query escape %前面加两个反斜杠，比如  
+`select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'` 
+
+## Replication
 
 [17.1.1.8 Setting Up Replication with Existing Data](https://dev.mysql.com/doc/refman/5.6/en/replication-howto-existingdata.html)
 If `--master-info-repository=TABLE`, the replication coordinates from the master is saved in the table `master_slave_info` in the mysql database
@@ -1162,7 +1160,7 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 2. (`Relay_Master_Log_File, Exec_Master_Log_Pos`): Coordinates in the master binary log indicating how far the slave SQL thread has executed events received from that log.
 3. (`Relay_Log_File, Relay_Log_Pos`): Coordinates in the slave relay log indicating how far the slave SQL thread has executed the relay log. These correspond to the preceding coordinates, but are expressed in slave relay log coordinates rather than master binary log coordinates.
 
-#### mysqlbinlog
+### mysqlbinlog
 
 [mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
 [mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
@@ -1207,7 +1205,7 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 [Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)
 
-#### relay log
+### relay log
 
 [MySQL 5.7 Reference Manual - The Slave Relay Log](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-relaylog.html)
 当slave不再使用时，通过`reset slave`来取消relaylog
@@ -1227,6 +1225,8 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 * MaxScale  
 * Atlas（360）, based on MySQL-Proxy 0.8.2  
 * Cobar（Alibaba）  
+
+HA: percona xtradb cluster, galera cluster
 
 ## inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具 
 
