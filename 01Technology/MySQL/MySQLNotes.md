@@ -23,99 +23,8 @@ validate your planned changes carefully with a tool such as pt-upgrade
 
 ## Recent
 
-mysqlreport --user root --password  
-
-`ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
 `SET @@auto_increment_increment=10`
 `SHOW FULL COLUMNS FROM tbl`  
-
-
-### Transaction
-
-[Using the Transaction Information Schema Tables](https://dev.mysql.com/doc/innodb-plugin/1.0/en/innodb-information-schema-examples.html)
-`begin`, `start transaction`, `set autocommit=0`  
-`end`, `commit`, `rollback`
-
-SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;  
-`SELECT @@global.tx_isolation;`  查看InnoDB系统级别的事务隔离级别
-`SELECT @@tx_isolation;`  查看InnoDB会话级别的事务隔离级别  
-`SET global transaction isolation level read committed;`  修改InnoDB系统级别的事务隔离级别  
-`SET session transaction isolation level read committed;`  修改InnoDB会话级别的事务隔离级别  
-`set innodb_lock_wait_timeout=100`  
-`show variables like 'innodb_lock_wait_timeout';`  
-`show engine innodb status`   to get a list of all the actions currently pending inside the InnoDB engine  
-
-#### FORCE UNLOCK for locked tables in MySQL
-
-`show open tables where in_use>0;`  get the list of locked tables
-`show processlist;`  get the list of the current processes, one of them is locking your table(s)  
-`kill <put_process_id_here>;`   Kill one of these processes
-Kill multiple process: `SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE user = 'root' \G`  
-[Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)
-
-[Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
-
-``` sql
-  mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root';
-  +------------------------+
-  | concat('KILL ',id,';') |
-  +------------------------+
-  | KILL 3101;             |
-  | KILL 2946;             |
-  +------------------------+
-  2 rows in set (0.00 sec)
-  mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root' into outfile '/tmp/a.txt';
-  Query OK, 2 rows affected (0.00 sec)
-  mysql> source /tmp/a.txt;
-  Query OK, 0 rows affected (0.00 sec)
-```
-
-#### 事务隔离模式
-
-1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。  
-2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。  
-3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。  
-    但是这种方式又引发了幻读的问题(MySQL InnoDB 通过 MVCC, Mutipleversion Concurrency Control 解决了幻读问题)。
-    因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。  
-4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。  
-
-[14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
-[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)  
-
-脏读（dirty read）
-不可重复读（unrepeatable read）
-幻读（phantom read）
-幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
-为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，  
-而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
-
-#### 锁机制
-
-1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写  
-2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
-
-锁的范围:  
-行锁: 对某行记录加上锁  
-表锁: 对整个表加上锁  
-共享锁(share mode), 排他锁(for update)
-
-不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。  
-`replace into`  相当于delete然后insert，会有对数据进行写的过程。  
-`insert ignore`  会忽略已经存在主键或unique索引的数据，而不会有数据的修改
-使用场景：  
-    如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据
-    如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间
-
-### MySQL调优
-
-1.mysql嵌套子查询效率确实比较低
-2.可以将其优化成连接查询
-3.连接表时，可以先用where条件对表进行过滤，然后做表连接 (虽然mysql会对连表语句做优化)
-4.建立合适的索引
-5.学会分析sql执行计划，mysql会对sql进行优化，所以分析执行计划很重要
-制定适当的存储引擎和字符编码  
-例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8  
-mysql线上将采用一master多slave的方式来进行部署  
 
 ## Documents
 
@@ -127,7 +36,112 @@ mysql线上将采用一master多slave的方式来进行部署
 
 [MySQL Documentation Home](https://dev.mysql.com/doc/)
 
-## Query
+## Statement
+
+### Connection
+
+连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
+`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）  
+
+### Database/Schema
+
+显示当前数据库服务器中的数据库列表：`SHOW DATABASES;`
+打开库: `USE 库名;`  
+建立数据库: `CREATE DATABASE 库名;`  
+删除数据库: `DROP DATABASE 库名 IF EXISTS 库名;`  
+
+### Table
+
+显示数据库中的数据表: `SHOW TABLES;`  
+显示数据表的结构: `DESCRIBE 表名;`  
+建立数据表: `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`  
+`SHOW CREATE TABLE`  
+删除数据表: `DROP TABLE 表名；`  
+将表中记录清空: `DELETE FROM 表名;`  
+
+### User management
+
+`CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';`
+`ALTER USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dev';`
+`DROP USER 'demo'@'localhost';`
+`DROP USER admin@'%';`
+
+`GRANT SELECT,INSERT,UPDATE,DELETE ON databaseName.tableName TO 'user'@'%';`  
+`GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost';`
+`REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`
+`REVOKE SELECT ON *.* FROM 'admin'@'%';`  
+
+`select user,host from mysql.user where user='cactiuser' \G` 查看MYSQL数据库中所有用户  
+`show grants for USERNAME@IP;` 查看用户权限  
+
+`FLUSH PRIVILEGES;`  
+
+### Insert
+
+往表中插入记录: `INSERT INTO 表名 VALUES ("hyq","M");`  
+用文本方式将数据装入数据表中: `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`  
+
+`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`
+`INSERT INTO tbl_temp2 (fld_id) SELECT tbl_temp1.fld_order_id FROM tbl_temp1 WHERE tbl_temp1.fld_order_id > 100;`
+
+### Update
+
+更新表中数据: `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
+append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
+
+``` SQL
+-- Update MySQL table with another table's data
+UPDATE tableB
+INNER JOIN tableA ON tableB.name = tableA.name
+SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
+WHERE tableA.name = 'Joe'
+
+-- update multiple fields
+UPDATE tbl SET refund_transactions = 0, trade_transactions = 83  
+```
+
+### Alter
+
+`ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
+`ALTER TABLE tableName DROP INDEX idx_name;`
+`ALTER TABLE table_name add UNIQUE KEY (model,ip);`  
+`ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
+updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
+
+`ALTER TABLE wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功' after ANOTHER_COLUMN_NAME;`
+`ALTER TABLE bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
+`ALTER TABLE old_name RENAME new_name;`
+`ALTER TABLE table_name ENGINE=InnoDB;`
+`ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
+
+### Select
+
+按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
+计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`  
+
+字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`  
+字符长度(in byte): `SELECT LENGTH("SQL字符长度") AS LengthOfString;`  
+`SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
+显示当前的user: `SELECT USER();`  
+来查看数据库版本 `SELECT VERSION();`  
+显示use的数据库名 query the current database name: `SELECT DATABASE();`
+
+`show variables where variable_name like '%myisam%'`
+`show variables like 'char%'`  
+
+#### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
+
+1. 和`=`号的相同点
+ 像常规的=运算符一样，两个值进行比较，结果是0（不等于）或1（相等）; 换句话说：'A'<=>'B'得0 和'a'<=>'a'得1。
+
+2. 和`=`号的不同点
+ 和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1  
+ 和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。  
+ 顺便说一句，mysql上几乎所有的操作符和函数都是这样工作的，因为和NULL比较基本上都没有意义。
+
+3. 相关操作符
+ 除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。  
+ 他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言
 
 ### JOIN
 
@@ -154,16 +168,80 @@ make a case-sensitive query
 `*_cs`: case sensitive collation，区分大小写
 `*_ci`: case insensitive collation，不区分大小写
 
-### Other
+### Other function
 
 `CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
-convert `D0490012475E` to `D0:49:00:12:47:5E`: `update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
+
+convert `D0490012475E` to `D0:49:00:12:47:5E`
+`update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
 
 SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2007-02-10 00:00:00' ORDER BY `time` ASC LIMIT 1;
+
+### Complicated SQL
+
+``` SQL
+
+-- SET table_name as variable
+SET @tableName = 'user';
+SET @s = concat('select id from ', @tableName, ' where id = 770');
+PREPARE stmt1 FROM @s;
+EXECUTE stmt1;
+DEALLOCATE PREPARE stmt1;
+
+SELECT
+    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`,
+    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
+FROM prince
+```
+
+### Check database status
+
+1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
+2. 看看索引是不是对的，看看哪些SQL本身是有问题的
+
+[Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)
+[Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
+
+```SQL
+pager grep -v Sleep | less; show full processlist;
+
+-- Kill multiple process: 
+SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE STATE = 'Sleep' AND user = 'root' and INFO LIKE 'SELECT %' \G
++----------------------------------------------------+
+| Paste the following query to kill all processes    |
++----------------------------------------------------+
+| KILL 16; KILL 8; KILL 9; KILL 19; KILL 5; KILL 15; |
++----------------------------------------------------+
+
+-- output file
+mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root' into outfile '/tmp/a.txt';
+mysql> source /tmp/a.txt;
+```
+
+``` bash
+# count states of SQL
+mysql -e "show full processlist \G" | grep State: | sort | uniq -c | sort -rn
+
+# Kill all process in shell
+mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
+grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
+mysql -h localhost -u root -p
+
+# 查看连接MYSQL数据库的IP信息
+select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
+mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
+mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
+```
 
 ## DataType
 
 [Data Type Storage Requirements](https://dev.mysql.com/doc/refman/8.0/en/storage-requirements.html#data-types-storage-reqs-strings)
+
+### [数据类型宽度](http://blog.jobbole.com/87318/ )
+
+显示宽度只用于显示，并不能限制取值范围和占用空间，例如：INT(3)会占用4个字节的存储空间，并且允许的最大值也不会是999，而是INT整型
+[Numeric Type Attributes](https://dev.mysql.com/doc/refman/5.7/en/numeric-type-attributes.html )
+[MySQL: Why specify display width without using zerofill](https://stackoverflow.com/questions/12592376/mysql-why-specify-display-width-without-using-zerofill )
 
 ### Integer Types
 
@@ -305,151 +383,13 @@ mysql> SELECT JSON_PRETTY("[1,3,5]"); # array
 mysql> SELECT JSON_PRETTY('{"a":"10","b":"15","x":"25"}'); # object
 ```
 
-#### Other
+#### JSON Other
 
 `JSON_KEYS(json_doc[, path])`: Returns the keys from the top-level value of a JSON object as a JSON array
 `JSON_OVERLAPS(json_doc1, json_doc2)`: Compares two JSON documents. Returns true (1) if the two document have any key-value pairs or array elements in common
 `value MEMBER OF(json_array)`: Returns true (1) if value is an element of json_array, otherwise returns false (0). value must be a scalar or a JSON document; if it is a scalar, the operator attempts to treat it as an element of a JSON array.
 
-
-### Common command
-
-连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
-`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）  
-显示当前数据库服务器中的数据库列表：`SHOW DATABASES;`
-`USE 库名;`  
-建立数据库： `CREATE DATABASE 库名;`  
-删除数据库： `DROP DATABASE 库名;`  
-显示数据库中的数据表： `SHOW TABLES;`  
-显示数据表的结构： `DESCRIBE 表名;`  
-建立数据表： `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`  
-`SHOW CREATE TABLE`  
-删除数据表： `DROP TABLE 表名；`  
-将表中记录清空： `DELETE FROM 表名;`  
-往表中插入记录： `INSERT INTO 表名 VALUES ("hyq","M");`  
-更新表中数据： `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
-
-``` SQL
--- Update MySQL table with another table's data
-UPDATE tableB
-INNER JOIN tableA ON tableB.name = tableA.name
-SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
-WHERE tableA.name = 'Joe'
-```
-
-用文本方式将数据装入数据表中： `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`  
-
-`ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
-`ALTER TABLE tableName DROP INDEX idx_name;`
-`ALTER table table_name add UNIQUE KEY (model,ip);`  
-`ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
-updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
-
-`ALTER table wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功' after ANOTHER_COLUMN_NAME;`
-`ALTER table bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
-`ALTER TABLE old_name RENAME new_name;`
-`ALTER TABLE table_name ENGINE=InnoDB;`
-
-`INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`  
-
-按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
-计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`  
-
-append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
-
-字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`  
-字符长度(in byte): `SELECT LENGTH("SQL字符长度") AS LengthOfString;`  
-`SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
-显示当前的user： `SELECT USER();`  
-来查看数据库版本 `SELECT VERSION();`  
-显示use的数据库名 query the current database name： `SELECT DATABASE();`
-
-`show variables where variable_name like '%myisam%'`
-`show variables like 'char%'`  
-
-#### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
-
-1. 和`=`号的相同点
- 像常规的=运算符一样，两个值进行比较，结果是0（不等于）或1（相等）; 换句话说：'A'<=>'B'得0 和'a'<=>'a'得1。
-
-2. 和`=`号的不同点
- 和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1  
- 和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。  
- 顺便说一句，mysql上几乎所有的操作符和函数都是这样工作的，因为和NULL比较基本上都没有意义。
-
-3. 相关操作符
- 除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。  
- 他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言  
-
-#### SET table_name as variable
-
-```sql
-SET @tableName = 'user';
-SET @s = concat('select id from ', @tableName, ' where id = 770');
-PREPARE stmt1 FROM @s;
-EXECUTE stmt1;
-DEALLOCATE PREPARE stmt1;
-```
-
-#### 修改密码
-
-格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
-
-1. 给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
- `mysqladmin -u root -password PWD_NEW`  
-注：因为开始时root没有密码，所以-p旧密码一项就可以省略了  
-2. 再将root的密码改为PWD_NEW  
-`mysqladmin -u root -pPWD_OLD password PWD_NEW`  
-命令行修改root密码： `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
-3. [忘记 root 密码](https://help.aliyun.com/knowledge_detail/42520.html)
-
-##### Linux
-
-1. `vim /etc/my.cnf`
-    `[mysqld]skip-grant-tables  #增加`
-2. `/etc/init.d/mysqld restart`
-3. `mysql`
-4. `UPDATE user SET password = 'root' WHERE User = 'root' ;`  
-5. `flush privileges ;`
-6. 删除`my.cnf`的 `spip-grant-tables`
-7. 重启 MySQL 服务
-
-#### 增加新用户 grant permission
-
-`SELECT DISTINCT CONCAT('User: ''',user,'''@''',host,''';') AS query FROM mysql.user;` 查看MYSQL数据库中所有用户  
-`grant all on dbName.* to 'USERNAME'@192.168.1.136 identified by 'PASSWORD';`  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
-`show grants for USERNAME@IP;` 查看用户权限  
-`select * from mysql.user where user='cactiuser' \G`
-`CREATE USER 'hadoop'@'localhost' IDENTIFIED BY 'password';`
-`GRANT SELECT ON databaseName.tableName TO 'user'@'%';`  
-`GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost' IDENTIFIED BY 'password';`  
-`ALTER USER 'dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'dev';`
-`REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`
-`revoke select on *.* from 'admin'@'%';`
-
-`DROP USER 'demo'@'localhost';`
-`DROP USER admin@'%';`
-
-（注意：和上面不同，下面的因为是MYSQL环境中的命令，所以后面都带一个分号作为命令结束符）  
-格式：`grant select on 数据库.* to 用户名@登录主机 identified by "PASSWORD"`  
-1、增加一个用户test1密码为abc，让他可以在任何主机上登录，并对所有数据库有查询、插入、修改、删除的权限。首先用root用户连入MYSQL，然后键入以下命令：  
-`grant select,insert,update,delete on *.* to test1@"%" Identified by "PWD";`
-但增加的用户是十分危险的，你想如某个人知道test1的密码，那么他就可以在internet上的任何一台电脑上登录你的mysql数据库并对你的数据可以为所欲为了，解决办法见2。  
-2、增加一个用户test2密码为abc,让他只可以在localhost上登录，并可以对数据库mydb进行查询、插入、修改、删除的操作（localhost指本地主机，即MYSQL数据库所在的那台主机），  
-这样用户即使用知道test2的密码，他也无法从internet上直接访问数据库，只能通过MYSQL主机上的web页来访问了。  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by "abc";`  
-如果你不想test2有密码，可以再打一个命令将密码消掉。  
-`grant select,insert,update,delete on mydb.* to test2@localhost identified by "";`
-`mysql> FLUSH PRIVILEGES;`  
-
-##### 查看连接MYSQL数据库的IP信息
-
-* `select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;`
-* `mysql -u root -h127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c`
-* `mysql -u root -h127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c`
-
-### Charset 查看三种MySQL字符集
+## Charset 查看三种MySQL字符集
 
 MySQL 5.5.3+ UTF8mb4支持emoji  
 查看支持的字符集和排序方式: `show character set`, `show collation` or `show variables like '%char%'`  
@@ -484,9 +424,7 @@ MySQL 5.5.3+ UTF8mb4支持emoji
   collation-server = utf8mb4_unicode_ci
 ```
 
-#### Sample
-
-##### 创建表的时候指定CHARSET为utf8mb4
+### 创建表的时候指定CHARSET为utf8mb4
 
 ``` sql
   CREATE TABLE IF NOT EXISTS mb4 (
@@ -505,7 +443,7 @@ update table character:
 
 update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
 
-##### 查看MySQL数据库服务器和数据库MySQL字符集  
+### 查看MySQL数据库服务器和数据库MySQL字符集  
 
   ```sql
   mysql> show variables like '%char%';
@@ -524,7 +462,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   8 rows in set (0.00 sec)
   ```
 
-##### 查看MySQL数据表（table）的MySQL字符集  
+### 查看MySQL数据表（table）的MySQL字符集  
 
   ``` sql
   mysql> show table status from settlement like 'tableName' \G
@@ -545,7 +483,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   1 row in set (0.00 sec)
   ```
 
-##### 查看MySQL数据列（column）的MySQL字符集  
+### 查看MySQL数据列（column）的MySQL字符集  
 
   ``` sql
   mysql> show full columns from st_card \G
@@ -559,11 +497,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   Privileges: select,insert,update,references
   ```
 
-### [数据类型宽度](http://blog.jobbole.com/87318/ )
-
-显示宽度只用于显示，并不能限制取值范围和占用空间，例如：INT(3)会占用4个字节的存储空间，并且允许的最大值也不会是999，而是INT整型
-[Numeric Type Attributes](https://dev.mysql.com/doc/refman/5.7/en/numeric-type-attributes.html )
-[MySQL: Why specify display width without using zerofill](https://stackoverflow.com/questions/12592376/mysql-why-specify-display-width-without-using-zerofill )
+## MySQL Server Administration
 
 ### Backup & restore
 
@@ -588,6 +522,13 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 * `--insert-ignore`  Write `INSERT IGNORE` statements rather than `INSERT` statements
 * `--force, -f`  Ignore all errors; continue even if an SQL error occurs during a
 
+``` bash
+
+  date_str=`date +%Y%m%d%H%M%S`
+  cd /data2/backup
+  mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
+```
+
 #### Import/Restore
 
 `mysql> USE 数据库名;`  
@@ -607,51 +548,17 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 ``` sql
 
 SELECT
-orderNumber, status, orderDate, requiredDate, comments
+  orderNumber, status, orderDate, requiredDate, comments
 FROM
-orders
+  orders
 WHERE
-status = 'Cancelled'
+  status = 'Cancelled'
 INTO OUTFILE '/tmp/cancelled_orders.csv'
 FIELDS ENCLOSED BY '"'
 TERMINATED BY ','
 ESCAPED BY '"'
 LINES TERMINATED BY '\r\n';
 ```
-
-### Backup script
-
-``` bash
-
-  date_str=`date +%Y%m%d%H%M%S`
-  cd /data2/backup
-  mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
-```
-
-### Example: 建库和建表以及插入数据
-
-``` sql
-
-  DROP DATABASE IF EXISTS school; //如果存在SCHOOL则删除
-  CREATE DATABASE school; //建立库SCHOOL
-  USE school; //打开库SCHOOL
-  CREATE TABLE teacher //建立表TEACHER
-  (
-  id INT(3) AUTO_INCREMENT NOT NULL PRIMARY KEY,
-  name CHAR(10) NOT NULL,
-  address VARCHAR(50) DEFAULT '深圳',
-  year DATE
-  );
-```
-
--- 以下为插入字段  
-`INSERT INTO teacher VALUES(",'jack','大连二中','1975-12-23′);`
-
-如果你在mysql提示符键入上面的命令也可以，但不方便调试。  
-（1）你可以将以上命令原样写入一个文本文件中，假设为school.sql，然后复制到c:\\下，并在DOS状态进入目录\\mysql\\bin，然后键入以下命令：  
-mysql -uroot -p密码 < c:\\school.sql  
-如果成功，空出一行无任何显示；如有错误，会有提示。（以上命令已经调试，你只要将//的注释去掉即可使用）。  
-（2）或者进入命令行后使用 mysql> source c:\\school.sql; 也可以将school.sql文件导入数据库中。  
 
 #### Get the sizes of the tables
 
@@ -768,110 +675,7 @@ JOIN   mytb t2 ON
 
 ```
 
-### Configuration
-
-#### MySQL Workbench update shortcut Auto-complete
-
-D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
-/usr/share/mysql-workbench/data/main_menu.xml  
-
-#### Autocompletion in the MySQL command-line client
-
-Edit or create a file called .my.cnf in your home directory, containing:
-
-``` config
-  [mysql]
-  auto-rehash
-```
-
-#### Input-Line Editing
-
-[MySQL Tips](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )
-echo bind "^W" ed-delete-prev-word > .editrc
-echo bind "^U" vi-kill-line-prev >> .editrc
-
-## Advanced
-
-### MySQL忘记root密码
-
-1. 在DOS窗口下输入net stop mysql5 或 net stop mysql  
-2. 开一个DOS窗口，这个需要切换到mysql的bin目录输入mysqld --skip-grant-tables;  
-3. 再开一个DOS窗口，mysql -u root  
-4. 输入
- use mysql  
- update user set password=password("password") where user="root";  
- flush privileges;  
-exit  
-5. 使用任务管理器，找到mysqld-nt的进程，结束进程
-
-### 将文本数据转到数据库中
-
-1. 文本数据应符合的格式：字段数据之间用tab键隔开，null值用\\n来代替.例：  
- 3 rose 大连二中 1976-10-10  
- 4 mike 大连一中 1975-12-23  
-假设你把这两组数据存为school.txt文件，放在c盘根目录下。  
-2. 数据传入命令 load data local infile "c:\\school.txt" into table 表名;  
-注意：你最好将文件复制到\\mysql\\bin目录下，并且要先用use命令打表所在的库。  
-
-### Advanced SQL
-
-``` sql
-
-  UPDATE tbl SET refund_transactions = 0, trade_transactions = 83  
-
-  SELECT
-      COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`,
-      COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
-  FROM prince
-
-```
-
-## Shell
-
-mysqld --initialize
-sudo su - mysql -s /bin/sh -c "mysqld_multi start 2 --log=/data/mysqld_multi.log"  
-
-mysqld --defaults-file=D:\ProgramFiles\mysql-5.7.20-winx64\my.ini --initialize
-mysqld --defaults-file=..\my.ini --initialize-insecure
-
-### start/stop
-
-`sudo systemctl start/stop/status mysql`
-`sudo systemctl status mysql`
-`sudo systemctl start mysql`
-`sudo systemctl stop mysql`
-
-`./mysqld_safe` start MySQL server  
-`service mysql stop`, `service mysql start` Ubuntu start MySQL
-`sudo /etc/init.d/mysql start`  start mysql server on ubuntu
-`sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
-
-### manage
-
-#### check database status
-
-1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
-2. 看看索引是不是对的，看看哪些SQL本身是有问题的
-
-```SQL
-pager grep -v Sleep | less; show full processlist;
-SELECT * FROM information_schema.processlist WHERE INFO LIKE 'SELECT %';
-```
-
-``` shell
-# count states of SQL
-mysql -e "show full processlist \G" | grep State: | sort | uniq -c | sort -rn
-
-# Kill all process in shell
-mysql -h localhost -u root -p -D dbName -e "show full processlist;" | \
-grep -i "show" | awk '{print $0}' | awk '{print "kill", $1 ";"}' \
-mysql -h localhost -u root -p
-
-# 查看连接MYSQL数据库的IP信息
-select SUBSTRING_INDEX(host,':',1) as ip , count(*) from information_schema.processlist group by ip;
-mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{ print $2 }'| sort | uniq -c
-mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
-```
+### Installation
 
 #### 查找 my.cnf 位置
 
@@ -883,8 +687,6 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 `select @@datadir;` select the data directory
-
-### Installation
 
 #### CentOS
 
@@ -910,6 +712,18 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
   rm -rf /var/lib/mysql /etc/my.cnf
 ```
 
+#### start/stop
+
+`sudo systemctl start/stop/status mysql`
+`sudo systemctl status mysql`
+`sudo systemctl start mysql`
+`sudo systemctl stop mysql`
+
+`./mysqld_safe` start MySQL server  
+`service mysql stop`, `service mysql start` Ubuntu start MySQL
+`sudo /etc/init.d/mysql start`  start mysql server on ubuntu
+`sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
+
 #### Windows
 
 1. unzip
@@ -922,6 +736,29 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 7. `mysqld --install` to install as a service
 8. `net start/stop  mysql` to start/stop mysql server as a service
 9. `mysqld --remove` to remove mysql service
+
+#### 修改密码
+
+格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
+
+1. 给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
+ `mysqladmin -u root -password PWD_NEW`  
+注：因为开始时root没有密码，所以-p旧密码一项就可以省略了  
+2. 再将root的密码改为PWD_NEW  
+`mysqladmin -u root -pPWD_OLD password PWD_NEW`  
+命令行修改root密码: `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
+3. [忘记 root 密码](https://help.aliyun.com/knowledge_detail/42520.html)
+
+##### Linux
+
+1. `vim /etc/my.cnf`
+    `[mysqld]skip-grant-tables  #增加`
+2. `/etc/init.d/mysqld restart`
+3. `mysql`
+4. `UPDATE user SET password = 'root' WHERE User = 'root' ;`  
+5. `flush privileges ;`
+6. 删除`my.cnf`的 `spip-grant-tables`
+7. 重启 MySQL 服务
 
 ### MySQL Shell Commands
 
@@ -946,6 +783,21 @@ From `man less`:
 
 When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
 
+#### Autocompletion in the MySQL command-line client
+
+Edit or create a file called .my.cnf in your home directory, containing:
+
+``` config
+  [mysql]
+  auto-rehash
+```
+
+#### Input-Line Editing
+
+[MySQL Tips](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )
+echo bind "^W" ed-delete-prev-word > .editrc
+echo bind "^U" vi-kill-line-prev >> .editrc
+
 #### editline(libedit) vs. readline
 
 try mysql command with `alt+.` to input last word in last command
@@ -953,55 +805,69 @@ MySQL 5.7.x on ubuntu 16.04 is compiled using editline library not readline
 `mysql --version`
 mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [MySQL EditLine](https://bugs.launchpad.net/percona-server/+bug/1266386)
 
-## MySQL线上常见故障剖析
+#### MySQL Workbench update shortcut Auto-complete
 
-–活动进程(Process list)  
-–日志文件(slow log, alert log, general query log, binlog)  
-–Status variables（com_select, com_insert,.etc)  
-–InnoDB(物理读、逻辑读、innodbstatus)  
-–参数配置  
-–Stack trace(plus source code)  
-•SQL  
-–执行计划，explain  
-•OS  
-–内存, SWAP, /proc/meminfo  
-–CPU, load, ps
-–IO（磁盘、网络)  
-•Iostat  
-•Profile  
-–Oprofile  
-–gprof  
+D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
+/usr/share/mysql-workbench/data/main_menu.xml  
 
-### slow log
+## Transaction
 
-#### record slow log
+[Using the Transaction Information Schema Tables](https://dev.mysql.com/doc/innodb-plugin/1.0/en/innodb-information-schema-examples.html)
+`begin`, `start transaction`, `set autocommit=0`  
+`end`, `commit`, `rollback`
 
-`show variables  like '%slow_query_log%'`  Query slow log status
-`set global slow_query_log=1`  Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
-`slow_query_log = 1`  开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）  
-`slow_query_log_file = /tmp/mysql_slow.log`  slow log location, default value: host_name-slow.log
-`long_query_time=2`  慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
-`log_queries_not_using_indexes`  未使用索引的查询也被记录到慢查询日志中（可选项）
+SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;  
+`SELECT @@global.tx_isolation;`  查看InnoDB系统级别的事务隔离级别
+`SELECT @@tx_isolation;`  查看InnoDB会话级别的事务隔离级别  
+`SET global transaction isolation level read committed;`  修改InnoDB系统级别的事务隔离级别  
+`SET session transaction isolation level read committed;`  修改InnoDB会话级别的事务隔离级别  
+`set innodb_lock_wait_timeout=100`  
+`show variables like 'innodb_lock_wait_timeout';`  
+`show engine innodb status`   to get a list of all the actions currently pending inside the InnoDB engine  
 
-#### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )
+### FORCE UNLOCK for locked tables in MySQL
 
-* --help
-* -a  Do not abstract all numbers to N and strings to 'S'.
-* -g pattern  Consider only queries that match the (grep-style) pattern.
-* -s  sort_type  
-  * t, at: Sort by query time or average query time  
-  * l, al: Sort by lock time or average lock time  
-  * r, ar: Sort by rows sent or average rows sent  
-  * c: Sort by count
-* -t N  Display only the first N queries in the output.
+`show open tables where in_use>0;`  get the list of locked tables
+`show processlist;`  get the list of the current processes, one of them is locking your table(s)  
+`kill <put_process_id_here>;`   Kill one of these processes
 
-##### mysqldumpslow Sample
+### 事务隔离模式
 
-`mysqldumpslow -s t -t 10 /var/lib/mysql/mysql-slow.log`  得到返回查询时间最长的10个SQL
-`mysqldumpslow -s r -t 10 /var/lib/mysql/mysql-slow.log`  得到返回记录集最多的10个SQL
-`mysqldumpslow -s c -t 10 /data/softwares/mysql/mysql06_slow.log`  得到访问次数最多的10个SQL
+1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。  
+2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。  
+3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。  
+    但是这种方式又引发了幻读的问题(MySQL InnoDB 通过 MVCC, Mutipleversion Concurrency Control 解决了幻读问题)。
+    因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。  
+4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。  
 
-### Example: 数据库插入数据时加锁 多线程(多job)重复insert
+[14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
+[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)  
+
+脏读（dirty read）
+不可重复读（unrepeatable read）
+幻读（phantom read）
+幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
+为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，  
+而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
+
+### 锁机制
+
+1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写  
+2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
+
+锁的范围:  
+行锁: 对某行记录加上锁  
+表锁: 对整个表加上锁  
+共享锁(share mode), 排他锁(for update)
+
+不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。  
+`replace into`  相当于delete然后insert，会有对数据进行写的过程。  
+`insert ignore`  会忽略已经存在主键或unique索引的数据，而不会有数据的修改
+使用场景:  
+    如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据
+    如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间
+
+## Example: 数据库插入数据时加锁 多线程(多job)重复insert
 
 1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`  
 2. `select ... for update`, then insert  
@@ -1011,11 +877,11 @@ mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [My
 `insert ignore`会忽略已经存在主键或unique索引的数据，而不会有数据的修改。  
  [mysql-insert-ignore-different-replace-into](http://www.chenyudong.com/archives/mysql-insert-ignore-different-replace-into.html)
 `insert ignore into table_name(email,phone,user_id) values('test9@163.com','99999','9999')`,这样当有重复记  
-录就会忽略,执行后返回数字0,还有个应用就是复制表,避免重复记录：  
+录就会忽略,执行后返回数字0,还有个应用就是复制表,避免重复记录:  
 `insert ignore into table(name)  select  name from table2`  
 4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下  
 
-#### reference [select-for-update-with-insert-into](http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into)
+### reference [select-for-update-with-insert-into](http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into)
 
 `SELECT ... FOR UPDATE` with UPDATE  
 
@@ -1029,7 +895,7 @@ However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for 
 
 If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn''t know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.  
 
-#### test case
+### test case
 
 select nonexistent orderId, which is not a index column, it will lock the whole table;  
 select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;  
@@ -1060,12 +926,42 @@ console 2:
   **pending**
 ```
 
-It pending to get the lock.  
+It pending to get the lock. 
+
+## MySQL线上常见故障剖析
+
+–活动进程(Process list)  
+–日志文件(slow log, alert log, general query log, binlog)  
+–Status variables（com_select, com_insert,.etc)  
+–InnoDB(物理读、逻辑读、innodbstatus)  
+–参数配置  
+–Stack trace(plus source code)  
+•SQL  
+–执行计划，explain  
+•OS  
+–内存, SWAP, /proc/meminfo  
+–CPU, load, ps
+–IO（磁盘、网络)  
+•Iostat  
+•Profile  
+–Oprofile  
+–gprof
 
 ## Performance
 
 [MySQL性能优化的最佳20+条经验](http://coolshell.cn/articles/1846.html )
 [MySQL 5.6 Reference Manual 8.6.1 Optimizing MyISAM Queries](https://dev.mysql.com/doc/refman/5.6/en/optimizing-queries-myisam.html )
+
+### MySQL调优
+
+1.mysql嵌套子查询效率确实比较低
+2.可以将其优化成连接查询
+3.连接表时，可以先用where条件对表进行过滤，然后做表连接 (虽然mysql会对连表语句做优化)
+4.建立合适的索引
+5.学会分析sql执行计划，mysql会对sql进行优化，所以分析执行计划很重要
+制定适当的存储引擎和字符编码  
+例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8  
+mysql线上将采用一master多slave的方式来进行部署  
 
 ### MySQL Query Cache
 
@@ -1083,6 +979,35 @@ The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM cust
 第六才是水平切分，针对数据量大的表，这一步最麻烦，最能考验技术水平，要选择一个合理的sharding key,为了有好的查询效率，表结构也要改动，做一定的冗余，应用也要改，sql中尽量带sharding key，将数据定位到限定的表上去查，而不是扫描全部的表；
 mysql数据库一般都是按照这个步骤去演化的，成本也是由低到高；
 
+### Slow log
+
+#### Slow log options
+
+`show variables  like '%slow_query_log%'`  Query slow log status
+`set global slow_query_log=1`  Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
+`slow_query_log = 1`  开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）  
+`slow_query_log_file = /tmp/mysql_slow.log`  slow log location, default value: host_name-slow.log
+`long_query_time=2`  慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
+`log_queries_not_using_indexes`  未使用索引的查询也被记录到慢查询日志中（可选项）
+
+#### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )
+
+* --help
+* -a  Do not abstract all numbers to N and strings to 'S'.
+* -g pattern  Consider only queries that match the (grep-style) pattern.
+* -s  sort_type  
+  * t, at: Sort by query time or average query time  
+  * l, al: Sort by lock time or average lock time  
+  * r, ar: Sort by rows sent or average rows sent  
+  * c: Sort by count
+* -t N  Display only the first N queries in the output.
+
+##### mysqldumpslow Sample
+
+`mysqldumpslow -s t -t 10 /var/lib/mysql/mysql-slow.log`  得到返回查询时间最长的10个SQL
+`mysqldumpslow -s r -t 10 /var/lib/mysql/mysql-slow.log`  得到返回记录集最多的10个SQL
+`mysqldumpslow -s c -t 10 /data/softwares/mysql/mysql06_slow.log`  得到访问次数最多的10个SQL
+
 ### 查询优化
 
 deferred join延迟关联 `select <cols> from profiles inner join (select <primary key cols> from profiles where x.sex='M' order by rating limiting 100000,10) as x using (<primary key cols>)`
@@ -1099,7 +1024,7 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 table：显示这一行的数据是关于哪张表的  
 type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL  
 possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
-key： 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
+key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
 key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
 ref：显示索引的哪一列被使用了，如果可能的话，是一个常数  
 rows：MYSQL认为必须检查的用来返回请求数据的行数  
@@ -1247,3 +1172,47 @@ MySQL NDB Cluster (或 MySQL Cluster) 与MySQL Server（人们普遍认知的MyS
 ### InnoDB Cluster
 
 几乎与MySQL Cluster完全无关，并且是从MySQL 5.7 开始作为一组插件实现的。其中之一是“组复制”插件，该插件使组中的MySQL服务器能够在它们之间复制数据。
+
+## Q
+
+### MYSQL=黑盒?
+
+1. 为什么在写SQL语句时遵守最左前缀原则才能用到索引？不遵守就用不到索引？其底层工作机制是怎样的？
+2. Mysql中写缓冲区为什么能优化写入的速度？如何做到的？
+3. Mysql在执行一个SQL语句时会经过哪些步骤？这每个步骤可以如何优化？
+4. 写了一个很长的SQL，这个SQL最终的执行顺序是怎样的？如何优化复杂SQL?
+
+### 大表=分库分表?
+
+1. 到底多大数量的表才是大表？500万条？2000万条？5000万条？
+2. 如果一个表中数据量很大，这个时候如何建立索引，如何优化索引？
+3. 高并发场景下，使用Mysql事务时应该要注意哪些方面，如何进行优化？
+
+### 高并发场景下如何使Mysql高效运行
+
+#### 亿级流量下如何高效的使用Mysql索引
+
+1. Innodb存储基本单位页结构详解
+2. 索引底层原理与执行流程精讲
+3. Mysql是如何选择最优索引的
+4. 覆盖索引底层原理与执行流程精讲
+5. 索引下推底层原理与执行流程精讲
+6. Mysql为什么会出现索引失效
+7. 亿级流量下Mysql索引最优使用和优化策略
+
+#### 超高并发下如何对Mysql事务进行优化
+
+1. Buffer Pool内存结构详解与优化策略分析
+2. Mysql事务底层实现原理及源码详解
+3. Innodb本身针对写语句做了哪些优化
+4. MVCC机制是如何保证事务的隔离性的
+5. 超高并发下使用事务时避免死锁策略分析
+6. 分布式事务与Mysql事务之间的关系是什么
+7. 超高并发下如何正确的使用Mysql事务及优化策略
+
+#### 通过学习你能收获
+
+1. 彻底掌握Mysql事务、索引的底层工作原理
+2. 彻底掌握增删查改SQL语句的底层执行机制
+3. 学习到如何针对大数据量表进行索引和事务的优化
+4. 收获并理解更多更强大的Mysql性能优化技巧
