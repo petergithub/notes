@@ -12,6 +12,9 @@ MongoDB limits the data size of individual BSON objects/documents. At the time o
 `mongod` To start MongoDB using all defaults  
 `mongod --dbpath /path/to/mongodb/data/ --auth` To start MongoDB  
 
+[mongo bin](https://docs.mongodb.com/manual/reference/program/mongo/#bin.mongo)
+[Write Scripts for the mongo Shell](https://docs.mongodb.com/manual/tutorial/write-scripts-for-the-mongo-shell/)
+
 `mongo <host>:<port>/<dbName>`  Connect to mongo
 `--quiet` Suppress MongoDB shell version  
 `--eval` execute command
@@ -20,9 +23,18 @@ MongoDB limits the data size of individual BSON objects/documents. At the time o
 `mongo mongodb://user:pwd@localhost:27017/DATABASE_NAME?authSource=admin`
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --authenticationDatabase=admin`
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet script.js`  
-`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'printjson(db.currentOp())' | less`  
-`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval 'db.users.find({a:'b'}).pretty().shellPrint()' | less`  
-`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --authenticationDatabase=admin --quiet --eval 'printjson(db.adminCommand('listDatabases'))' | less`  
+
+```bash
+# mongo shell script
+# For .find() operations, you need to call an operation on the result object to print the documents, such as toArray() or shellPrint()
+CMD="db.adminCommand('listDatabases')"
+CMD='db.getCollection("user").find({}).count()'
+CMD='db.getCollection("user").find({}).sort({created:-1}).limit(2)'
+CMD="db.getCollection('user').find({}).sort({created:-1}).limit(2).toArray()"
+CMD="db.getCollection('user').find({}).sort({created:-1}).limit(2).pretty().shellPrint()"
+mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet --eval '$CMD'
+keti -n storage-service mongo-7d7c64f477-658fh -- mongo "mongodb://user:pwd@localhost:27017/DATABASE_NAME?authSource=admin" --eval "$CMD"
+```
 
 ### Basic Commands
 
@@ -66,7 +78,8 @@ print ("end " + tojson(date1.toLocaleString()))
 删除数据库 删除数据库首先使用`use`命令切换到要删除的数据库，然后使用`db.dropDatabase()`  
 `db.stats()`
 
-`db.copyDatabase(fromdb, todb, fromhost, username, password, mechanism)` Copies a database either from one mongod instance to the current mongod instance or within the current mongod.
+`db.copyDatabase(fromdb, todb, fromhost, username, password, mechanism)` Copies a database either from one mongod instance to the current mongod instance or within the current mongod. [db.copyDatabase()](https://docs.mongodb.com/manual/reference/method/db.copyDatabase/)
+`db.copyDatabase("live", "live_test")`
 
 #### collection
 
@@ -86,8 +99,20 @@ duplicate collection in the same database
 copy a collection from one database to new_database `db.collection_name.find().forEach(function(d){ db.getSiblingDB('new_database')['collection_name'].insert(d); });`
 
 ```bash
+# copy many collections
+target_db='new_database'
+copy_collection_list = ["collection1", "collection2"]
+copy_collection_list.forEach( function (collection) {
+    if (db.getCollectionNames().indexOf(collection)>=0) {
+        print("Deleted target collection: "+ collection);
+        db.getSiblingDB(target_db).getCollection(collection).drop();
+        db.getCollection(collection).find().forEach(function(d){ db.getSiblingDB(target_db)[collection].insert(d); });
+        print("Copied collection: "+ collection);
+    }
+  })
+
 # drop many collections
-delete_collection_list = ["collection1", "collection2", "collection3", "collection4", "collection5", "collection6"]
+delete_collection_list = ["collection1", "collection2"]
 delete_collection_list.forEach( function (collection) {
     if (db.getCollectionNames().indexOf(collection)>=0) {
         db.getCollection(collection).drop();

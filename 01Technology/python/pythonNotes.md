@@ -4,6 +4,8 @@
 
 ### Recent
 
+`python setup.py install` Installing without pip after `cd %path_to_pandapower%\pandapower-x.x.x\`
+
 requests.exceptions.SSLError: HTTPSConnectionPool(host='pypi.org', port=443): Max retries exceeded with url: /pypi/loguru/json (Caused by SSLError("Can't connect to HTTPS URL because the SSL module is not available.",))
 `pip install pyopenssl`
 

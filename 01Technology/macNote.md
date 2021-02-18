@@ -1,7 +1,16 @@
 # Mac Note
 
 `System Preference -> Keyboard -> Shortcuts -> App Shortcuts -> +` 为任何软件菜单里的项目设置快捷键
-`Command+Shift+5` capture screenshot
+
+[在 Mac 上截屏或录制屏幕](https://support.apple.com/zh-cn/guide/mac-help/mh26782/mac)
+`Command+Shift+5` capture screenshot  
+`Command+Shift+3` 捕捉整个屏幕
+`Command+Shift+4` 捕捉屏幕的一部分
+Options:
+`defaults write com.apple.screencapture location ~/Desktop/`
+`defaults write com.apple.screencapture target clipboard` Save to clipboard
+`killall SystemUIServer` to make the command effective
+
 `unar -encoding GBK file.zip` 解压缩文件避免乱码
 `md5 -s string`
 `md5 /path/to/file` or `openssl md5 /path/to/file`
@@ -218,6 +227,10 @@ block selection: `Command+Option+Left Click`
 #### Settings
 
 Display: `Preference -> Profiles -> Colors -> Foreground: black, Background: white, Bold: gray, Minimum contrast: middle`
+
+### chrome
+
+Alt+U or click the icon to copy URL without encoding from address bar
 
 ### firefox
 
