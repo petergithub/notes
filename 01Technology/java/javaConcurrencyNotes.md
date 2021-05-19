@@ -1,5 +1,12 @@
-
 # Java Concurrency
+
+## Recent
+
+[Joins](https://docs.oracle.com/javase/tutorial/essential/concurrency/join.html)
+The join method allows one thread to wait for the completion of another. If t is a Thread object whose thread is currently executing, `t.join();` causes the current thread to pause execution until t's thread terminates.
+
+[Interrupts](https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html)
+An interrupt is an indication to a thread that it should stop what it is doing and do something else
 
 synchronization:  
 
@@ -132,60 +139,7 @@ Thread类优先级常量有三个：
 3. 在同步方法中使用wait()、notify()、notifyAll()方法：
  当一个线程使用的同步方法中用到某个变量，而此变量又需要其他线程修改后才能符合本线程需要，那么可以在同步方法中使用wait()方法.中断方法的执行，使本线程等待，暂时让出CPU资源，并允许其他线程使用这个同步方法.其他线程如果在使用这个同步方法时不需要等待，那么它使用完这个同步方法时应当用notifyAll()方法通知所有由于使用这个同步方法而处于等待的线程结束等待.曾中断的线程就会从中断处继续执行，并遵循"先中断先继续"的原则.如果用的notify()方法，那么只是通知等待中的线程中某一个结束等待.
 
-## Java Concurrency in Practice
-
-[Author: Brian Goetz](http://jcip.net/)
-
-Chapter 2 and 3 are useful
-
-### 1.3.2 活跃性问题
-
-死锁,饥饿,活锁
-
-The most common type of race condition is check-then-act, where a potentially stale observation is used to make a decision on what to do next.
-
-`AtomicLong`, `AtomicReference`
-
-`synchronized`, *intrinsic locks* in Java act as mutexes (or mutual exclusion locks(互斥锁)), which means that at most one thread may own the lock.
-
-intrinsic locks are *reentrant*
-
-### Chapter 2. Thread Safety
-
-#### 2.3.2. Reentrancy
-
-重入意味着获取锁操作的粒度是"线程",而不是"调用"
-Reentrancy means that locks are acquired on a per-thread rather than per-invocation basis.
-
-#### 2.4 Guarding State with Locks
-
-If synchronization is used to coordinate access to a variable, it is **needed everywhere that variable is accessed**. Further, when using locks to coordinate access to a variable, the same lock must be used wherever that variable is accessed.
-
-It is a common mistake to assume that synchronization needs to be used only when writing to
-shared variables; this is simply not true. (The reasons for this will become clearer in Section 3.1.)
-
-### Chapter 3. Sharing Objects
-
-#### synchronized
-
-1. it is about atomicity or demarcating "critical sections" (实现原子性和确定临界区)
-2. another significant, and subtle aspect: memory visibility. (内存可见性)  
- We want not only to prevent one thread from modifying the state of an object when another is using it, but also to ensure that when a thread modifies the state of an object, other threads can actually see the changes that were made.
-
-Locking is not just about **mutual exclusion**; it is also about memory visibility. To ensure that **all threads see the most up-to-date values of shared mutable variables**, the reading and writing threads must synchronize on a common lock.
-
-#### volatile P32
-
-use volatile variables only when all the following criteria are met:  
-• Writes to the variable do not depend on its current value, or you can ensure that only a single thread ever updates the value;
-• The variable does not participate in invariants with other state variables; and
-• Locking is not required for any other reason while the variable is being accessed.
-
-3.3 发布和逸出?
-
-### Chapter 8 线程池的使用
-
-[聊聊并发（三）——JAVA线程池的分析和使用](http://www.infoq.com/cn/articles/java-threadPool)
+### [聊聊并发（三）——JAVA线程池的分析和使用](http://www.infoq.com/cn/articles/java-threadPool)
 作者 方腾飞 发布于 2012年11月15日
 
 通过`ThreadPoolExecutor`来创建一个线程池。
@@ -226,7 +180,7 @@ Java Doc: `java.util.concurrent.ThreadPoolExecutor.execute(Runnable)`
 
 任务性质不同的任务可以用不同规模的线程池分开处理。
 
-*　CPU密集型任务配置尽可能小的线程，如配置Ncpu+1个线程的线程池  
+* CPU密集型任务配置尽可能小的线程，如配置Ncpu+1个线程的线程池  
 * IO密集型任务则由于线程并不是一直在执行任务，则配置尽可能多的线程，如2*Ncpu  
 * 混合型的任务，如果可以拆分，则将其拆分成一个CPU密集型任务和一个IO密集型任务，只要这两个任务执行的时间相差不是太大，那么分解后执行的吞吐率要高于串行执行的吞吐率，如果这两个任务执行时间相差太大，则没必要进行分解。
  我们可以通过Runtime.getRuntime().availableProcessors()方法获得当前设备的CPU个数。
