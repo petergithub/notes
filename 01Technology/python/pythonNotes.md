@@ -20,8 +20,28 @@ requests.exceptions.SSLError: HTTPSConnectionPool(host='pypi.org', port=443): Ma
 
 ## Install
 
+### Install Python from source
+
+```bash
+yum  install zlib-devel bzip2-devel openssl-devel ncurses-devel libffi-devel -y
+
+# download source file
+wget https://www.python.org/ftp/python/3.6.13/Python-3.6.13.tgz
+tar xzf Python-3.6.13.tgz
+
+cd Python-3.6.13
+./configure --enable-optimizations 
+# prevent replacing the default python binary file /usr/bin/python
+make altinstall
+# make && make install
+
+# check version
+python3.6 -V
+```
+
 ### [pip](https://pip.pypa.io/en/stable/user_guide/)
 
+Python 3.6 以后安装 Python 会同时安装 pip
 use proxy `pip install -i http://pypi.douban.com/simple  --proxy http://localhost:1087 numpy`
 推荐清华大学一个镜像网址站点：`http://e.pypi.python.org`
 
@@ -43,6 +63,25 @@ If multiple configuration files are found by pip then they are combined in the f
 1. The global file is read
 2. The per-user file is read
 3. The virtualenv-specific file is read
+
+### [pip Quickstart](https://pip.pypa.io/en/stable/quickstart/)
+
+Install packages within a virtual environment without affecting the host system setup. Start by upgrading pip:
+`pip -V` check version
+`pip install --upgrade pip`
+`pip list  # show packages installed within the virtual environment`
+
+`pip freeze > requirements.txt` generate a requirements.txt file
+`pip install -r requirements.txt` # Install from our fancy new file
+`pip uninstall somepackage`
+
+#### pip install
+
+`-e, --editable <path/url>`
+Install a project in editable mode (i.e. setuptools “develop mode”) from a local project path or a VCS url.
+
+`pip install -e /path/to/locations/repo` This will overwrite the directory in site-packages with a symbolic link to the locations repository, meaning any changes to code in there will automatically be reflected - just reload the page (so long as you're using the development server).
+[What is the use case for `pip install -e`?](https://stackoverflow.com/questions/42609943/what-is-the-use-case-for-pip-install-e)
 
 ### [Conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 
@@ -80,15 +119,6 @@ Create a new virtual environment by choosing a Python interpreter and making a .
 `source ~/venv/bin/activate  # sh, bash, ksh, or zsh` Activate the virtual environment
 
 `python -V` to check version
-
-Install packages within a virtual environment without affecting the host system setup. Start by upgrading pip:
-`pip -V` check version
-`pip install --upgrade pip`
-`pip list  # show packages installed within the virtual environment`
-
-`pip freeze > requirements.txt` generate a requirements.txt file
-`pip install -r requirements.txt` # Install from our fancy new file
-`pip uninstall somepackage`
 
 ``` bash
 # https://github.com/Damnever/pigar

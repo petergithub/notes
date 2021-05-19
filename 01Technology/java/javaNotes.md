@@ -9,7 +9,6 @@ Java偏向锁是如何撤销的？ https://www.zhihu.com/question/57774162
 Java Language Specification Chapter 17. Threads and Locks https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
 Synchronization and Object Locking https://wiki.openjdk.java.net/display/HotSpot/Synchronization
 
-对象的内置锁? 每个对象都有一个内置锁?
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
 SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swagger-ui.html)
@@ -27,6 +26,9 @@ concurrent: 主内存.寄存器是是运行时?
 >-------------->>
 
 jcmd jhsdb
+
+[OpenJDK](https://openjdk.java.net/)
+[JDK 16 Documentation](https://docs.oracle.com/en/java/javase/16/books.html)
 
 ### 常用参数
 

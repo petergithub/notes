@@ -92,7 +92,7 @@ append a string to an existing field: `UPDATE categories SET code = CONCAT(code,
 ``` SQL
 -- Update MySQL table with another table's data
 UPDATE tableB
-INNER JOIN tableA ON tableB.name = tableA.name
+INNER JOIN tableA ON tableA.name = tableB.name
 SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
 WHERE tableA.name = 'Joe'
 
@@ -106,11 +106,12 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 `ALTER TABLE tableName DROP INDEX idx_name;`
 `ALTER TABLE table_name add UNIQUE KEY (model,ip);`  
 `ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
-updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
+`ALTER TABLE table_name RENAME COLUMN old_col_name TO new_col_name;`
 
 `ALTER TABLE wifi_data add column type tinyint default 0 comment '0, 没有用户成功; 1,有用户成功' after ANOTHER_COLUMN_NAME;`
 `ALTER TABLE bpg_info add column remark varchar(256) DEFAULT '' COMMENT '备注'`
 `ALTER TABLE old_name RENAME new_name;`
+`ALTER TABLE old_db.fooTable RENAME new_db.fooTable` move table from one schema to another schema
 `ALTER TABLE table_name ENGINE=InnoDB;`
 `ALTER TABLE tbl AUTO_INCREMENT = 100;` set AUTO_INCREMENT value
 
@@ -196,6 +197,10 @@ FROM prince
 
 ### Check database status
 
++---------+-----------------+--------------------+---------+---------+---------+------------------------+------------------+
+| Id      | User            | Host               | db      | Command | Time    | State                  | Info             |
++---------+-----------------+--------------------+---------+---------+---------+------------------------+------------------+
+
 1. 先`show processlist;` 看到有疑问的SQL，去`explain`，然后`set profiling=1；`
 2. 看看索引是不是对的，看看哪些SQL本身是有问题的
 
@@ -206,7 +211,7 @@ FROM prince
 pager grep -v Sleep | less; show full processlist;
 
 -- Kill multiple process: 
-SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE STATE = 'Sleep' AND user = 'root' and INFO LIKE 'SELECT %' \G
+SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE STATE = 'Sleep' AND user = 'root' and Host like '172%' and INFO LIKE 'SELECT %' \G
 +----------------------------------------------------+
 | Paste the following query to kill all processes    |
 +----------------------------------------------------+
@@ -268,6 +273,8 @@ TINYBLOB, TINYTEXT | L + 1 bytes, where L < 28
 BLOB, TEXT | L + 2 bytes, where L < 216
 
 ### Datetime
+
+updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
 
 `SELECT UNIX_TIMESTAMP(NOW());`  
 `SELECT FROM_UNIXTIME(1467542031);`
@@ -538,6 +545,10 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 * `--force, -f`  Ignore all errors; continue even if an SQL error occurs  
 * `--skip-column-names, -N`  Do not write column names in results.
+
+#### Export and Import a MySQL Database in One Command
+
+`mysqldump -u root -p database_name | mysql -h remote_host -u root -p remote_database_name`
 
 #### MySQL Export Table to CSV
 
@@ -1089,7 +1100,8 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 
 [mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
 [mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
-从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/xuyi/binlog2sql)
+从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/danfengcao/binlog2sql)
+A tool for parsing a MySQL binlog file to JSON. [binlog-parser](https://github.com/zalora/binlog-parser)
 `GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`  
 
 bin log location  
@@ -1118,15 +1130,18 @@ bin log location
 * `--verbose, -v` The output will contain lines beginning with ###,
  Specify --verbose or -v twice to also display data types and some metadata for each column
 
-* `-u --user=name`              Connect to the remote server as username.连接到远程主机的用户名
-* `-p --password[=name]`        Password to connect to remote server.连接到远程主机的密码
-* `-h --host=name`              Get the binlog from server.从远程主机上获取binlog日志
+* `--read-from-remote-server, -R` connect to a server and request its binary log
+* `--user=name, -u`              Connect to the remote server as username.连接到远程主机的用户名
+* `--password[=name], -p`        Password to connect to remote server.连接到远程主机的密码
+* `--host=name, -h`              Get the binlog from server.从远程主机上获取binlog日志
+* `--database=db_name, -d db_name`              Get the binlog from server.从远程主机上获取binlog日志
 
 The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`  
 `SELECT ORDINAL_POSITION,COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, COLUMN_COMMENT, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'tbl_name';`
 
 `mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less`
 `mysqlbinlog binlog_files | mysql -u root -p`  To execute events from the binary log, process mysqlbinlog output using the mysql client
+`mysqlbinlog --read-from-remote-server -h localhost -uroot -p --base64-output=decode-rows -v -v binlog.000062`
 
 [Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)
 
@@ -1153,7 +1168,7 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 HA: percona xtradb cluster, galera cluster
 
-## inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具 
+## Inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具 
 
 [Inception](https://github.com/hanchuanchuan/inception)
 [goInception](https://hanchuanchuan.github.io/goInception/)是一个集审核、执行、备份及生成回滚语句于一身的MySQL运维工具， 通过对执行SQL的语法解析，返回基于自定义规则的审核结果，并提供执行和备份及生成回滚语句的功能

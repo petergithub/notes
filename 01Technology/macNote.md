@@ -6,10 +6,14 @@
 `Command+Shift+5` capture screenshot  
 `Command+Shift+3` 捕捉整个屏幕
 `Command+Shift+4` 捕捉屏幕的一部分
+`Command-Control-Esc` 停止屏幕录制
 Options:
 `defaults write com.apple.screencapture location ~/Desktop/`
 `defaults write com.apple.screencapture target clipboard` Save to clipboard
 `killall SystemUIServer` to make the command effective
+录制 Mac 播放的声音需要安装 [Loopback](https://rogueamoeba.com/loopback/)
+
+分屏功能 1、当窗口不处于全屏状态时，长按两秒左上角绿色按钮松手，即可选择右边窗口。
 
 `unar -encoding GBK file.zip` 解压缩文件避免乱码
 `md5 -s string`
@@ -39,6 +43,7 @@ move line up/down: `Option+Shift+up/down`
 duplicate line: `Command+D`
 import class: `Option+Enter`
 `Option+Shift+Space` Smart code completion
+`Command+Shift+8`: Column selection mode (Vertical selection)
 `Command+Shift+A`: Display all command, Help -> Find Action
 `Command+F12`: list all method in current file
 `F3` Toggle bookmark
@@ -319,16 +324,18 @@ To open this port, add the following line in /etc/pf.conf
 
 sudo vim /etc/pf.conf
 
-    ```shell
-    # Open port 1234 for TCP on all interfaces
-    pass in proto tcp from any to any port 1234
-    # You can limit the ip addresses .. replace any with allowed addresses ..
-    ```
+```shell
+# Open port 1234 for TCP on all interfaces
+pass in proto tcp from any to any port 1234
+# You can limit the ip addresses .. replace any with allowed addresses ..
+```
+
 restart the service  `sudo pfctl -f /etc/pf.conf`
 
 ### Issue
 
 #### dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
+
 `ls -al /usr/local/Cellar/openssl`
 
 [dyld: Library not loaded error on macOS (OpenSSL missing) #86](https://github.com/kelaberetiv/TagUI/issues/86#issue-303370944)
@@ -337,4 +344,7 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 `brew switch openssl 1.0.2s`
 
+## Apps
+
+[IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
 

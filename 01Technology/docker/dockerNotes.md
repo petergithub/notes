@@ -12,8 +12,7 @@
 `docker run` 只在第一次运行时使用，将镜像放到容器中，以后再次启动这个容器时，使用 `docker start imageName`
 
 `docker start docker-mysql-5.6`
-`docker exec -it docker-mysql-5.6 bash`
-`[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
+`docker exec -it docker-mysql-5.6 bash` 进入一个正在运行的 docker 容器 `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
 
 [Networking features in Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/networking/)
 connect from a container to a service on the host: connect to the special DNS name `host.docker.internal`, which resolves to the internal IP address used by the host. This is for development purpose and will not work in a production environment outside of Docker for Mac.
@@ -35,7 +34,7 @@ connect from a container to a service on the host: connect to the special DNS na
 
 `docker start -i <image_id>` Start a existed container  
 `docker attach <container_id>` Attach a running container
-`docker exec -it [containerID] /bin/bash` 进入一个正在运行的 docker 容器  
+`docker exec -it [containerID] /bin/bash` 进入正在运行的容器  `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
 `docker inspect containerID` 查看信息
 
 `exit` 退出

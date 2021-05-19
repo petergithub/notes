@@ -7,6 +7,27 @@
 `^[^#].*[^\s\s]$` 匹配中结尾不是两个空格的行, 修改mark down 文件  
 `[^0-9]*,` matches string start with non-number until to (,)  
 
+### 替换命中词前后的内容，且保留命中词
+
+在 find 语句中把需要保留的词用 `()` 括起来
+
+#### 需求：数字序号是中文括号包含的比如（1），需要替换成 1.
+
+Find:`（(\d+)）`
+Replace: `$1.`
+
+#### 需求 将所有的方法调用都套上print()
+
+Find: `(num.\w+())`
+Replace: `print($1)`
+
+#### 需求 将SQL语句中的多余字符替换掉
+
+原文：`SELECT platform, sales_medium.platform_anchor_id AS sales_medium_platform_anchor_id FROM sales_medium`
+需求：把 `sales_medium.platform_anchor_id AS sales_medium_platform_anchor_id` 替换成 `platform_anchor_id`
+Find: `sales_medium\.(.*?) AS.*?,`
+Replace: `$1,`
+
 ## filename
 
 [Unix Reg exp](http://www.interlude.org.uk/unix/Unix%20Reg%20exp%20stuff.htm )
@@ -66,6 +87,7 @@ example: `ls *.fm`, `rm prog.?`, `cp [pP]art[0-9] ../book`
 下面是一些使用重复的例子：  
 `Windows\d+`匹配Windows后面跟1个或更多数字  
 `^\w+`匹配一行的第一个单词(或整个字符串的第一个单词，具体匹配哪个意思得看选项设置)  
+`.*` 之后的 `?` 符号和其他一些匹配规则意味着“尽可能少的匹配” 非贪婪的匹配
 
 ### 字符类
 

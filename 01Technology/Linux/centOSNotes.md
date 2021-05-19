@@ -166,6 +166,10 @@ echo "baseurl=http://mirror.centos.org/centos" | tee -a /etc/yum.repos.d/myrepo.
 echo "gpgcheck=0" | tee -a /etc/yum.repos.d/myrepo.repo
 echo "enabled=1" | tee -a /etc/yum.repos.d/myrepo.repo
 
+# 阿里云CentOS 6 EOL如何切换源 https://help.aliyun.com/document_detail/193569.htm
+mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-6.repo
+
 
 yum update -y
 # Modify NTP Server

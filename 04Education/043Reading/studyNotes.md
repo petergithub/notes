@@ -30,7 +30,7 @@ PDF杂志 Android平板 + 软件 ezPDF reader 这个软件我专门用来读PDF�
 学术书或教材 PC + Acrobat 把一本PDF书在电脑上打开两次，垂直并排在桌面上。我读左边的PDF，当遇到一些概念忘记了需要搜索或者需要对照其他页面的内容或图表，就用右边的PDF。
 英文书 Microsoft Word +  英汉词典 dictionary.cambridge.org 英英同义词词典 oxforddictionaries.com
 
-### Not from the article
+### Note from the article
 
 ## Work
 

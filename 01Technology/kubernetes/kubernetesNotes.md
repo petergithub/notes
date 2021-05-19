@@ -5,6 +5,16 @@
 batch delete `kdelp $(kgp -l | grep Evicted | awk '{print $1}')`
 kubelet summary API `http://localhost:8001/api/v1/nodes/node-name/proxy/stats/summary`
 
+### 获取信息 排查问题
+
+kubectl get events -A -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message |less
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb
+
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod --sort-by=.metadata.creationTimestamp |less
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --sort-by=.metadata.creationTimestamp |less
+
+kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
+
 ## Concept
 
 ### [Requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
@@ -31,11 +41,16 @@ The expression 0.1 is equivalent to the expression 100m, which can be read as "o
 ### Debug
 
 排查问题
-`k get events`
+`kubectl get events`
 `kubectl -n namespace top pods`
-kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb
-kubectl get events --sort-by=.metadata.creationTimestamp
-k get events -o yaml|less
+`kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
+`kubectl get events --sort-by=.metadata.creationTimestamp`
+`kubectl get events -o yaml|less`
+
+jsonpath 查询申请的内存
+`kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145`
+
+go-template `kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'`
 
 `kubectl cluster-info dump`
 
@@ -113,9 +128,12 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 `kubectl cordon <node>` marks the node as unschedulable (but doesn’t do anything with pods running on that node).
 `kubectl drain <node>` marks the node as unschedulable and then evicts all the pods from the node.
 
+### PVC
+
+`kubectl get pvc` volume claim
 `kubectl patch pvc test-pvc -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'` resize pvc
 
-### pod
+### Pod
 
 `k port-forward pod-name 8001:5000` 本地端口 8001 转发到 pod 的端口 5000
 
@@ -129,14 +147,14 @@ nodeSelector:
 
 ```
 
-### service
+### Service
 
 访问URI: `SERVICE_NAME.NAMESPACE.svc.cluster.local`
  `svc.cluster.local` is a configurable cluster domain suffix used in all cluster local service names.
 
 [Debug Services](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/)
 
-### deployment
+### Deployment
 
 `k rollout history deployment  deployment-name` deployment 历史记录
 `kubectl set image deployment kubia nodejs=luksa/kubia:v3` Changes the container image defined in a Pod
@@ -158,7 +176,7 @@ deployment strategies:
 `kubectl get pod -l env` To list all pods that include the env label
 `kubectl get po -l '!env'` To list all pods that don’t have the env label
 
-### namespaces
+### Namespaces
 
 `kubectl create ns name`
 `kubectl get ns`

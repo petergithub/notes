@@ -69,7 +69,6 @@ install sources:`mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=
 deploy root-pom.pom to snapshots 库:
 `mvn deploy:deploy-file -DgroupId=com -DartifactId=root-pom -Dversion=1.0.1-SNAPSHOT -Dpackaging=pom -DrepositoryId=maven-snapshots -Drepo.login=user -Drepo.pwd=password -Durl=http://maven.com/repository/maven-snapshots -Dfile=root-pom.pom`
 
-
 ### Specify the location for the testResource folder
 
 adding this to your pom.xml build section

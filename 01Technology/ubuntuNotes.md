@@ -12,6 +12,10 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 emacs save and quit: `Ctrl+x, Ctrl+c`
 [Emacs Basics](http://ergoemacs.org/emacs/emacs_basics.html)
 
+16 进制数字 10 进制转换 `printf '%d\n' 0x11`
+Convert a number from hexadecimal to decimal: `printf '%d\n' 0xff`  or `echo $((0xFF))`
+Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
+
 `for i in *; do cd /path/to/folder/$i ;mvn clean; done`  
 `SCRIPT_PATH=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname ${S})`  
 
@@ -65,9 +69,6 @@ expands non-matching globs to zero arguments, rather than to themselves.
 `trap`命令用于指定在接收到信号后将要采取的动作，常见的用途是在脚本程序被中断时完成清理工作。  
 当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。  
 例如：`trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行  
-
-Convert a number from hexadecimal to decimal: `printf '%d\n' 0xff`  or `echo $((0xFF))`
-Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
 
 man readline to get more information:  
 Question: Cancel failed reverse-i-search in bash but keep what I typed in  
