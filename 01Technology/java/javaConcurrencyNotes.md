@@ -2,6 +2,9 @@
 
 ## Recent
 
+
+CopyOnWriteArrayList 原来的一系列类 对应的新类型整理
+
 [Joins](https://docs.oracle.com/javase/tutorial/essential/concurrency/join.html)
 The join method allows one thread to wait for the completion of another. If t is a Thread object whose thread is currently executing, `t.join();` causes the current thread to pause execution until t's thread terminates.
 
@@ -15,6 +18,8 @@ synchronization:
 
 同步: 原子性Atomic,内存可见性  
 重排序Reordering, Happens-Before 排序
+
+[不可不说的Java“锁”事-美团](https://tech.meituan.com/2018/11/15/java-lock.html)
 
 易出现并发问题情形:  
 竞态条件Race Condition  

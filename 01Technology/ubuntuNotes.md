@@ -1181,6 +1181,18 @@ positional parameter: space, line return
 `IFS=- read -r x y z <<< foo-bar-baz; echo $x, $y, $z` 按变量IFS分割字符串并存到单独变量中  
 `IFS=- read -ra parts <<< foo-bar-baz; echo $parts, ${parts[0]}, ${parts[1]}` 按变量IFS分割字符串并存到数组parts中  
 
+```bash
+# 遍历对象
+for_elements=(
+    a
+    b
+    c
+)
+for e ($for_elements); do
+    echo $e
+done
+```
+
 ##### Script
 
 1. `var_name=value` 变量名和等号之间不能有空格  

@@ -15,6 +15,18 @@ Enable: `setenforce enforcing`
 
 `sed -i 's/SELinux=enforcing/SELinux=disabled/' /etc/sysconfig/selinux` then reboot system and then check the status with `sestatus`
 
+## 自动启动
+
+### CentOS 7 配置系统服务来设置自启动
+
+`systemctl enable mysqld` 把MySQL服务设置成自启动
+
+`systemctl status mysqld` 检查一下状态
+
+### CentOS 6 自动启动
+
+/etc/rc.d/rc.local
+
 ## Firewall
 
 [Centos 7 和 Centos 6 开放查看端口 防火墙关闭打开](https://www.cnblogs.com/eaglezb/p/6073739.html)
@@ -342,3 +354,4 @@ $ loginctl show-user ruanyf
 
 `journalctl -b` 查看系统本次启动的日志
 `journalctl -b -1` 查看上一次启动的日志（需更改设置）
+
