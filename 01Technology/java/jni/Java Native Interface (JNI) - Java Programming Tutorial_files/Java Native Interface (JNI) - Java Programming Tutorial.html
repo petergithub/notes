@@ -1,0 +1,2535 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Java Native Interface (JNI) - Java Programming Tutorial</title>
+
+<!-- @@ start change in v1 -->
+<link href="Java%20Native%20Interface%20(JNI)%20-%20Java%20Programming%20Tutorial_files/programming_notes_v1.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="Java%20Native%20Interface%20(JNI)%20-%20Java%20Programming%20Tutorial_files/programming_notes_v1.js"></script>
+<link rel="shortcut icon" href="https://www3.ntu.edu.sg/home/ehchua/programming/favicon.ico" type="image/x-icon"><style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -100px !important;
+    width: 200px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+</style></head>
+
+<body>
+
+<div id="wrap-outer">
+
+<!-- header filled by JavaScript -->
+<div id="header" class="header-footer"><p>yet another insignificant programming notes... &nbsp;&nbsp;| &nbsp;&nbsp;<a href="https://www3.ntu.edu.sg/home/ehchua/programming/index.html">HOME</a></p></div>
+
+<div id="wrap-inner">
+
+<div id="wrap-toc">
+<h5>TABLE OF CONTENTS <a id="show-toc" href="#show-toc">(HIDE)</a></h5>
+<div id="toc"><a class="toc-H3" href="#zz-1.">1.&nbsp;&nbsp;Introduction</a><br><a class="toc-H3" href="#zz-2.">2.&nbsp;&nbsp;Getting Started</a><br><a class="toc-H4" href="#zz-2.1">2.1&nbsp;&nbsp;JNI with C</a><br><a class="toc-H4" href="#zz-2.2">2.2&nbsp;&nbsp;JNI with C++</a><br><a class="toc-H4" href="#zz-2.3">2.3&nbsp;&nbsp;JNI with C/C++ Mixture</a><br><a class="toc-H4" href="#zz-2.4">2.4&nbsp;&nbsp;JNI in Package</a><br><a class="toc-H4" href="#zz-2.5">2.5&nbsp;&nbsp;JNI in Module (JDK 9)</a><br><a class="toc-H4" href="#zz-2.6">2.6&nbsp;&nbsp;JNI in Eclipse [To Check]</a><br><a class="toc-H4" href="#zz-2.7">2.7&nbsp;&nbsp;JNI in NetBeans</a><br><a class="toc-H3" href="#zz-3.">3.&nbsp;&nbsp;JNI Basics</a><br><a class="toc-H3" href="#zz-4.">4.&nbsp;&nbsp;Passing Arguments and Result between Java &amp; Native Programs</a><br><a class="toc-H4" href="#zz-4.1">4.1&nbsp;&nbsp;Passing Primitives</a><br><a class="toc-H4" href="#zz-4.2">4.2&nbsp;&nbsp;Passing Strings</a><br><a class="toc-H4" href="#zz-4.3">4.3&nbsp;&nbsp;Passing Array of Primitives</a><br><a class="toc-H3" href="#zz-5.">5.&nbsp;&nbsp;Accessing Object's Variables and Calling Back Methods</a><br><a class="toc-H4" href="#zz-5.1">5.1&nbsp;&nbsp;Accessing Object's Instance Variables</a><br><a class="toc-H4" href="#zz-5.2">5.2&nbsp;&nbsp;Accessing Class' Static Variables</a><br><a class="toc-H4" href="#zz-5.3">5.3&nbsp;&nbsp;Callback Instance Methods and Static Methods</a><br><a class="toc-H4" href="#zz-5.4">5.4&nbsp;&nbsp;Callback Overridden Superclass' Instance Method</a><br><a class="toc-H3" href="#zz-6.">6.&nbsp;&nbsp;Creating Objects and Object Arrays</a><br><a class="toc-H4" href="#zz-6.1">6.1&nbsp;&nbsp;Callback the Constructor to Create a New Java Object in the Native Code</a><br><a class="toc-H4" href="#zz-6.2">6.2&nbsp;&nbsp;Array of Objects</a><br><a class="toc-H3" href="#zz-7.">7.&nbsp;&nbsp;Local and Global References</a><br><a class="toc-H3" href="#zz-8.">8.&nbsp;&nbsp;JNI Common Errors</a><br><a class="toc-H3" href="#zz-9.">9.&nbsp;&nbsp;Debugging JNI Programs</a><br><br></div>  <!-- for showing the "Table of Content" -->
+</div>
+
+<div id="content-header">
+<h1>Java Programming Tutorial</h1>
+<h2>Java Native Interface (JNI)</h2>
+</div>
+
+<div id="content-main">
+
+<!-- @@ end change in v1 -->
+
+<h3>1.&nbsp;&nbsp;Introduction<a id="zz-1."></a></h3>
+
+<p>At times, it is necessary to use native (non-Java) codes (e.g., 
+C/C++) to overcome the memory management and performance constraints in 
+Java. Java supports native codes via the Java Native Interface (JNI).</p>
+
+<p>JNI is difficult, as it involves two languages and runtimes.</p>
+<p>I shall assume that you are familiar with:</p>
+<ol>
+<li>Java.</li>
+<li>C/C++ and the GCC Compiler (Read "<a href="https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html">GCC and Make</a>").</li>
+<li>(For Windows) Cygwin or MinGW (Read "<a href="https://www3.ntu.edu.sg/home/ehchua/programming/howto/Cygwin_HowTo.html">How to Setup Cygwin and MinGW</a>").</li>
+</ol>
+
+<h3>2.&nbsp;&nbsp;Getting Started<a id="zz-2."></a></h3>
+
+<h4>2.1&nbsp;&nbsp;JNI with C<a id="zz-2.1"></a></h4>
+
+<h5>Step 1: Write a Java Class <span class="font-code">HelloJNI.java</span> that uses C Codes</h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</pre>
+</td>
+<td>
+<pre>public class HelloJNI {  <span class="color-comment">// Save as HelloJNI.java</span>
+   static {
+      System.loadLibrary("hello"); <span class="color-comment">// Load native library hello.dll (Windows) or libhello.so (Unixes)</span>
+                                   <span class="color-comment">// </span><span class="color-comment"> at runtime</span>
+                                   <span class="color-comment">// </span><span class="color-comment">This library contains a native method called sayHello()</span>
+   }
+ 
+   <span class="color-comment">// Declare an instance native method sayHello() which receives no parameter and returns void</span>
+   private native void sayHello();
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String[] args) {
+      new HelloJNI().sayHello();  <span class="color-comment">// Create an instance and invoke the native method</span>
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The <em>static initializer</em> invokes <code>System.loadLibrary()</code> to load the native library "<code>hello</code>" (which contains a native method called <code>sayHello()</code>) during the class loading. It will be mapped to "<code>hello.dll</code>" in Windows; or <code>"libhello.so</code>" in Unixes/Mac OS X. This library shall be included in Java's library path (kept in <em>Java system variable</em> <code>java.library.path</code>). You could include the library into Java's library path via VM argument <code>-Djava.library.path=<em>/path/to/lib</em></code>.  The program will throw a <code>UnsatisfiedLinkError</code> if the library cannot be found in runtime. </p>
+
+<p>Next, we declare the method <code>sayHello()</code> as a native instance method, via keyword <code>native</code> which denotes that this method is implemented in another language. A native method does not contain a body. The <code>sayHello()</code> shall be found in the native library loaded.</p>
+<p>The <code>main()</code> method allocates an instance of <code>HelloJNI</code> and invoke the native method <code>sayHello()</code>.</p>
+
+<h5>Step 2: Compile the Java Program <span class="font-code">HelloJNI.java</span> &amp; Generate the C/C++ Header File <span class="font-code">HelloJNI.h</span></h5>
+
+<p>Starting from JDK 8, you should use "<code>javac -h</code>" to compile the Java program AND generate C/C++ header file called <code>HelloJNI.h</code> as follows:</p>
+<pre class="color-command">&gt; <strong>javac -h . HelloJNI.java</strong></pre>
+
+<p>The "<code>-h <em>dir</em></code>" option generates C/C++ header and places it in the directory specified (in the above example, <code>'.'</code> for the current directory).</p>
+
+<p>Before JDK 8, you need to compile the Java program using <code>javac</code> and generate C/C++ header using a dedicated <code>javah</code> utility, as follows. The <code>javah</code> utility is no longer available in JDK 10.</p>
+<pre class="color-command">&gt; <strong>javac HelloJNI.java</strong>
+&gt; <strong>javah HelloJNI</strong></pre>
+
+<p>Inspect the header file <code>HelloJNI.h</code>:</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></td>
+<td>
+<pre><span class="color-comment">/* DO NOT EDIT THIS FILE - it is machine generated */</span>
+#include &lt;jni.h&gt;
+<span class="color-comment">/* Header for class HelloJNI */</span>
+ 
+#ifndef _Included_HelloJNI
+#define _Included_HelloJNI
+#ifdef __cplusplus
+extern "C" {
+#endif
+<span class="color-comment">/*
+ * Class:     HelloJNI
+ * Method:    sayHello
+ * Signature: ()V
+ */</span>
+JNIEXPORT void JNICALL Java_HelloJNI_sayHello(JNIEnv *, jobject);
+ 
+#ifdef __cplusplus
+}
+#endif
+#endif</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The header declares a C function <code>Java_HelloJNI_sayHello</code> as follows:</p>
+
+<pre class="color-syntax">JNIEXPORT void JNICALL <strong>Java_HelloJNI_sayHello</strong>(JNIEnv *, jobject);</pre>
+
+<p>The naming convention for the C function is <code>Java_{package_and_classname}_{function_name}(JNI_arguments)</code>. The dot in package name is replaced by underscore.</p>
+
+<p>The arguments are:</p>
+<ul>
+<li><code>JNIEnv*</code>: reference to JNI environment, which lets you access all the JNI functions.</li>
+<li><code>jobject</code>: reference to "<code>this</code>" Java object.</li>
+</ul>
+
+<p>We are not using these arguments in this hello-world example, but will be using them later. Ignore the macros <code>JNIEXPORT</code> and <code>JNICALL</code> for the time being.</p>
+<p>The <code>extern "C" </code>is recognized by C++ compiler only. It 
+notifies the C++ compiler that these functions are to be compiled using 
+C's function naming protocol instead of C++ naming protocol. C and C++ 
+have different function naming protocols as C++ support function 
+overloading and uses a name mangling scheme to differentiate the 
+overloaded functions. Read "<a href="https://www3.ntu.edu.sg/home/ehchua/programming/cpp/cp1_Basics.html#name_mangling">Name Mangling</a>".</p>
+
+<h5>Step 3: Implementing the C Program <span class="font-code">HelloJNI.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre>
+</td>
+<td>
+<pre><span class="color-comment">// Save as "HelloJNI.c"</span>
+#include &lt;jni.h&gt;        <span class="color-comment">// JNI header provided by JDK</span>
+#include &lt;stdio.h&gt;      <span class="color-comment">// C Standard IO Header</span>
+#include "HelloJNI.h"   <span class="color-comment">// Generated</span>
+ 
+<span class="color-comment">// Implementation of the native method sayHello()</span>
+JNIEXPORT void JNICALL Java_HelloJNI_sayHello(JNIEnv *env, jobject thisObj) {
+   printf("Hello World!\n");
+   return;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Save the C program as "<code>HelloJNI.c</code>".</p>
+<p>The JNI header "<code>jni.h</code>" provided by JDK is available under the "<code>&lt;JAVA_HOME&gt;\include</code>" and "<code>&lt;JAVA_HOME&gt;\include\win32</code>" (for Windows) or "<code>&lt;JAVA_HOME&gt;\include\linux</code>" (for Ubuntu) [Check Mac OS X] directories, where <code>&lt;JAVA_HOME&gt;</code> is your JDK installed directory (e.g., "<code>c:\program files\java\jdk10.0.x</code>" for Windows).</p>
+
+<p>The C function simply prints the message "Hello world!" to the console.</p>
+
+<h5>Step 4: Compile the C program <span class="font-code">HelloJNI.c</span></h5>
+
+<p>Finding the right compiler for your operating platform (Windows, Mac 
+OS X, Ubuntu), for your JDK (32-bit, 64-bit), and figuring out the 
+correct compiler options is the hardest part to get the JNI working!!!</p>
+
+<h5>(Windows) 64-bit JDK</h5>
+
+<p>We are going to use Cygwin. You need to take note of the followings for Windows:</p>
+<ul>
+<li>Windows/Intel uses these instruction sets: x86 is a 32-bit 
+instruction set; i868 is an enhanced version of x86 (also 32-bit); 
+x86_64 (or amd64) is a 64-bit instruction set.</li>
+<li>A 32-bit compiler can run on 32-bit or 64-bit (backward compatible) Windows, but 64-bit compiler can only run on 64-bit Windows.</li>
+<li>A 64-bit compiler could produce target of 32-bit or 64-bit.</li>
+<li>If you use Cygwin's GCC, the target could be native Windows or 
+Cygwin. If the target is native Windows, the code can be distributed and
+ run under Windows. However, if the target is Cygwin, to distribute, you
+ need to distribute Cygwin runtime environment (<code>cygwin1.dll</code>). This is because Cygwin is a Unix emulator under Windows.</li>
+<li>The above explains for the many versions of GCC under Cygwin.</li>
+</ul>
+
+<p>For 64-bit JDK, you need to find a compiler that produces target of 
+64-bit native Windows. This is provided by MinGW-W64. You can install 
+MinGW-W64 under Cygwin, by selecting packages "<code>mingw64-x86_64-gcc-core</code>" (C compiler) and  "<code>mingw64-x86_64-gcc-g++</code>" (C++ compiler). The executables are <code>"x86_64-w64-mingw32-gcc</code>" (C Compiler) and <code>"x86_64-w64-mingw32-g++</code>" (C++ Compiler), respectively.</p>
+
+<p>First, set the environment variable <code>JAVA_HOME</code> to point the JDK installed directory (e.g.,  "<code>c:\program files\java\jdk10.0.x</code>"). Follow the steps <a href="https://www3.ntu.edu.sg/home/ehchua/programming/howto/JDK_HowTo.html#Set-JAVA_HOME">HERE</a>.</p>
+
+<p>Next, use the following commands to compile <code>HelloJNI.c</code> into <code>hello.dll</code>. In Windows, we reference the environment variable <code>JAVA_HOME</code> as <code>%JAVA_HOME%</code> in the command.</p>
+
+<pre class="color-command">&gt; <strong>x86_64-w64-mingw32-gcc -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o hello.dll HelloJNI.c</strong></pre>
+
+<p>The compiler options used are:</p>
+<ul>
+<li><code>-I<em>headerDir</em></code>: for specifying the header directory. In this case "<code>jni.h</code>" (in "<code>%JAVA_HOME%\include</code>") and "<code>jni_md.h</code>" (in "<code>%JAVA_HOME%\include\win32"</code>), where <code>JAVA_HOME</code> is an environment variable set to the JDK installed directory.</li>
+<li><code>-shared</code>: to generate share library.</li>
+<li><code>-o <em>outputFilename</em></code>: for setting the output filename "<code>hello.dll</code>".</li>
+</ul>
+
+<p>You can also compile and link in two steps:</p>
+<pre class="color-command"><span class="color-comment">// Compile-only "HelloJNI.c" with -c flag. Output is "HElloJNI.o"</span>
+&gt; <strong>x86_64-w64-mingw32-gcc -c -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" HelloJNI.c</strong>
+ 
+<span class="color-comment">// Link "HelloJNO.o" into shared library "hello.dll"</span>
+&gt; <strong>x86_64-w64-mingw32-gcc -shared -o hello.dll HelloJNI.o</strong></pre>
+
+<p>You need check the resultant file type via the "<code>file</code>" utility, which indicates "<code>Hello.dll</code>" is a 64-bit (x86_64) native Windows DLL.</p>
+<pre class="color-command">&gt; <strong>file hello.dll</strong>
+hello.dll: PE32+ executable (DLL) (console) x86-64, for MS Windows</pre>
+
+<p>Try <code>nm</code>, which lists all the symbols in the shared library and look for the <code>sayHello()</code> function. Check for the function name <code>Java_HelloJNI_sayHello</code> with type <code>"T"</code> (defined).</p>
+<pre class="color-command">&gt; <strong>nm hello.dll | grep say</strong>
+00000000624014a0 T Java_HelloJNI_sayHello</pre>
+
+<h5>(Windows) 32-bit JDK [Obsolete?]</h5>
+
+<p>For 32-bit JDK, you need to find a 32/64-bit compiler that produces 
+target of 32-bit native Windows. This is provided by MinGW-W64 (and the 
+older MinGW). You can install MinGW-W64 under Cygwin, by selecting 
+packages "<code>mingw64-i686-gcc-core</code>" (C compiler) and  "<code>mingw64-i686-gcc-g++</code>" (C++ compiler). The executables are <code>"i886-w64-mingw32-gcc</code>" (C Compiler) and <code>"i686-w64-mingw32-g++</code>" (C++ Compiler), respectively.</p>
+
+<p>First, set the environment variable <code>JAVA_HOME</code> to point the JDK installed directory (e.g.,  "<code>c:\program files\java\jdk9.0.x</code>"). Follow the steps <a href="https://www3.ntu.edu.sg/home/ehchua/programming/howto/JDK_HowTo.html#Set-JAVA_HOME">HERE</a>.</p>
+
+<p>Next, use the following command to compile <code>HelloJNI.c</code> into <code>hello.dll</code>:</p>
+
+<pre class="color-command">&gt; <strong>i886-w64-mingw32-gcc -Wl,--add-stdcall-alias -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o hello.dll HelloJNI.c</strong></pre>
+
+<p>The compiler options used are:</p>
+<ul>
+<li><code>-Wl</code>: The <code>-Wl</code> to pass linker option <code>--add-stdcall-alias</code> to prevent <code>UnsatisfiedLinkError</code> (symbols with a stdcall suffix (<code>@nn</code>) will be exported as-is and also with the suffix stripped). (Some people suggested to use <code>-Wl,--kill-at</code>.)</li>
+<li><code>-I</code>: for specifying the header files directories. In this case "<code>jni.h</code>" (in "<code>%JAVA_HOME%\include</code>") and "<code>jni_md.h</code>" (in "<code>%JAVA_HOME%\include\win32"</code>), where <code>%JAVA_HOME%</code> is an environment variable set to the JDK installed directory.</li>
+<li><code>-shared</code>: to generate share library.</li>
+<li><code>-o</code>: for setting the output filename "<code>hello.dll</code>".</li>
+<li><code>-D</code> <code>__int64</code>=<code>"long long"</code>: define the type  (add this option in front if error "unknown type name '__int64'")</li>
+</ul>
+
+<h5>(Ubuntu) 64-bit JDK</h5>
+
+<ol>
+<li>Set environment variable <code>JAVA_HOME</code> to point to the JDK installed directory (which shall contains the <code>include</code> subdirectory to be used in the next step):
+  <pre class="color-command">$ <strong>export JAVA_HOME=/<em>your</em>/<em>java</em>/<em>installed</em>/<em>dir</em></strong><em>
+</em>$ <strong>echo $JAVA_HOME</strong></pre></li>
+
+<li>Compile the C program <code>HelloJNI.c</code> into share module <code>libhello.so</code> using <code>gcc</code>, which is included in all Unixes:
+<pre class="color-command">$ <strong>gcc -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libhello.so HelloJNI.c</strong></pre></li>
+
+<li>Run the Java Program:
+<pre class="color-command">$ <strong>java -Djava.library.path=. HelloJNI</strong></pre></li>
+
+</ol>
+
+
+<h5>(Mac OS X) 64-Bit JDK</h5>
+
+<ol>
+<li>Set environment variable <code>JAVA_HOME</code> to point to the JDK installed directory (which shall contains the <code>include</code> subdirectory to be used in the next step):
+  <pre class="color-command">$ <strong>export JAVA_HOME=/<em>your</em>/<em>java</em>/<em>installed</em>/<em>dir</em></strong>
+   <span class="color-comment">// for my machine @ /Library/Java/JavaVirtualMachines/jdk1.8.0_xx.jdk/Contents/Home</span>
+$ <strong>echo $JAVA_HOME</strong></pre></li>
+
+<li>Compile the C program <code>HelloJNI.c</code> into dynamic share module <code>libhello.dylib</code> using <code>gcc</code>, which is included in all Unixes/Mac OS:
+  <pre class="color-command">$ <strong>gcc -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" -dynamiclib -o libhello.dylib HelloJNI.c</strong></pre></li>
+
+<li>Run the Java Program:
+<pre class="color-command">$ <strong>java -Djava.library.path=. HelloJNI</strong></pre></li>
+
+</ol>
+
+<h5>Step 4: Run the Java Program</h5>
+
+<pre class="color-command">&gt; <strong>java HelloJNI</strong></pre>
+
+<p>You may need to explicitly specify the Java library path of the "<code>hello.dll</code>" (Windows), "<code>libHello.so</code>" (Unixes), "<code>libhello.dylib</code>" (Mac OS X) via VM option <code>-Djava.library.path=<em>/path/to/lib</em></code>, as below. In this example, the native library is kept in the current directory <code>'.'</code>.</p>
+<pre class="color-command">&gt; <strong>java -Djava.library.path=. HelloJNI</strong></pre>
+
+<h4>2.2&nbsp;&nbsp;JNI with C++<a id="zz-2.2"></a></h4>
+
+<p>Instead of a C program, we can use a C++ program (called <code>HelloJNI.cpp</code>) for the above example.</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</pre>
+</td>
+<td>
+<pre><span class="color-comment">// Save as "HelloJNI.cpp"</span>
+#include &lt;jni.h&gt;       <span class="color-comment">// JNI header provided by JDK</span>
+#include &lt;iostream&gt;    <span class="color-comment">// C++ standard IO header</span>
+#include "HelloJNI.h"  <span class="color-comment">// Generated</span>
+using namespace std;
+
+<span class="color-comment">// Implementation of the native method sayHello()</span>
+JNIEXPORT void JNICALL Java_HelloJNI_sayHello(JNIEnv *env, jobject thisObj) {
+	cout &lt;&lt; "Hello World from C++!" &lt;&lt; endl;
+   return;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C++ programs into shared library as follows. See "JNI with C" section for explanation.</p>
+
+<p><span class="underline">(Windows) 64-bit JDK</span></p>
+
+<p>On Cygwin, you need to install <code>mingw64-x86-gcc-g++</code> package.</p>
+
+<pre class="color-command">&gt; <strong>x86_64-w64-mingw32-g++ -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o hello.dll HelloJNI.cpp</strong></pre>
+
+<p><span class="underline">(Ubuntu) 64-bit JDK</span></p>
+
+<pre class="color-command">$ <strong>g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libhello.so HelloJNI.cpp</strong></pre>
+
+<p><span class="underline">(Mac OS X) 64-bit JDK</span></p>
+<p>[TODO]</p>
+
+<h5>Run the Java Program</h5>
+
+<pre class="color-command">&gt; <strong>java HelloJNI</strong>
+<span class="color-comment">or</span>
+&gt; <strong>java -Djava.library.path=. HelloJNI</strong></pre>
+
+<p><strong>Notes</strong>: If you encounter "<code>java.lang.UnsatisfiedLinkError: hello.dll: Can't find dependent libraries</code>",
+ you need to find a "DLL dependency walker" to track down the dependent 
+libraries. Search for the libraries (under Cygwin) and include the 
+libraries in the environment variable <code>PATH</code>. In my case, the dependent library is "<code>libstdc++-6.dll</code>" located at "<code>cygwin64\usr\x86_64-w64-mingw32\sys-root\mingw\bin</code>".</p>
+
+
+<h4>2.3&nbsp;&nbsp;JNI with C/C++ Mixture<a id="zz-2.3"></a></h4>
+
+<h5>Step 1: Write a Java Class that uses Native Codes - <span class="font-code">HelloJNICpp.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre>
+</td>
+<td>
+<pre>public class HelloJNICpp {
+   static {
+      System.loadLibrary("hello"); <span class="color-comment">// hello.dll (Windows) or libhello.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Native method declaration</span>
+   private native void sayHello();
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String[] args) {
+      new HelloJNICpp().sayHello();  <span class="color-comment">// Invoke native method</span>
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<h5>Step 2: Compile the Java Program &amp; Generate the C/C++ Header file <span class="font-code">HelloJNICpp.h</span></h5>
+
+<pre class="color-command"><strong>javac -h . HelloJNICpp</strong>
+</pre>
+
+<p>The resultant header file "<code>HelloJNICpp.h</code>" declares the native function as:</p>
+
+<pre class="color-syntax">JNIEXPORT void JNICALL <strong>Java_HelloJNICpp_sayHello</strong>(JNIEnv *, jobject);</pre>
+
+<h5>Step 3: C/C++ Implementation - <span class="font-code">HelloJNICppImpl.h</span>, <span class="font-code">HelloJNICppImpl.cpp</span>, and <span class="font-code">HelloJNICpp.c</span></h5>
+<p>We shall implement the program in C++ (in "<code>HelloJNICppImpl.h</code>" and "<code>HelloJNICppImpl.cpp</code>"), but use a C program ("<code>HelloJNICpp.c</code>") to interface with Java.</p>
+
+<p>C++ Header - "<code>HelloJNICppImpl.h</code>"</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre>
+</td>
+<td>
+<pre>#ifndef _HELLO_JNI_CPP_IMPL_H
+#define _HELLO_JNI_CPP_IMPL_H
+ 
+#ifdef __cplusplus
+        extern "C" {
+#endif
+        void sayHello ();
+#ifdef __cplusplus
+        }
+#endif
+ 
+#endif</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>C++ Implementation - "<code>HelloJNICppImpl.cpp</code>"</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9</pre>
+</td>
+<td>
+<pre>#include "HelloJNICppImpl.h"
+#include  &lt;iostream&gt;
+ 
+using namespace std;
+ 
+void sayHello () {
+    cout &lt;&lt; "Hello World from C++!" &lt;&lt; endl;
+    return;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>C Program interfacing with Java - "<code>HelloJNICpp.c</code>"</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include "HelloJNICpp.h"
+#include "HelloJNICppImpl.h"
+ 
+JNIEXPORT void JNICALL Java_HelloJNICpp_sayHello (JNIEnv *env, jobject thisObj) {
+    sayHello();  <span class="color-comment">// invoke C++ function</span>
+    return;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C/C++ programs into shared library ("<code>hello.dll</code>" for Windows).</p>
+
+<p><span class="underline">(Windows) 64-bit JDK</span></p>
+
+<p>On Cygwin, you need to install <code>mingw64-x86-gcc-g++</code> package.</p>
+
+<pre class="color-command">&gt; <strong>x86_64-w64-mingw32-g++ -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o hello.dll HelloJNICpp.c HelloJNICppImpl.cpp</strong></pre>
+
+<p><span class="underline">(Ubuntu) 64-bit JDK</span></p>
+
+<pre class="color-command">$ <strong>g++ -fPIC -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" -shared -o libhello.so HelloJNICpp.c HelloJNICppImpl.cpp</strong></pre>
+
+<h5>Step 4: Run the Java Program</h5>
+
+<pre class="color-command">&gt; <strong>java HelloJNICpp</strong>
+<span class="color-comment">or</span>
+&gt; <strong>java -Djava.library.path=. HelloJNICpp</strong></pre>
+
+<p><strong>Notes</strong>: If you encounter "<code>java.lang.UnsatisfiedLinkError: hello.dll: Can't find dependent libraries</code>",
+ you need to find a DLL dependency walker to track down the dependent 
+libraries. Search for the libraries (under Cygwin) and include the 
+libraries in the <code>PATH</code>. In my case, the dependent library is "<code>libstdc++-6.dll</code>" located at "<code>cygwin64\usr\x86_64-w64-mingw32\sys-root\mingw\bin</code>".</p>
+
+<h4>2.4&nbsp;&nbsp;JNI in Package<a id="zz-2.4"></a></h4>
+
+<p>For production, all Java classes shall be kept in proper packages, instead of the default no-name package.</p>
+
+<h5>Step 1: JNI Program - <span class="font-code">myjni\HelloJNI.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre>
+</td>
+<td>
+<pre><span class="color-new">package myjni;</span>
+ 
+public class HelloJNI {
+   static {
+      System.loadLibrary("hello"); <span class="color-comment">// hello.dll (Windows) or libhello.so (Unixes)</span>
+   }
+   <span class="color-comment">// A native method that receives nothing and returns void</span>
+   private native void sayHello();
+ 
+   public static void main(String[] args) {
+      new myjni.HelloJNI().sayHello();  <span class="color-comment">// invoke the native method</span>
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>This JNI class is kept in package "<code>myjni</code>" - to be saved as "<code>myjni\HelloJNI.java</code>".</p>
+
+<h5>Step 2: Compile the JNI program &amp; Generate C/C++ Header</h5>
+
+<pre class="color-command"><span class="color-comment">// change directory to package base directory</span>
+&gt; <strong>javac -h include myjni\HelloJNI</strong></pre>
+
+<p>The output of compilation is "<code>myjni\HelloJNI.class</code>".</p>
+
+<p>In this example, we decided to place the header file under a "<code>include</code>" sub-directory. The generated output is "<code>include\myjni_HelloJNI.h</code>".</p>
+
+<p>The header file declares a native function:</p>
+<pre class="color-syntax">JNIEXPORT void JNICALL <strong>Java_myjni_HelloJNI_sayHello</strong>(JNIEnv *, jobject);</pre>
+
+<p>Take note of the native function naming convention: <code>Java_&lt;<em>fully-qualified-name</em>&gt;_methodName</code>, with dots replaced by underscores.</p>
+
+<h5>Step 3: C Implementation - <span class="font-code">HelloJNI.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "include\myjni_HelloJNI.h"
+ 
+JNIEXPORT void JNICALL Java_myjni_HelloJNI_sayHello(JNIEnv *env, jobject thisObj) {
+   printf("Hello World!\n");
+   return;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C program:</p>
+
+<pre class="color-command"><span class="color-comment">// for Windows 64-bit JDK</span>
+&gt; <strong>x86_64-w64-mingw32-gcc -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o hello.dll HelloJNI.c</strong></pre>
+
+<p>You can now run the JNI program:</p>
+<pre class="color-command">&gt; <strong>java -Djava.library.path=. myjni.HelloJNI</strong>
+</pre>
+
+<h4>2.5&nbsp;&nbsp;JNI in Module (JDK 9)<a id="zz-2.5"></a></h4>
+<p>[TODO]</p>
+
+
+<h4>2.6&nbsp;&nbsp;JNI in Eclipse [To Check]<a id="zz-2.6"></a></h4>
+
+<p>Writing JNI under Eclipse is handy for development Android apps with NDK.</p>
+<p>You need to install Eclipse and Eclipse CDT (C/C++ Development Tool) Plugin. Read "<a href="https://www3.ntu.edu.sg/home/ehchua/programming/howto/EclipseCpp_HowTo.html">Eclipse for C/C++</a>" on how to install CDT.</p>
+
+<h5>Step 1: Create a Java Project</h5>
+
+<p>Create a new Java project (says <code>HelloJNI</code>), and the following Java  class "<code>HelloJNI.java</code>":</p>
+
+<pre class="color-example">public class HelloJNI {
+   static {
+      System.loadLibrary("hello"); <span class="color-comment">// hello.dll (Windows) or libhello.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Declare native method</span>
+   private native void sayHello();
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String[] args) {
+      new HelloJNI().sayHello();  <span class="color-comment">// Allocate an instance and invoke the native method</span>
+   }
+}</pre>
+
+<h5>Step 2: Convert the Java Project to C/C++ Makefile Project</h5>
+
+<p>Right-click on the "<code>HelloJNI</code>" Java project ⇒ New ⇒ Other... ⇒ Convert to a C/C++ Project (Adds C/C++ Nature) ⇒ Next.</p>
+<p>The "Convert to a C/C++ Project" dialog appears. In "Project type", select "<span class="underline">Makefile Project</span>" ⇒ In "Toolchains", select "MinGW GCC" ⇒ Finish.</p>
+
+<p>Now, you can run this project as a Java as well as C/C++ project.</p>
+
+<h5>Step 3: Generate C/C++ Header File (Pre JDK-10)</h5>
+
+<p>Create a directory called "<code>jni</code>" under the project to keep all the C/C++ codes, by right-click on the project ⇒ New ⇒ Folder ⇒ In "Folder name", enter "<code>jni</code>".</p>
+
+
+<p>Create a "<code>makefile</code>" under the "<code>jni</code>" directory, by right-click on the "<code>jni</code>" folder ⇒ new ⇒ File ⇒ In "File name", enter "<code>makefile</code>" ⇒ Enter the following codes. Take note that you need to use tab (instead of spaces) for the indent.</p>
+
+<pre class="color-example"><span class="color-comment"># Define a variable for classpath</span>
+CLASS_PATH = ../bin
+
+<span class="color-comment"># Define a virtual path for .class in the bin directory</span>
+vpath %.class $(CLASS_PATH)
+
+<span class="color-comment"># $* matches the target filename without the extension
+# Pre JDK-10. JDK 10 removes the javah utility, need to use javac -h instead [TO CHECK]</span>
+HelloJNI.h : HelloJNI.class
+	javah -classpath $(CLASS_PATH) $*</pre>
+
+<p>This makefile create a target "<code>HelloJNI.h</code>", which has a dependency "<code>HelloJNI.class</code>", and invokes the <code>javah</code> utility on <code>HelloJNI.class</code> (under <code>-classpath</code>) to build the target header file.</p>
+
+<p>Right-click on the makefile ⇒ Make Targets ⇒ Create ⇒ In "Target Name", enter "<code>HelloJNI.h</code>".</p>
+
+<p>Run the makefile for the target "<code>HelloJNI.h</code>", by right-click on the makefile ⇒ Make Targets ⇒ Build ⇒ Select the target "<code>HelloJNI.h</code>" ⇒ Build. The header file "<code>HelloJNI.h</code>" shall be generated in the "<code>jni</code>" directory. Refresh (F5) if necessary. The outputs are:</p>
+<pre class="output">make HelloJNI.h 
+javah -classpath ../bin HelloJNI</pre>
+
+<p>Read "<a href="https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html">GCC and Make</a>" for details about makefile.</p>
+
+<p>Alternatively, you could also use the CMD shell to run the make file:</p>
+<pre class="color-command"><span class="color-comment">// change directory to the directory containing makefile</span>
+&gt; <strong>make HelloJNI.h</strong></pre>
+
+<p>You can even use the CMD shell to run the <code>javah</code> (Pre JDK-10):</p>
+<pre class="color-command">&gt; <strong>javah -classpath ../bin HelloJNI</strong></pre>
+
+<h5>Step 4: C Implementation - <span class="font-code">HelloJNI.c</span></h5>
+<p>Create a C program called "<code>HelloJNI.c</code>", by right-click on the "<code>jni</code>" folder ⇒ New ⇒ Source file ⇒ In "Source file", enter "<code>HelloJNI.c</code>". Enter the following codes:</p>
+
+<pre class="color-example">#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "HelloJNI.h"
+ 
+JNIEXPORT void JNICALL Java_HelloJNI_sayHello(JNIEnv *env, jobject thisObj) {
+   printf("Hello World!\n");
+   return;
+}</pre>
+
+<p>Modify the "<code>makefile</code>" as follows to generate the shared library "<code>hello.dll</code>". (Again, use tab to indent the lines.)</p>
+
+<pre class="color-example"><span class="color-comment"># Define a variable for classpath</span>
+CLASS_PATH = ../bin
+
+<span class="color-comment"># Define a virtual path for .class in the bin directory</span>
+vpath %.class $(CLASS_PATH)
+
+<span class="color-new">all : hello.dll</span>
+
+<span class="color-comment"># $@ matches the target, $&lt; matches the first dependency</span>
+<span class="color-new">hello.dll : HelloJNI.o
+	gcc -Wl,--add-stdcall-alias -shared -o $@ $&lt;</span>
+
+<span class="color-comment"># $@ matches the target, $&lt; matches the first dependency</span>
+<span class="color-new">HelloJNI.o : HelloJNI.c HelloJNI.h
+	gcc -I"D:\bin\jdk1.7\include" -I"D:\bin\jdk1.7\include\win32" -c $&lt; -o $@</span>
+
+<span class="color-comment"># $* matches the target filename without the extension</span>
+HelloJNI.h : HelloJNI.class
+	javah -classpath $(CLASS_PATH) $*
+
+<span class="color-new">clean :
+	rm HelloJNI.h HelloJNI.o hello.dll</span></pre>
+
+<p>Right-click on the "<code>makefile</code>" ⇒ Make Targets ⇒ Create ⇒ In "Target Name", enter "<code><code>all</code></code>". Repeat to create a target "<code>clean</code>".</p>
+
+<p>Run the makefile for the target "<code>all</code>", by right-click on the makefile ⇒ Make Targets ⇒ Build ⇒ Select the target "<code>all</code>" ⇒ Build. The outputs are:</p>
+<pre class="output">make all
+javah -classpath ../bin HelloJNI
+gcc -I"D:\bin\jdk1.7\include" -I"D:\bin\jdk1.7\include\win32" -c HelloJNI.c -o HelloJNI.o
+gcc -Wl,--add-stdcall-alias -shared -o hello.dll HelloJNI.o</pre>
+
+<p>The shared library "<code>hello.dll</code>" shall have been created in "<code>jni</code>" directory.</p>
+
+<h5>Step 5: Run the Java JNI Program</h5>
+<p>You can run the Java JNI program <code>HelloJNI</code>. However, you need to provide the library path to the "<code>hello.dll</code>". This can be done via VM argument <code>-Djava.library.path</code>. Right-click on the project ⇒ Run As ⇒ Run Configurations ⇒ Select "Java Application" ⇒ In "Main" tab, enter the main class "<code>HelloJNI</code>" ⇒ In "Arguments", "VM Arguments", enter "<code>-Djava.library.path=jni</code>" ⇒ Run.</p>
+
+<p>You shall see the output "Hello World!" displayed on the console.</p>
+
+<h4>2.7&nbsp;&nbsp;JNI in NetBeans<a id="zz-2.7"></a></h4>
+<p>[TODO]</p>
+
+<h3>3.&nbsp;&nbsp;JNI Basics<a id="zz-3."></a></h3>
+
+<p>JNI defines the following JNI types in the native system that correspond to Java types:</p>
+
+<ol>
+<li>Java Primitives: <code>jint</code>, <code>jbyte</code>, <code>jshort</code>, <code>jlong</code>, <code>jfloat</code>, <code>jdouble</code>, <code>jchar</code>, <code>jboolean</code> for Java Primitive of <code>int</code>, <code>byte</code>, <code>short</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>char</code> and <code>boolean</code>, respectively.</li>
+
+<li>Java Reference Types: <code>jobject</code> for <code>java.lang.Object</code>. It also defines the following <em>sub-type</em>s:
+  <ol>
+<li><code>jclass</code> for <code>java.lang.Class</code>.</li>
+<li><code>jstring</code> for <code>java.lang.String</code>.</li>
+<li><code>jthrowable</code> for <code>java.lang.Throwable</code>.</li>
+<li><code>jarray</code> for Java array. Java array is a reference type with eight primitive array and one <code>Object</code> array. Hence, there are eight array of primitives <code>jintArray</code>, <code>jbyteArray</code>, <code>jshortArray</code>, <code>jlongArray</code>, <code>jfloatArray</code>, <code>jdoubleArray</code>, <code>jcharArray</code> and <code>jbooleanArray</code>; and one object array <code>jobjectArray</code>.</li>
+</ol>
+</li>
+</ol>
+
+<p>The native functions receives argument in the above JNI types and returns a value in the JNI type (such as <code>jstring</code>, <code>jintArray</code>). However, native functions operate on their own native types (such as C-string, C's <code>int[]</code>). Hence, there is a need to convert (or transform) between JNI types and the native types.</p>
+
+<p>The native programs:</p>
+<ol>
+<li>Receive the arguments in JNI type (passed over by the Java program).</li>
+<li>For reference JNI type, convert or copy the arguments to local native types, e.g., <code>jstring</code> to a C-string, <code>jintArray</code> to C's <code>int[]</code>, and so on. Primitive JNI types such as <code>jint</code> and <code>jdouble</code> do not need conversion and can be operated directly.</li>
+<li>Perform its operations, in local native type.</li>
+<li>Create the returned object in JNI type, and copy the result into the returned object.</li>
+<li>Return.</li>
+</ol>
+
+<p>The most confusing and challenging task in JNI programming is the conversion (or transformation) between JNI <em>reference</em> types (such as <code>jstring</code>, <code>jobject</code>, <code>jintArray</code>, <code>jobjectArray</code>) and native types (<code>C-string</code>, <code>int[]</code>). The JNI Environment interface provides many functions to do the conversion.</p>
+
+<p>JNI is a C interface, which is not object-oriented. It does not really pass the objects.</p>
+<p>[C++ object-oriented interface?!]</p>
+
+<h3>4.&nbsp;&nbsp;Passing Arguments and Result between Java &amp; Native Programs<a id="zz-4."></a></h3>
+
+<h4>4.1&nbsp;&nbsp;Passing Primitives<a id="zz-4.1"></a></h4>
+
+<p>Passing Java primitives is straight forward. A <code>jxxx</code> type is defined in the native system, i.e,. <code>jint</code>, <code>jbyte</code>, <code>jshort</code>, <code>jlong</code>, <code>jfloat</code>, <code>jdouble</code>, <code>jchar</code> and <code>jboolean</code> for each of the Java's primitives <code>int</code>, <code>byte</code>, <code>short</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>char</code> and <code>boolean</code>, respectively.</p>
+
+<h5>Java JNI Program: <span class="font-code">TestJNIPrimitive.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre>
+</td>
+<td>
+<pre>public class TestJNIPrimitive {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Declare a native method average() that receives two ints and return a double containing the average</span>
+   private native double average(int n1, int n2);
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String args[]) {
+      System.out.println("In Java, the average is " + new TestJNIPrimitive().average(3, 2));
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>This JNI program loads a shared library <code>myjni.dll</code> (Windows) or <code>libmyjni.so</code> (Unixes). It declares a <code>native</code> method <code>average()</code> that receives two <code>int</code>'s<code></code> and returns a <code>double</code> containing the average value of the two <code>int</code>'s. The <code>main()</code> method invoke the <code>average()</code>.</p>
+
+<p>Compile the Java program into "<code>TestJNIPrimitive.class</code>" and generate the C/C++ header file "<code>TestJNIPrimitive.h</code>":</p>
+<pre class="color-command"><strong>javac -h . TestJNIPrimitive.java</strong></pre>
+
+<h5>C Implementation - <span class="font-code">TestJNIPrimitive.c</span></h5>
+
+<p>The header file <code>TestJNIPrimitive.h</code> contains a function declaration <code>Java_TestJNIPrimitive_average()</code> which takes a <code>JNIEnv*</code> (for accessing JNI environment interface), a <code>jobject</code> (for referencing this <code>object</code>), two <code>jint</code>'s (Java native method's two arguments) and returns a <code>jdouble</code> (Java native method's return-type).</p>
+<pre class="color-syntax">JNIEXPORT jdouble JNICALL <strong>Java_TestJNIPrimitive_average</strong>(JNIEnv *, jobject, jint, jint);</pre>
+
+<p>The JNI types <code>jint</code> and <code>jdouble</code> correspond to Java's type <code>int</code> and <code>double</code>, respectively.</p>
+
+<p>The "<code>jni.h</code>" and "<code>win32\jni_mh.h</code>" (which is platform dependent) contains these <code>typedef</code> statements for the eight JNI primitives and an additional <code>jsize</code>. </p>
+<p>It is interesting to note that <code>jint</code> is mapped to C's <code>long</code> (which is at least 32 bits), instead of of C's <code>int</code> (which could be 16 bits). Hence, it is important to use <code>jint</code> in the C program, instead of simply using <code>int</code>. Cygwin does not support <code>__int64</code>.</p>
+
+<pre class="color-syntax"><span class="color-comment">// In "win\jni_mh.h" - machine header which is machine dependent</span>
+typedef long            jint;
+typedef __int64         jlong;
+typedef signed char     jbyte;
+ 
+<span class="color-comment">// In "jni.h"</span>
+typedef unsigned char   jboolean;
+typedef unsigned short  jchar;
+typedef short           jshort;
+typedef float           jfloat;
+typedef double          jdouble;
+typedef jint            jsize;</pre>
+
+
+<p>The implementation <code>TestJNIPrimitive.c</code> is as follows:</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIPrimitive.h"
+ 
+JNIEXPORT jdouble JNICALL Java_TestJNIPrimitive_average
+          (JNIEnv *env, jobject thisObj, jint n1, jint n2) {
+   jdouble result;
+   printf("In C, the numbers are %d and %d\n", n1, n2);
+   result = ((jdouble)n1 + n2) / 2.0;
+   <span class="color-comment">// jint is mapped to int, jdouble is mapped to double</span>
+   return result;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C program into shared library (<code>jni.dll</code>).</p>
+<pre class="color-command"><span class="color-comment"></span><strong>gcc -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o myjni.dll TestJNIPrimitive.c</strong></pre>
+
+<p>Now, run the Java Program:</p>
+<pre class="color-command"><strong>java -Djava.library.path=. TestJNIPrimitive</strong></pre>
+
+
+
+<h5>C++ Implementation - <span class="font-code">TestJNIPrimitive.cpp</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;iostream&gt;
+#include "TestJNIPrimitive.h"
+using namespace std;
+ 
+JNIEXPORT jdouble JNICALL Java_TestJNIPrimitive_average
+          (JNIEnv *env, jobject obj, jint n1, jint n2) {
+   jdouble result;
+   cout &lt;&lt; "In C++, the numbers are " &lt;&lt; n1 &lt;&lt; " and " &lt;&lt; n2 &lt;&lt; endl;
+   result = ((jdouble)n1 + n2) / 2.0;
+   <span class="color-comment">// jint is mapped to int, jdouble is mapped to double</span>
+   return result;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C++ program:</p>
+<pre class="color-command"><strong>g++ -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o myjni.dll TestJNIPrimitive.cpp</strong></pre>
+
+<h4>4.2&nbsp;&nbsp;Passing Strings<a id="zz-4.2"></a></h4>
+
+<h5>Java JNI Program: <span class="font-code">TestJNIString.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</pre>
+</td>
+<td>
+<pre>public class TestJNIString {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+   <span class="color-comment">// Native method that receives a Java String and return a Java String</span>
+   private native String sayHello(String msg);
+ 
+   public static void main(String args[]) {
+      String result = new TestJNIString().sayHello("Hello from Java");
+      System.out.println("In Java, the returned string is: " + result);
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>This JNI program declares a <code>native</code> method <code>sayHello()</code> that receives a Java <code>String</code> and returns a Java <code>String</code>. The <code>main()</code> method invokes the <code>sayHello()</code>.</p>
+
+<p>Compile the Java program and generate the C/C++ header file "<code>TestJNIString.h</code>":</p>
+<pre class="color-command"><strong>javac -h . TestJNIString.java</strong><strong></strong></pre>
+
+<h5>C Implementation - <span class="font-code">TestJNIString.c</span></h5>
+
+<p>The header file <code>TestJNIString.h</code> contains this function declaration:</p>
+<pre class="color-example">JNIEXPORT jstring JNICALL <strong>Java_TestJNIString_sayHello</strong>(JNIEnv *, jobject, jstring);</pre>
+
+<p>JNI defined a <code>jstring</code> type to represent the Java <code>String</code>. The last argument (of JNI type <code>jstring</code>) is the Java <code>String</code> passed into the C program. The return-type is also <code>jstring</code>.</p>
+
+<p>Passing strings is more complicated than passing primitives, as Java's <code>String</code> is an object (reference type), while C-string is a NULL-terminated <code>char</code> array. You need to convert between Java <code>String</code> (represented as JNI <code>jstring</code>) and C-string (<code>char*</code>).</p>
+
+<p>The JNI Environment (accessed via the argument <code>JNIEnv*</code>) provides functions for the conversion:</p>
+<ol>
+<li>To get a C-string (<code>char*</code>) from JNI string (<code>jstring</code>), invoke method <code>const char* GetStringUTFChars(JNIEnv*, jstring, jboolean*)</code>.</li>
+<li>To get a JNI string (<code>jstring</code>) from a C-string (<code>char*</code>), invoke method <code>jstring NewStringUTF(JNIEnv*, char*)</code>.</li>
+</ol>
+
+
+<p>The C implementation <code>TestJNIString.c</code> is as follows.</p>
+<ol>
+<li>It receives the JNI string (<code>jstring</code>), convert into a C-string (<code>char*</code>), via <code>GetStringUTFChars()</code>.</li>
+<li>It then performs its intended operations - displays the string received and prompts user for another string to be returned.</li>
+<li>It converts the returned C-string (<code>char*</code>) to JNI string (<code>jstring</code>), via <code>NewStringUTF()</code>, and return the <code>jstring</code>.</li>
+</ol>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIString.h"
+ 
+JNIEXPORT jstring JNICALL Java_TestJNIString_sayHello(JNIEnv *env, jobject thisObj, jstring inJNIStr) {
+   <span class="color-comment">// Step 1: Convert the JNI String (jstring) into C-String (char*)</span>
+   const char *inCStr = (*env)-&gt;GetStringUTFChars(env, inJNIStr, NULL);
+   if (NULL == inCStr) return NULL;
+ 
+   <span class="color-comment">// Step 2: Perform its intended operations</span>
+   printf("In C, the received string is: %s\n", inCStr);
+   (*env)-&gt;ReleaseStringUTFChars(env, inJNIStr, inCStr);  <span class="color-comment">// release resources</span>
+ 
+   <span class="color-comment">// Prompt user for a C-string</span>
+   char outCStr[128];
+   printf("Enter a String: ");
+   scanf("%s", outCStr);    <span class="color-comment">// not more than 127 characters</span>
+ 
+   <span class="color-comment">// Step 3: Convert the C-string (char*) into JNI String (jstring) and return</span>
+   return (*env)-&gt;NewStringUTF(env, outCStr);
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Compile the C program into shared library.</p>
+<pre class="color-command"><strong>gcc -I"&lt;JAVA_HOME&gt;\include" -I"&lt;JAVA_HOME&gt;\include\win32" -shared -o myjni.dll TestJNIString.c</strong></pre>
+
+<p>Now, run the Java Program:</p>
+<pre class="color-command"><strong>java -Djava.library.path=. TestJNIString</strong>
+In C, the received string is: Hello from Java
+Enter a String: test
+In Java, the returned string is: test</pre>
+
+<h5>JNI Native String Functions</h5>
+
+<p>JNI supports conversion for Unicode (16-bit characters) and UTF-8 
+(encoded in 1-3 bytes)  strings. UTF-8 strings act like null-terminated 
+C-strings (<code>char</code> array), which should be used in C/C++ programs.</p>
+
+<p>The JNI string (<code>jstring</code>) functions are:</p>
+
+<pre class="color-syntax"><span class="color-comment">// UTF-8 String (encoded to 1-3 byte, backward compatible with 7-bit ASCII)
+// Can be mapped to null-terminated char-array C-string</span>
+const char * <strong>GetStringUTFChars</strong>(JNIEnv *env, jstring string, jboolean *isCopy);
+   <span class="color-comment">// Returns a pointer to an array of bytes representing the string in modified UTF-8 encoding.</span>
+void <strong>ReleaseStringUTFChars</strong>(JNIEnv *env, jstring string, const char *utf);
+   <span class="color-comment">// Informs the VM that the native code no longer needs access to utf.</span>
+jstring <strong>NewStringUTF</strong>(JNIEnv *env, const char *bytes);
+   <span class="color-comment">// Constructs a new java.lang.String object from an array of characters in modified UTF-8 encoding.</span>
+jsize <strong>GetStringUTFLength</strong>(JNIEnv *env, jstring string);
+   <span class="color-comment">// Returns the length in bytes of the modified UTF-8 representation of a string.</span>
+void <strong>GetStringUTFRegion</strong>(JNIEnv *env, jstring str, jsize start, jsize length, char *buf);
+   <span class="color-comment">// Translates len number of Unicode characters beginning at offset start into modified UTF-8 encoding 
+   // and place the result in the given buffer buf.</span>
+  
+<span class="color-comment">// Unicode Strings (16-bit character)</span>
+const jchar * <strong>GetStringChars</strong>(JNIEnv *env, jstring string, jboolean *isCopy);
+   <span class="color-comment">// Returns a pointer to the array of Unicode characters</span>
+void <strong>ReleaseStringChars</strong>(JNIEnv *env, jstring string, const jchar *chars);
+   <span class="color-comment">// Informs the VM that the native code no longer needs access to chars.</span>
+jstring <strong>NewString</strong>(JNIEnv *env, const jchar *unicodeChars, jsize length);
+   <span class="color-comment">// Constructs a new java.lang.String object from an array of Unicode characters.</span>
+jsize <strong>GetStringLength</strong>(JNIEnv *env, jstring string);
+   <span class="color-comment">// Returns the length (the count of Unicode characters) of a Java string.</span>
+void <strong>GetStringRegion</strong>(JNIEnv *env, jstring str, jsize start, jsize length, jchar *buf);
+   <span class="color-comment">// Copies len number of Unicode characters beginning at offset start to the given buffer buf</span></pre>
+
+<h5>UTF-8 strings or C-strings</h5>
+
+<p>The <code>GetStringUTFChars()</code> function can be used to create a new C-string (<code>char*</code>) from the given Java's <code>jstring</code>. The function returns <code>NULL</code> if the memory cannot be allocated. It is always a good practice to check against <code>NULL</code>.</p>
+<p>The 3rd parameter <code>isCopy</code> (of <code>jboolean*</code>), which is an "in-out" parameter, will be set to <code>JNI_TRUE</code> if the returned string is a copy of the original <code>java.lang.String</code> instance. It will be set to <code>JNI_FALSE</code> if the returned string is a direct pointer to the original <code>String</code>
+ instance - in this case, the native code shall not modify the contents 
+of the returned string. The JNI runtime will try to return a direct 
+pointer, if possible; otherwise, it returns a copy. Nonetheless, we 
+seldom interested in modifying the underlying string, and often pass a <code>NULL</code> pointer.</p>
+<p>Always invoke <code>ReleaseStringUTFChars()</code> whenever you do not need the returned string of <code>GetStringUTFChars()</code> to release the memory and the reference so that it can be garbage-collected.</p>
+<p>The <code>NewStringUTF()</code> function create a new JNI string (<code>jstring</code>), with the given C-string.</p>
+<p>JDK 1.2 introduces the <code>GetStringUTFRegion()</code>, which copies the <code>jstring</code> (or a portion from <code>start</code> of <code>length</code>) into the "<em>pre-allocated"</em> C's <code>char</code> array. They can be used in place of <code>GetStringUTFChars()</code>. The <code>isCopy</code> is not needed as the C's array is <em>pre-allocated</em>.</p>
+<p>JDK 1.2 also introduces the <code>Get/ReleaseStringCritical()</code> functions. Similar to <code>GetStringUTFChars()</code>,
+ it returns a direct pointer if possible; otherwise, it returns a copy. 
+The native method shall not block (for IO or others) between a pair a <code>GetStringCritical()</code> and <code>ReleaseStringCritical()</code> call.</p>
+<p>For detailed description, always refer to "Java Native Interface Specification" @ <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jni/index.html">http://docs.oracle.com/javase/7/docs/technotes/guides/jni/index.html</a>.</p>
+
+<h5>Unicode String</h5>
+<p>Instead of <code>char*</code>, it uses a <code>jchar*</code> to store the Unicode characters.</p>
+
+<h5>C++ Implementation - <span class="font-code">TestJNIString.cpp</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include "TestJNIString.h"
+using namespace std;
+ 
+JNIEXPORT jstring JNICALL Java_TestJNIString_sayHello(JNIEnv *env, jobject thisObj, jstring inJNIStr) {
+   <span class="color-comment">// Step 1: Convert the JNI String (jstring) into C-String (char*)</span>
+   const char *inCStr = env-&gt;GetStringUTFChars(inJNIStr, NULL);
+   if (NULL == inCStr) return NULL;
+ 
+   <span class="color-comment">// Step 2: Perform its intended operations</span>
+   cout &lt;&lt; "In C++, the received string is: " &lt;&lt; inCStr &lt;&lt; endl;
+   env-&gt;ReleaseStringUTFChars(inJNIStr, inCStr);  <span class="color-comment">// release resources</span>
+ 
+   <span class="color-comment">// Prompt user for a C++ string</span>
+   string outCppStr;
+   cout &lt;&lt; "Enter a String: ";
+   cin &gt;&gt; outCppStr;
+ 
+   <span class="color-comment">// Step 3: Convert the C++ string to C-string, then to JNI String (jstring) and return</span>
+   return env-&gt;NewStringUTF(outCppStr.c_str());
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Use <code>g++</code> to compile the C++ program:</p>
+<pre class="color-command"><span class="color-comment"></span><strong>g++ -I"&lt;JAVA_HOME&gt;\include" -I"&lt;JAVA_HOME&gt;\include\win32" -shared -o myjni.dll TestJNIString.cpp</strong></pre>
+
+<p>Take note that C++ native string functions have different syntax from C. In C++, we could us "<code>env-&gt;</code>", instead of "<code>(env*)-&gt;</code>". Furthermore, there is no need for the <code>JNIEnv*</code> argument in the C++ functions.</p>
+
+<p>Also take note that C++ support a <code>string</code> class (under the header <code>&lt;string&gt;</code> which is more user-friendly, as well as the legacy C-string (char array).</p>
+
+<p>[TODO] Is C++ <code>string</code> class supported directly?</p>
+
+<h4>4.3&nbsp;&nbsp;Passing Array of Primitives<a id="zz-4.3"></a></h4>
+
+<h5>JNI Program - <span class="font-code">TestJNIPrimitiveArray.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre>
+</td>
+<td>
+<pre>public class TestJNIPrimitiveArray {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Declare a native method sumAndAverage() that receives an int[] and</span>
+   <span class="color-comment">//  return a double[2] array with [0] as sum and [1] as average</span>
+   private native double[] sumAndAverage(int[] numbers);
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String args[]) {
+      int[] numbers = {22, 33, 33};
+      double[] results = new TestJNIPrimitiveArray().sumAndAverage(numbers);
+      System.out.println("In Java, the sum is " + results[0]);
+      System.out.println("In Java, the average is " + results[1]);
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<h5>C Implementation - <span class="font-code">TestJNIPrimitiveArray.c</span></h5>
+
+<p>The header "<code>TestJNIPrimitiveArray.h</code>" contains the following function declaration:</p>
+<pre class="color-syntax">JNIEXPORT jdoubleArray JNICALL Java_TestJNIPrimitiveArray_average (JNIEnv *, jobject, jintArray);</pre>
+
+<p>In Java, array is a <em>reference type</em>, similar to a class. There are 9 types of Java arrays, one each of the eight primitives and an array of <code>java.lang.Object</code>. JNI defines a type for each of the eight Java primitive arrays, i.e, <code>jintArray</code>, <code>jbyteArray</code>, <code>jshortArray</code>, <code>jlongArray</code>, <code>jfloatArray</code>, <code>jdoubleArray</code>, <code>jcharArray</code>, <code>jbooleanArray</code> for Java's primitive array of <code>int</code>, <code>byte</code>, <code>short</code>, <code>long</code>, <code>float</code>, <code>double</code>, <code>char</code> and <code>boolean</code>, respectively. It also define a <code>jobjectArray</code> for Java's array of <code>Object</code> (to be discussed later).</p>
+
+<p>Again, you need to convert between JNI array and native array, e.g., between <code>jintArray</code> and C's <code>jint[]</code>, or <code>jdoubleArray</code> and C's <code>jdouble[]</code>. The JNI Environment interface provides a set of functions for the conversion:</p>
+
+<ol>
+<li>To get a C native <code>jint[]</code> from a JNI <code>jintArray</code>, invoke <code>jint* GetIntArrayElements(JNIEnv *env, jintArray a, jboolean *iscopy)</code>.</li>
+<li>To get a JNI <code>jintArray</code> from C native <code>jint[]</code>, first, invoke <code>jintArray NewIntArray(JNIEnv *env, jsize len)</code> to allocate, then use <code>void SetIntArrayRegion(JNIEnv *env, jintArray a, jsize start, jsize len, const jint *buf)</code> to copy from the <code>jint[]</code> to <code>jintArray</code>.</li>
+</ol>
+
+<p>There are 8 sets of the above functions, one for each of the eight Java primitives.</p>
+
+<p>The native program is required to:</p>
+<ol>
+<li>Receive the incoming JNI array (e.g., <code>jintArray</code>), convert to C's native array (e.g., <code>jint[]</code>).</li>
+<li>Perform its intended operations.</li>
+<li>Convert the return C's native array (e.g., <code>jdouble[]</code>) to JNI array (e.g., <code>jdoubleArray</code>), and return the JNI array.</li>
+</ol>
+
+
+
+<p>The C implementation "<code>TestJNIPrimitiveArray.c</code>" is:</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIPrimitiveArray.h"
+ 
+JNIEXPORT jdoubleArray JNICALL Java_TestJNIPrimitiveArray_sumAndAverage
+          (JNIEnv *env, jobject thisObj, jintArray inJNIArray) {
+   <span class="color-comment">// Step 1: Convert the incoming JNI jintarray to C's jint[]</span>
+   jint *inCArray = (*env)-&gt;GetIntArrayElements(env, inJNIArray, NULL);
+   if (NULL == inCArray) return NULL;
+   jsize length = (*env)-&gt;GetArrayLength(env, inJNIArray);
+ 
+   <span class="color-comment">// Step 2: Perform its intended operations</span>
+   jint sum = 0;
+   int i;
+   for (i = 0; i &lt; length; i++) {
+      sum += inCArray[i];
+   }
+   jdouble average = (jdouble)sum / length;
+   (*env)-&gt;ReleaseIntArrayElements(env, inJNIArray, inCArray, 0); <span class="color-comment">// release resources</span>
+ 
+   jdouble outCArray[] = {sum, average};
+ 
+   <span class="color-comment">// Step 3: Convert the C's Native jdouble[] to JNI jdoublearray, and return</span>
+   jdoubleArray outJNIArray = (*env)-&gt;NewDoubleArray(env, 2);  <span class="color-comment">// allocate</span>
+   if (NULL == outJNIArray) return NULL;
+   (*env)-&gt;SetDoubleArrayRegion(env, outJNIArray, 0 , 2, outCArray);  <span class="color-comment">// copy</span>
+   return outJNIArray;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<h5>JNI Primitive Array Functions</h5>
+
+<p>The JNI primitive array (<code>jintArray</code>, <code>jbyteArray</code>, <code>jshortArray</code>, <code>jlongArray</code>, <code>jfloatArray</code>, <code>jdoubleArray</code>, <code>jcharArray</code> and  <code>jbooleanArray</code>) functions are:</p>
+
+<pre class="color-syntax"><span class="color-comment">// <em>ArrayType</em>: jintArray, jbyteArray, jshortArray, jlongArray, jfloatArray, jdoubleArray, jcharArray, jbooleanArray
+// <em>PrimitiveType</em>: int, byte, short, long, float, double, char, boolean
+// <em>NativeType</em>: jint, jbyte, jshort, jlong, jfloat, jdouble, jchar, jboolean</span>
+<em>NativeType</em> * <strong>Get&lt;<em>PrimitiveType</em>&gt;ArrayElements</strong>(JNIEnv *env, <em>ArrayType</em> array, jboolean *isCopy);
+void <strong>Release&lt;<em>PrimitiveType</em>&gt;ArrayElements</strong>(JNIEnv *env, <em>ArrayType</em> array, <em>NativeType</em> *elems, jint mode);
+void <strong>Get&lt;<em>PrimitiveType</em>&gt;ArrayRegion</strong>(JNIEnv *env, <em>ArrayType</em> array, jsize start, jsize length, <em>NativeType</em> *buffer);
+void <strong>Set&lt;<em>PrimitiveType</em>&gt;ArrayRegion</strong>(JNIEnv *env, <em>ArrayType</em> array, jsize start, jsize length, const <em>NativeType</em> *buffer);
+<em>ArrayType</em> <strong>New&lt;<em>PrimitiveType</em>&gt;Array</strong>(JNIEnv *env, jsize length);
+void * <strong>GetPrimitiveArrayCritical</strong>(JNIEnv *env, jarray array, jboolean *isCopy);
+void <strong>ReleasePrimitiveArrayCritical</strong>(JNIEnv *env, jarray array, void *carray, jint mode);</pre>
+
+<p>The <code>GET|Release&lt;<em>PrimitiveType</em>&gt;ArrayElements()</code> can be used to create a new C's native array <code>jxxx[]</code> from the given Java <code>jxxxArray</code>. <code>GET|Set&lt;<em>PrimitiveType</em>&gt;ArrayRegion()</code> can be used to copy a <code>jxxxArray</code> (or a portion from <code>start</code> of <code>length</code>) <em>to and from</em> a <em>pre-allocated</em> C native array <code>jxxx[]</code>.</p>
+<p>The <code>New&lt;PrimitiveType&gt;Array()</code> can be used to allocate a new <code>jxxxArray</code> of a given size. You can then use the <code>Set&lt;<em>PrimitiveType</em>&gt;ArrayRegion()</code> function to fill its contents from a native array <code>jxxx[]</code>.</p>
+<p>The <code>Get|ReleasePrimitiveArrayCritical()</code> functions does not allow blocking calls in between the get and release.</p>
+
+<h3>5.&nbsp;&nbsp;Accessing Object's Variables and Calling Back Methods<a id="zz-5."></a></h3>
+
+<h4>5.1&nbsp;&nbsp;Accessing Object's Instance Variables<a id="zz-5.1"></a></h4>
+
+<h5>JNI Program - <span class="font-code">TestJNIInstanceVariable.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre>
+</td>
+<td>
+<pre>public class TestJNIInstanceVariable {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Instance variables</span>
+   private int number = 88;
+   private String message = "Hello from Java";
+ 
+   <span class="color-comment">// Declare a native method that modifies the instance variables</span>
+   private native void modifyInstanceVariable();
+ 
+   <span class="color-comment">// Test Driver</span>   
+   public static void main(String args[]) {
+      TestJNIInstanceVariable test = new TestJNIInstanceVariable();
+      test.modifyInstanceVariable();
+      System.out.println("In Java, int is " + test.number);
+      System.out.println("In Java, String is " + test.message);
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The class contains two <code>private</code> instance variables: a primitive <code>int</code> called <code>number</code> and a <code>String</code> called <code>message</code>. It also declares a native method, which could modify the contents of the instance variables.</p>
+
+<h5>C Implementation - <span class="font-code">TestJNIInstanceVariable.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIInstanceVariable.h"
+ 
+JNIEXPORT void JNICALL Java_TestJNIInstanceVariable_modifyInstanceVariable
+          (JNIEnv *env, jobject thisObj) {
+   <span class="color-comment">// Get a reference to this object's class</span>
+   jclass thisClass = (*env)-&gt;GetObjectClass(env, thisObj);
+ 
+   <span class="color-comment">// int</span>
+   <span class="color-comment">// Get the Field ID of the instance variables "number"</span>
+   jfieldID fidNumber = (*env)-&gt;GetFieldID(env, thisClass, "number", "I");
+   if (NULL == fidNumber) return;
+ 
+   <span class="color-comment">// Get the int given the Field ID</span>
+   jint number = (*env)-&gt;GetIntField(env, thisObj, fidNumber);
+   printf("In C, the int is %d\n", number);
+ 
+   <span class="color-comment">// Change the variable</span>
+   number = 99;
+   (*env)-&gt;SetIntField(env, thisObj, fidNumber, number);
+ 
+   <span class="color-comment">// Get the Field ID of the instance variables "message"</span>
+   jfieldID fidMessage = (*env)-&gt;GetFieldID(env, thisClass, "message", "Ljava/lang/String;");
+   if (NULL == fidMessage) return;
+ 
+   <span class="color-comment">// String</span>
+   <span class="color-comment">// Get the object given the Field ID</span>
+   jstring message = (*env)-&gt;GetObjectField(env, thisObj, fidMessage);
+ 
+   <span class="color-comment">// Create a C-string with the JNI String</span>
+   const char *cStr = (*env)-&gt;GetStringUTFChars(env, message, NULL);
+   if (NULL == cStr) return;
+ 
+   printf("In C, the string is %s\n", cStr);
+   (*env)-&gt;ReleaseStringUTFChars(env, message, cStr);
+ 
+   <span class="color-comment">// Create a new C-string and assign to the JNI string</span>
+   message = (*env)-&gt;NewStringUTF(env, "Hello from C");
+   if (NULL == message) return;
+ 
+   <span class="color-comment">// modify the instance variables</span>
+   (*env)-&gt;SetObjectField(env, thisObj, fidMessage, message);
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>To access the instance variable of an object:</p>
+<ol>
+<li>Get a reference to this object's class via <code>GetObjectClass()</code>.</li>
+<li>Get the Field ID of the instance variable to be accessed via <code>GetFieldID()</code>
+ from the class reference. You need to provide the variable name and its
+ field descriptor (or signature). For a Java class, the field descriptor
+ is in the form of "<code>L&lt;fully-qualified-name&gt;;</code>", with dot replaced by forward slash (<code>/</code>), e.g.,, the class descriptor for <code>String</code> is "<code>Ljava/lang/String;</code>". For primitives, use <code>"I"</code> for <code>int</code>, <code>"B"</code> for <code>byte</code>, <code>"S"</code> for <code>short</code>, <code>"J"</code> for <code>long</code>, <code>"F"</code> for <code>float</code>, <code>"D"</code> for <code>double</code>, <code>"C"</code> for <code>char</code>, and <code>"Z"</code> for <code>boolean</code>. For arrays, include a prefix <code>"["</code>, e.g., "<code>[Ljava/lang/Object;</code>" for an array of <code>Object</code>; <code>"[I"</code> for an array of <code>int</code>.</li>
+<li>Based on the Field ID, retrieve the instance variable via <code>GetObjectField()</code> or <code>Get&lt;<em>primitive-type</em>&gt;Field()</code> function.</li>
+<li>To update the instance variable, use the <code>SetObjectField()</code> or <code>Set&lt;<em>primitive-type</em>&gt;Field()</code> function, providing the Field ID.</li>
+</ol>
+
+<p>The JNI functions for accessing instance variable are:</p>
+<pre class="color-syntax">jclass <strong>GetObjectClass</strong>(JNIEnv *env, jobject obj);
+   <span class="color-comment">// Returns the class of an object.</span>
+   
+jfieldID <strong>GetFieldID</strong>(JNIEnv *env, jclass cls, const char *name, const char *sig);
+  <span class="color-comment">// Returns the field ID for an instance variable of a class.</span>
+ 
+NativeType <strong>Get&lt;<em>type</em>&gt;Field</strong>(JNIEnv *env, jobject obj, jfieldID fieldID);
+void <strong>Set&lt;<em>type</em>&gt;Field</strong>(JNIEnv *env, jobject obj, jfieldID fieldID, NativeType value);
+  <span class="color-comment">// Get/Set the value of an instance variable of an object
+  // &lt;<em>type</em>&gt; includes each of the eight primitive types plus Object.</span></pre>
+
+<h4>5.2&nbsp;&nbsp;Accessing Class' Static Variables<a id="zz-5.2"></a></h4>
+
+<p>Accessing static variables is similar to accessing instance variable, except that you use functions such as <code>GetStaticFieldID()</code>, <code>Get|SetStaticObjectField()</code>, <code>Get|SetStatic&lt;<em>Primitive-type</em>&gt;Field()</code>.</p>
+
+<h5>JNI Program - <span class="font-code">TestJNIStaticVariable.java</span></h5>
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre>
+</td>
+<td>
+<pre>public class TestJNIStaticVariable {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// nyjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Static variables</span>
+   private static double number = 55.66;
+ 
+   <span class="color-comment">// Declare a native method that modifies the static variable</span>
+   private native void modifyStaticVariable();
+ 
+   <span class="color-comment">// Test Driver</span>
+   public static void main(String args[]) {
+      TestJNIStaticVariable test = new TestJNIStaticVariable();
+      test.modifyStaticVariable();
+      System.out.println("In Java, the double is " + number);
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<h5>C Implementation - <span class="font-code">TestJNIStaticVariable.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIStaticVariable.h"
+ 
+JNIEXPORT void JNICALL Java_TestJNIStaticVariable_modifyStaticVariable
+          (JNIEnv *env, jobject thisObj) {
+   <span class="color-comment">// Get a reference to this object's class</span>
+   jclass cls = (*env)-&gt;GetObjectClass(env, thisObj);
+ 
+   <span class="color-comment">// Read the int static variable and modify its value</span>
+   jfieldID fidNumber = (*env)-&gt;GetStaticFieldID(env, cls, "number", "D");
+   if (NULL == fidNumber) return;
+   jdouble number = (*env)-&gt;GetStaticDoubleField(env, cls, fidNumber);
+   printf("In C, the double is %f\n", number);
+   number = 77.88;
+   (*env)-&gt;SetStaticDoubleField(env, cls, fidNumber, number);
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The JNI functions for accessing static variable are:</p>
+
+<pre class="color-syntax">jfieldID <strong>GetStaticFieldID</strong>(JNIEnv *env, jclass cls, const char *name, const char *sig);
+  <span class="color-comment">// Returns the field ID for a static variable of a class.</span>
+ 
+NativeType <strong>GetStatic&lt;<em>type</em>&gt;Field</strong>(JNIEnv *env, jclass clazz, jfieldID fieldID);
+void <strong>SetStatic&lt;<em>type</em>&gt;Field</strong>(JNIEnv *env, jclass clazz, jfieldID fieldID, NativeType value);
+  <span class="color-comment">// Get/Set the value of a static variable of a class.
+  // &lt;<em>type</em>&gt; includes each of the eight primitive types plus Object.</span></pre>
+
+<h4>5.3&nbsp;&nbsp;Callback Instance Methods and Static Methods<a id="zz-5.3"></a></h4>
+
+<p>You can callback an instance and static methods from the native code.</p>
+
+<h5>JNI Program - <span class="font-code">TestJNICallBackMethod.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre>
+</td>
+<td>
+<pre>public class TestJNICallBackMethod {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Declare a native method that calls back the Java methods below</span>
+   private native void nativeMethod();
+ 
+   <span class="color-comment">// To be called back by the native code</span>
+   private void callback() {
+      System.out.println("In Java");
+   }
+ 
+   private void callback(String message) {
+      System.out.println("In Java with " + message);
+   }
+ 
+   private double callbackAverage(int n1, int n2) {
+      return ((double)n1 + n2) / 2.0;
+   }
+ 
+   <span class="color-comment">// Static method to be called back</span>
+   private static String callbackStatic() {
+      return "From static Java method";
+   }
+
+   <span class="color-comment">// Test Driver</span> 
+   public static void main(String args[]) {
+      new TestJNICallBackMethod().nativeMethod();
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>This class declares a <code>native</code> method called <code>nativeMethod()</code>, and invoke this <code>nativeMethod()</code>. The <code>nativeMethod()</code>, in turn, calls back the various instance and static methods defined in this class.</p>
+
+<h5>C Implementation - <span class="font-code">TestJNICallBackMethod.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNICallBackMethod.h"
+ 
+JNIEXPORT void JNICALL Java_TestJNICallBackMethod_nativeMethod
+          (JNIEnv *env, jobject thisObj) {
+ 
+   <span class="color-comment">// Get a class reference for this object</span>
+   jclass thisClass = (*env)-&gt;GetObjectClass(env, thisObj);
+ 
+   <span class="color-comment">// Get the Method ID for method "callback", which takes no arg and return void</span>
+   jmethodID midCallBack = (*env)-&gt;GetMethodID(env, thisClass, "callback", "()V");
+   if (NULL == midCallBack) return;
+   printf("In C, call back Java's callback()\n");
+   <span class="color-comment">// Call back the method (which returns void), baed on the Method ID</span>
+   (*env)-&gt;CallVoidMethod(env, thisObj, midCallBack);
+ 
+   jmethodID midCallBackStr = (*env)-&gt;GetMethodID(env, thisClass,
+                               "callback", "(Ljava/lang/String;)V");
+   if (NULL == midCallBackStr) return;
+   printf("In C, call back Java's called(String)\n");
+   jstring message = (*env)-&gt;NewStringUTF(env, "Hello from C");
+   (*env)-&gt;CallVoidMethod(env, thisObj, midCallBackStr, message);
+ 
+   jmethodID midCallBackAverage = (*env)-&gt;GetMethodID(env, thisClass,
+                                  "callbackAverage", "(II)D");
+   if (NULL == midCallBackAverage) return;
+   jdouble average = (*env)-&gt;CallDoubleMethod(env, thisObj, midCallBackAverage, 2, 3);
+   printf("In C, the average is %f\n", average);
+ 
+   jmethodID midCallBackStatic = (*env)-&gt;GetStaticMethodID(env, thisClass,
+                                 "callbackStatic", "()Ljava/lang/String;");
+   if (NULL == midCallBackStatic) return;
+   jstring resultJNIStr = (*env)-&gt;CallStaticObjectMethod(env, thisClass, midCallBackStatic);
+   const char *resultCStr = (*env)-&gt;GetStringUTFChars(env, resultJNIStr, NULL);
+   if (NULL == resultCStr) return;
+   printf("In C, the returned string is %s\n", resultCStr);
+   (*env)-&gt;ReleaseStringUTFChars(env, resultJNIStr, resultCStr);
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>To call back an instance method from the native code:</p>
+
+<ol>
+<li>Get a reference to this object's class via <code>GetObjectClass()</code>.</li>
+<li>From the class reference, get the Method ID via <code>GetMethodID()</code>. You need to provide the method name and the signature. The signature is in the form "<code>(<em>parameters</em>)<em>return-type</em></code>". You can list the method signature for a Java program via <code>javap</code> utility (Class File Disassembler) with <code>-s</code> (print signature) and <code>-p</code> (show private members):
+  <pre class="color-command">&gt; <strong>javap --help</strong>
+&gt; <strong>javap -s -p TestJNICallBackMethod</strong>
+  .......
+  private void callback();
+    Signature: ()V
+ 
+  private void callback(java.lang.String);
+    Signature: (Ljava/lang/String;)V
+ 
+  private double callbackAverage(int, int);
+    Signature: (II)D
+ 
+  private static java.lang.String callbackStatic();
+    Signature: ()Ljava/lang/String;
+  .......</pre></li>
+
+<li>Based on the Method ID, you could invoke <code>Call&lt;Primitive-type&gt;Method()</code> or <code>CallVoidMethod()</code> or <code>CallObjectMethod()</code>, where the return-type is <code>&lt;<em>Primitive-type</em>&gt;</code>, void and <code>Object</code>, respectively. Append the argument, if any, before the argument list. For non-<code>void</code> return-type, the method returns a value.</li>
+</ol>
+
+<p>To callback a <code>static</code> method, use <code>GetStaticMethodID(), </code><code>CallStatic&lt;Primitive-type&gt;Method()</code>, <code>CallStaticVoidMethod()</code> or <code>CallStaticObjectMethod()</code>.</p>
+
+<p>The JNI functions for calling back instance method and static method are:</p>
+
+<pre class="color-syntax">jmethodID <strong>GetMethodID</strong>(JNIEnv *env, jclass cls, const char *name, const char *sig);
+   <span class="color-comment">// Returns the method ID for an instance method of a class or interface.</span>
+   
+NativeType <strong>Call&lt;<em>type</em>&gt;Method</strong>(JNIEnv *env, jobject obj, jmethodID methodID, ...);
+NativeType <strong>Call&lt;<em>type</em>&gt;MethodA</strong>(JNIEnv *env, jobject obj, jmethodID methodID, const jvalue *args);
+NativeType <strong>Call&lt;<em>type</em>&gt;MethodV</strong>(JNIEnv *env, jobject obj, jmethodID methodID, va_list args);
+   <span class="color-comment">// Invoke an instance method of the object.
+   // The &lt;type&gt; includes each of the eight primitive and Object.</span>
+   
+jmethodID <strong>GetStaticMethodID</strong>(JNIEnv *env, jclass cls, const char *name, const char *sig);
+   <span class="color-comment">// Returns the method ID for an instance method of a class or interface.</span>
+   
+NativeType <strong>CallStatic&lt;<em>type</em>&gt;Method</strong>(JNIEnv *env, jclass clazz, jmethodID methodID, ...);
+NativeType <strong>CallStatic&lt;<em>type</em>&gt;MethodA</strong>(JNIEnv *env, jclass clazz, jmethodID methodID, const jvalue *args);
+NativeType <strong>CallStatic&lt;<em>type</em>&gt;MethodV</strong>(JNIEnv *env, jclass clazz, jmethodID methodID, va_list args);
+   <span class="color-comment">// Invoke an instance method of the object.
+   // The &lt;type&gt; includes each of the eight primitive and Object.</span></pre>
+
+<h4>5.4&nbsp;&nbsp;Callback Overridden Superclass' Instance Method<a id="zz-5.4"></a></h4>
+
+
+<p>JNI provides a set of <code>CallNonvirtual&lt;Type&gt;Method()</code> functions to invoke superclass' instance methods which has been overridden in this class (similar to a <code>super.<em>methodName</em>()</code> call inside a Java subclass):</p>
+
+<ol>
+<li>Get the Method ID, via <code>GetMethodID()</code>.</li>
+<li>Based on the Method ID, invoke one of the <code>CallNonvirtual&lt;Type&gt;Method()</code>, with the object, superclass, and arguments.</li>
+</ol>
+
+<p>The JNI function for calling the overridden superclass' instance method are:</p>
+<pre class="color-syntax">NativeType <strong>CallNonvirtual&lt;<em>type</em>&gt;Method</strong>(JNIEnv *env, jobject obj, jclass cls, jmethodID methodID, ...);
+NativeType <strong>CallNonvirtual&lt;<em>type</em>&gt;MethodA</strong>(JNIEnv *env, jobject obj, jclass cls, jmethodID methodID, const jvalue *args);
+NativeType <strong>CallNonvirtual&lt;<em>type</em>&gt;MethodV</strong>(JNIEnv *env, jobject obj, jclass cls, jmethodID methodID, va_list args);</pre>
+
+<h3>6.&nbsp;&nbsp;Creating Objects and Object Arrays<a id="zz-6."></a></h3>
+
+<p>You can construct <code>jobject</code> and <code>jobjectArray</code> inside the native code, via <code>NewObject()</code> and <code>newObjectArray()</code> functions, and pass them back to the Java program.</p>
+
+<h4>6.1&nbsp;&nbsp;Callback the Constructor to Create a New Java Object in the Native Code<a id="zz-6.1"></a></h4>
+
+<p>Callback the constructor is similar to calling back method. First, get the Method ID of the constructor by passing "<code>&lt;init&gt;</code>" as the method name and "<code>V</code>" as the return-type. You can then use methods like <code>NewObject()</code> to call the constructor to create a new java object.</p>
+
+<h5>JNI Program - <span class="font-code">TestJavaConstructor.java</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</pre>
+</td>
+<td>
+<pre>public class TestJNIConstructor {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// Native method that calls back the constructor and return the constructed object.
+   // Return an Integer object with the given int.</span>
+   private native Integer getIntegerObject(int number);
+ 
+   public static void main(String args[]) {
+      TestJNIConstructor obj = new TestJNIConstructor();
+      System.out.println("In Java, the number is :" + obj.getIntegerObject(9999));
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>This class declares a <code>native</code> method <code>getIntegerObject()</code>. The native code shall create and return an Integer object, based on the argument given.</p>
+
+<h5>C Implementation - <span class="font-code">TestJavaConstructor.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIConstructor.h"
+ 
+JNIEXPORT jobject JNICALL Java_TestJNIConstructor_getIntegerObject
+          (JNIEnv *env, jobject thisObj, jint number) {
+   <span class="color-comment">// Get a class reference for java.lang.Integer</span>
+   jclass cls = (*env)-&gt;FindClass(env, "java/lang/Integer");
+ 
+   <span class="color-comment">// Get the Method ID of the constructor which takes an int</span>
+   jmethodID midInit = (*env)-&gt;GetMethodID(env, cls, "&lt;init&gt;", "(I)V");
+   if (NULL == midInit) return NULL;
+   <span class="color-comment">// Call back constructor to allocate a new instance, with an int argument</span>
+   jobject newObj = (*env)-&gt;NewObject(env, cls, midInit, number);
+ 
+   <span class="color-comment">// Try running the toString() on this newly create object</span>
+   jmethodID midToString = (*env)-&gt;GetMethodID(env, cls, "toString", "()Ljava/lang/String;");
+   if (NULL == midToString) return NULL;
+   jstring resultStr = (*env)-&gt;CallObjectMethod(env, newObj, midToString);
+   const char *resultCStr = (*env)-&gt;GetStringUTFChars(env, resultStr, NULL);
+   printf("In C: the number is %s\n", resultCStr);
+
+   //May need to call releaseStringUTFChars() before return
+   return newObj;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The JNI functions for creating object (<code>jobject</code>) are:</p>
+<pre class="color-syntax">jclass <strong>FindClass</strong>(JNIEnv *env, const char *name);
+ 
+jobject <strong>NewObject</strong>(JNIEnv *env, jclass cls, jmethodID methodID, ...);
+jobject <strong>NewObjectA</strong>(JNIEnv *env, jclass cls, jmethodID methodID, const jvalue *args);
+jobject <strong>NewObjectV</strong>(JNIEnv *env, jclass cls, jmethodID methodID, va_list args);
+   <span class="color-comment">// Constructs a new Java object. The method ID indicates which constructor method to invoke</span>
+ 
+jobject <strong>AllocObject</strong>(JNIEnv *env, jclass cls);
+  <span class="color-comment">// Allocates a new Java object without invoking any of the constructors for the object.</span></pre>
+
+<h4>6.2&nbsp;&nbsp;Array of Objects<a id="zz-6.2"></a></h4>
+
+<h5>JNI Program - <span class="font-code">TestJNIObjectArray.java</span></h5>
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</pre>
+</td>
+<td>
+<pre>import java.util.ArrayList;
+ 
+public class TestJNIObjectArray {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+   <span class="color-comment">// Native method that receives an Integer[] and</span>
+   <span class="color-comment">//  returns a Double[2] with [0] as sum and [1] as average</span>
+   private native Double[] sumAndAverage(Integer[] numbers);
+ 
+   public static void main(String args[]) {
+      Integer[] numbers = {11, 22, 32};  <span class="color-comment">// auto-box</span>
+      Double[] results = new TestJNIObjectArray().sumAndAverage(numbers);
+      System.out.println("In Java, the sum is " + results[0]);  <span class="color-comment">// auto-unbox</span>
+      System.out.println("In Java, the average is " + results[1]);
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>For illustration, this class declares a <code>native</code> method that takes an array of <code>Integer</code>, compute their sum and average, and returns as an array of <code>Double</code>. Take note the arrays of objects are pass into and out of the native method.</p>
+
+<h5>C Implementation - <span class="font-code">TestJNIObjectArray.c</span></h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIObjectArray.h"
+ 
+JNIEXPORT jobjectArray JNICALL Java_TestJNIObjectArray_sumAndAverage
+          (JNIEnv *env, jobject thisObj, jobjectArray inJNIArray) {
+   <span class="color-comment">// Get a class reference for java.lang.Integer</span>
+   jclass classInteger = (*env)-&gt;FindClass(env, "java/lang/Integer");
+   <span class="color-comment">// Use Integer.intValue() to retrieve the int</span>
+   jmethodID midIntValue = (*env)-&gt;GetMethodID(env, classInteger, "intValue", "()I");
+   if (NULL == midIntValue) return NULL;
+ 
+   <span class="color-comment">// Get the value of each Integer object in the array</span>
+   jsize length = (*env)-&gt;GetArrayLength(env, inJNIArray);
+   jint sum = 0;
+   int i;
+   for (i = 0; i &lt; length; i++) {
+      jobject objInteger = (*env)-&gt;GetObjectArrayElement(env, inJNIArray, i);
+      if (NULL == objInteger) return NULL;
+      jint value = (*env)-&gt;CallIntMethod(env, objInteger, midIntValue);
+      sum += value;
+   }
+   double average = (double)sum / length;
+   printf("In C, the sum is %d\n", sum);
+   printf("In C, the average is %f\n", average);
+ 
+   <span class="color-comment">// Get a class reference for java.lang.Double</span>
+   jclass classDouble = (*env)-&gt;FindClass(env, "java/lang/Double");
+ 
+   <span class="color-comment">// Allocate a jobjectArray of 2 java.lang.Double</span>
+   jobjectArray outJNIArray = (*env)-&gt;NewObjectArray(env, 2, classDouble, NULL);
+ 
+   <span class="color-comment">// Construct 2 Double objects by calling the constructor</span>
+   jmethodID midDoubleInit = (*env)-&gt;GetMethodID(env, classDouble, "&lt;init&gt;", "(D)V");
+   if (NULL == midDoubleInit) return NULL;
+   jobject objSum = (*env)-&gt;NewObject(env, classDouble, midDoubleInit, (double)sum);
+   jobject objAve = (*env)-&gt;NewObject(env, classDouble, midDoubleInit, average);
+   <span class="color-comment">// Set to the jobjectArray</span>
+   (*env)-&gt;SetObjectArrayElement(env, outJNIArray, 0, objSum);
+   (*env)-&gt;SetObjectArrayElement(env, outJNIArray, 1, objAve);
+ 
+   return outJNIArray;
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>Unlike primitive array which can be processed in bulk, for object array, you need to use the <code>Get|SetObjectArrayElement()</code> to process each of the elements.</p>
+
+<p>The JNI functions for creating and manipulating object array (<code>jobjectArray</code>) are:</p>
+<pre class="color-syntax">jobjectArray <strong>NewObjectArray</strong>(JNIEnv *env, jsize length, jclass elementClass, jobject initialElement);
+   <span class="color-comment">// Constructs a new array holding objects in class elementClass.
+   // All elements are initially set to initialElement.</span>
+ 
+jobject <strong>GetObjectArrayElement</strong>(JNIEnv *env, jobjectArray array, jsize index);
+   <span class="color-comment">// Returns an element of an Object array.</span>
+ 
+void <strong>SetObjectArrayElement</strong>(JNIEnv *env, jobjectArray array, jsize index, jobject value);
+   <span class="color-comment">// Sets an element of an Object array.</span></pre>
+
+<h3>7.&nbsp;&nbsp;Local and Global References<a id="zz-7."></a></h3>
+<p>Managing references is critical in writing efficient programs. For example, we often use <code>FindClass()</code>, <code>GetMethodID()</code>, <code>GetFieldID()</code> to retrieve a <code>jclass</code>, <code>jmethodID</code> and <code>jfieldID</code>
+ inside native functions. Instead of performing repeated calls, the 
+values should be obtained once and cached for subsequent usage, to 
+eliminate the overheads.</p>
+
+<p>The JNI divides object references (for <code>jobject</code>) used by the native code into two categories: local and global references:</p>
+
+<ol>
+
+<li>A <em>local reference</em> is created within the native method, and 
+freed once the method exits. It is valid for the duration of a native 
+method. You can also use JNI function <code>DeleteLocalRef()</code> to 
+invalidate a local reference explicitly, so that it is available for 
+garbage collection intermediately. Objects are passed to native methods 
+as local references. All Java objects (<code>jobject</code>) returned by JNI functions are local references.</li>
+
+<li>A <em>global reference</em> remains until it is explicitly freed by the programmer, via the <code>DeleteGlobalRef()</code> JNI function. You can create a new global reference from a local reference via JNI function <code>NewGlobalRef()</code>.</li>
+</ol>
+
+
+<h5>Example</h5>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre>
+</td>
+<td>
+<pre>public class TestJNIReference {
+   static {
+      System.loadLibrary("myjni"); <span class="color-comment">// myjni.dll (Windows) or libmyjni.so (Unixes)</span>
+   }
+ 
+   <span class="color-comment">// A native method that returns a java.lang.Integer with the given int.</span>
+   private native Integer getIntegerObject(int number);
+ 
+   <span class="color-comment">// Another native method that also returns a java.lang.Integer with the given int.</span>
+   private native Integer anotherGetIntegerObject(int number);
+ 
+   public static void main(String args[]) {
+      TestJNIReference test = new TestJNIReference();
+      System.out.println(test.getIntegerObject(1));
+      System.out.println(test.getIntegerObject(2));
+      System.out.println(test.anotherGetIntegerObject(11));
+      System.out.println(test.anotherGetIntegerObject(12));
+      System.out.println(test.getIntegerObject(3));
+      System.out.println(test.anotherGetIntegerObject(13));
+   }
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>The above JNI program declares two native methods. Both of them create and return a <code>java.lang.Integer</code> object.</p>
+
+<p>In the C implementation, we need to get a class reference for <code>java.lang.Integer</code>, via <code>FindClass()</code>. We then find the method ID for the constructor of <code>Integer</code>,
+ and invoke the constructor. However, we wish to cache both the class 
+reference and method ID, to be used for repeated invocation.</p>
+
+<p>The following C implementation does not work!</p>
+
+<table class="table-program">
+<colgroup><col class="col-line-number">
+<col class="col-program">
+</colgroup><tbody>
+<tr>
+<td>
+<pre class="text-right">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre>
+</td>
+<td>
+<pre>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include "TestJNIReference.h"
+ 
+<span class="color-comment">// Global Reference to the Java class "java.lang.Integer"</span>
+static jclass classInteger;
+static jmethodID midIntegerInit;
+ 
+jobject getInteger(JNIEnv *env, jobject thisObj, jint number) {
+ 
+   <span class="color-comment">// Get a class reference for java.lang.Integer if missing</span>
+   if (NULL == classInteger) {
+      printf("Find java.lang.Integer\n");
+      classInteger = (*env)-&gt;FindClass(env, "java/lang/Integer");
+   }
+   if (NULL == classInteger) return NULL;
+ 
+   <span class="color-comment">// Get the Method ID of the Integer's constructor if missing</span>
+   if (NULL == midIntegerInit) {
+      printf("Get Method ID for java.lang.Integer's constructor\n");
+      midIntegerInit = (*env)-&gt;GetMethodID(env, classInteger, "&lt;init&gt;", "(I)V");
+   }
+   if (NULL == midIntegerInit) return NULL;
+ 
+   <span class="color-comment">// Call back constructor to allocate a new instance, with an int argument</span>
+   jobject newObj = (*env)-&gt;NewObject(env, classInteger, midIntegerInit, number);
+   printf("In C, constructed java.lang.Integer with number %d\n", number);
+   return newObj;
+}
+ 
+JNIEXPORT jobject JNICALL Java_TestJNIReference_getIntegerObject
+          (JNIEnv *env, jobject thisObj, jint number) {
+   return getInteger(env, thisObj, number);
+}
+ 
+JNIEXPORT jobject JNICALL Java_TestJNIReference_anotherGetIntegerObject
+          (JNIEnv *env, jobject thisObj, jint number) {
+   return getInteger(env, thisObj, number);
+}</pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>In the above program, we invoke <code>FindClass()</code> to find the class reference for <code>java.lang.Integer</code>,
+ and saved it in a global static variable. Nonetheless, in the next 
+invocation, this reference is no longer valid (and not NULL). This is 
+because <code>FindClass()</code> returns a local reference, which is invalidated once the method exits.</p>
+
+<p>To overcome the problem, we need to create a global reference from the local reference returned by <code>FindClass()</code>. We can then free the local reference. The revised code is as follows:</p>
+
+<pre class="color-example">   <span class="color-comment">// Get a class reference for java.lang.Integer if missing</span>
+   if (NULL == classInteger) {
+      printf("Find java.lang.Integer\n");
+      <span class="color-comment">// FindClass returns a local reference</span>
+      jclass classIntegerLocal = (*env)-&gt;FindClass(env, "java/lang/Integer");
+      <span class="color-comment">// Create a global reference from the local reference</span>
+      classInteger = (*env)-&gt;NewGlobalRef(env, classIntegerLocal);
+      <span class="color-comment">// No longer need the local reference, free it!</span>
+      (*env)-&gt;DeleteLocalRef(env, classIntegerLocal);
+   }</pre>
+
+<p>Take note that <code>jmethodID</code> and <code>jfieldID</code> are not <code>jobject</code>, and cannot create global reference.</p>
+
+
+<h3 id="errors">8.&nbsp;&nbsp;JNI Common Errors<a id="zz-8."></a></h3>
+
+<pre class="output"><strong>ERROR MESSAGE:</strong> <span class="color-error">SEVERE: java.lang.UnsatisfiedLinkError: no <em>xxx</em> in java.library.path</span>
+<strong>PROBABLE CAUSES:</strong> Your program uses a native library from a 3rd-party API (such as JOGL), 
+   which cannot be located in the native library search paths.
+<strong>POSSIBLE SOLUTION:</strong>
+A Java Native Library (JNI) contains non-Java library codes (in filetype of ".dll" in Windows, ".so" in Linux, 
+   ".jnilib" in MacOS). For example, JOGL's "jogl_xxx.dll", "gluegen-rt.dll".
+   These dll's are needed for proper operations.
+The directory path of native libraries must be included in Java system's property "java.library.path".
+The "java.library.path" <em>usually</em> mirrors the Envrionment Variable PATH. You can list the entries by issuing:
+   System.out.println(System.getProperty("java.library.path"));
+
+To include a directory in "java.library.path", you can use VM command-line option -Djava.library.path=<em>pathname</em>
+For JRE:
+   &gt; java -Djava.library.path=d:\bin\jogl2.0\lib <em>myjoglapp</em>
+ 
+For Eclipse, the VM command-line option can be set in "Run Configuration..." ⇒ "Arguments" ⇒ "VM Arguments".
+Alternatively, you can create a User library and specifying the native library (Refer to "Eclipse How-To")
+ 
+For NetBeans, the VM command-line option can be set in "Set Configuration" ⇒ "Customize..." ⇒ "Run" ⇒ "VM options".</pre>
+
+
+<h3>9.&nbsp;&nbsp;Debugging JNI Programs<a id="zz-9."></a></h3>
+
+<p>[TODO]</p>
+
+
+
+<!-- @@ start change in v1 -->
+
+<p class="references">REFERENCES &amp; RESOURCES</p>
+<ol>
+<li>Java Native Interface Specification @ <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jni/index.html">http://docs.oracle.com/javase/7/docs/technotes/guides/jni/index.html</a>.</li>
+
+<li>Wiki "Java Native Interface" @ <a href="http://en.wikipedia.org/wiki/Java_Native_Interface">http://en.wikipedia.org/wiki/Java_Native_Interface</a>.</li>
+<li>Liang, "The Java Native Interface - Programmer's Guide and Specification", Addison Wesley, 1999, available online @ <a href="http://java.sun.com/docs/books/jni/html/jniTOC.html">http://java.sun.com/docs/books/jni/html/jniTOC.html</a>.</li>
+<li>JNI Tips @ <a href="http://developer.android.com/guide/practices/jni.html">http://developer.android.com/guide/practices/jni.html</a>.</li>
+</ol>
+
+</div> <!-- End the content-main division -->
+
+<div id="content-footer">
+<p>Latest version tested: JDK 9.0.1, Cygwin's MinGW-w64 GCC/G++<br>
+Last modified: March, 2018</p>
+</div>
+
+</div>  <!-- End the wrap-inner division -->
+
+<!-- footer filled by JavaScript -->
+<div id="footer" class="header-footer"><p>Feedback, comments, corrections, and errata can be sent to Chua Hock-Chuan (ehchua@ntu.edu.sg) &nbsp;&nbsp;|&nbsp;&nbsp; <a href="https://www3.ntu.edu.sg/home/ehchua/programming/index.html">HOME</a></p></div>
+
+</div>  <!-- End the wrap-outer division -->
+<!-- @@ end change in v1 -->
+
+
+</body></html>
