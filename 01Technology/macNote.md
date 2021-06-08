@@ -178,6 +178,10 @@ File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 
 add to PATH environment: `command palette -> shell command install`
 
+configure control + scroll-wheel to increase/decrease zoom in VS Code: 
+edit settings.json and add this line: "editor.mouseWheelZoom": true
+or go to settings CTRL + , or File > Preferences > Settings and search for mouseWheelZoom
+
 ### Mac common
 
 通过 全键盘控制(Tab 键和箭头浏览、空格键选择) 将键盘当作鼠标使用: 系统偏好设置 -> 键盘 -> 快捷键 -> 全键盘控制
