@@ -5,6 +5,7 @@
 [15.22 InnoDB Limits](https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html)
 767 bytes is the stated prefix limitation for InnoDB tables - its 1,000 bytes long for MyISAM tables.
 [4.9 Environment Variables](https://dev.mysql.com/doc/refman/8.0/en/environment-variables.html)
+[MYSQL, OOM KILLER, AND EVERYTHING RELATED](https://www.psce.com/en/blog/2012/05/31/mysql-oom-killer-and-everything-related/)
 
 `SHOW ENGINE INNODB STATUS`
 
@@ -24,7 +25,7 @@ validate your planned changes carefully with a tool such as pt-upgrade
 ## Recent
 
 `SET @@auto_increment_increment=10`
-`SHOW FULL COLUMNS FROM tbl`  
+`SHOW FULL COLUMNS FROM tbl`
 
 ## Documents
 
@@ -40,24 +41,24 @@ validate your planned changes carefully with a tool such as pt-upgrade
 
 ### Connection
 
-连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock  
-`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）  
+连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock
+`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）
 
 ### Database/Schema
 
 显示当前数据库服务器中的数据库列表：`SHOW DATABASES;`
-打开库: `USE 库名;`  
-建立数据库: `CREATE DATABASE 库名;`  
-删除数据库: `DROP DATABASE 库名 IF EXISTS 库名;`  
+打开库: `USE 库名;`
+建立数据库: `CREATE DATABASE 库名;`
+删除数据库: `DROP DATABASE 库名 IF EXISTS 库名;`
 
 ### Table
 
-显示数据库中的数据表: `SHOW TABLES;`  
-显示数据表的结构: `DESCRIBE 表名;`  
-建立数据表: `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`  
-`SHOW CREATE TABLE`  
-删除数据表: `DROP TABLE 表名；`  
-将表中记录清空: `DELETE FROM 表名;`  
+显示数据库中的数据表: `SHOW TABLES;`
+显示数据表的结构: `DESCRIBE 表名;`
+建立数据表: `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`
+`SHOW CREATE TABLE`
+删除数据表: `DROP TABLE 表名；`
+将表中记录清空: `DELETE FROM 表名;`
 
 ### User management
 
@@ -66,28 +67,28 @@ validate your planned changes carefully with a tool such as pt-upgrade
 `DROP USER 'demo'@'localhost';`
 `DROP USER admin@'%';`
 
-`GRANT SELECT,INSERT,UPDATE,DELETE ON databaseName.tableName TO 'user'@'%';`  
+`GRANT SELECT,INSERT,UPDATE,DELETE ON databaseName.tableName TO 'user'@'%';`
 `GRANT ALL PRIVILEGES ON *.* TO 'hadoop'@'localhost';`
 `REVOKE [type of permission] ON [database name].[table name] FROM '[username]'@'localhost';`
-`REVOKE SELECT ON *.* FROM 'admin'@'%';`  
+`REVOKE SELECT ON *.* FROM 'admin'@'%';`
 
-`select user,host from mysql.user where user='cactiuser' \G` 查看MYSQL数据库中所有用户  
-`show grants for USERNAME@IP;` 查看用户权限  
+`select user,host from mysql.user where user='cactiuser' \G` 查看MYSQL数据库中所有用户
+`show grants for USERNAME@IP;` 查看用户权限
 
-`FLUSH PRIVILEGES;`  
+`FLUSH PRIVILEGES;`
 
 ### Insert
 
-往表中插入记录: `INSERT INTO 表名 VALUES ("hyq","M");`  
-用文本方式将数据装入数据表中: `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`  
+往表中插入记录: `INSERT INTO 表名 VALUES ("hyq","M");`
+用文本方式将数据装入数据表中: `LOAD DATA LOCAL INFILE "D:/mysql.txt" INTO TABLE 表名`
 
 `INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`
 `INSERT INTO tbl_temp2 (fld_id) SELECT tbl_temp1.fld_order_id FROM tbl_temp1 WHERE tbl_temp1.fld_order_id > 100;`
 
 ### Update
 
-更新表中数据: `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`  
-append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`  
+更新表中数据: `UPDATE 表名 SET 字段名1='a',字段名2='b' WHERE 字段名3='c';`
+append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`
 
 ``` SQL
 -- Update MySQL table with another table's data
@@ -97,14 +98,14 @@ SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
 WHERE tableA.name = 'Joe'
 
 -- update multiple fields
-UPDATE tbl SET refund_transactions = 0, trade_transactions = 83  
+UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 ```
 
 ### Alter
 
-`ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`  
+`ALTER TABLE tableName ADD INDEX idx_name (column1, column2) USING BTREE;`
 `ALTER TABLE tableName DROP INDEX idx_name;`
-`ALTER TABLE table_name add UNIQUE KEY (model,ip);`  
+`ALTER TABLE table_name add UNIQUE KEY (model,ip);`
 `ALTER TABLE tableName modify column columnName varchar(512) NOT NULL COMMENT 'comments';`
 `ALTER TABLE table_name RENAME COLUMN old_col_name TO new_col_name;`
 
@@ -118,17 +119,17 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 ### Select
 
 按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
-计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`  
+计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`
 
-字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`  
-字符长度(in byte): `SELECT LENGTH("SQL字符长度") AS LengthOfString;`  
+字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`
+字符长度(in byte): `SELECT LENGTH("SQL字符长度") AS LengthOfString;`
 `SELECT case a.platformid when 1 then "admob" when 2 then "facebook" else platformid end as platform FROM table;`
-显示当前的user: `SELECT USER();`  
-来查看数据库版本 `SELECT VERSION();`  
+显示当前的user: `SELECT USER();`
+来查看数据库版本 `SELECT VERSION();`
 显示use的数据库名 query the current database name: `SELECT DATABASE();`
 
 `show variables where variable_name like '%myisam%'`
-`show variables like 'char%'`  
+`show variables like 'char%'`
 
 #### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
 
@@ -136,20 +137,20 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
  像常规的=运算符一样，两个值进行比较，结果是0（不等于）或1（相等）; 换句话说：'A'<=>'B'得0 和'a'<=>'a'得1。
 
 2. 和`=`号的不同点
- 和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1  
- 和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。  
+ 和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1
+ 和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。
  顺便说一句，mysql上几乎所有的操作符和函数都是这样工作的，因为和NULL比较基本上都没有意义。
 
 3. 相关操作符
- 除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。  
+ 除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。
  他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言
 
 ### JOIN
 
-[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)  
-INNER JOIN: match in both Table A and Table B.  
-FULL OUTER JOIN: all records in Table A and Table B  
-LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.  
+[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
+INNER JOIN: match in both Table A and Table B.
+FULL OUTER JOIN: all records in Table A and Table B
+LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.
 
 TableA - TableB: `SELECT * FROM TableA LEFT OUTER JOIN TableB ON TableA.name = TableB.name WHERE TableB.id IS null`
 
@@ -160,11 +161,11 @@ To produce the set of records unique to Table A and Table B, we perform the same
 
 ### Case-sensitive
 
-make a case-sensitive query  
-`select *  from table where BINARY column = 'value'`  
-`select * from t1 where name = binary 'YOU'`  
+make a case-sensitive query
+`select *  from table where BINARY column = 'value'`
+`select * from t1 where name = binary 'YOU'`
 
-设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:  
+设置表或行的collation，使其为binary或case sensitive。在MySQL中，对于Column Collate其约定的命名方法如下:
 `*_bin`: 表示的是binary case sensitive collation，也就是说是区分大小写的
 `*_cs`: case sensitive collation，区分大小写
 `*_ci`: case insensitive collation，不区分大小写
@@ -205,12 +206,12 @@ FROM prince
 2. 看看索引是不是对的，看看哪些SQL本身是有问题的
 
 [Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)
-[Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)  
+[Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)
 
 ```SQL
 pager grep -v Sleep | less; show full processlist;
 
--- Kill multiple process: 
+-- Kill multiple process:
 SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE STATE = 'Sleep' AND user = 'root' and Host like '172%' and INFO LIKE 'SELECT %' \G
 +----------------------------------------------------+
 | Paste the following query to kill all processes    |
@@ -274,9 +275,9 @@ BLOB, TEXT | L + 2 bytes, where L < 216
 
 ### Datetime
 
-updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`  
+updates automatically the date field `ALTER TABLE tableName ADD COLUMN modifyDate DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;`
 
-`SELECT UNIX_TIMESTAMP(NOW());`  
+`SELECT UNIX_TIMESTAMP(NOW());`
 `SELECT FROM_UNIXTIME(1467542031);`
 `select SUBSTRING(1456958130210,1,10);`
 `select DATE_ADD(now(), INTERVAL 1 day);` # - 加1天
@@ -398,13 +399,13 @@ mysql> SELECT JSON_PRETTY('{"a":"10","b":"15","x":"25"}'); # object
 
 ## Charset 查看三种MySQL字符集
 
-MySQL 5.5.3+ UTF8mb4支持emoji  
-查看支持的字符集和排序方式: `show character set`, `show collation` or `show variables like '%char%'`  
-查看数据库字符集`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`  
+MySQL 5.5.3+ UTF8mb4支持emoji
+查看支持的字符集和排序方式: `show character set`, `show collation` or `show variables like '%char%'`
+查看数据库字符集`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`
 查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;` or `show table status from databaseName like 'tableName'`
-查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;` or `show full columns from tableName`  
+查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;` or `show full columns from tableName`
 
-* `utf8_bin`: case-sensitive, because it compares the binary values of the characters.  
+* `utf8_bin`: case-sensitive, because it compares the binary values of the characters.
 * Both `utf8_general_ci` and `utf8_unicode_ci` perform case-insensitive comparison. operations performed using the `_general_ci` collation are faster than those for the `_unicode_ci` collation. For example, comparisons for the utf8_general_ci collation are faster, but slightly less correct, than comparisons for utf8_unicode_ci.
 
 * `utf8_bin` compares the bits blindly. No case folding, no accent stripping.
@@ -442,15 +443,15 @@ MySQL 5.5.3+ UTF8mb4支持emoji
   ) ENGINE=MyIsam DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
 ```
 
-update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`  
+update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
 
 update table character:
-`ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
-`ALTER TABLE table_name modify column_name varchar(32) charset utf8mb4 not null comment 'comment';`  
+`ALTER TABLE table_name CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+`ALTER TABLE table_name modify column_name varchar(32) charset utf8mb4 not null comment 'comment';`
 
-update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`  
+update column character: `ALTER TABLE table_name CHANGE column_name column_name VARCHAR(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 
-### 查看MySQL数据库服务器和数据库MySQL字符集  
+### 查看MySQL数据库服务器和数据库MySQL字符集
 
   ```sql
   mysql> show variables like '%char%';
@@ -469,7 +470,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   8 rows in set (0.00 sec)
   ```
 
-### 查看MySQL数据表（table）的MySQL字符集  
+### 查看MySQL数据表（table）的MySQL字符集
 
   ``` sql
   mysql> show table status from settlement like 'tableName' \G
@@ -490,7 +491,7 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   1 row in set (0.00 sec)
   ```
 
-### 查看MySQL数据列（column）的MySQL字符集  
+### 查看MySQL数据列（column）的MySQL字符集
 
   ``` sql
   mysql> show full columns from st_card \G
@@ -510,17 +511,17 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 
 #### Export/Backup database mysqldump
 
-MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)  
-导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)  
-备份文件中的"--"字符开头的行为注释语句；以/*!"开头、以"*/"结尾的语句为可执行的mysql注释，这些语句可以被mysql执行  
+MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)
+导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)
+备份文件中的"--"字符开头的行为注释语句；以/*!"开头、以"*/"结尾的语句为可执行的mysql注释，这些语句可以被mysql执行
 
-`mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz`  
-`mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`  
+`mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz`
+`mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`
 
 * `--no-data, -d` 没有数据
 * `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
 * `--add-drop-table` 在每个create语句之前增加一个drop table
-* `--skip-add-drop-table` without drop table  
+* `--skip-add-drop-table` without drop table
 * `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
 * `--default-character-set=utf8` 带语言参数导出
 * `--single-transaction`  This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
@@ -538,12 +539,12 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 #### Import/Restore
 
-`mysql> USE 数据库名;`  
-`mysql> SOURCE d:/mysql.sql;` or  
+`mysql> USE 数据库名;`
+`mysql> SOURCE d:/mysql.sql;` or
 `mysql -uroot -p dbName < dbName.sql` or
-`mysql -uroot -p dbName -e "source /path/to/dbName.sql"`  
+`mysql -uroot -p dbName -e "source /path/to/dbName.sql"`
 
-* `--force, -f`  Ignore all errors; continue even if an SQL error occurs  
+* `--force, -f`  Ignore all errors; continue even if an SQL error occurs
 * `--skip-column-names, -N`  Do not write column names in results.
 
 #### Export and Import a MySQL Database in One Command
@@ -552,9 +553,9 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 #### MySQL Export Table to CSV
 
-[Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)  
+[Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)
 `mysql -uroot -proot -D account -s -e "select id,username from user_0 limit 10 INTO OUTFILE '/tmp/user.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'"`
-`mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`  
+`mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`
 
 ``` sql
 
@@ -648,13 +649,13 @@ or this query to list the size of every table in every database, largest first:
 -- This will leave the ones with the highest URL_ID for a particular URL_ADDR
 -- (The derived table 'X' is to avoid the error "You can't specify target table 'tablename' for update in FROM clause")
 DELETE FROM table
-WHERE URL_ID NOT IN 
-    (SELECT ID FROM 
-       (SELECT MAX(URL_ID) AS ID 
-        FROM table 
+WHERE URL_ID NOT IN
+    (SELECT ID FROM
+       (SELECT MAX(URL_ID) AS ID
+        FROM table
         WHERE URL_ID IS NOT NULL
-        GROUP BY URL_ADDR ) X)   /*Sounds like you would need to GROUP BY a 
-                                   calculated form - e.g. using REPLACE to 
+        GROUP BY URL_ADDR ) X)   /*Sounds like you would need to GROUP BY a
+                                   calculated form - e.g. using REPLACE to
                                   strip out www see Daniel's answer*/
 
 
@@ -680,8 +681,8 @@ JOIN   mytb t2 ON (t2.url_addr = t1.url_addr AND t2.url_id > t1.url_id);
 
 DELETE t2
 FROM   mytb t1
-JOIN   mytb t2 ON 
-  (REPLACE(t2.url_addr, 'www.', '') = REPLACE(t1.url_addr, 'www.', '') AND 
+JOIN   mytb t2 ON
+  (REPLACE(t2.url_addr, 'www.', '') = REPLACE(t1.url_addr, 'www.', '') AND
                    t2.url_id > t1.url_id);
 
 ```
@@ -694,7 +695,7 @@ JOIN   mytb t2 ON
 mysql --help | grep /my.cnf | xargs ls
 /etc/my.cnf /etc/mysql/my.cnf /usr/local/etc/my.cnf ~/.my.cnf
 find the mysql data directory by `grep datadir /etc/my.cnf` or
-`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`  
+`mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name LIKE "%dir"'`
 `mysql -u USER -p -e 'SHOW VARIABLES WHERE Variable_Name = "datadir"'`
 
 `select @@datadir;` select the data directory
@@ -730,7 +731,7 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `sudo systemctl start mysql`
 `sudo systemctl stop mysql`
 
-`./mysqld_safe` start MySQL server  
+`./mysqld_safe` start MySQL server
 `service mysql stop`, `service mysql start` Ubuntu start MySQL
 `sudo /etc/init.d/mysql start`  start mysql server on ubuntu
 `sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
@@ -750,14 +751,14 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 
 #### 修改密码
 
-格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`  
+格式: `mysqladmin -u username -pPWD_OLD password PWD_NEW`
 
-1. 给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令  
- `mysqladmin -u root -password PWD_NEW`  
-注：因为开始时root没有密码，所以-p旧密码一项就可以省略了  
-2. 再将root的密码改为PWD_NEW  
-`mysqladmin -u root -pPWD_OLD password PWD_NEW`  
-命令行修改root密码: `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;  
+1. 给root加个密码`PWD_OLD`。首先进入目录mysql\bin，然后键入以下命令
+ `mysqladmin -u root -password PWD_NEW`
+注：因为开始时root没有密码，所以-p旧密码一项就可以省略了
+2. 再将root的密码改为PWD_NEW
+`mysqladmin -u root -pPWD_OLD password PWD_NEW`
+命令行修改root密码: `UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root'`;
 3. [忘记 root 密码](https://help.aliyun.com/knowledge_detail/42520.html)
 
 ##### Linux
@@ -766,7 +767,7 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
     `[mysqld]skip-grant-tables  #增加`
 2. `/etc/init.d/mysqld restart`
 3. `mysql`
-4. `UPDATE user SET password = 'root' WHERE User = 'root' ;`  
+4. `UPDATE user SET password = 'root' WHERE User = 'root' ;`
 5. `flush privileges ;`
 6. 删除`my.cnf`的 `spip-grant-tables`
 7. 重启 MySQL 服务
@@ -774,12 +775,12 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 ### MySQL Shell Commands
 
 [3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
-[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )  
+[mysql Tips Input-Line Editing](https://dev.mysql.com/doc/refman/5.7/en/mysql-tips.html )
 
 `help` to get List of all MySQL commands
-`clear     (\c)` Clear the current input statement.  
-`status    (\s)` Get status information from the server.  
-`edit      (\e)` Edit command with $EDITOR. like CTRL+X,E in bash  
+`clear     (\c)` Clear the current input statement.
+`status    (\s)` Get status information from the server.
+`edit      (\e)` Edit command with $EDITOR. like CTRL+X,E in bash
 `ego       (\G)` Send command to mysql server, display result vertically.
 `nopager   (\n)` Disable pager, print to stdout.
 `pager     (\P)` Set PAGER [to_pager]. Print the query results via PAGER.
@@ -787,10 +788,10 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `system    (\!)` Execute a system shell command.
 
 `pager less`, `pager less -n -i -S`
-From `man less`:  
-`-i` Causes searches to ignore case  
+From `man less`:
+`-i` Causes searches to ignore case
 `-n` Suppresses line numbers
-`-S` Causes lines longer than the screen width to be chopped rather than folded.  
+`-S` Causes lines longer than the screen width to be chopped rather than folded.
 
 When code starts with something like this `/*!50100`, the code following till `*/` is executed only, when MySQL is installed in a version above 5.0.100
 
@@ -818,98 +819,98 @@ mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [My
 
 #### MySQL Workbench update shortcut Auto-complete
 
-D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml  
-/usr/share/mysql-workbench/data/main_menu.xml  
+D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
+/usr/share/mysql-workbench/data/main_menu.xml
 
 ## Transaction
 
 [Using the Transaction Information Schema Tables](https://dev.mysql.com/doc/innodb-plugin/1.0/en/innodb-information-schema-examples.html)
-`begin`, `start transaction`, `set autocommit=0`  
+`begin`, `start transaction`, `set autocommit=0`
 `end`, `commit`, `rollback`
 
-SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;  
+SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 `SELECT @@global.tx_isolation;`  查看InnoDB系统级别的事务隔离级别
-`SELECT @@tx_isolation;`  查看InnoDB会话级别的事务隔离级别  
-`SET global transaction isolation level read committed;`  修改InnoDB系统级别的事务隔离级别  
-`SET session transaction isolation level read committed;`  修改InnoDB会话级别的事务隔离级别  
-`set innodb_lock_wait_timeout=100`  
-`show variables like 'innodb_lock_wait_timeout';`  
-`show engine innodb status`   to get a list of all the actions currently pending inside the InnoDB engine  
+`SELECT @@tx_isolation;`  查看InnoDB会话级别的事务隔离级别
+`SET global transaction isolation level read committed;`  修改InnoDB系统级别的事务隔离级别
+`SET session transaction isolation level read committed;`  修改InnoDB会话级别的事务隔离级别
+`set innodb_lock_wait_timeout=100`
+`show variables like 'innodb_lock_wait_timeout';`
+`show engine innodb status`   to get a list of all the actions currently pending inside the InnoDB engine
 
 ### FORCE UNLOCK for locked tables in MySQL
 
 `show open tables where in_use>0;`  get the list of locked tables
-`show processlist;`  get the list of the current processes, one of them is locking your table(s)  
+`show processlist;`  get the list of the current processes, one of them is locking your table(s)
 `kill <put_process_id_here>;`   Kill one of these processes
 
 ### 事务隔离模式
 
-1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。  
-2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。  
-3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。  
+1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。
+2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。
+3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。
     但是这种方式又引发了幻读的问题(MySQL InnoDB 通过 MVCC, Mutipleversion Concurrency Control 解决了幻读问题)。
-    因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。  
-4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。  
+    因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。
+4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。
 
 [14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
-[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)  
+[Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)
 
 脏读（dirty read）
 不可重复读（unrepeatable read）
 幻读（phantom read）
 幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
-为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，  
+为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，
 而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
 
 ### 锁机制
 
-1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写  
+1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写
 2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
 
-锁的范围:  
-行锁: 对某行记录加上锁  
-表锁: 对整个表加上锁  
+锁的范围:
+行锁: 对某行记录加上锁
+表锁: 对整个表加上锁
 共享锁(share mode), 排他锁(for update)
 
-不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。  
-`replace into`  相当于delete然后insert，会有对数据进行写的过程。  
+不想向数据表中插入相同的主键、unique索引时，可以使用replace或insert ignore，来避免重复的数据。
+`replace into`  相当于delete然后insert，会有对数据进行写的过程。
 `insert ignore`  会忽略已经存在主键或unique索引的数据，而不会有数据的修改
-使用场景:  
+使用场景:
     如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据
     如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间
 
 ## Example: 数据库插入数据时加锁 多线程(多job)重复insert
 
-1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`  
-2. `select ... for update`, then insert  
- it locks the whole table, other process will pending to get the lock when select the table, so no one can insert into it.  
-3. `insert ignore`  
+1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`
+2. `select ... for update`, then insert
+ it locks the whole table, other process will pending to get the lock when select the table, so no one can insert into it.
+3. `insert ignore`
  [innodb-locking-reads](http://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html)
-`insert ignore`会忽略已经存在主键或unique索引的数据，而不会有数据的修改。  
+`insert ignore`会忽略已经存在主键或unique索引的数据，而不会有数据的修改。
  [mysql-insert-ignore-different-replace-into](http://www.chenyudong.com/archives/mysql-insert-ignore-different-replace-into.html)
-`insert ignore into table_name(email,phone,user_id) values('test9@163.com','99999','9999')`,这样当有重复记  
-录就会忽略,执行后返回数字0,还有个应用就是复制表,避免重复记录:  
-`insert ignore into table(name)  select  name from table2`  
-4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下  
+`insert ignore into table_name(email,phone,user_id) values('test9@163.com','99999','9999')`,这样当有重复记
+录就会忽略,执行后返回数字0,还有个应用就是复制表,避免重复记录:
+`insert ignore into table(name)  select  name from table2`
+4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下
 
 ### reference [select-for-update-with-insert-into](http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into)
 
-`SELECT ... FOR UPDATE` with UPDATE  
+`SELECT ... FOR UPDATE` with UPDATE
 
-Using transactions with InnoDB (auto-commit turned off), a SELECT ... FOR UPDATE allows one session to temporarily lock down a particular record (or records) so that no other session can update it. Then, within the same transaction, the session can actually perform an UPDATE on the same record and commit or roll back the transaction. This would allow you to lock down the record so no other session could update it while perhaps you do some other business logic.  
+Using transactions with InnoDB (auto-commit turned off), a SELECT ... FOR UPDATE allows one session to temporarily lock down a particular record (or records) so that no other session can update it. Then, within the same transaction, the session can actually perform an UPDATE on the same record and commit or roll back the transaction. This would allow you to lock down the record so no other session could update it while perhaps you do some other business logic.
 
-This is accomplished with locking. InnoDB utilizes indexes for locking records, so locking an existing record seems easy--simply lock the index for that record.  
+This is accomplished with locking. InnoDB utilizes indexes for locking records, so locking an existing record seems easy--simply lock the index for that record.
 
-`SELECT ... FOR UPDATE` with INSERT  
+`SELECT ... FOR UPDATE` with INSERT
 
-However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for a record that doesn''t exist yet? If you are using the default isolation level of REPEATABLE READ, InnoDB will also utilize gap locks. As long as you know the id (or even range of ids) to lock, then InnoDB can lock the gap so no other record can be inserted in that gap until we''re done with it.  
+However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for a record that doesn''t exist yet? If you are using the default isolation level of REPEATABLE READ, InnoDB will also utilize gap locks. As long as you know the id (or even range of ids) to lock, then InnoDB can lock the gap so no other record can be inserted in that gap until we''re done with it.
 
-If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn''t know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.  
+If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn''t know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.
 
 ### test case
 
-select nonexistent orderId, which is not a index column, it will lock the whole table;  
-select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;  
+select nonexistent orderId, which is not a index column, it will lock the whole table;
+select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
 
 ``` sql
   CREATE TABLE `test_sql_type` (
@@ -919,17 +920,17 @@ select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
   ) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8 COMMENT='测试类型表';
 ```
 
-console 1:  
+console 1:
 
 ``` sql
   begin;
   select * from test_sql_type where orderId = 41 for update;
 ```
 
-orderId 41 is not a existing row.  
-it gets the lock of the whole table;  
+orderId 41 is not a existing row.
+it gets the lock of the whole table;
 
-console 2:  
+console 2:
 
 ``` sql
   begin;
@@ -937,25 +938,25 @@ console 2:
   **pending**
 ```
 
-It pending to get the lock. 
+It pending to get the lock.
 
 ## MySQL线上常见故障剖析
 
-–活动进程(Process list)  
-–日志文件(slow log, alert log, general query log, binlog)  
-–Status variables（com_select, com_insert,.etc)  
-–InnoDB(物理读、逻辑读、innodbstatus)  
-–参数配置  
-–Stack trace(plus source code)  
-•SQL  
-–执行计划，explain  
-•OS  
-–内存, SWAP, /proc/meminfo  
+–活动进程(Process list)
+–日志文件(slow log, alert log, general query log, binlog)
+–Status variables（com_select, com_insert,.etc)
+–InnoDB(物理读、逻辑读、innodbstatus)
+–参数配置
+–Stack trace(plus source code)
+•SQL
+–执行计划，explain
+•OS
+–内存, SWAP, /proc/meminfo
 –CPU, load, ps
-–IO（磁盘、网络)  
-•Iostat  
-•Profile  
-–Oprofile  
+–IO（磁盘、网络)
+•Iostat
+•Profile
+–Oprofile
 –gprof
 
 ## Performance
@@ -970,15 +971,15 @@ It pending to get the lock.
 3.连接表时，可以先用where条件对表进行过滤，然后做表连接 (虽然mysql会对连表语句做优化)
 4.建立合适的索引
 5.学会分析sql执行计划，mysql会对sql进行优化，所以分析执行计划很重要
-制定适当的存储引擎和字符编码  
-例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8  
-mysql线上将采用一master多slave的方式来进行部署  
+制定适当的存储引擎和字符编码
+例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8
+mysql线上将采用一master多slave的方式来进行部署
 
 ### MySQL Query Cache
 
-[8.10.3 The MySQL Query Cache](https://dev.mysql.com/doc/refman/5.6/en/query-cache.html )  
-The have_query_cache server system variable indicates whether the query cache is available `SHOW VARIABLES LIKE 'have_query_cache';`  
-The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM customer;`  
+[8.10.3 The MySQL Query Cache](https://dev.mysql.com/doc/refman/5.6/en/query-cache.html )
+The have_query_cache server system variable indicates whether the query cache is available `SHOW VARIABLES LIKE 'have_query_cache';`
+The server does not use the query cache. `SELECT SQL_NO_CACHE id, name FROM customer;`
 
 ### [优化建议 -- 知乎哈哈](https://www.zhihu.com/question/19719997/answer/81930332)
 
@@ -995,10 +996,10 @@ mysql数据库一般都是按照这个步骤去演化的，成本也是由低到
 #### Slow log options
 
 `show variables  like '%slow_query_log%'`  Query slow log status
-`set global slow_query_log=1`  Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效  
-`slow_query_log = 1`  开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）  
+`set global slow_query_log=1`  Start recording slow log, 开启了慢查询日志只对当前数据库生效，如果MySQL重启后则会失效
+`slow_query_log = 1`  开启慢日志永久生效，必须修改配置文件`~/.my.cnf`, `/etc/my.cnf`（其它系统变量也是如此）
 `slow_query_log_file = /tmp/mysql_slow.log`  slow log location, default value: host_name-slow.log
-`long_query_time=2`  慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s  
+`long_query_time=2`  慢查询阈值，当查询时间多于设定的阈值时，记录日志,默认10s
 `log_queries_not_using_indexes`  未使用索引的查询也被记录到慢查询日志中（可选项）
 
 #### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )
@@ -1006,10 +1007,10 @@ mysql数据库一般都是按照这个步骤去演化的，成本也是由低到
 * --help
 * -a  Do not abstract all numbers to N and strings to 'S'.
 * -g pattern  Consider only queries that match the (grep-style) pattern.
-* -s  sort_type  
-  * t, at: Sort by query time or average query time  
-  * l, al: Sort by lock time or average lock time  
-  * r, ar: Sort by rows sent or average rows sent  
+* -s  sort_type
+  * t, at: Sort by query time or average query time
+  * l, al: Sort by lock time or average lock time
+  * r, ar: Sort by rows sent or average rows sent
   * c: Sort by count
 * -t N  Display only the first N queries in the output.
 
@@ -1025,29 +1026,29 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 
 ### explain
 
-[EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )  
+[EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )
 [详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
 
 `explain SQL` query;  then `show warnings` to get the raw SQL clause
 
 #### EXPLAIN列的解释
 
-table：显示这一行的数据是关于哪张表的  
-type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL  
-possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句  
-key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引  
-key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好  
-ref：显示索引的哪一列被使用了，如果可能的话，是一个常数  
-rows：MYSQL认为必须检查的用来返回请求数据的行数  
+table：显示这一行的数据是关于哪张表的
+type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
+possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
+key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
+key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
+ref：显示索引的哪一列被使用了，如果可能的话，是一个常数
+rows：MYSQL认为必须检查的用来返回请求数据的行数
 Extra：关于MYSQL如何解析查询的额外信息
 
 #### Type
 
 性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
 
-#### 需要强调rows是核心指标  
+#### 需要强调rows是核心指标
 
-绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说  
+绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说
 
 * rows<1000，是在可接受的范围内的。
 * rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
@@ -1059,31 +1060,31 @@ Extra：关于MYSQL如何解析查询的额外信息
 
 该列包含MySQL解决查询的详细信息
 
-* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现  
-* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中  
+* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现
+* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中
 
 当执行计划Extra 出现Using filesort 、Using temporary 时，可以考虑是否需要进行sql优化和调整索引，最后再调整my.cnf 中与排序或者临时表相关的参数，如sort_buffer_size或者tmp_table_size.
 
 ### 建立索引原则
 
-1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)  
-2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式  
+1. 最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(>、<、between、like)就停止匹配，比如a = 1 and b = 2 and c > 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整(keep the range criterion at the end of the index, so the optimizer will use as much of the index as possible)
+2. =和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式
 3. 尽量选择区分度高的列作为索引,区分度的公式是`count(distinct col)/count(*)`，表示字段不重复的比例，比例越大我们扫描的记录数越少，唯一键的区分度是1，而一些状态、性别字段可能在大数据面前区分度就是0，那可能有人会问，这个比例有什么经验值吗？使用场景不同，这个值也很难确定，一般需要join的字段我们都要求是0.1以上，即平均1条扫描10条记录
 4. 索引列不能参与计算，保持列"干净"，比如from_unixtime(create_time) = '2014-05-29'就不能使用到索引，原因很简单，b+树中存的都是数据表中的字段值，但进行检索时，需要把所有元素都应用函数才能比较，显然成本太大。所以语句应该写成create_time = unix_timestamp('2014-05-29');
-5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可  
+5. 尽量的扩展索引，不要新建索引。比如表中已经有a的索引，现在要加(a,b)的索引，那么只需要修改原来的索引即可
 
-### MySQL压力测试  
+### MySQL压力测试
 
-1. mysqlslap的介绍及使用  
-2. sysbench  
-3. tpcc-mysql  
+1. mysqlslap的介绍及使用
+2. sysbench
+3. tpcc-mysql
 
 ### index
 
-To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`  
-To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`  
-mysql query escape %前面加两个反斜杠，比如  
-`select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'` 
+To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable;`
+To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`
+mysql query escape %前面加两个反斜杠，比如
+`select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'`
 
 ## Replication
 
@@ -1098,26 +1099,26 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 
 ### mysqlbinlog
 
-[mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)  
-[mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)  
+[mysqlbinlog — Utility for Processing Binary Log Files](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog.html)
+[mysqlbinlog Row Event Display](https://dev.mysql.com/doc/refman/5.7/en/mysqlbinlog-row-events.html)
 从MySQL binlog解析出你要的SQL [binlog2sql](https://github.com/danfengcao/binlog2sql)
 A tool for parsing a MySQL binlog file to JSON. [binlog-parser](https://github.com/zalora/binlog-parser)
-`GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`  
+`GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`
 
-bin log location  
-`ps -ef | grep mysql` to `--datadir=/data/local/mysql`  
-`show variables like 'datadir';`  
-`show variables like '%binlog%';`  
-`show variables like 'expire_logs_days';` binlog日志自动删除/过期的天数，默认值为0，表示不自动删除  
+bin log location
+`ps -ef | grep mysql` to `--datadir=/data/local/mysql`
+`show variables like 'datadir';`
+`show variables like '%binlog%';`
+`show variables like 'expire_logs_days';` binlog日志自动删除/过期的天数，默认值为0，表示不自动删除
 
-`show master status` 查看当前正在写入的binlog文件  
-`show binary logs` Lists the binary log files on the server  
-`show variables like 'expire_logs_days';` 设置binlog的过期时间  
-`flush logs` 刷新log日志，自此刻开始产生一个新编号的binlog日志文件  
-`reset master` 重置(清空)所有binlog日志  
+`show master status` 查看当前正在写入的binlog文件
+`show binary logs` Lists the binary log files on the server
+`show variables like 'expire_logs_days';` 设置binlog的过期时间
+`flush logs` 刷新log日志，自此刻开始产生一个新编号的binlog日志文件
+`reset master` 重置(清空)所有binlog日志
 
 `SHOW BINLOG EVENTS [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];`
-`show binlog events in 'mysql-bin.000021'\G`  
+`show binlog events in 'mysql-bin.000021'\G`
 
 `mysqlbinlog /path/to/binlog > tmpfile.sql`
 
@@ -1136,7 +1137,7 @@ bin log location
 * `--host=name, -h`              Get the binlog from server.从远程主机上获取binlog日志
 * `--database=db_name, -d db_name`              Get the binlog from server.从远程主机上获取binlog日志
 
-The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`  
+The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`
 `SELECT ORDINAL_POSITION,COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, COLUMN_COMMENT, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'tbl_name';`
 
 `mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less`
@@ -1158,17 +1159,17 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 ### MySQL读写分离解决方案
 
-* 通过amoeba 实现MySQL读写分离  
-* 通过keepalived构建高可用的amoeba服务  
-* MySQL-Proxy（官方）  
-* Amoeba for MySQL  
-* MaxScale  
-* Atlas（360）, based on MySQL-Proxy 0.8.2  
-* Cobar（Alibaba）  
+* 通过amoeba 实现MySQL读写分离
+* 通过keepalived构建高可用的amoeba服务
+* MySQL-Proxy（官方）
+* Amoeba for MySQL
+* MaxScale
+* Atlas（360）, based on MySQL-Proxy 0.8.2
+* Cobar（Alibaba）
 
 HA: percona xtradb cluster, galera cluster
 
-## Inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具 
+## Inception 一个集审核、执行、备份及生成回滚语句于一身的MySQL自动化运维工具
 
 [Inception](https://github.com/hanchuanchuan/inception)
 [goInception](https://hanchuanchuan.github.io/goInception/)是一个集审核、执行、备份及生成回滚语句于一身的MySQL运维工具， 通过对执行SQL的语法解析，返回基于自定义规则的审核结果，并提供执行和备份及生成回滚语句的功能
