@@ -335,8 +335,9 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 `kubectl run mysql-client --image=mysql:5.6 -it --rm --restart=Never -- mysql`
 `kubectl run redis-client --image=redis:6.0.9 -it --rm --restart=Never -- bash`
 `kubectl run dnsutils --image=tutum/dnsutils -it --rm`
-`kubectl run -it srvlookup --image=tutum/dnsutils --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
-`kubectl run -it curl --image=tutum/curl --rm --restart=Never`
+`kubectl run dnsutils --image=tutum/dnsutils -it --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
+`kubectl run curl --image=tutum/curl -it --rm --restart=Never`
+`kubectl run netshoot --image=nicolaka/netshoot -it --rm`
 `kubectl run nginx --image=nginx -it --rm`
 `kubectl run busybox --image=busybox -it --rm`  busybox: BusyBox combines tiny versions of many common UNIX utilities
 `kubectl run alpine --image=alpine -it --rm`  alpine: A minimal Docker image based on Alpine Linux
