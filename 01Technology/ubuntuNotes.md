@@ -2612,6 +2612,9 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
         2. `nmap HOST`, `nmap -p PORT IP` 可以了解端口无法连接的原因是端口关闭还是防火墙过滤了
       本地端口 `# netstat -lnp | grep PORT`
       查看防火墙规则: `iptables -L -n -v`
+        `ip rule show`
+        `ip route get IP` 得到使用的 RULE
+        `ip route show table RULE | grep IP`
 
 2. 如果是网络速度慢, 一般有以下几个方式定位问题源:
     DNS是否是问题的源头:

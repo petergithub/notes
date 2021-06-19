@@ -3,7 +3,7 @@
 `System Preference -> Keyboard -> Shortcuts -> App Shortcuts -> +` 为任何软件菜单里的项目设置快捷键
 
 [在 Mac 上截屏或录制屏幕](https://support.apple.com/zh-cn/guide/mac-help/mh26782/mac)
-`Command+Shift+5` capture screenshot  
+`Command+Shift+5` capture screenshot
 `Command+Shift+3` 捕捉整个屏幕
 `Command+Shift+4` 捕捉屏幕的一部分
 `Command-Control-Esc` 停止屏幕录制
@@ -22,7 +22,7 @@ Options:
 `shasum -a 256 /path/to/file` or `openssl sha256 /path/to/file`
 `brew install sleepwatcher` [sleepwatcher](https://formulae.brew.sh/formula/sleepwatcher)
 
-got error message `find: message_uk.xml: unknown primary or operator` with command `find . -name *_uk.xml` 
+got error message `find: message_uk.xml: unknown primary or operator` with command `find . -name *_uk.xml`
 correct with quote: `find . -name '*_uk.xml'`
 
 `gcc -v` `gcc --version`
@@ -122,7 +122,7 @@ PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
 config path: `~/.ideavimrc`
 Allocating conflicting keystrokes to IdeaVim: Preference -> Editor -> Vim Emulation -> Set Handler as IDE for (CTRL+C, CTRL+R, CTRL+T)
 [IdeaVIM Reference Manual SCROLL](http://ideavim.sourceforge.net/vim/scroll.html)
-`zz` line [count] at center of window (default cursor line) 
+`zz` line [count] at center of window (default cursor line)
 
 ##### Add External Tool
 
@@ -178,7 +178,7 @@ File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 
 add to PATH environment: `command palette -> shell command install`
 
-configure control + scroll-wheel to increase/decrease zoom in VS Code: 
+configure control + scroll-wheel to increase/decrease zoom in VS Code:
 edit settings.json and add this line: "editor.mouseWheelZoom": true
 or go to settings CTRL + , or File > Preferences > Settings and search for mouseWheelZoom
 
@@ -198,12 +198,12 @@ commond+下箭头可以直达页面底部
 `Fn+Up/Down` windows-style page up/down
 
 `brew install bat` alternative to `cat`
-`alt+e` eclipse plugin EasyShell Main pop menu  
+`alt+e` eclipse plugin EasyShell Main pop menu
 `tldr` TL;DR project for help
 
 #### Finder shortcut
 
-`Command+Option+Space` Show Finder search window  
+`Command+Option+Space` Show Finder search window
 
 Create new folder: `Command+Shift+n`
 `Command-Option-P` to show or hide the path bar
@@ -212,7 +212,7 @@ Create new folder: `Command+Shift+n`
 `Command-Option-S` show or hide Finder's sidebar
 `Command+Shift+G` 快捷键可以完成到达某路径的操作
 Display hidden file: `Command+Shift+.`
-强制退出程序窗口 `Command+Option+Esc`  
+强制退出程序窗口 `Command+Option+Esc`
 
 #### open terminal in Finder
 
@@ -250,24 +250,24 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 1. last parameter from last command: `esc+.`, `!$`
  Move in command line:
 `esc+delete` delete one word backward, like `ctrl+w`
-`option+click` cursor will move to clicked position. This even works inside `vim`  
+`option+click` cursor will move to clicked position. This even works inside `vim`
 
-`open .` open Finder in terminal  
+`open .` open Finder in terminal
 `open -a Finder`
 `open -a iTerm`
 
 #### date
 
-`date -r 1444645890` convert timestamp to date  
-`date +%s` get current timstamp  
-`date +%U` display week number of this year  
+`date -r 1444645890` convert timestamp to date
+`date +%s` get current timstamp
+`date +%U` display week number of this year
 
 ### 代理服务器 AnyProxy
 
 1. 以支持 Https 方式启动 `anyproxy --intercept`
 2. 启动浏览器 [链接](http://localhost:8002)
 3. 客户端设置代理 [链接](http://ip:8001)
- [代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)  
+ [代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)
  [AnyProxy](http://anyproxy.io/cn)
 
 ### Homebrew update 慢
@@ -306,9 +306,9 @@ launchctl print-disabled user/$(id -u)
 
 #### disable auto start
 
-load from `/Library/LaunchAgents`  
-disable it `launchctl unload -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`  
-turn it back on `launchctl load -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`  
+load from `/Library/LaunchAgents`
+disable it `launchctl unload -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
+turn it back on `launchctl load -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
 
 ### macbook pro合盖之后耗电很快:休眠时关闭 WiFi
 
@@ -343,7 +343,7 @@ restart the service  `sudo pfctl -f /etc/pf.conf`
 `ls -al /usr/local/Cellar/openssl`
 
 [dyld: Library not loaded error on macOS (OpenSSL missing) #86](https://github.com/kelaberetiv/TagUI/issues/86#issue-303370944)
-This error is happening because macOS decided to drop OpenSSL and switched to LibreSSL. Furthermore, macOS Homebrew switched from OpenSSL v.1.0 to v1.1, breaking many other apps that are dependent on OpenSSL v1.0. 
+This error is happening because macOS decided to drop OpenSSL and switched to LibreSSL. Furthermore, macOS Homebrew switched from OpenSSL v.1.0 to v1.1, breaking many other apps that are dependent on OpenSSL v1.0.
 `brew uninstall openssl; brew install https://github.com/tebelorg/Tump/releases/download/v1.0.0/openssl.rb`
 
 `brew switch openssl 1.0.2s`
@@ -352,3 +352,4 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
 [ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
+[rustdesk 远程桌面软件](https://rustdesk.com/zh/)
