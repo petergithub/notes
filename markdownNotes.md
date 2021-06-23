@@ -213,4 +213,34 @@ _ underscore
 
 ``` html
 <p><code>There is a literal backtick (`) here.</code></p>`
-````
+```
+
+### Auto compelte
+
+输入 `code` 就会弹出行内代码和代码块两种补全提示
+输入 `ul` 或 `li` 就会弹出列表补全提示
+
+## [Plugin: Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one#keyboard-shortcuts)
+
+### Others
+
+Paste link on selected text
+
+### Keyboard Shortcuts
+
+`Ctrl/Cmd + Shift + ]` Toggle heading (uplevel)
+`Ctrl/Cmd + Shift + [` Toggle heading (downlevel)
+`Ctrl/Cmd + M` Toggle math environment
+`Alt + C` Check/Uncheck task list item
+`Ctrl/Cmd + Shift + V` Toggle preview
+`Ctrl/Cmd + K V` Toggle preview to side
+
+## [Plugin: Markdown Preview Enhanced is a SUPER POWERFUL markdown extension](https://shd101wyy.github.io/markdown-preview-enhanced/)
+
+Paste to Markdown
+Instructions
+Find the text to convert to Markdown (e.g., in another browser tab)
+Copy it to the clipboard (Ctrl+C, or ⌘+C on Mac)
+Paste it into this window (Ctrl+V, or ⌘+V on Mac)
+The converted Markdown will appear!
+The conversion is carried out by to-markdown, a Markdown converter written in JavaScript and running locally in the browser.

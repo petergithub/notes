@@ -182,6 +182,12 @@ configure control + scroll-wheel to increase/decrease zoom in VS Code:
 edit settings.json and add this line: "editor.mouseWheelZoom": true
 or go to settings CTRL + , or File > Preferences > Settings and search for mouseWheelZoom
 
+#### vs code plugin
+
+[Markdown Preview Enhanced is a SUPER POWERFUL markdown extension](https://shd101wyy.github.io/markdown-preview-enhanced/)
+[Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one#keyboard-shortcuts-1)
+[PicGo - A fast and powerful image uploading plugin](https://marketplace.visualstudio.com/items?itemName=Spades.vs-picgo)
+
 ### Mac common
 
 通过 全键盘控制(Tab 键和箭头浏览、空格键选择) 将键盘当作鼠标使用: 系统偏好设置 -> 键盘 -> 快捷键 -> 全键盘控制
@@ -353,3 +359,5 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
 [ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
 [rustdesk 远程桌面软件](https://rustdesk.com/zh/)
+[Joplin is a free, open source note taking and to-do application](https://github.com/laurent22/joplin)
+[Typora — a markdown editor, markdown reader](https://typora.io/)
