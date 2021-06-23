@@ -6,36 +6,15 @@
 `cat /etc/shells` get all available shells
 `xargs echo`
 
-[`set`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
-执行时传入 `bash -euxo pipefail script.sh` 或者`set -euxo pipefail` 放在脚本开头
-
-`set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
-`set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
-`set -e` 当有错误发生的时候abort执行
-`set +e` 表示关闭`-e`选项, 同`-o errexit`
-`set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
-`bash -n scriptname`  # don't run commands; check for syntax errors only
-
-`command || exit 1` 只要command有非零返回值，脚本就会停止执行
-
-1. `command || { echo "command failed"; exit 1; }`
-2. `if ! command; then echo "command failed"; exit 1; fi`
-3. `command
- if [ "$?" -ne 0 ]; then echo "command failed"; exit 1; fi`
-
-`command1 && command2`  只有第一个命令成功了，才能继续执行第二个命令
-
 在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中
 
 `read -p "Press [Enter] key to continue"`
 `read -n 1 -p "Press any key to continue"`
 `sleep 2; echo 'end sleep 2 sec'`
 
-`$?` 上一个命令的返回代码. 0为true, 1为false
-`$$` 进程标识号
-`$*` 该变量包含了所有输入的命令行参数值
-`${var//\"/}` 将"替换成空
-`${var/a/b}` 将a替换成b
+- `$?` 上一个命令的返回代码. 0为true, 1为false
+- `$$` 进程标识号
+- `$*` 该变量包含了所有输入的命令行参数值
 
 ## Shell 变量
 
@@ -91,7 +70,13 @@ echo "str#*/    : ${str#*/}"   # 从 字符串开头 删除到 左数第一个'/
 echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一个'/'
 echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
 echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
+
 ```
+
+#### 字符串替换
+
+- `${var//\"/}` 将"替换成空
+- `${var/a/b}` 将a替换成b
 
 ### Shell 数组
 
@@ -147,6 +132,14 @@ lengthn=${#array_name[n]}
 EOF
 ```
 
+### 逻辑与或非
+
+1. `command || exit 1` 只要command有非零返回值，脚本就会停止执行
+2. `command || { echo "command failed"; exit 1; }`
+3. `if ! command; then echo "command failed"; exit 1; fi`
+4. `command if [ "$?" -ne 0 ]; then echo "command failed"; exit 1; fi`
+5. `command1 && command2`  只有第一个命令成功了，才能继续执行第二个命令
+
 ### test
 
 #### Common Bash comparisons
@@ -196,6 +189,17 @@ The `-o` and `-a` operators work with the test command or occur within single te
 ```
 
 ### 其他
+
+#### [`set`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
+
+执行时传入 `bash -euxo pipefail script.sh` 或者`set -euxo pipefail` 放在脚本开头
+
+- `set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
+- `set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
+- `set -e` 当有错误发生的时候abort执行
+- `set +e` 表示关闭`-e`选项, 同`-o errexit`
+- `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
+- `bash -n scriptname`  # don't run commands; check for syntax errors only
 
 #### `dirname $0`
 
