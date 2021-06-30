@@ -24,36 +24,36 @@ git merge --squash --no-ff
 `HEAD^^` `HEAD~2` 倒数第2个版本
 `HEAD~3` 倒数第3个版本
 
-Final release version  
-`git merge --no-ff <branchName>`    使得合并操作总是产生一次新的提交  
-`git merge --squash <branchName>`    把branchName上所有提交合并为一次提交到当前分支上再commit  
-`git tag <tagName> -m "comment"`  
-`git push origin --tags`    一次性推送很多标签  
-`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag  
+Final release version
+`git merge --no-ff <branchName>`    使得合并操作总是产生一次新的提交
+`git merge --squash <branchName>`    把branchName上所有提交合并为一次提交到当前分支上再commit
+`git tag <tagName> -m "comment"`
+`git push origin --tags`    一次性推送很多标签
+`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
 
-`git log -g branchName` show Git branch created time just for local fetch/create time  
-`git log --name-only` show changed file name only  
+`git log -g branchName` show Git branch created time just for local fetch/create time
+`git log --name-only` show changed file name only
 `git show <commit-id>` show difference for a commit
-`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git  
-`git log --follow [file]`    显示某个文件的版本历史，包括文件改名  
-`git whatchanged [file]`    显示某个文件的版本历史，包括文件改名  
-`git log -p [file]`    显示指定文件相关的每一次diff  
-`git blame [file]`    显示指定文件是什么人在什么时间修改过  
-`git commit -v`  
+`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
+`git log --follow [file]`    显示某个文件的版本历史，包括文件改名
+`git whatchanged [file]`    显示某个文件的版本历史，包括文件改名
+`git log -p [file]`    显示指定文件相关的每一次diff
+`git blame [file]`    显示指定文件是什么人在什么时间修改过
+`git commit -v`
 
-`git ls-files` List all tracked files  
-`git checkout anotherBranch -- path/to/file` Copy file from another branch  
+`git ls-files` List all tracked files
+`git checkout anotherBranch -- path/to/file` Copy file from another branch
 
 ```bash
 # Replace master branch entirely from another latestBranch:
 
-git checkout latestBranch  
+git checkout latestBranch
 git merge -s ours master --allow-unrelated-histories
-git checkout master  
-git merge latestBranch  
+git checkout master
+git merge latestBranch
 ```
 
-git pull all the projects in the folder  
+git pull all the projects in the folder
 
 ```bash
 
@@ -68,22 +68,22 @@ done
 
 #### tag
 
-`git tag -m "comment" <tagName>`  
-`git tag -a <tagName> <commit-id>`  
-`git show <tagName>`    查看相应标签的版本信息，并连同显示打标签时的提交对象  
-`git push origin --tags`    一次性推送很多标签  
-`git checkout -b <branchName> <tagName>`  
-`git tag -d <tagname>`    刪除Tag  
-`git push origin :refs/tags/<tagName>`    刪除Tag from remote Git repositories  
+`git tag -m "comment" <tagName>`
+`git tag -a <tagName> <commit-id>`
+`git show <tagName>`    查看相应标签的版本信息，并连同显示打标签时的提交对象
+`git push origin --tags`    一次性推送很多标签
+`git checkout -b <branchName> <tagName>`
+`git tag -d <tagname>`    刪除Tag
+`git push origin :refs/tags/<tagName>`    刪除Tag from remote Git repositories
 
 ### Basic commands
 
-HEAD指向最后一次commit的信息  
-`git cat-file -p [SHA-1]` 输出数据内容  
-`git cat-file -t [SHA-1]` 输出数据对象的类型  
+HEAD指向最后一次commit的信息
+`git cat-file -p [SHA-1]` 输出数据内容
+`git cat-file -t [SHA-1]` 输出数据对象的类型
 
-`git log --stat -2` 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改  
-`git log --oneline`  
+`git log --stat -2` 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
+`git log --oneline`
 
 `git commit --amend -m "Comment"`
 `git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
@@ -104,15 +104,15 @@ Do the merge, and then pull the stash:
 
 批量修改为ssh协议 `find . -name config | grep .git | xargs sed -i 's#http://username@host:7990/scm#ssh://git@host:port#g'`
 
-`git remote add origin <server>` 将仓库连接到某个远程服务器  
+`git remote add origin <server>` 将仓库连接到某个远程服务器
 
 添加另一个仓库存储分支
 
 1. `git remote add anotherRepository URL`
 2. `git push anotherRepository remoteRepository`
 
-删除远程仓库 `git remote rm remoteRepository`  
-查看远程仓库信息 `git remote show origin`  
+删除远程仓库 `git remote rm remoteRepository`
+查看远程仓库信息 `git remote show origin`
 
 `git push remoteMachine localBranch:remoteBranch`
 `git push origin global:global`
@@ -122,18 +122,18 @@ Do the merge, and then pull the stash:
 `git push origin --tags`: 推送refs/tags/*
 `git push -u origin master` 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
 
-`git pull <远程主机名> <远程分支名>:<本地分支名>`  
-`git push <远程主机名> <本地分支名>:<远程分支名>`  
-`git branch --set-upstream master origin/next` 指定master分支追踪origin/next分支  
+`git pull <远程主机名> <远程分支名>:<本地分支名>`
+`git push <远程主机名> <本地分支名>:<远程分支名>`
+`git branch --set-upstream master origin/next` 指定master分支追踪origin/next分支
 
 (1) current status
 (2) After modified local files
 (3) After git add
-`git diff`得到的是从(2)到(1)的变化   
-`git diff --cached`得到的是从(3)到(2)的变化  
-`git diff HEAD`得到的是从(3)到(1)的变化  
-`git diff global origin/global`: fetch后对比文件  
-`gitk`: view commite graph  
+`git diff`得到的是从(2)到(1)的变化
+`git diff --cached`得到的是从(3)到(2)的变化
+`git diff HEAD`得到的是从(3)到(1)的变化
+`git diff global origin/global`: fetch后对比文件
+`gitk`: view commite graph
 
 ### Advanced Command
 
@@ -153,10 +153,10 @@ Do the merge, and then pull the stash:
     总之，就是让这个文件回到最近一次git commit或git add时的状态。
 
 回退总结
-    场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`  
-    场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。  
-    场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。  
-恢复 `git reset --hard` 删除的文件 通过`git reflog`找到commitID,然后`git reset --hard commitID`  
+    场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
+    场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
+    场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
+恢复 `git reset --hard` 删除的文件 通过`git reflog`找到commitID,然后`git reset --hard commitID`
 
 ### stage part of a new file, but not the whole file
 
@@ -168,16 +168,16 @@ Then, you will need to use the e option to manually choose which lines to add. R
 ### Untrack files
 
 删掉已经track的文件  This will tell git you want to start ignoring the changes to the file
-`git update-index --assume-unchanged path/to/file`  
-When you want to start keeping track again  
-`git update-index --no-assume-unchanged path/to/file`  
+`git update-index --assume-unchanged path/to/file`
+When you want to start keeping track again
+`git update-index --no-assume-unchanged path/to/file`
 停止追踪一个文件 `git rm --cached path/to/file`
 
 ### [Get rid of large files](https://help.github.com/articles/remove-sensitive-data)
 
-`git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty`  
-`git gc --aggressive --prune`  
-`git push origin --force --all`  
+`git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty`
+`git gc --aggressive --prune`
+`git push origin --force --all`
 
 ### .gitignore文件的例子 [git ignore](https://www.gitignore.io/api/intellij,linux,windows,eclipse,java,scala,osx,maven,gradle,sbt,svn)
 
@@ -206,7 +206,7 @@ download git-completion.bash from source code and load it from .bashrc
 
 ### git status 中文
 
-默认中文文件名是 `\xxx\xxx` 等八进制形式 , 是因为 对`0x80`以上的字符进行quote, 只需要 `git config --global core.quotepath false`  
+默认中文文件名是 `\xxx\xxx` 等八进制形式 , 是因为 对`0x80`以上的字符进行quote, 只需要 `git config --global core.quotepath false`
 
 ### git中文乱码解决(git bash中的中文乱码问题)
 
@@ -241,11 +241,13 @@ Next: Create a README for your repo.
 1. Create the README file
     In the prompt, type the following code:
 
-        $ mkdir ~/Hello-World    //Creates a directory for your project called "Hello-World" in your user directory
-        $ cd ~/Hello-World    //Changes the current working directory to your newly created directory
-        $ git init    //Sets up the necessary Git files
-        Initialized empty Git repository in /Users/your_user_directory/Hello-World/.git/
-        $ touch README
+```bash
+$ mkdir ~/Hello-World    //Creates a directory for your project called "Hello-World" in your user directory
+$ cd ~/Hello-World    //Changes the current working directory to your newly created directory
+$ git init    //Sets up the necessary Git files
+Initialized empty Git repository in /Users/your_user_directory/Hello-World/.git/
+$ touch README
+```
 
 Open the new README file found in your Hello-World directory in a text editor and add the text "Hello World!" When you are finished, save and close the file.
 2. Commit your README
@@ -253,16 +255,16 @@ Open the new README file found in your Hello-World directory in a text editor an
         More about commits
         Think of a commit as a snapshot of your project — code, files, everything — at a particular point in time. More accurately, after your first commit, each subsequent commit is only a snapshot of your changes. For code files, this means it only takes a snapshot of the lines of code that have changed. For everything else like music or image files, it saves a new copy of the file.
 
-        `$ git add README    //Stages your README file, adding it to the list of files to be committed`
-        `$ git commit -m 'first commit'    //Commits your files, adding the message "first commit"`
+`$ git add README    //Stages your README file, adding it to the list of files to be committed`
+`$ git commit -m 'first commit'    //Commits your files, adding the message "first commit"`
 
 THE CODE ABOVE EXECUTES ACTIONS LOCALLY, meaning you still haven't done anything on GitHub yet. To connect your local repository to your GitHub account, you will need to set a remote for your repo and push your commits to it:
         More about remotes
         A remote is a repo stored on another computer, in this case on GitHub's server. It is standard practice (and also the default in some cases) to give the name origin to the remote that points to your main offsite repo (for example, your GitHub repo).
     Git supports multiple remotes. This is commonly used when forking a repo.
 
-        `$ git remote add origin git@github.com:petergithub/Hello-World.git    //Sets the origin for the Hello-World repo`
-        `$ git push -u origin master    //Sends your commit to GitHub`
+`$ git remote add origin git@github.com:petergithub/Hello-World.git    //Sets the origin for the Hello-World repo`
+`$ git push -u origin master    //Sends your commit to GitHub`
 
 Now if you look at your repository on GitHub, you will see your README has been added to it.
 Your README has been created
