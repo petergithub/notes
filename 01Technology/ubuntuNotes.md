@@ -2285,6 +2285,7 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
 
 `netstat -anp | grep PORT` Listening open ports
 `netstat -antup` 查看已建立的连接进程, 所占用的端口
+Mac OS X: `netstat -anv | grep PORT` 倒数第四个是进程号  或者 `lsof -i -P | grep 9091`
 
 ##### ss
 
