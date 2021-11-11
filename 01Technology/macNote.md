@@ -182,11 +182,17 @@ configure control + scroll-wheel to increase/decrease zoom in VS Code:
 edit settings.json and add this line: "editor.mouseWheelZoom": true
 or go to settings CTRL + , or File > Preferences > Settings and search for mouseWheelZoom
 
+执行文字相关的导航或操作时将用作文字分隔符的字符(比如双击选中文字, 只会选中下面分隔符中的文字)
+"editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/！（）｛｝【】、；：’”，。《》？?"
+
 #### vs code plugin
+
+`code --list-extensions | xargs -L 1 echo code --install-extension` to list all extensions with installation command
 
 [Markdown Preview Enhanced is a SUPER POWERFUL markdown extension](https://shd101wyy.github.io/markdown-preview-enhanced/)
 [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one#keyboard-shortcuts-1)
 [PicGo - A fast and powerful image uploading plugin](https://marketplace.visualstudio.com/items?itemName=Spades.vs-picgo)
+[Better Outline](https://marketplace.visualstudio.com/items?itemName=adamerose.better-outline): text outline
 
 ### Mac common
 
