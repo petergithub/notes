@@ -4,8 +4,8 @@
 
 ## Recent
 
-1. Display filter `ip.addr == 124.251.36.121 && tcp.port == portNumber`  
-2. `Follow TCP/UDP Stream`  
+1. Display filter `ip.addr == 124.251.36.121 && tcp.port == portNumber`
+2. `Follow TCP/UDP Stream`
 3. Wireshark的`Analyze-->Expert Info Composite`，就可以在不同标签下看到不同级别的提示信息。比如重传的统计、连接的建立和重置统计，等等。在分析网络性能和连接问题时，我们经常需要借助这个功能
 4. 单击`Statistics-->Service Response Time`，再选定协议名称，可以得到响应时间的统计表
 5. 单击`Statistics-->TCP Stream Graph`，可以生成几类统计图。比如我曾经用Time-Sequence Graph (Stevens)
@@ -15,8 +15,8 @@
 
 ### Capture filter
 
-`host domainName`  
-`host IP`  
+`host domainName`
+`host IP`
 `port portNumber`
 
 #### Protocol（协议）
@@ -62,7 +62,7 @@ src net 192.168.0.0 mask 255.255.255.0  //捕捉源地址为192.168.0.0网络内
 http.host == login.tclclouds.com
 ip.addr == 124.251.36.121 or ip.addr == 124.251.36.122
 http and ip.addr == 124.251.36.121 and ip.dst ==124.251.43.33
-`tcp.port == portNumber`  
+`tcp.port == portNumber`
 
 wireshark http数据包过滤条件列表
 

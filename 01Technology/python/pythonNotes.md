@@ -13,7 +13,7 @@ requests.exceptions.SSLError: HTTPSConnectionPool(host='pypi.org', port=443): Ma
 
 `sudo python -m pip install package`
 
-`brew switch python 3.6.5_1`  `brew switch python 3.7.0`  
+`brew switch python 3.6.5_1`  `brew switch python 3.7.0`
 
 `$ brew unlink python`
 `$ brew install https://raw.githubusercontent.com/Homebrew/homebrew-core/f2a764ef944b1080be64bd88dca9a1d80130c558/Formula/python.rb`
@@ -30,7 +30,7 @@ wget https://www.python.org/ftp/python/3.6.13/Python-3.6.13.tgz
 tar xzf Python-3.6.13.tgz
 
 cd Python-3.6.13
-./configure --enable-optimizations 
+./configure --enable-optimizations
 # prevent replacing the default python binary file /usr/bin/python
 make altinstall
 # make && make install
@@ -259,6 +259,10 @@ time0 = time.perf_counter()
 print(time.perf_counter() - time0)
 
 ```
+
+## Execute
+
+`export PYTHONPATH=. && python /path/to/script.py`
 
 ## Web
 
