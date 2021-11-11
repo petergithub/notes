@@ -17,11 +17,13 @@ crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
 `rabbitmq-upgrade` for maintenance tasks related to upgrades
 
 ``` bash
-service rabbitmq-server statrt
+service rabbitmq-server start
 service rabbitmq-server stop
 service rabbitmq-server status
 rabbitmqctl status
 rabbitmqctl environment # 环境信息
+# log path: /usr/local/rabbitmq/var/log/
+# /var/log/rabbitmq/
 
 rabbitmqctl list_vhosts
 rabbitmqctl list_queues -p <vhost>
@@ -29,7 +31,7 @@ rabbitmqctl list_consumers -p <vhost>
 rabbitmqctl list_exchanges -p push-center
 rabbitmqctl list_users # 查看用户
 rabbitmqctl list_user_permissions username
-rabbitmqctl purge_queue queue.name.development -p <vhost>
+rabbitmqctl purge_queue -p <vhost> queue.name.development
 curl -X DELETE -i -u guest:guest "http://localhost:15672/api/queues/local/gongzhonghao.refreshAccessToken.queue.name.development"
 ```
 
@@ -47,8 +49,8 @@ rabbitmqctl set_permissions -p vhost_name admin ".*" ".*" ".*"
 RabbitMQ has a web management console. To enable web management console run : `rabbitmq-plugins enable rabbitmq_management`
 `http://localhost:15672/   guest / guest`
 
-`curl -i -u guest:guest "http://localhost:15672/api/overview"`  
-`curl -i -u guest:guest "http://localhost:15672/api/queues/push-center/push.schedule.push.queue.name.publish"`  
+`curl -i -u guest:guest "http://localhost:15672/api/overview"`
+`curl -i -u guest:guest "http://localhost:15672/api/queues/push-center/push.schedule.push.queue.name.publish"`
 
 The OS limits are controlled via a configuration file at `/etc/systemd/system/rabbitmq-server.service.d/limits.conf`
 
@@ -70,7 +72,7 @@ rabbitmq-diagnostics status --help
 
 ### Ubuntu
 
-install erlang  
+install erlang
 
 ``` bash
 wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb

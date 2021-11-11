@@ -12,6 +12,8 @@ Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 emacs save and quit: `Ctrl+x, Ctrl+c`
 [Emacs Basics](http://ergoemacs.org/emacs/emacs_basics.html)
 
+[命令行的艺术](https://github.com/jlevy/the-art-of-command-line/blob/master/README-zh.md)
+
 16 进制数字 10 进制转换 `printf '%d\n' 0x11`
 Convert a number from hexadecimal to decimal: `printf '%d\n' 0xff`  or `echo $((0xFF))`
 Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
@@ -331,6 +333,8 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 #### 文件对比 合并 多窗口
 
 `diff -u`
+`diffstat` 查看变更总览数据
+`diff -r` 对整个文件夹有效。使用 `diff -r tree1 tree2 | diffstat` 查看变更的统计数据
 `vimdiff  FILE_LEFT  FILE_RIGHT`
 `:qa` (quit all)同时退出两个文件
 `:wa` (write all)
@@ -598,55 +602,75 @@ Vim中查看文件编码 `:set fileencoding`
 
 #### Common usage 例子
 
-`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者
-`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`    print each filed number
-`awk -F ':' 'NR >3 {print $1}' demo.txt`  # 输出第三行以后的行
-`ls -1 | awk 'ORS=","' | head -c -1` 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter  或者 `ls -1 | paste -sd "," -`
+``` bash
+# 按逗号分割字段输出成行, 来查看需要打印的行数
+ps -ef | head -n 2 | awk '{print ++i,$i}'
+#  或者 print each filed number
+ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'
+# print the process by "root", $1 match root
+ps -ef | awk '$1~/root/ {print $0}' | less
+# print in format
+ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head
+
+# 输出第三行以后的行
+awk -F ':' 'NR >3 {print $1}' demo.txt
+
+# 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter  
+ls -1 | awk 'ORS=","' | head -c -1
+# 或者
+ls -1 | paste -sd "," -
+
+# awk求和 sum
+echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'
+# 求TCP重传率
+cat /proc/net/snmp | grep Tcp | grep -v RetransSegs | awk '{print $13/$12}'
+
+# query ~/.ssh/config to get aliases in to IP addresses
+awk '/Host $youralias/ { print $2; getline; print $2;}' ~/.ssh/config
+
+# Using bash shell function inside AWK: system(cmd) executes cmd and returns its exit status
+# download in batch
+ossutil ls oss://path/to/202109/02/ | sort -k 2 | awk '$2>"14:28:00" && $2<"14:32:00" {print $8; system("ossutil cp " $8 " .")}'
+```
 
 `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
 `awk '$5 ~ /ldb/ {print}' f.txt` #第五列匹配ldb
 `alias aprint='awk "{print \$1}"'`  the $ is preceded by a \ to prevent $1 from being expanded by the shell.
 `w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0
-`ps -ef | awk '$1~/root/ {print $0}' | less` print the process by "root", $1 match root
-`ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head` print in format
-`f'/Host $youralias/ { print $2; getline; print $2;}' .ssh/config` query ~/.ssh/config to get aliases in to IP addresses
 `awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
 `awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS
 `echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
-
-按时间段查询: `cat log | awk '$1=="Nov" && $2=="1"' | awk '$3>="08:00:00" && $3<"23:00:00"' > file.log`
-
-按时间区间查询:
-`awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
-`awk '$1>startTime && $1<endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log`
-
-awk求和 sum  `echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'`
-求TCP重传率 `cat /proc/net/snmp | grep Tcp | grep -v RetransSegs | awk '{print $13/$12}'`
-
-删掉所有空行 `awk <pattern> '{print <stuff>}' <file>`
 Print every line that has at least one field: `awk 'NF > 0' data`
 
 过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=
 保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
 
-tomcat `localhost_access_log` filter with http status code: `awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'`
-
 awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`
  with `'\''` you close the opening `'`, then print a literal `'` by escaping it and finally open the ' again.
 escape square brackets: Brackets `[` need double escape `\\`: `\\[`
 
-awk 16进制转换
+##### 日志解析
 
-``` bash
+```bash
+# tomcat localhost_access_log filter with http status code
+awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'
+
+# 按时间区间查询:
+awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log
+awk '$1>=startTime && $1<=endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log
+```
+
+##### awk 16进制转换
+
+```bash
 echo "D0490012475E" | awk '{
     p0=("0x" $1);
     p1=(substr($1,1,2) ":" substr($1,3,2) ":" substr($1,5,2) ":" substr($1,7,2) ":" substr($1,9,2) ":" substr($1,11,2))
     printf "insert into device (mac,macHex,deviceId,area,createTime) values (%d,\"%s\",9,0,now()) \n", p0,p1;
     }'
+# hex 转成 decimal 实际利用的是`printf :  printf %d "0x109e3a022559"`
+# decimal 转成 hex: `printf "%x\n" 18271764096345`
 ```
-
-hex 转成 decimal 实际利用的是`printf :  printf %d "0x109e3a022559"`
-decimal 转成 hex: `printf "%x\n" 18271764096345`
 
 #### awk 语法
 
@@ -916,6 +940,9 @@ It uses `/bin/sh`
 `-l` 列出crontab文件
 `-e` 编辑当前的crontab文件
 `-r` 删除当前的crontab文件
+
+crontab filename 以filename做为crontab的任务列表文件并载入
+
 crontab特殊的符号说明
 
 1. "*"代表所有的取值范围内的数字
@@ -1069,7 +1096,7 @@ Add comments for multi-lines
 * CTRL+c: 终止命令
 * CTRL+z: 挂起命令
 
-Bang (!) 命令
+Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node/Event-Designators.html#Event-Designators)
 
 * `!!` or `!-1` : 执行上一条命令 Run the last command-name
 * `!-2` : 执行倒数第二条命令
@@ -1081,11 +1108,15 @@ Bang (!) 命令
 * `!*`: 上一条命令的所有参数
 * `!*:p`: 打印输出 `!*` 的内容
 
-* `!blah`: 执行最近的以 blah 开头的命令, 如 !ls
-* `!blah:p`: 仅打印输出, 而不执行
-* `^blah`: 删除上一条命令中的 blah
-* `^blah^foo`: 将上一条命令中的 blah 替换为 foo
-* `^blah^foo^`: 将上一条命令中所有的 blah 都替换为 foo
+* `!foo`: 执行最近的以 foo 开头的命令, 如 !ls
+* `!foo:p`: 仅打印输出, 而不执行
+* `^foo`: 删除上一条命令中的 foo
+* `^foo^foo`: 将上一条命令中的 foo 替换为 bar
+* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式
+  * `!!:gs/foo/bar/`
+  * `fc -s foo=bar` GNU bash, zsh
+  * `^foo^bar^:G` zsh
+  * `^foo^bar^` 未验证出来
 
 * `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响
 * `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
@@ -1712,7 +1743,8 @@ List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
 
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
 `var = raw_input('Prompt')`
-`python -m SimpleHTTPServer 8000`  HTTP服务在8000号端口上侦听
+`python -m SimpleHTTPServer 8000`  HTTP服务在8000号端口上侦听 Python 2
+`python -m http.server 7777` （使用端口 7777 和 Python 3）
 
 ## Softwares
 
@@ -1831,14 +1863,20 @@ gMTP connect to android from Ubuntu
 4. `mpstat -P ALL 1` ⟶  CPU balance
 5. `pidstat 1` ⟶  process usage
 6. `iostat -xz 1` ⟶  disk I/O
-7. `free -m` ⟶   memory usage
+7. `free -m` or `cat /proc/meminfo` ⟶   memory usage
 8. `sar -n DEV 1` ⟶   network I/O
 9. `sar -n TCP,ETCP 1` ⟶   TCP stats
 10. `top` ⟶  check overview
 
-11. `dmesg | tail` 输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`
+11. `dmesg -T | tail` 输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`
 12. `sysstat`工具与负载历史回放
 13. `dstat`
+
+```bash
+# dmesg -T 可以转换成可读时间
+# dmesg日志时间转换公式:log实际时间=格林威治1970-01-01+(当前时间秒数-系统启动至今的秒数+dmesg打印的log时间)秒数：
+date -d "1970-01-01 UTC `echo "$(date +%s)-$(cat /proc/uptime|cut -f 1 -d' ')+12288812.926194"|bc ` seconds"
+```
 
 [性能指标总结](http://blog.csdn.net/heyongluoyao8/article/details/51413668)
 
@@ -2761,6 +2799,25 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 
 ssh login log `/var/log/secure` is configured in /etc/ssh/sshd_config
 
+##### 开启认证代理连接转发功能
+
+[What is SSH Agent Forwarding and How Do You Use It?](https://www.cloudsavvyit.com/25/what-is-ssh-agent-forwarding-and-how-do-you-use-it/)
+[ssh转发代理：ssh-agent用法详解](https://www.cnblogs.com/f-ck-need-u/p/10484531.html)
+
+在 server 上使用本地的私钥来进行认证，不需要拷贝本地私钥到 server
+
+```bash
+# 添加密钥到ssh-agent的高速缓存中
+ssh-add ~/.ssh/id_rsa
+# 查看是否添加成功
+ssh-add -l
+
+# 注意 ssh 到第一台 server1 的时候，使用 -A 选项 开启认证代理连接转发功能
+ssh -A server1
+# 登录需要本地私钥的服务器，登陆其他 server2 的时候，只支持 ip 地址访问，可以在 server1 的 /etc/hosts 里面配置host，就可以通过主机名访问
+ssh -p port root@server2
+```
+
 ##### Troubleshooting sshd
 
 [OpenSSH Configuring](https://help.ubuntu.com/community/SSH/OpenSSH/Configuring)
@@ -2813,24 +2870,35 @@ vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 [远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html )
 [Linux下ssh动态端口转发](https://www.chenyudong.com/archives/linux-ssh-port-dynamic-forward.html )
 [实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward )
+[SSH隧道：端口转发功能详解](https://www.cnblogs.com/f-ck-need-u/p/10482832.html)
 
-动态转发:
+###### 动态转发
+
 `ssh -D <local port> <SSH Server>`    动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能
 `ssh -D 7070 remoteServer -gfNT` Dynamic forward all the connection by SOCKS
 `ssh -D 7070 -l username proxy.remotehost.com -gfNT -o ProxyCommand="connect -H web-proxy.oa.com:8080 %h %p "` 给ssh连接增加http代理, 如果你的PC无法直接访问到ssh服务器上，但是有http代理可以访问，那么可以为建立这个socks5的动态端口转发加上一个代理.
 其中ProxyCommand指定了使用`connect`程序(`sudo apt-get install connect-proxy`)来进行代理。通常还可以使用corkscrew来达到相同的效果。
 
-本地端口转发:
+###### 本地端口转发
+
 localhost 连不上remoteSecret, remoteHost可以连通localhost和remoteSecret, 通过remoteHost连上remoteSecret
-`ssh -L localPort:remoteSecret:remoteSecretPort remoteHost`    #在localhost执行本地端口转发Local forwarding:connect remoteSecret through remoteHost
-`ssh -L <localhost>:<local port>:<remote host>:<remote port> <SSH hostname>`  # localhost 可以是 0.0.0.0 运行本地网络的其他机器连接
+`ssh -gL localPort:remoteSecret:remoteSecretPort remoteHost`    #在localhost执行本地端口转发Local forwarding:connect remoteSecret through remoteHost
+`ssh -gL <localhost>:<local port>:<remote host>:<remote port> <SSH hostname>`  # localhost 可以是 0.0.0.0 运行本地网络的其他机器连接
 
-example: 通过 host3 的端口转发, ssh通过连接 localhost 登录 host2
+其工作方式为：在本地指定一个由ssh监听的转发端口(localPort)，将远程主机的端口(remoteSecret:remoteSecretPort)映射为本地端口(localPort)，当有主机连接本地映射端口(localPort)时，本地ssh就将此端口的数据包转发给中间主机(remoteHost)，然后 remoteHost 再与远程主机的端口(remoteSecret:remoteSecretPort)通信。
 
-1. `ssh -L 9001:host2:22 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
+example 1: 通过 host3 的端口转发, ssh通过连接 localhost 登录 host2
+
+1. `ssh -gfNTL 9001:host2:22 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
 2. `ssh -p 9001 localhost` ssh登录本机的9001端口, 相当于连接host2的22端口
 
-远程端口转发:
+example 2: 通过 host3 的端口转发, local 通过连接 localhost:9001 访问 host2:80
+
+1. `ssh -gfNTL 9001:host2:80 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
+2. `curl localhost:9001` ssh登录本机的9001端口, 相当于连接host2的22端口
+
+###### 远程端口转发
+
 localhost与remoteSecret之间无法连通, 必须借助remoteHost转发, 不过remoteHost是一台内网机器, 它可以连接外网的localhost, 但是反过来就不行, 外网的localhost连不上内网的remoteHost.
 解决办法:从remoteHost上建立与localhost的SSH连接, 然后在localhost上使用这条连接
 
@@ -2912,8 +2980,10 @@ trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 
 #### pssh
 
+pssh  is  a  program  for executing ssh in parallel on a number of hosts.
+
 `pssh -ih /path/to/host.txt date` Pass list of hosts using a file
-`pssh -iH "host1 host2" -l root date` Pass list of hosts manually
+`pssh -iH "host1 host2" date` Pass list of hosts manually
 `pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
     Using `-o` or `--outdir` you can save standard output to files
     Using `-e` or `--errdir` you can save standard error to files
@@ -2922,6 +2992,8 @@ trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 
 `scp client_file user@host:filepath`    上传文件到服务器端
 `scp user@host:server_files client_file_path`    下载文件
+`scp -3 -P port1 ruser1@rhost1:/rpath/1 scp://ruser2@rhost2:port2/rpath/2` scp from rhost1 to rhost2
+
 client_file 待上传的文件, 可以有多个, 多个文件之间用空格隔开. 也可以用*.filetype上传某个类型的全部文件
 user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
 

@@ -5,6 +5,8 @@
 batch delete `kdelp $(kgp -l | grep Evicted | awk '{print $1}')`
 kubelet summary API `http://localhost:8001/api/v1/nodes/node-name/proxy/stats/summary`
 
+install arthas: `kubectl exec -it podName -- /bin/bash -c "wget https://arthas.aliyun.com/arthas-boot.jar && java -jar arthas-boot.jar"`
+
 ### 获取信息 排查问题
 
 kubectl get events -A -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message |less
@@ -42,7 +44,7 @@ The expression 0.1 is equivalent to the expression 100m, which can be read as "o
 
 排查问题
 `kubectl get events`
-`kubectl -n namespace top pods`
+`kubectl -n namespace top pods --containers`
 `kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
 `kubectl get events --sort-by=.metadata.creationTimestamp`
 `kubectl get events -o yaml|less`
@@ -111,6 +113,7 @@ accessing your service through its external ip `curl 104.155.74.57:8080`
     `--previous` figure out why the previous container
 
 `kubectl exec -it <pod name> -- /bin/sh`  进入pod内部
+`kubectl exec -it [POD_NAME] -c [CONTAINER_NAME] -- /bin/sh -c "kill 1"` restart the specific container
 `kubectl port-forward pod-name 8888:8080` forwarding a local network port 8888 to a port 8080 in the pod
 
 `k top node` node 资源使用情况
@@ -122,8 +125,8 @@ COMMUNICATING WITH PODS THROUGH THE API SERVER
 use localhost:8001 rather than the actual API server host and port. You’ll send a request to the kubia-0 pod like this:
 `curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/`
 
-`kubectl autoscale deployment kubia --cpu-percent=30 --min=1 --max=5` creates the HPA object for you and sets the Deployment called kubia as the scaling target
-`kubectl get hpa`
+`kubectl autoscale deployment kubia --cpu-percent=30 --min=1 --max=5` creates the HorizontalPodAutoscaler(HPA) object for you and sets the Deployment called kubia as the scaling target
+`kubectl get hpa` HorizontalPodAutoscaler
 a container’s CPU utilization is the container’s actual CPU usage divided by its requested CPU
 `kubectl cordon <node>` marks the node as unschedulable (but doesn’t do anything with pods running on that node).
 `kubectl drain <node>` marks the node as unschedulable and then evicts all the pods from the node.
@@ -203,6 +206,24 @@ deployment strategies:
 `kubectl delete ns custom-namespace` delete the whole namespace (the pods will be deleted along with the namespace automatically)
 `kubectl delete po --all` Deleting all pods in a namespace, while keeping the namespace
 `kubectl delete all --all` Deleting (almost) all resources in a namespace
+
+### Ingress
+
+```yaml
+    # HTTP 413 错误 （ Request entity too large 请求实体太大 ）
+    # Custom max body size
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    # Client Body Buffer Size
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#client-body-buffer-size
+    nginx.ingress.kubernetes.io/client-body-buffer-size: 21m
+
+    # Configuration snippet
+    # Using this annotation you can add additional configuration to the NGINX location
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#configuration-snippet
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+        client_body_buffer_size 21m;
+```
 
 ### ConfigMap
 
@@ -355,7 +376,7 @@ helm uninstall gitlab
 
 [Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
 [kube-ps1](https://github.com/jonmosco/kube-ps1)
-`brew install kube-ps1`
+`brew install kube-ps1 stern`
 kube-shell `pip install kube-shell --user -U`
 `brew install kubectx`
 切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
@@ -380,14 +401,11 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 阿里云 kubernetes 配置
 
-1. 配置 configmap: 容器服务 -> 应用配置-> 配置项 -> tcp-services -> 添加 名称: config-name, 值: namespace/serviceName:service port, 注意名称config-name 需要配置到 ingress 容器端口, 例如 22:kube-ops/gitlab:22
-2. 配置 service: 容器服务 -> 路由与负载均衡 -> 服务 -> nginx-ingress-lb -> 更新 增加端口
+1. 配置 configmap: 容器服务 -> 应用配置-> 配置项 -> tcp-services -> 添加 名称: config-name, 值: namespace/serviceName:service port, 注意名称config-name 需要配置到 ingress 容器端口, 例如 `5672:rabbitmq-system/rabbitmqcluster:5672` 或者用命令 `kubectl -n kube-system patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'`
+2. 配置 service: 容器服务 -> 网络 -> 服务 -> nginx-ingress-lb -> 更新 增加端口
    port 是暴露的公网端口(控制台叫做 服务端口), targetPort 是 configmap 名称 (控制台叫做 容器端口), 这里容器端口只能是数字, 所以反过来限制第一步的 config-name 只能用数字
 
-然后 ingress 会动态读取tcp-services 暴露端口
-tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-
-`kubectl patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'`
+然后 `ingress` 会动态读取`tcp-services` 暴露的端口 `tcp-services-configmap=$(POD_NAMESPACE)/tcp-services`
 
 reference:
 [玩转Kubernetes TCP Ingress](https://developer.aliyun.com/article/603225)

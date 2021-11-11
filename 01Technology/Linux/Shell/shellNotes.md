@@ -73,7 +73,7 @@ echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一�
 
 ```
 
-#### 字符串替换
+#### 字符串替换 replace
 
 - `${var//\"/}` 将"替换成空
 - `${var/a/b}` 将a替换成b
@@ -297,18 +297,41 @@ done
     fi
 ```
 
+```bash
+VAR1=var
+VAR2=var
+VAR3=var
+if [[ "$VAR1" = "$VAR2" ]] || [[ "$VAR1" = "$VAR3" ]]; then
+    echo "字符串是相等的。"
+else
+    echo "字符串是不相等的。"
+fi
+```
+
 #### switch流程控制
 
 ``` bash
-    case expression in
-        pattern1)
-            do something... ;;
-        pattern2)
-            do something... ;;
-        pattern2)
-            do something... ;;
-        ...
-    esac
+case expression in
+    pattern1)
+        do something...
+        ;;
+    pattern2)
+        do something...
+        ;;
+    pattern2)
+        do something...
+        ;;
+esac
+
+
+case test_a_sentence in
+    *"test"*)
+        echo "in case test"
+        ;;
+    *)
+        echo "default case "
+        ;;
+esac
 ```
 
 ``` bash

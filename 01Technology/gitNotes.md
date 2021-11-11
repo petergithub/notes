@@ -91,6 +91,7 @@ HEAD指向最后一次commit的信息
 `git rebase --onto master commitId` 在非master分支上执行,在master上重复commitId之后的提交,开区间
 `git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
 `git cherry-pick` 使用cherry pick在各个分支间同步代码
+`git cherry-pick r1..r2` cherry pick commit (r1, r2] exclude r1. See `man gitrevisions`
 `git clean` clean untracked files
 `git branch -m <oldname> <newname>`
 `git branch -a`: show all branch (remote and local)

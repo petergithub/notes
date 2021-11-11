@@ -12,7 +12,7 @@
 `docker run` 只在第一次运行时使用，将镜像放到容器中，以后再次启动这个容器时，使用 `docker start imageName`
 
 `docker start docker-mysql-5.6`
-`docker exec -it docker-mysql-5.6 bash` 进入一个正在运行的 docker 容器 `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
+`docker exec -it docker-mysql-5.6 bash` 进入一个正在运行的 docker 容器 `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container
 
 [Networking features in Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/networking/)
 connect from a container to a service on the host: connect to the special DNS name `host.docker.internal`, which resolves to the internal IP address used by the host. This is for development purpose and will not work in a production environment outside of Docker for Mac.
@@ -22,45 +22,55 @@ connect from a container to a service on the host: connect to the special DNS na
 `docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container
 `docker run = docker create + docker start`
 
-* `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
-* `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上  
-* `-i` 让容器的标准输入保持打开  
-* `-p` [host:]port:dockerPort
-* `-d` 后台运行
-* `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`  
-* `--rm` 在容器终止运行后自动删除容器文件  
-* `-v, --volume "/path/to/host/machine:/path/to/container`
-* `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
+- `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
+- `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
+- `-i` 让容器的标准输入保持打开
+- `-p` [host:]port:dockerPort
+- `-d` 后台运行
+- `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
+- `--rm` 在容器终止运行后自动删除容器文件
+- `-v, --volume "/path/to/host/machine:/path/to/container`
+- `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
 
-`docker start -i <image_id>` Start a existed container  
+`docker start -i <image_id>` Start a existed container
 `docker attach <container_id>` Attach a running container
-`docker exec -it [containerID] /bin/bash` 进入正在运行的容器  `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container  
+`docker exec -it [containerID] /bin/bash` 进入正在运行的容器  `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container
 `docker inspect containerID` 查看信息
+`docker update --restart=no $(docker ps -a -q)` updates the restart-policy
 
 `exit` 退出
 `docker stop <hash>` Gracefully stop the specified container
-`docker kill [containID]` 手动终止容器  
+`docker kill [containID]` 手动终止容器
 
-`docker ps` Show running containers  
+`docker ps` Show running containers
 
-* `-a, --all` Show all containers (default shows just running)  
-* `-n, --last int` Show n last created containers (includes all states) (default -1)  
-* `-l, --latest` Show the latest created container (includes all states)  
+- `-a, --all` Show all containers (default shows just running)
+- `-n, --last int` Show n last created containers (includes all states) (default -1)
+- `-l, --latest` Show the latest created container (includes all states)
 
 `docker system df` 磁盘占用
+
+`docker stats`  a live look at your containers resource utilization
+
+- Memory is listed under the MEM USAGE / LIMIT column. This provides a snapshot of how much memory the container is utilizing and what it’s memory limit is.
+- CPU utilization is listed under the CPU % column.
+- Network traffic is represented under the NET I/O column. It displays the outgoing and incoming traffic consumption of a container.
+- Storage utilization is shown under the BLOCK I/O column. This show you the amount of reads and writes a container is peforming to disk.
+
+`docker stats --no-stream` the first stats pull results
 
 ### image
 
 `docker images` Show all images in your local repository
 
-`docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`  
-`docker tag server:latest myname/server:latest` Rename image  
+`docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`
+`docker tag server:latest myname/server:latest` Rename image
 `docker tag IMAGE[:TAG] [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]`
 
-`docker rm <container_id/contaner_name>`  
+`docker rm <container_id/contaner_name>`
 `docker rm $(docker ps -a -q | grep -v $(docker ps -q))` Remove all containers from this machine except the running one
 `docker rm $(docker ps -a -q)` Remove all containers from this machine
-`docker rmi <image_id/image_name ...>`  
+`docker rmi <image_id/image_name ...>`
 `docker image prune` clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. [Prune unused Docker objects](https://docs.docker.com/config/pruning/)
 
 `docker save <image-id> -o filename` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
@@ -71,7 +81,7 @@ connect from a container to a service on the host: connect to the special DNS na
 
 #### build image with Dockerfile
 
-`docker build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`  
+`docker build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`
 
 [Dockerfile最佳实践](https://zhuanlan.zhihu.com/p/75013836)
 将标准日志与错误日志分别输出到stdout与stderr
@@ -86,7 +96,7 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 
 ### 和系统交互
 
-拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`  
+拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`
 
 ### Docker 中国官方镜像
 
@@ -160,13 +170,13 @@ CMD ["/usr/sbin/init"]
 
 [How to copy docker images from one host to another without via repository?](https://stackoverflow.com/questions/23935141/how-to-copy-docker-images-from-one-host-to-another-without-via-repository )
 
-1. save the docker image as a tar file: `docker save -o <path for generated tar file> <image name>`  
-2. copy your image to a new system with regular file transfer tools such as cp or scp.  
+1. save the docker image as a tar file: `docker save -o <path for generated tar file> <image name>`
+2. copy your image to a new system with regular file transfer tools such as cp or scp.
 3. load the image into docker: `docker load -i <path to image tar file>`
 4. list the images: `docker images`
 
-or  
-Transferring a Docker image via SSH, bzipping the content on the fly, put pv in the middle of the pipe to see how the transfer is going  
+or
+Transferring a Docker image via SSH, bzipping the content on the fly, put pv in the middle of the pipe to see how the transfer is going
 `docker save <image> | bzip2 | pv | ssh user@host 'bunzip2 | docker load'`
 
 #### Docker commit the changes you make to the container and then run it
@@ -179,10 +189,10 @@ Transferring a Docker image via SSH, bzipping the content on the fly, put pv in 
 
 #### 端口映射
 
-因为docker容器中运行的软件所使用的端口,在本机和本机的局域网内是无法访问到的,所以我们要给docker容器中端口映射到当前主机的端口上,  
-这样才能在本机和本机所在的局域网内访问到.(Windows环境下的docker要做两次端口映射)  
-docker的端口映射是通过-p参数来实现的.  
-例如下面 , 将端口6379映射到6378  
+因为docker容器中运行的软件所使用的端口,在本机和本机的局域网内是无法访问到的,所以我们要给docker容器中端口映射到当前主机的端口上,
+这样才能在本机和本机所在的局域网内访问到.(Windows环境下的docker要做两次端口映射)
+docker的端口映射是通过-p参数来实现的.
+例如下面 , 将端口6379映射到6378
 `docker run -d -p [host:]6378:6379 --name port-redis redis`
 `docker run -d -p 8083:8080 7c34bafd1150` (使用imagesid启动tomcat)
 

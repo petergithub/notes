@@ -16,26 +16,51 @@ SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swa
 concurrent: 主内存.寄存器是是运行时?
 
 并发Concurrent 并发指能够让多个任务在逻辑上交织执行的程序设计
+
+```shell
           --  --  --
         /              \
 >---- --    --  --  -- ---->>
+```
 
 并行Parallel 并行指物理上同时执行
+
+```shell
      ------
     /      \
 >-------------->>
+```
 
 jcmd jhsdb
 
 [OpenJDK](https://openjdk.java.net/)
-[JDK 16 Documentation](https://docs.oracle.com/en/java/javase/16/books.html)
 
 ### 常用参数
 
-`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
+`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
 `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
--XX:+Pringflagsfinal 打印平台默认值  
-[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)  
+-XX:+Pringflagsfinal 打印平台默认值
+[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)
+
+## Java 17
+
+[JDK 17 Documentation](https://docs.oracle.com/en/java/javase/17/)
+[JDK 17 readme](https://www.oracle.com/java/technologies/javase/jdk17-readme-downloads.html)
+[JDK 17 Tool Specifications](https://docs.oracle.com/en/java/javase/17/docs/specs/man/index.html)
+[JDK 17 New Feature](https://www.oracle.com/java/technologies/javase/17-relnote-issues.html#NewFeature)
+[JDK 17 Books](https://docs.oracle.com/en/java/javase/17/books.html)
+
+### Flight Recorder
+
+[Flight Recorder API Programmer’s Guide](https://docs.oracle.com/en/java/javase/17/jfapi/creating-and-recording-your-first-event.html)
+[The jfr Command](https://docs.oracle.com/en/java/javase/17/docs/specs/man/jfr.html)
+
+## Java 8
+
+method reference :: syntax (meaning “use this method as a value”
+`File[] hiddenFiles = new File(".").listFiles(File::isHidden);`
+
+## Java问题排查工具箱
 
 ### [Arthas](https://github.com/alibaba/arthas)
 
@@ -43,10 +68,11 @@ jcmd jhsdb
 download: `wget https://alibaba.github.io/arthas/arthas-boot.jar`
 startup: `java -jar arthas-boot.jar`
 
-[watch](https://alibaba.github.io/arthas/en/quick-start.html#watch)
-watch Demo$Counter method {params,returnObj}
-watch com.company.EnvironmentEnum isAbroad {params,returnObj} -x 3
-watch com.company.Service method {params,returnObj} "params[0]==1 && params[1]==new java.sql.Timestamp(1572424327000L)" -x 3
+[watch](https://arthas.aliyun.com/doc/en/watch.html) to view the return object and parameters
+`watch Demo$Counter method {params,returnObj}`
+`watch com.company.EnvironmentEnum isAbroad {params,returnObj} -x 3`  more detail `-x`
+`watch com.company.Service method {params,returnObj} "params[0]==1 && params[1]==new java.sql.Timestamp(1572424327000L)" -x 3`
+`watch com.company.Service method "{params[0],throwExp}" -e -x 2` Check exceptions
 
 [trace](https://alibaba.github.io/arthas/trace.html) 方法内部调用路径，并输出方法路径上的每个节点上耗时
 trace Demo$Counter getFactoryInfo #cost>10 -n 1
@@ -71,17 +97,10 @@ instrument：jdk1.5新增功能，通过instrument俗称javaagent技术，可以
 
 然后 arthas 和其他诊断工具一样，都是先通过attach链接上目标应用，通过instrument动态修改应用程序的字节码达到不重启应用而监控应用的目的
 
-## Java 8
-
-method reference :: syntax (meaning “use this method as a value”
-`File[] hiddenFiles = new File(".").listFiles(File::isHidden);`
-
-## Java问题排查工具箱
-
 ### java.net.SocketException 异常
 
-[understanding_some_common_socketexceptions_in_java3](https://www.ibm.com/developerworks/community/blogs/738b7897-cd38-4f24-9f05-48dd69116837/entry/understanding_some_common_socketexceptions_in_java3?lang=en)  
-[java.net.SocketException 异常](http://developer.51cto.com/art/201003/189724.htm)  
+[understanding_some_common_socketexceptions_in_java3](https://www.ibm.com/developerworks/community/blogs/738b7897-cd38-4f24-9f05-48dd69116837/entry/understanding_some_common_socketexceptions_in_java3?lang=en)
+[java.net.SocketException 异常](http://developer.51cto.com/art/201003/189724.htm)
 
 1. java.net.SocketException: Broken pipe (UNIX)
  A broken pipe error is seen when the remote end of the connection is closed gracefully.
@@ -92,12 +111,12 @@ Solution: This exception usually arises when the socket operations performed on 
 
 ### [高CPU占用分析](http://www.blogjava.net/hankchen/archive/2012/05/09/377735.html)
 
-一个应用占用CPU很高，除了确实是计算密集型应用之外，通常原因都是出现了死循环  
+一个应用占用CPU很高，除了确实是计算密集型应用之外，通常原因都是出现了死循环
 
 1. `top -H`
 2. 找到具体是CPU高占用的线程 `ps -mp <PID> -o THREAD,tid,time,rss,size,%mem`
 3. 将需要的线程ID转换为16进制格式 `printf "%x\n" tid`
-4. 打印线程的堆栈信息 `jstack PID | grep tid -A 30`  
+4. 打印线程的堆栈信息 `jstack PID | grep tid -A 30`
 
 #### checklist from linux to application process
 
@@ -130,9 +149,9 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### jemalloc 查看堆外内存 anon
 
-[native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )  
-[Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )  
-[Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )  
+[native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )
+[Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )
+[Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )
 [Using jemalloc to get to the bottom of a memory leak](https://gdstechnology.blog.gov.uk/2015/12/11/using-jemalloc-to-get-to-the-bottom-of-a-memory-leak/ )
 
 1. Starting your JVM with jemalloc `export LD_PRELOAD=/usr/local/lib/libjemalloc.so`
@@ -142,9 +161,9 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### gperf 查看堆外内存
 
-[Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )  
-[perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )  
-[Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )  
+[Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )
+[perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )
+[Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )
 
 1. `export GPERF_HOME=/path/to/gperftools-2.7`
 2. `export LD_PRELOAD=$GPERF_HOME/lib/libtcmalloc.so HEAPCHECK=normal`
@@ -153,7 +172,7 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### Valgrind
 
-[The Valgrind Quick Start Guide](http://valgrind.org/docs/manual/quick-start.html )  
+[The Valgrind Quick Start Guide](http://valgrind.org/docs/manual/quick-start.html )
 `valgrind ls -l >& valgrind.log`
 `valgrind --leak-check=yes myprog arg1 arg2`
 
@@ -171,33 +190,33 @@ Solution: This exception usually arises when the socket operations performed on 
 
 碰到一些CPU相关的问题时，通常需要用到的工具：
 
-`top (-H)` top可以实时的观察cpu的指标状况，尤其是每个core的指标状况，可以更有效的来帮助解决问题，-H则有助于看是什么线程造成的CPU消耗，这对解决一些简单的耗CPU的问题会有很大帮助。  
+`top (-H)` top可以实时的观察cpu的指标状况，尤其是每个core的指标状况，可以更有效的来帮助解决问题，-H则有助于看是什么线程造成的CPU消耗，这对解决一些简单的耗CPU的问题会有很大帮助。
 
-`sar` sar有助于查看历史指标数据，除了CPU外，其他内存，磁盘，网络等等各种指标都可以查看，毕竟大部分时候问题都发生在过去，所以翻历史记录非常重要。  
+`sar` sar有助于查看历史指标数据，除了CPU外，其他内存，磁盘，网络等等各种指标都可以查看，毕竟大部分时候问题都发生在过去，所以翻历史记录非常重要。
 
-`jstack` jstack可以用来查看Java进程里的线程都在干什么，这通常对于应用没反应，非常慢等等场景都有不小的帮助，jstack默认只能看到Java栈，而jstack -m则可以看到线程的Java栈和native栈，但如果Java方法被编译过，则看不到（然而大部分经常访问的Java方法其实都被编译过）。  
+`jstack` jstack可以用来查看Java进程里的线程都在干什么，这通常对于应用没反应，非常慢等等场景都有不小的帮助，jstack默认只能看到Java栈，而jstack -m则可以看到线程的Java栈和native栈，但如果Java方法被编译过，则看不到（然而大部分经常访问的Java方法其实都被编译过）。
 
-`pstack` pstack可以用来看Java进程的native栈。  
+`pstack` pstack可以用来看Java进程的native栈。
 
-`perf` 一些简单的CPU消耗的问题靠着 `top -H` + `jstack` 通常能解决，复杂的话就需要借助perf这种超级利器了。  
+`perf` 一些简单的CPU消耗的问题靠着 `top -H` + `jstack` 通常能解决，复杂的话就需要借助perf这种超级利器了。
 
 `cat /proc/interrupts` 之所以提这个是因为对于分布式应用而言，频繁的网络访问造成的网络中断处理消耗也是一个关键，而这个时候网卡的多队列以及均衡就非常重要了，所以如果观察到cpu的si指标不低，那么看看interrupts就有必要了。
 
 ### 内存相关工具 bluedavy
 
-碰到一些内存相关的问题时，通常需要用到的工具：  
+碰到一些内存相关的问题时，通常需要用到的工具：
 
-`jstat` `jstat -gcutil`或`-gc`等等有助于实时看gc的状况，不过我还是比较习惯看gc log。  
+`jstat` `jstat -gcutil`或`-gc`等等有助于实时看gc的状况，不过我还是比较习惯看gc log。
 
 `jmap` 在需要dump内存看看内存里都是什么的时候，`jmap -dump`可以帮助你；在需要强制执行fgc的时候（在CMS GC这种一定会产生碎片化的GC中，总是会找到这样的理由的），`jmap -histo:live`可以帮助你（显然，不要随便执行）。
 
-`gcore` 相比`jmap -dump`，其实我更喜欢gcore，因为感觉就是更快，不过由于某些jdk版本貌似和gcore配合的不是那么好，所以那种时候还是要用jmap -dump的。  
+`gcore` 相比`jmap -dump`，其实我更喜欢gcore，因为感觉就是更快，不过由于某些jdk版本貌似和gcore配合的不是那么好，所以那种时候还是要用jmap -dump的。
 
 `mat` 有了内存dump后，没有分析工具的话然并卵
 
-`btrace` 少数的问题可以mat后直接看出，而多数会需要再用btrace去动态跟踪，btrace绝对是Java中的超级神器，举个简单例子，如果要你去查下一个运行的Java应用，哪里在创建一个数组大小>1000的ArrayList，你要怎么办呢，在有btrace的情况下，那就是秒秒钟搞定的事，:)  
+`btrace` 少数的问题可以mat后直接看出，而多数会需要再用btrace去动态跟踪，btrace绝对是Java中的超级神器，举个简单例子，如果要你去查下一个运行的Java应用，哪里在创建一个数组大小>1000的ArrayList，你要怎么办呢，在有btrace的情况下，那就是秒秒钟搞定的事，:)
 
-`gperf` Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。  
+`gperf` Java堆内的内存消耗用上面的一些工具基本能搞定，但堆外就悲催了，目前看起来还是只有gperf还算是比较好用的一个，或者从经验上来说Direct ByteBuffer、Deflater/Inflater这些是常见问题。
 
 除了上面的工具外，同样内存信息的记录也非常重要，就如日志一样，所以像GC日志是一定要打开的，确保在出问题后可以翻查GC日志来对照是否GC有问题，所以像 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps -Xloggc:<gc log file>` 这样的参数必须是启动参数的标配。
 
@@ -215,26 +234,26 @@ Solution: This exception usually arises when the socket operations performed on 
 
 ### jvm log 时间格式
 
-打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
-打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`  
-`-Xloggc` 需要使用绝对路径  
-`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`  
-`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`  
-[Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)  
+打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`
+打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`
+`-Xloggc` 需要使用绝对路径
+`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
+`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
+[Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)
 
 ### ClassLoader相关工具
 
-作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是`-XX:+TraceClassLoading`，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用`jar -tvf *.jar`这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。  
+作为Java程序员，不碰到ClassLoader问题那基本是不可能的，在排查此类问题时，最好办的还是`-XX:+TraceClassLoading`，或者如果知道是什么类的话，我的建议就是把所有会装载的lib目录里的jar用`jar -tvf *.jar`这样的方式来直接查看冲突的class，再不行的话就要呼唤btrace神器去跟踪Classloader.defineClass之类的了。
 
 ### 其他工具
 
-`jinfo` Java有N多的启动参数，N多的默认值，而任何文档都不一定准确，只有用jinfo -flags看到的才靠谱，甚至你还可以看看jinfo -flag，你会发现更好玩的。  
+`jinfo` Java有N多的启动参数，N多的默认值，而任何文档都不一定准确，只有用jinfo -flags看到的才靠谱，甚至你还可以看看jinfo -flag，你会发现更好玩的。
 
-`dmesg` 你的java进程突然不见了？ 也许可以试试dmesg先看看。  
+`dmesg` 你的java进程突然不见了？ 也许可以试试dmesg先看看。
 
-`systemtap` 有些问题排查到java层面是不够的，当需要trace更底层的os层面的函数调用的时候，systemtap神器就可以派上用场了。  
+`systemtap` 有些问题排查到java层面是不够的，当需要trace更底层的os层面的函数调用的时候，systemtap神器就可以派上用场了。
 
-`gdb` 更高级的玩家们，拿着core dump可以用gdb来排查更诡异的一些问题。  
+`gdb` 更高级的玩家们，拿着core dump可以用gdb来排查更诡异的一些问题。
 
 ## Java Mermory check
 
@@ -243,13 +262,13 @@ Solution: This exception usually arises when the socket operations performed on 
 [Troubleshooting Guide for Java SE 6 with HotSpot VM](http://www.oracle.com/technetwork/java/javase/memleaks-137499.html#gdysp)
 jps: 虚拟机进程状况工具  (Java Virtual Machine Process Status Tool)
 jstat: 虚拟机统计信息工具  (Java Virtual Machine Statistics Monitoring Tool)
-jinfo: Java配置信息工具  
+jinfo: Java配置信息工具
 jmap: Java内存映像工具  (Memory Map)
 jhat: 虚拟机堆转储快照分析工具  (Java Heap Analysis Tool)
 jstack: Java堆栈跟踪工具  (Stack Trace)
-HSDIS: JIT生成代码反汇编  
-`jcmd 4874 VM.command_line` 打印指定线程的启动参数  
-HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`  
+HSDIS: JIT生成代码反汇编
+`jcmd 4874 VM.command_line` 打印指定线程的启动参数
+HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`
 [Serviceability in HotSpot](http://openjdk.java.net/groups/hotspot/docs/Serviceability.html)
 
 #### jmap
@@ -259,16 +278,16 @@ HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`
 常用用法：
 强制FGC：-histo:live
 dump堆：-dump:[live],format=b,file=dump.bin
-`$(ps -ef | grep applicationName | grep -v grep | awk '{print $2}')` 获取pid  
+`$(ps -ef | grep applicationName | grep -v grep | awk '{print $2}')` 获取pid
 
 查看各代内存占用情况：
 
 * `jmap -heap [pid]`
 * `jmap [pid]`
 * `jmap -dump:format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程的内存占用情况导出来
-* `jmap -dump:live,format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程存活对象在内存中占用情况导出来, `:live` 会触发一次Full GC  
+* `jmap -dump:live,format=b,file=/tmp/java_pid.hprof [pid]` 可以将当前Java进程存活对象在内存中占用情况导出来, `:live` 会触发一次Full GC
 * `jmap -histo:live [pid] >a.log` 查看当前Java进程创建的活跃对象数目和占用内存大小
-* `jmap -histo $(ps -ef | grep applicationName | grep -v grep | awk '{print $2}') | head -20` top 20 内存占用  
+* `jmap -histo $(ps -ef | grep applicationName | grep -v grep | awk '{print $2}') | head -20` top 20 内存占用
 
 浅堆（Shallow Heap）: 对象的浅堆指它在内存中的大小
 保留堆（Retained Heap）: 指当特定对象被垃圾回收后即将释放的内存大小, 因为 保留堆=内存中的大小 + 持有对象的引用大小
@@ -278,11 +297,11 @@ dump堆：-dump:[live],format=b,file=dump.bin
 在JDK 1.7之后，新增了一个命令行工具jcmd。它是一个多功能工具，可以用来导出堆，查看java进程，导出线程信息，执行GC等。
 jcmd拥有jmap的大部分功能，Oracle官方建议使用jcmd代替jmap
 
-* `jcmd pid help` 列出该虚拟机支持的所有命令  
+* `jcmd pid help` 列出该虚拟机支持的所有命令
 
 #### jstack
 
-jstack 可以告诉你当前所有JVM线程正在做什么，包括用户线程和虚拟机线程，你可以用它来查看线程栈，并且结合Lock信息来检测是否发生了死锁和死锁的线程。  
+jstack 可以告诉你当前所有JVM线程正在做什么，包括用户线程和虚拟机线程，你可以用它来查看线程栈，并且结合Lock信息来检测是否发生了死锁和死锁的线程。
 另外在用top -H看到占用CPU非常高的pid时，可以转换成16进制后在jstack dump出来的文件中搜索，看看到底是什么线程占用了CPU。
 
 #### jhat
@@ -291,22 +310,22 @@ jstack 可以告诉你当前所有JVM线程正在做什么，包括用户线程�
 
 #### jstat
 
-可以告诉你当前的GC情况，包括GC次数、时间，具体的GC还可以结合gc.log文件去分析。  
-`jstat -gc pid 250 10`  
-`jstat -gcutil`  
-根据JVM的内存布局  
+可以告诉你当前的GC情况，包括GC次数、时间，具体的GC还可以结合gc.log文件去分析。
+`jstat -gc pid 250 10`
+`jstat -gcutil`
+根据JVM的内存布局
 
 * 堆内存 = 年轻代 + 年老代 + 永久代
 * 年轻代 = Eden区 + 两个Survivor区（From和To）
 
-以上统计数据各列的含义为  
-    S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）  
-    EC、EU：Eden区容量和使用量  
-    OC、OU：年老代容量和使用量  
-    PC、PU：永久代容量和使用量  
-    YGC、YGT：年轻代GC次数和GC耗时  
-    FGC、FGCT：Full GC次数和Full GC耗时  
-    GCT：GC总耗时  
+以上统计数据各列的含义为
+    S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）
+    EC、EU：Eden区容量和使用量
+    OC、OU：年老代容量和使用量
+    PC、PU：永久代容量和使用量
+    YGC、YGT：年轻代GC次数和GC耗时
+    FGC、FGCT：Full GC次数和Full GC耗时
+    GCT：GC总耗时
 
 #### jVisualVM
 
@@ -417,7 +436,7 @@ At a glance, ZGC is:
     Using colored pointers
     Using load barriers
 
-江南白衣本衣 春天的旁边 [Java程序员的荣光，听R大论JDK11的ZGC](https://mp.weixin.qq.com/s/KUCs_BJUNfMMCO1T3_WAjw)  
+江南白衣本衣 春天的旁边 [Java程序员的荣光，听R大论JDK11的ZGC](https://mp.weixin.qq.com/s/KUCs_BJUNfMMCO1T3_WAjw)
 > R大: 与标记对象的传统算法相比，ZGC在指针上做标记，在访问指针时加入Load Barrier（读屏障），比如当对象正被GC移动，指针上的颜色就会不对，这个屏障就会先把指针更新为有效地址再返回，也就是，永远只有单个对象读取时有概率被减速，而不存在为了保持应用与GC一致而粗暴整体的Stop The World。
 
 ZGC的八大特征
@@ -500,3 +519,66 @@ Java中实际上有四种强度不同的引用，从强到弱它们分别是，�
 虚引用使用场景主要由两个。它允许你知道具体何时其引用的对象从内存中移除。而实际上这是Java中唯一的方式。这一点尤其表现在处理类似图片的大文件的情况。当你确定一个图片数据对象应该被回收，你可以利用虚引用来判断这个对象回收之后在继续加载下一张图片。这样可以尽可能地避免可怕的内存溢出错误。
 
 第二点，虚引用可以避免很多析构时的问题。finalize方法可以通过创建强引用指向快被销毁的对象来让这些对象重新复活。
+
+## JVM 致命错误日志（hs_err_pid.log）解读
+
+[JVM 致命错误日志（hs_err_pid.log）解读](https://www.raychase.net/1459) Posted on 06/27/2013 by 四火
+
+致命错误出现的时候，JVM 生成了 `hs_err_pid<pid>.log` 这样的文件，其中往往包含了虚拟机崩溃原因的重要信息。
+
+默认情况下文件是创建在工作目录下的（如果没权限创建的话 JVM 会尝试把文件写到/tmp 这样的临时目录下面去），当然，文件格式和路径也可以通过参数指定，比如：`java -XX:ErrorFile=/var/log/java/java_error%p.log`
+
+这个文件将包括：
+
+* 触发致命错误的操作异常或者信号；
+* 版本和配置信息；
+* 触发致命异常的线程详细信息和线程栈；
+* 当前运行的线程列表和它们的状态；
+* 堆的总括信息；
+* 加载的本地库；
+* 命令行参数；
+* 环境变量；
+* 操作系统 CPU 的详细信息。
+
+首先，看到的是对问题的概要介绍：
+
+```shell
+#  SIGSEGV (0xb) at pc=0x03568cf4, pid=16819, tid=3073346448
+```
+
+一个非预期的错误被 JRE 检测到，其中：
+
+* SIGSEGV 是信号名称
+* 0xb 是信号码
+* pc=0x03568cf4 指的是程序计数器的值
+* pid=16819 是进程号
+* tid=3073346448 是线程号
+
+如果你对 JVM 有了解，应该不会对这些东西陌生。
+
+接下来是 JRE 和 JVM 的版本信息：
+
+```shell
+# JRE version: 6.0_32-b05
+
+# Java VM: Java HotSpot(TM) Server VM (20.7-b02 mixed mode linux-x86 )
+```
+
+运行在 mixed 模式下。
+
+然后是问题帧的信息：
+
+```shell
+# Problematic frame:
+
+# C  [libgtk-x11-2.0.so.0+0x19fcf4]  __float128+0x19fcf4
+```
+
+* C：帧类型为本地帧，帧的类型包括：
+* C：本地 C 帧
+* j：解释的 Java 帧
+* V：虚拟机帧
+* v：虚拟机生成的存根栈帧
+* J：其他帧类型，包括编译后的 Java 帧
+
+`libgtk-x11-2.0.so.0+0x19fcf4`：和程序计数器（pc）表达的含义一样，但是用的是本地 so 库+偏移量的方式。

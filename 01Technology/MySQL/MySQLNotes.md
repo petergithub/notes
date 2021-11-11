@@ -37,6 +37,8 @@ validate your planned changes carefully with a tool such as pt-upgrade
 
 [MySQL Documentation Home](https://dev.mysql.com/doc/)
 
+[如果有人问你数据库的原理，叫他看这篇文章](https://www.cnblogs.com/jiujuan/p/10676119.html)
+
 ## Statement
 
 ### Connection
@@ -128,26 +130,28 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 来查看数据库版本 `SELECT VERSION();`
 显示use的数据库名 query the current database name: `SELECT DATABASE();`
 
-`show variables where variable_name like '%myisam%'`
 `show variables like 'char%'`
+`show variables where variable_name like '%myisam%'`
+`show status where variable_name in ('Threads_cached','Aborted_clients');`
 
 #### [MySQL 中的 `<=>` 操作符](http://blog.jobbole.com/62478/)
+
+[<=> NULL-safe equal](https://dev.mysql.com/doc/refman/8.0/en/comparison-operators.html#operator_equal-to)
 
 1. 和`=`号的相同点
  像常规的=运算符一样，两个值进行比较，结果是0（不等于）或1（相等）; 换句话说：'A'<=>'B'得0 和'a'<=>'a'得1。
 
 2. 和`=`号的不同点
- 和=运算符不同的是，NULL的值是没有任何意义的。所以=号运算符不能把NULL作为有效的结果。所以：请使用<=>, 'a' <=> NULL 得0   NULL<=> NULL 得出 1
- 和=运算符正相反，=号运算符规则是 'a'=NULL 结果是NULL 甚至NULL = NULL 结果也是NULL。
- 顺便说一句，mysql上几乎所有的操作符和函数都是这样工作的，因为和NULL比较基本上都没有意义。
+ 使用`=`号运算符时，NULL 没有任何意义，不把NULL作为有效的结果：`'a'=NULL` 结果是NULL，`NULL = NULL` 结果也是NULL。
+ 使用`<=>`时, `'a' <=> NULL` 得 0  `NULL<=> NULL` 得 1
 
 3. 相关操作符
- 除了 <=> ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。
- 他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而<=>只能在mysql中使用。你可以把<=>当作mysql中的方言
+ 除了 `<=>` ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。
+ 他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而`<=>`只能在mysql中使用。你可以把`<=>`当作mysql中的方言
 
 ### JOIN
 
-[visual-explanation-of-sql-joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
+[A Visual Explanation of SQL Joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
 INNER JOIN: match in both Table A and Table B.
 FULL OUTER JOIN: all records in Table A and Table B
 LEFT OUTER JOIN: produces a complete set of records from Table A, with the matching records (where available) in Table B. If there is no match, the right side will contain null.
@@ -174,10 +178,16 @@ make a case-sensitive query
 
 `CONV()` converts a number from one numeric base number system to another numeric base number system. After the conversion, the function returns a string representation of the number.  `CONV(num , from_base , to_base );`
 
-convert `D0490012475E` to `D0:49:00:12:47:5E`
-`update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;`
+```sql
+-- convert `D0490012475E` to `D0:49:00:12:47:5E`
+update mac_tbl set macHex = CONCAT_WS(':',SUBSTRING(macHex,1,2),SUBSTRING(macHex,3,2),SUBSTRING(macHex,5,2),SUBSTRING(macHex,7,2),SUBSTRING(macHex,9,2),SUBSTRING(macHex,11,2)) where id = 8;
 
+-- force index
 SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2007-02-10 00:00:00' ORDER BY `time` ASC LIMIT 1;
+
+-- 查询倒数第二位是偶数 even  或者 mod(id / 10, 2) = 0
+SELECT id FROM `user` WHERE id / 10 % 2=0 limit 2;
+```
 
 ### Complicated SQL
 
@@ -211,6 +221,9 @@ FROM prince
 ```SQL
 pager grep -v Sleep | less; show full processlist;
 
+-- id1,id2,id3
+-- select GROUP_CONCAT(id) from table where id > 1000;
+
 -- Kill multiple process:
 SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following query to kill all processes' FROM information_schema.processlist WHERE STATE = 'Sleep' AND user = 'root' and Host like '172%' and INFO LIKE 'SELECT %' \G
 +----------------------------------------------------+
@@ -222,6 +235,7 @@ SELECT GROUP_CONCAT(CONCAT('KILL ',id,';') SEPARATOR ' ') 'Paste the following q
 -- output file
 mysql> select concat('KILL ',id,';') from information_schema.processlist where user='root' into outfile '/tmp/a.txt';
 mysql> source /tmp/a.txt;
+
 ```
 
 ``` bash
@@ -529,6 +543,7 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 * `--where, -w` export with condition `mysqldump -u root -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
 * `--insert-ignore`  Write `INSERT IGNORE` statements rather than `INSERT` statements
 * `--force, -f`  Ignore all errors; continue even if an SQL error occurs during a
+* `--compress`
 
 ``` bash
 
@@ -1027,6 +1042,7 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 ### explain
 
 [EXPLAIN Output Format](https://dev.mysql.com/doc/refman/5.5/en/explain-output.html#explain-join-types )
+[EXPLAIN Output Format 8.0](https://dev.mysql.com/doc/refman/8.0/en/explain-output.html)
 [详解MySQL中EXPLAIN解释命令](https://www.cnblogs.com/phpfans/p/4213096.html )
 
 `explain SQL` query;  then `show warnings` to get the raw SQL clause
@@ -1105,7 +1121,7 @@ If `--master-info-repository=TABLE`, the replication coordinates from the master
 A tool for parsing a MySQL binlog file to JSON. [binlog-parser](https://github.com/zalora/binlog-parser)
 `GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'admin'@'IP' identified by 'pwd';`
 
-bin log location
+bin log location default: /var/lib/mysql/binlog*
 `ps -ef | grep mysql` to `--datadir=/data/local/mysql`
 `show variables like 'datadir';`
 `show variables like '%binlog%';`
@@ -1150,6 +1166,15 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 
 [MySQL 5.7 Reference Manual - The Slave Relay Log](https://dev.mysql.com/doc/refman/5.7/en/slave-logs-relaylog.html)
 当slave不再使用时，通过`reset slave`来取消relaylog
+
+### InnoDB的崩溃恢复过程
+
+[InnoDB的崩溃恢复过程主要分为四个步骤](https://mp.weixin.qq.com/s/9lmuRJY1z87t1c9mAdYqdA)
+
+1. redo log操作：保证已提交事务影响的最新数据刷到数据页里。从redo log中读取checkpoint LSN
+2. undo log操作：保证未提交事务影响的数据页回滚。
+3. 写缓冲(change buffer)合并。[写缓冲(change buffer)](https://mp.weixin.qq.com/s/PF21mUtpM8-pcEhDN4dOIw)
+4. purge操作。InnoDB的一种垃圾收集机制，使用单独的后台线程周期性处理索引中标记删除的数据。
 
 ## 构建高性能的 MySQL 集群系统
 
