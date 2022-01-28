@@ -69,6 +69,9 @@ read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而w
 ## 同步阻塞IO（Blocking IO）
 
 发起一个blocking socket的read读操作系统调用，流程大概是这样：
+
+![Figure6.1. Blocking I/O Model.png](image/figure.6.1.BlockingIOModel.png)
+
 ![BlockingIO](image/BlockingIO.png)
 
 1. 当用户线程调用了read系统调用，内核（kernel）就开始了IO的第一个阶段：准备数据。很多时候，数据在一开始还没有到达（比如，还没有收到一个完整的Socket数据包），这个时候kernel就要等待足够的数据到来。
@@ -91,6 +94,8 @@ read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而w
 
 1. 在内核缓冲区没有数据的情况下，系统调用会立即返回，返回一个调用失败的信息。
 2. 在内核缓冲区有数据的情况下，是阻塞的，直到数据从内核缓冲复制到用户进程缓冲。复制完成后，系统调用返回成功，应用进程开始处理用户空间的缓存数据。
+
+![Figure 6.2. Nonblocking I/O model](image/figure.6.2.NoneBlockingIO.model.png)
 
 ![NoneBlockingIO](image/NoneBlockingIO.png)
 
@@ -118,15 +123,21 @@ read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而w
 
 ## IO多路复用模型(I/O multiplexing）
 
+即经典的Reactor设计模式，有时也称为异步阻塞IO，Java中的Selector和Linux中的epoll都是这种模型
+
 如何避免同步非阻塞NIO模型中轮询等待的问题呢？这就是IO多路复用模型。
 
 IO多路复用模型，就是通过一种新的系统调用，一个进程可以监视多个文件描述符，一旦某个描述符就绪（一般是内核缓冲区可读/可写），内核kernel能够通知程序进行相应的IO系统调用。
 
-目前支持IO多路复用的系统调用，有 select，epoll等等。select系统调用，是目前几乎在所有的操作系统上都有支持，具有良好跨平台特性。epoll是在linux 2.6内核中提出的，是select系统调用的linux增强版本。
+select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。但select，poll，epoll本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的。
+
+select系统调用，是目前几乎在所有的操作系统上都有支持，具有良好跨平台特性。epoll是在linux 2.6内核中提出的，是select系统调用的linux增强版本。
 
 IO多路复用模型的基本原理就是select/epoll系统调用，单个线程不断的轮询select/epoll系统调用所负责的成百上千的socket连接，当某个或者某些socket网络连接有数据到达了，就返回这些可以读写的连接。因此，好处也就显而易见了——通过一次select/epoll系统调用，就查询到到可以读写的一个甚至是成百上千的网络连接。
 
 举个栗子。发起一个多路复用IO的的read读操作系统调用，流程是这个样子：
+
+![Figure 6.3. I/O multiplexing model](image/figure.6.3.IOmultiplexing.model.png)
 
 ![IO.multiplexing](image/IO.multiplexing.png)
 
@@ -154,13 +165,19 @@ Java的NIO（new IO）技术，使用的就是IO多路复用模型。在linux系
 本质上，select/epoll系统调用，属于同步IO，也是阻塞IO。都需要在读写事件就绪后，自己负责进行读写，也就是说这个读写过程是阻塞的。
 如何充分的解除线程的阻塞呢？那就是异步IO模型。
 
+## 信号驱动模型
+
+用的不多
+
 ## 异步IO模型（asynchronous IO）
 
-如何进一步提升效率，解除最后一点阻塞呢？这就是异步IO模型，全称asynchronous I/O，简称为AIO。
+如何进一步提升效率，解除最后一点阻塞呢？这就是异步IO模型，全称asynchronous I/O，简称为AIO。即经典的Proactor设计模式，也称为异步非阻塞IO
 
 AIO的基本流程是：用户线程通过系统调用，告知kernel内核启动某个IO操作，用户线程返回。kernel内核在整个IO操作（包括数据准备、数据复制）完成后，通知用户程序，用户执行后续的业务操作。
 
 kernel的数据准备是将数据从网络物理设备（网卡）读取到内核缓冲区；kernel的数据复制是将数据从内核缓冲区拷贝到用户程序空间的缓冲区。
+
+![Figure 6.5. Asynchronous I/O model](image/figure.6.5.AsynchronousIO.model.png)
 
 ![asynchronousIO](image/asynchronousIO.png)
 
