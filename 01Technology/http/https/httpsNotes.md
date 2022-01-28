@@ -7,7 +7,7 @@
 [SSL/TLS协议运行机制的概述](http://www.ruanyifeng.com/blog/2014/02/ssl_tls.html)
 
 [图解SSL/TLS协议](http://www.ruanyifeng.com/blog/2014/09/illustration-ssl.html)
-CloudFlare宣布，开始提供Keyless服务，即你把网站放到它们的CDN上，不用提供自己的私钥，也能使用SSL加密链接.  
+CloudFlare宣布，开始提供Keyless服务，即你把网站放到它们的CDN上，不用提供自己的私钥，也能使用SSL加密链接.
 CloudFlare的说明:
 
 1. [Announcing Keyless SSL™: All the Benefits of CloudFlare Without Having to Turn Over Your Private SSL Keys](https://blog.cloudflare.com/announcing-keyless-ssl-all-the-benefits-of-cloudflare-without-having-to-turn-over-your-private-ssl-keys/)
@@ -28,7 +28,7 @@ Author: Mihan 凹凸实验室 [Nginx 配置 HTTPS 服务器](https://mp.weixin.q
 
 要开启 HTTPS 服务，在配置文件信息块(server block)，必须使用监听命令 listen 的 ssl 参数和定义服务器证书文件和私钥文件，如下所示
 
-``` nginx
+```bash
 server {
     #ssl参数
     listen              443 ssl;
@@ -39,7 +39,8 @@ server {
     ssl_certificate_key example.com.key;
     ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers         HIGH:!aNULL:!MD5;
-    #...}
+    #...
+}
 ```
 
 证书文件会作为公用实体發送到每台连接到服务器的客戶端，私钥文件作为安全实体，**应该被存放在具有一定权限限制的目录文件，并保证 Nginx 主进程有存取权限。**
@@ -78,11 +79,11 @@ CSR (Certificate Signing Request)
 
 #### Create CSR and Key Without Prompt using OpenSSL
 
-`openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`  
+`openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`
 
 #### Generate CSR From the Existing Key using OpenSSL
 
-`openssl req -new -key example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`  
+`openssl req -new -key example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`
 
 #### Convert private key version
 
@@ -104,7 +105,11 @@ Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocr
 * Get expired date from URL `openssl s_client -connect example.com:443 -servername example.com 2>/dev/null | openssl x509 -noout -dates`
 * Get expired date `openssl x509 -noout -enddate -in certificate.pem`
 * Get expired date `openssl x509 -noout -dates -in nginx/05/ssl/example.com.crt`
-* Get expired date `openssl pkcs12 -in certificate.p12 -nodes | openssl x509 -noout -enddate`  
+* Get expired date `openssl pkcs12 -in certificate.p12 -nodes | openssl x509 -noout -enddate`
+
+openssl s_client -connect -showcerts example.com:443 -servername example.com
+openssl s_client -connect example.com:443 -servername example.com 2>/dev/null
+openssl s_client -connect -debug example.com:443 -servername example.com
 
 #### Options
 
@@ -125,11 +130,11 @@ rsa:2048 generates an RSA key 2048 bits in size
 
 The fields, required in CSR are listed below:
 
-|Field |Meaning |Example
-|:---|:---|
-|/C= |Country |GB
-|/ST= |State |London
-|/L= |Location |London
-|/O= |Organization |Global Security
-|/OU= |Organizational Unit |IT Department
-|/CN= |Common Name |example.com
+|Field  |Meaning             |Example
+|:---   |:---                |
+|/C=    |Country             |GB
+|/ST=   |State               |London
+|/L=    |Location            |London
+|/O=    |Organization        |Global Security
+|/OU=   |Organizational Unit |IT Department
+|/CN=   |Common Name         |example.com (the domain name the Certificate will be issued for, e.g. *.example.com)

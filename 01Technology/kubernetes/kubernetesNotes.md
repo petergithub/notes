@@ -45,6 +45,7 @@ The expression 0.1 is equivalent to the expression 100m, which can be read as "o
 排查问题
 `kubectl get events`
 `kubectl -n namespace top pods --containers`
+`kubectl top pod --all-namespaces | sort --reverse --key 4 --numeric | grep -v system | less` sort by memory
 `kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
 `kubectl get events --sort-by=.metadata.creationTimestamp`
 `kubectl get events -o yaml|less`
@@ -238,6 +239,8 @@ CREATING A TLS CERTIFICATE FOR THE INGRESS
 `kubectl create secret tls tls-secret --cert=tls.cert --key=tls.key`
 `kubectl create secret generic fortune-https --from-file=https.key --from-file=https.cert --from-file=foo`
 
+Copying Kubernetes Secrets Between Namespaces: `kubectl get secret gitlab-registry --namespace=revsys-com -o yaml | kubectl apply --namespace=devspectrum-dev -f -`
+
 `exec` form—For example, `ENTRYPOINT ["node", "app.js"]`: runs the node process directly (not inside a shell)
 `shell` form—For example, `ENTRYPOINT node app.js`: used the shell form
 
@@ -353,7 +356,7 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 
 ## Useful image
 
-`kubectl run mysql-client --image=mysql:5.6 -it --rm --restart=Never -- mysql`
+`kubectl run mysql-client --image=mysql:8.0.28 -it --rm --restart=Never -- mysql`
 `kubectl run redis-client --image=redis:6.0.9 -it --rm --restart=Never -- bash`
 `kubectl run dnsutils --image=tutum/dnsutils -it --rm`
 `kubectl run dnsutils --image=tutum/dnsutils -it --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
@@ -392,6 +395,37 @@ kube-shell `pip install kube-shell --user -U`
 Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源，它是这样计算的：节点剩余资源=节点总资源-已经分配出去的资源，并不是实际使用的资源。如果您自己手动运行一个很耗资源的程序，Kubernetes并不能感知到。
 
 另外所有Pod上都要声明resources。对于没有声明resources的Pod，它被调度到某个节点后，Kubernetes也不会在对应节点上扣掉这个Pod使用的资源。可能会导致节点上调度过去太多的Pod。
+
+## Troubleshooting
+
+### [Troubleshooting a failed certificate request | cert-manager](https://cert-manager.io/docs/faq/troubleshooting/)
+
+There are several resources that are involved in requesting a certificate.
+Automated Certificate Management Environment (ACME).
+
+```text
+  (  +---------+  )
+  (  | Ingress |  ) Optional                                              ACME Only!
+  (  +---------+  )
+         |                                                     |
+         |   +-------------+      +--------------------+       |  +-------+       +-----------+
+         |-> | Certificate |----> | CertificateRequest | ----> |  | Order | ----> | Challenge |
+             +-------------+      +--------------------+       |  +-------+       +-----------+
+                                                               |
+```
+
+1. Checking the Certificate resource `kubectl get certificate` or `kubectl describe certificate <certificate-name>`
+2. Checking the CertificateRequest `kubectl describe certificaterequest <CertificateRequest name>`
+3. Check the issuer state
+   1. `kubectl describe issuer <Issuer name>`
+   2. `kubectl describe clusterissuer <ClusterIssuer name>`
+4. [Troubleshooting Issuing ACME Certificates | cert-manager](https://cert-manager.io/docs/faq/acme/): ACME(e.g. Let’s Encrypt)
+   1. Check Orders `kubectl describe order example-com-2745722290-439160286`. If the Order is not completing successfully, you can debug the challenges for the Order
+   2. Check Challenges `kubectl describe challenge example-com-2745722290-4391602865-0`
+      1. [HTTP01 troubleshooting](https://cert-manager.io/docs/faq/acme/#http01-troubleshooting)
+      2. [DNS01 troubleshooting](https://cert-manager.io/docs/faq/acme/#dns01-troubleshooting)
+         1. [alidns-webhook/bundle.yaml](https://github.com/pragkent/alidns-webhook/blob/master/deploy/bundle.yaml)
+      3. Check the pod status and log `kubectl log alidns-webhook-78df4cfddd-cnjsd`
 
 ## Example
 

@@ -95,6 +95,7 @@ pycharm: Directories Used by PyCharm https://www.jetbrains.com/help/pycharm/dire
 6. Preference | Code Style | Java | Imports | Set Class count to use import with '*' and Names count to use static import with '*' fields as 999
 7. "Apropos" terminal pops up when typing cmd+shift+A to get actions: System Preferences | Keyboard | Shortcuts | Services | disable Search man Page Index in Terminal
 8. Preferences -> Editor -> File and code templates -> Includes tab (on the right). There is a template header
+9. Preferences -> Editor -> Java -> Comment Code -> uncheck "Line comment at first column", check "Add a space at comment start"
 
 ```java
 /**
@@ -367,3 +368,4 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 [rustdesk 远程桌面软件](https://rustdesk.com/zh/)
 [Joplin is a free, open source note taking and to-do application](https://github.com/laurent22/joplin)
 [Typora — a markdown editor, markdown reader](https://typora.io/)
+[TablePlus | Modern, Native Tool for Database Management](https://tableplus.com/)

@@ -3,6 +3,8 @@
 - [MySQL memory troubleshooting](#mysql-memory-troubleshooting)
   - [Other](#other)
 
+[8.12.3.1 How MySQL Uses Memory](https://dev.mysql.com/doc/refman/8.0/en/memory-use.html)
+
 [What To Do When MySQL Runs Out of Memory: Troubleshooting Guide](https://dzone.com/articles/what-to-do-when-mysql-runs-out-of-memory-troublesh)
 
 [What To Do When MySQL Runs Out of Memory](https://www.percona.com/blog/2018/06/28/what-to-do-when-mysql-runs-out-of-memory-troubleshooting-guide/)

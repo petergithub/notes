@@ -133,6 +133,7 @@ PATH="/usr/local/gnubin:$PATH"
 # how can I filter out unwanted search results in Alfred (ie node_modules folder, caches)
 # https://apple.stackexchange.com/questions/310443/how-can-i-filter-out-unwanted-search-results-in-alfred-ie-node-modules-folder
 # Go to Preferences -> Spotlight -> Privacy (TAB) Then add the folders you want to exclude to that list.
+### Maccy: Lightweight clipboard manager for macOS
 brew install --cask xmind calibre virtualbox alfred karabiner-elements maccy postman
 
 # Visual Studio Code (vscode)
@@ -198,6 +199,7 @@ chmod 0644 /etc/synthetic.conf
 # [SwitchHosts - hosts /etc/hosts switch]
 # [Bagel is a little native iOS network debugger](https://github.com/yagiz/Bagel)
 # NewFileMenuFree
+# Maccy: Lightweight clipboard manager for macOS
 
 ## Config
 ### Tap to click

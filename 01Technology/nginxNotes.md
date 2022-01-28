@@ -29,8 +29,8 @@ invalid POST format id:13
 
 ### timeout 配置
 
-`proxy_connect_timeout` :后端服务器连接的超时时间_发起握手等候响应超时时间  
-`proxy_read_timeout`:连接成功后_等候后端服务器响应时间_其实已经进入后端的排队之中等候处理（也可以说是后端服务器处理请求的时间）  
+`proxy_connect_timeout` :后端服务器连接的超时时间_发起握手等候响应超时时间
+`proxy_read_timeout`:连接成功后_等候后端服务器响应时间_其实已经进入后端的排队之中等候处理（也可以说是后端服务器处理请求的时间）
 `proxy_send_timeout` :后端服务器数据回传时间_就是在规定时间之内后端服务器必须传完所有的数据
 
 ## Nginx offical
@@ -205,7 +205,7 @@ ssl_client_certificate   /path/to/ca.crt;#根级证书公钥，用于验证各�
 ssl_verify_client on;
 ```
 
-curl 验证 `curl --insecure --key client.key --cert client.crt 'https://test'`  
+curl 验证 `curl --insecure --key client.key --cert client.crt 'https://test'`
 
 ### Location ends with slash
 
@@ -249,7 +249,7 @@ A request URI is passed to the server as follows:
         }
 ```
 
-- If proxy_pass is specified **without a URI**, the request URI is passed to the server in the same form as sent by a client when the original request is processed, or the full normalized request URI is passed when processing the changed URI:  
+- If proxy_pass is specified **without a URI**, the request URI is passed to the server in the same form as sent by a client when the original request is processed, or the full normalized request URI is passed when processing the changed URI:
 
 ``` shell
         location /some/path/ {
@@ -373,7 +373,7 @@ GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%
 
 ### Adding cross-origin resource sharing (CORS) support
 
-test with `curl`: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`  
+test with `curl`: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`
 
 [URL](https://gist.github.com/Stanback/7145487)
 
@@ -420,5 +420,78 @@ if ($request_method = 'OPTIONS') {
     add_header 'Content-Type' 'text/plain; charset=utf-8';
     add_header 'Content-Length' 0;
     return 204;
+}
+```
+
+### cros headers
+
+```bash
+# /etc/nginx/conf/module/crossdomainheader.conf
+
+# include module/crossdomainheader.conf;
+if ($http_origin ~* \w+.domain.(net|cn|com)) {
+    add_header "Access-Control-Allow-Origin" $http_origin;
+    add_header "Access-Control-Allow-Credentials" true;
+    add_header "Access-Control-Allow-Methods" "GET,POST,OPTIONS";
+    add_header "Access-Control-Max-Age" 86400;
+}
+```
+
+### 启用长连接 proxy_pass http 1.1
+
+[nginx keepalive](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive)
+
+[nginx反向代理时保持长连接 - 流年的夏天 - 博客园](https://www.cnblogs.com/liufarui/p/11075630.html)
+
+[nginx配置长连接 - 凌度 - 博客园](https://www.cnblogs.com/linn/p/4738820.html)
+
+```bash
+http {
+    server {
+        location / {
+            proxy_pass http://backend;
+
+            ##
+            # 与上游服务器(Tomcat)建立keepalive长连接的配置，可参考上面的keepalive链接里的"For HTTP"部分
+            ##
+            # http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_http_version
+            # 设置代理的HTTP协议版本（默认是1.0版本）
+            # 使用keepalive连接的话，建议使用1.1版本。
+            proxy_http_version 1.1;                         # 设置http版本为1.1
+
+            # http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header
+            # 允许重新定义或追加字段到传递给代理服务器的请求头信息（默认是close）
+            # "Connection" header 被清理，这样即便是 Client 和 Nginx 之间是短连接，Nginx 和 upstream 之间也是可以开启长连接的。
+
+            # 在nginx的配置文件中，如果当前模块中没有proxy_set_header的设置，则会从上级别继承配置。
+            # 继承顺序为：http, server, location
+            proxy_set_header Connection "";      # 设置Connection为长连接（默认为no）
+        }
+    }
+}
+```
+
+### 请求路径重写 改写 rewrite
+
+[Nginx的rewrite指令修改访问路径 - 腾讯云](https://cloud.tencent.com/developer/article/1531268)
+
+[Module ngx_http_rewrite_module](http://nginx.org/en/docs/http/ngx_http_rewrite_module.html#rewrite)
+
+`Syntax: rewrite regex replacement [flag];`
+
+```bash
+
+location /api/ {
+    proxy_set_header Host 'app-h5.dev.picooc.cn';
+
+    # rewrite “^/api/(.*)$” /$1 break，路径重写：
+    # “^/api/(.*)$”：匹配路径的正则表达式，用了分组语法，把/api/以后的所有部分当做1组
+    # /$1：重写的目标路径，这里用$1引用前面正则表达式匹配到的分组（组编号从1开始），即/api/后面的所有。这样新的路径就是除去/api/以外的所有，就达到了去除/api前缀的目的
+    # break：指令，常用的有2个，分别是：last、break
+    # last：重写路径结束后，将得到的路径重新进行一次路径匹配
+    # break：重写路径结束后，不再重新匹配路径。
+    # 我们这里不能选择last，否则以新的路径/upload/image来匹配，就不会被正确的匹配到8082端口了
+    rewrite ^/api/(.*)$ /$1 break;
+    proxy_pass http://app-h5.dev.picooc.cn/;
 }
 ```

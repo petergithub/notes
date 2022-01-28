@@ -25,7 +25,7 @@ Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
 Use `Ctrl+x` followed by `Ctrl+e` to open the current line in the editor specified by $FCEDIT or $EDITOR or emacs (tried in that order).
 `bindkey` get all keybinding
 
-tr
+tr 合并换行 多行变一行
 concatenate multiple lines of output to one line `grep pattern file | tr '\n' ' '`
 Upper case to lower case  `tr [A-Z] [a-z]`
 Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 30" | tr -d " "`
@@ -44,6 +44,7 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 为了方便地键入长命令, 在设置你的编辑器后（例如 `export EDITOR=vim`）, 键入 `ctrl-x, ctrl-e` 会打开一个编辑器来编辑当前命令. 在 `vi` 模式下则键入 `escape-v` 实现相同的功能.
 vimtutor: vim interactive guide
 `man readline` to get the introduction to the combination of keys
+Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
 man manpath
 MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
@@ -72,8 +73,6 @@ expands non-matching globs to zero arguments, rather than to themselves.
 当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。
 例如：`trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行
 
-man readline to get more information:
-Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
 `mv {short,very_long}.txt` will move short.txt to very_long.txt
 `Alt + d`, `esc +d`   Delete the Word after the cursor.
@@ -615,7 +614,7 @@ ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\
 # 输出第三行以后的行
 awk -F ':' 'NR >3 {print $1}' demo.txt
 
-# 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter  
+# 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter
 ls -1 | awk 'ORS=","' | head -c -1
 # 或者
 ls -1 | paste -sd "," -
@@ -933,6 +932,11 @@ Wed, 30 Aug 2017 05:58:36 +0000
 Tue, 29 Aug 2017 21:58:33 -0800
 ```
 
+`timedatectl`  Display Current Date and Time with timedatectl
+`timedatectl list-timezones | grep keyword` 列出支持的时区
+`timedatectl set-timezone Asia/Shanghai` 时区设置
+`timedatectl set-timezone UTC` Set Universal Time (UTC) in Ubuntu
+
 ### crontab
 
 To create a cronjob, just edit the crontab file: `crontab -e`.
@@ -1112,8 +1116,8 @@ Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node
 * `!foo:p`: 仅打印输出, 而不执行
 * `^foo`: 删除上一条命令中的 foo
 * `^foo^foo`: 将上一条命令中的 foo 替换为 bar
-* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式
-  * `!!:gs/foo/bar/`
+* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式，quick substitution
+  * `!!:gs/foo/bar/` 推荐使用
   * `fc -s foo=bar` GNU bash, zsh
   * `^foo^bar^:G` zsh
   * `^foo^bar^` 未验证出来
@@ -1122,7 +1126,6 @@ Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node
 * `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
 
 Bash History: Correct / Repeat The Last Command With a Substitution
-$ ^old^new^  或者 !!:s/old/new/ !!:gs/old/new 替换上一条命令中的一个短语 old替换成new, quick substitution
 echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
 `sudo su -` change to root user
 `su - username`(load new env) vs. `su username`
@@ -1143,9 +1146,9 @@ echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
     After that `C-s` would work in the given terminal.
     Set it in ~/.bashrc to make it work in every terminal.
         refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)
-   5. 在已经敲完的命令后按<CTRL+x CTRL+e>, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  echo "export EDITOR=vim" >> ~/.bashrc
+   5. 在已经敲完的命令后按`CTRL+x CTRL+e`, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  `echo "export EDITOR=vim" >> ~/.bashrc`
 
-ALT+.把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
+`ALT+.`把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
 undo     CTRL+/
 
 #### bash profile
@@ -1351,7 +1354,7 @@ echo '["\u6df1\u5733"]' | jq .
 ##### Print request time detail
 
 ``` bash
-    curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
+    curl -so /dev/null -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" https://www.baidu.com
 ```
 
 Time to domain lookup: `time_namelookup`
@@ -1424,7 +1427,7 @@ wget 'http://www.example.com:9000/json' \
 
 `rsync -avPz src/ dest` Copy contents of `src/` to destination
 
-* `-a`  等于 `-rlptgoD`
+* `-a` 等于 `-rlptgoD`
 * `-r` 是递归
 * `-l` 是链接文件, 意思是拷贝链接文件;
 * `-p` 表示保持文件原有权限
@@ -2158,7 +2161,7 @@ identify the directory which is using all your inodes:
 3. 将大量的文件压缩成一个文件;
 4. 备份当前文件系统中的所有文件, 重新格式化之前的硬盘, 获得更多的I节点, 再将文件复制回去.
 
-一般 `/var/spool/postfix/maildrop` 下面有很多文件
+一般 `/var/spool/postfix/ldrop` 下面有很多文件
 为了避免，可以在每个定时任务后面加上  `>/dev/null 2>&1`
 或者执行 `crontab -e` 在最开头添加 `MAILTO='"'` 保存，然后 `server crond restart` 重启 `crond`
 
@@ -2807,6 +2810,8 @@ ssh login log `/var/log/secure` is configured in /etc/ssh/sshd_config
 在 server 上使用本地的私钥来进行认证，不需要拷贝本地私钥到 server
 
 ```bash
+# 开启代理
+ssh-agent
 # 添加密钥到ssh-agent的高速缓存中
 ssh-add ~/.ssh/id_rsa
 # 查看是否添加成功
@@ -2817,6 +2822,8 @@ ssh -A server1
 # 登录需要本地私钥的服务器，登陆其他 server2 的时候，只支持 ip 地址访问，可以在 server1 的 /etc/hosts 里面配置host，就可以通过主机名访问
 ssh -p port root@server2
 ```
+
+ssh-agent的工作是依赖于环境变量 `SSH_AUTH_SOCK` 和 `SSH_AGENT_PID`
 
 ##### Troubleshooting sshd
 
@@ -2993,6 +3000,7 @@ pssh  is  a  program  for executing ssh in parallel on a number of hosts.
 `scp client_file user@host:filepath`    上传文件到服务器端
 `scp user@host:server_files client_file_path`    下载文件
 `scp -3 -P port1 ruser1@rhost1:/rpath/1 scp://ruser2@rhost2:port2/rpath/2` scp from rhost1 to rhost2
+`scp -3 host1:source_file host2:target_file`
 
 client_file 待上传的文件, 可以有多个, 多个文件之间用空格隔开. 也可以用*.filetype上传某个类型的全部文件
 user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）

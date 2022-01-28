@@ -422,6 +422,8 @@ Greys是一个JVM进程执行过程中的异常诊断工具，可以在不中断
 
 [Z Garbage Collector](https://wiki.openjdk.java.net/display/zgc/Main)
 
+[新一代垃圾回收器ZGC的探索与实践 - 美团技术团队](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
+
 goals
     Pause times do not exceed 10ms
     Pause times do not increase with the heap or live-set size
@@ -463,23 +465,23 @@ ZGC的八大特征
  分代原本是因为most object die young的假设，而让新生代和老生代使用不同的GC算法。但C4已经是全程并发算法了，为什么还要分代呢？
  R大说：因为分代的C4能承受的对象分配速度(Allocation Rate)， 大概是原始PGC的10倍。
 
-### Java™ Tutorials
+## Java™ Tutorials
 
 [Java Documentation](http://docs.oracle.com/javase/tutorial/essential/concurrency/index.html)
 
-#### Pausing Execution with `sleep`
+### Pausing Execution with `sleep`
 
 `Thread.sleep` causes the current thread to suspend execution for a specified period
 
-#### Interrupts
+### Interrupts
 
 An interrupt is an indication to a thread that it should stop what it is doing and do something else
 
-#### Joins
+### Joins
 
 The join method allows one thread to wait for the completion of another. If `t` is a `Thread` object whose thread is currently executing, `t.join();` causes the current thread to pause execution until t's thread terminates.
 
-#### `wait`
+### `wait`
 
 Always invoke wait inside a loop that tests for the condition being waited for. Don't assume that the interrupt was for the particular condition you were waiting for, or that the condition is still true.
 
@@ -487,32 +489,32 @@ Item 50 "Never invoke wait outside a loop" in Joshua Bloch's "Effective Java Pro
 
 该方法属于Object的方法，wait方法的作用是**使当前调用wait方法所在部分(代码块)的线程**停止执行，并释放当前获得的调用wait所在的代码块的锁，并在其他线程调用notify或者notifyAll方法时恢复到竞争锁状态(一旦获得锁就恢复执行).
 
-#### Concurrent Collections
+### Concurrent Collections
 
 `BlockingQueue`, `ConcurrentMap`, `ConcurrentHashMap`, `ConcurrentNavigableMap`, `ConcurrentSkipListMap`
 
-#### Atomic Variables
+### Atomic Variables
 
 `AtomicInteger`
 
-### [理解Java中的四种引用](http://www.importnew.com/17019.html)
+## [理解Java中的四种引用](http://www.importnew.com/17019.html)
 
 Java中实际上有四种强度不同的引用，从强到弱它们分别是，强引用，软引用，弱引用和虚引用
 
-#### 强引用(Strong Reference)
+### 强引用(Strong Reference)
 
 就是我们经常使用的引用，其写法如下 `StringBuffer buffer = new StringBuffer();`
 
-#### 软引用（Soft Reference）
+### 软引用（Soft Reference）
 
 当内存不足时垃圾回收器才会回收这些软引用可到达的对象。
 
-#### 弱引用(Weak Reference)
+### 弱引用(Weak Reference)
 
 弱引用简单来说就是将对象留在内存的能力不是那么强的引用。使用WeakReference，垃圾回收器会帮你来决定引用的对象何时回收并且将对象从内存移除。创建弱引用如下
 `WeakReference<Widget> weakWidget = new WeakReference<Widget>(widget)`
 
-#### 虚引用 （Phantom Reference）
+### 虚引用 （Phantom Reference）
 
 我们不可以通过get方法来得到其指向的对象。它的唯一作用就是当其指向的对象被回收之后，自己被加入到引用队列，用作记录该引用指向的对象已被销毁。
 

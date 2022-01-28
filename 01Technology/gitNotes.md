@@ -154,10 +154,12 @@ Do the merge, and then pull the stash:
     总之，就是让这个文件回到最近一次git commit或git add时的状态。
 
 回退总结
-    场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
-    场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
-    场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
-恢复 `git reset --hard` 删除的文件 通过`git reflog`找到commitID,然后`git reset --hard commitID`
+
+1. 新增的文件还没有添加到暂存区，`git clean` clean untracked files. 或者先 add 然后 reset
+2. 当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
+3. 当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
+4. 已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
+5. 恢复 `git reset --hard` 删除的文件 通过`git reflog`找到commitID,然后`git reset --hard commitID`
 
 ### stage part of a new file, but not the whole file
 
@@ -306,4 +308,16 @@ If your code is already tracked by Git then set this repository as your "origin"
 cd existing-project
 git remote set-url origin http://username@host/project.git
 git push origin master
+```
+
+### How to complete a git clone for a big project on an unstable connection?
+
+```bash
+# The key here is --depth 1 and --unshallow.
+# This also works for fetching an existing repo on slow connection: git fetch --depth 1 then git fetch --unshallow
+
+# --depth 1: Create a shallow clone with a history truncated to the specified number of commits
+git clone http://github.com/large-repository --depth 1
+cd large-repository
+git fetch --unshallow
 ```

@@ -156,17 +156,11 @@ get all config `config get *`
 `redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
 用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
 
-`SCAN cursor [MATCH pattern] [COUNT count]`
-eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
-`redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
-
 `client list`
 `--bigkeys`
 `--latency`, 用来测试 Redis 服务端的响应延迟
 `--latency-history`
 `redis-cli -h <host> -p <port> -a <pwd> -n <db> info memory`
-`redis-cli --scan | head -10`
-`redis-cli --scan --pattern '*-11*' | xargs -L 100 redis-cli DEL`
 
 `info memory`
 `info keyspace`
@@ -216,6 +210,18 @@ Redis的value存储中文后，get之后显示16进制的字符串”\xe4\xb8\xa
 12  move key db-index      //将key从当前数据库移动到指定数据库。返回1成功。0 如果key不存在，或者已经在指定数据库中
 13  flushdb                //删除当前数据库中所有key,此方法不会失败。慎用
 14  flushall               //删除所有数据库中的所有key，此方法不会失败。更加慎用
+
+#### [SCAN](https://redis.io/commands/scan)
+
+SCAN return value is an array of two values
+
+1. the first value is the new cursor to use in the next call
+2. the second value is an array of elements.
+
+`SCAN cursor [MATCH pattern] [COUNT count]`
+eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
+`redis-cli --scan | head -10`
+`redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
 
 ### string 类型数据操作命令
 

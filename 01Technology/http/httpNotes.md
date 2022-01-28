@@ -44,9 +44,26 @@ TCP keep alive的表现：当一个连接“一段时间”没有数据通讯时
 https CDN方式, 私钥不需要提供给CDN
 
 1. Keyless SSL
-2. 网宿推出无证书https加速方案 http://www.chinanetcenter.com/Home/News/420
+2. [网宿推出无证书https加速方案](http://www.chinanetcenter.com/Home/News/420)
 
 https SSL增加的时间大概多少 time(ssl) = 3 * time(tcp)
 HTTP耗时 = TCP握手(三个包)
 HTTPs耗时 = TCP握手(三个包) + SSL握手(需要9个包)
 
+## HTTP/1.1 vs. HTTP/2
+
+| content                   | HTTP/1.1  | HTTP/2    |
+|---                        |---        |---        |
+| Transfer protocol         | Text      |  Binary   |
+| Headers                   | Plain text| Compressed|
+| Multiplexing              |  No       | Yes       |
+| Requests per Connections  | 1         | Multiple  |
+| Server Push               | No        |  Yes      |
+| Release Year              |  1997     |  2015     |
+
+## HTTP/3.0
+
+Google QUIC 协议
+
+1. 基于UDP
+2. TLS 链接的建立 一次后，重复请求时简化为使用 connection id，节省连接时间。

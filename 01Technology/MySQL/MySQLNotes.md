@@ -24,7 +24,6 @@ validate your planned changes carefully with a tool such as pt-upgrade
 
 ## Recent
 
-`SET @@auto_increment_increment=10`
 `SHOW FULL COLUMNS FROM tbl`
 
 ## Documents
@@ -148,6 +147,36 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 3. 相关操作符
  除了 `<=>` ，还有两个其他的操作符用来处理某个值和NULL做比较，也就是IS NULL and IS NOT NULL。
  他们是ANSI标准中的一部分，因此也可以用在其他数据库中。而`<=>`只能在mysql中使用。你可以把`<=>`当作mysql中的方言
+
+#### 窗口函数
+
+[MySQL 8.0 Reference Manual :: 12.21.1 Window Function Descriptions](https://dev.mysql.com/doc/refman/8.0/en/window-function-descriptions.html)
+
+[通俗易懂的学会：SQL窗口函数 - 知乎](https://zhuanlan.zhihu.com/p/92654574)
+
+用途：
+
+1. 排名问题：每个部门按业绩来排名
+2. topN问题：找出每个部门排名前N的员工进行奖励
+
+基本语法如下：
+<窗口函数> over (partition by <用于分组的列名>
+                order by <用于排序的列名>)
+
+partition by用来对表分组。在这个例子中，所以我们指定了按“班级”分组（partition by 班级）
+order by子句的功能是对分组后的结果进行排序
+
+<窗口函数>的位置，可以放以下两种函数：
+
+1. 专用窗口函数，包括后面要讲到的rank, dense_rank, row_number等专用窗口函数。
+2. 聚合函数，如sum. avg, count, max, min等
+
+```sql
+-- 按国家分组后，按profit排名（数据见 Load local file）
+select id, year, country, product, profit,
+  rank() over(partition by country order by country,profit)
+  from sales;
+```
 
 ### JOIN
 
@@ -411,6 +440,17 @@ mysql> SELECT JSON_PRETTY('{"a":"10","b":"15","x":"25"}'); # object
 `JSON_OVERLAPS(json_doc1, json_doc2)`: Compares two JSON documents. Returns true (1) if the two document have any key-value pairs or array elements in common
 `value MEMBER OF(json_array)`: Returns true (1) if value is an element of json_array, otherwise returns false (0). value must be a scalar or a JSON document; if it is a scalar, the operator attempts to treat it as an element of a JSON array.
 
+## Setting
+
+[Variable-Setting Hint Syntax](https://dev.mysql.com/doc/refman/8.0/en/optimizer-hints.html#optimizer-hints-set-var)
+The `SET_VAR` hint sets the session value of a system variable temporarily (for the duration of a single statement).
+
+Examples:
+`SELECT /*+ SET_VAR(sort_buffer_size = 16M) */ name FROM people ORDER BY name;`
+`INSERT /*+ SET_VAR(foreign_key_checks=OFF) */ INTO t2 VALUES(2);`
+
+`SET @@auto_increment_increment=10`
+
 ## Charset 查看三种MySQL字符集
 
 MySQL 5.5.3+ UTF8mb4支持emoji
@@ -519,11 +559,9 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
   Privileges: select,insert,update,references
   ```
 
-## MySQL Server Administration
+## Backup & restore
 
-### Backup & restore
-
-#### Export/Backup database mysqldump
+### Export/Backup database mysqldump
 
 MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_single-transaction)
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)
@@ -547,33 +585,22 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 
 ``` bash
 
-  date_str=`date +%Y%m%d%H%M%S`
-  cd /data2/backup
-  mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
+date_str=`date +%Y%m%d%H%M%S`
+cd /data2/backup
+mysqldump -h localhost -uroot --pxxxxx -R -e --max_allowed_packet=1048576 --net_buffer_length=16384 i5a6 | gzip > /data2/backup/i5a6_$date_str.sql.gz
 ```
 
-#### Import/Restore
-
-`mysql> USE 数据库名;`
-`mysql> SOURCE d:/mysql.sql;` or
-`mysql -uroot -p dbName < dbName.sql` or
-`mysql -uroot -p dbName -e "source /path/to/dbName.sql"`
-
-* `--force, -f`  Ignore all errors; continue even if an SQL error occurs
-* `--skip-column-names, -N`  Do not write column names in results.
-
-#### Export and Import a MySQL Database in One Command
+### Export and Import a MySQL Database in One Command
 
 `mysqldump -u root -p database_name | mysql -h remote_host -u root -p remote_database_name`
 
-#### MySQL Export Table to CSV
+### MySQL Export Table to CSV
 
 [Select INTO](http://dev.mysql.com/doc/refman/5.7/en/select-into.html)
 `mysql -uroot -proot -D account -s -e "select id,username from user_0 limit 10 INTO OUTFILE '/tmp/user.csv' FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'"`
 `mysql -uroot -p -D account < mysql.sql |  sed 's/\t/,/g' > out.csv`
 
 ``` sql
-
 SELECT
   orderNumber, status, orderDate, requiredDate, comments
 FROM
@@ -586,6 +613,70 @@ TERMINATED BY ','
 ESCAPED BY '"'
 LINES TERMINATED BY '\r\n';
 ```
+
+### Import/Restore
+
+`mysql> USE 数据库名;`
+`mysql> SOURCE d:/mysql.sql;` or
+`mysql -uroot -p dbName < dbName.sql` or
+`mysql -uroot -p dbName -e "source /path/to/dbName.sql"`
+
+* `--force, -f`  Ignore all errors; continue even if an SQL error occurs
+* `--skip-column-names, -N`  Do not write column names in results.
+
+#### Load local file into mysql
+
+[MySQL 8.0 Reference Manual :: 13.2.7 LOAD DATA Statement](https://dev.mysql.com/doc/refman/8.0/en/load-data.html)
+
+[How to import data from text file to mysql database - Stack Overflow](https://stackoverflow.com/questions/13579810/how-to-import-data-from-text-file-to-mysql-database)
+
+```sql
+-- 启用 Load 命令
+-- 1. enable from server: SET GLOBAL local_infile=1;
+-- 2. enable from client: Edit the connection -> Advanced' -> Others box -> add the line 'OPT_LOCAL_INFILE=1'.
+
+-- 创建表
+create table sales (
+  id int AUTO_INCREMENT,
+  year int,
+  country VARCHAR(32),
+  product varchar(32),
+  profit int,
+  PRIMARY KEY (id)
+);
+
+-- 导入的文件内容 /tmp/mysql.group.txt
+-- | 2000 | Finland | Computer   |   1500 |
+-- | 2000 | Finland | Phone      |    100 |
+-- | 2001 | Finland | Phone      |     10 |
+-- | 2000 | India   | Calculator |     75 |
+-- | 2000 | India   | Calculator |     75 |
+-- | 2000 | India   | Computer   |   1200 |
+-- | 2000 | USA     | Calculator |     75 |
+-- | 2000 | USA     | Computer   |   1500 |
+-- | 2001 | USA     | Calculator |     50 |
+-- | 2001 | USA     | Computer   |   1500 |
+-- | 2001 | USA     | Computer   |   1200 |
+-- | 2001 | USA     | TV         |    150 |
+-- | 2001 | USA     | TV         |    100 |
+
+-- 导入 SQL
+LOAD DATA LOCAL INFILE '/tmp/mysql.group.txt' INTO TABLE sales COLUMNS TERMINATED BY '|';
+
+-- How to specify which columns to load your text file columns into:
+LOAD DATA LOCAL INFILE '/tmp/foo.txt' INTO TABLE foo
+FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n'
+(@col1,@col2,@col3) set myid=@col1,mydecimal=@col3;
+
+LOAD DATA LOCAL
+    INFILE '/tmp/mydata.txt' INTO TABLE PerformanceReport
+    COLUMNS TERMINATED BY '\t'  ## This should be your delimiter
+    OPTIONALLY ENCLOSED BY '"'; ## ...and if text is enclosed, specify here
+```
+
+## MySQL Server Administration
+
+### Admin sql
 
 #### Get the sizes of the tables
 
@@ -605,12 +696,12 @@ or this query to list the size of every table in every database, largest first:
 
 ``` sql
 
-  SELECT
-       table_schema as DatabaseName,
-       table_name AS TableName,
-       round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
-  FROM information_schema.TABLES
-  ORDER BY (data_length + index_length) DESC;
+SELECT
+      table_schema as DatabaseName,
+      table_name AS TableName,
+      round(((data_length + index_length) / 1024 / 1024), 2) "Size in MB"
+FROM information_schema.TABLES
+ORDER BY (data_length + index_length) DESC;
 ```
 
 #### find the selectivity of several prefix lengths in one query
@@ -860,19 +951,19 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 
 ### 事务隔离模式
 
-1. READ UNCOMMITED SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。
-2. READ COMMITED SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。
-3. REPEATABLE READ SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。
+1. `READ UNCOMMITED` SELECT的时候允许脏读，即SELECT会读取其他事务修改而还没有提交的数据。脏读
+2. `READ COMMITED` SELECT的时候无法重复读，即同一个事务中两次执行同样的查询语句，若在第一次与第二次查询之间时间段，其他事务又刚好修改了其查询的数据且提交了，则两次读到的数据不一致。不可重复读
+3. `REPEATABLE READ` SELECT的时候可以重复读，即同一个事务中两次执行同样的查询语句，得到的数据始终都是一致的。实现的原理是，在一个事务对数据行执行读取或写入操作时锁定了这些数据行。
     但是这种方式又引发了幻读的问题(MySQL InnoDB 通过 MVCC, Mutipleversion Concurrency Control 解决了幻读问题)。
     因为只能锁定读取或写入的行，不能阻止另一个事务插入数据，后期执行同样的查询会产生更多的结果。
-4. SERIALIZABLE 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。
+4. `SERIALIZABLE` 与可重复读的唯一区别是，默认把普通的SELECT语句改成SELECT … LOCK IN SHARE MODE。即为查询语句涉及到的数据加上共享琐，阻塞其他事务修改真实数据。SERIALIZABLE模式中，事务被强制为依次执行。这是SQL标准建议的默认行为。
 
 [14.5.2.1 Transaction Isolation Levels](https://dev.mysql.com/doc/refman/5.6/en/innodb-transaction-isolation-levels.html)
 [Innodb中的事务隔离级别和锁的关系](https://tech.meituan.com/2014/08/20/innodb-lock.html)
 
 脏读（dirty read）
 不可重复读（unrepeatable read）
-幻读（phantom read）
+幻读（phantom read）：The so-called phantom problem occurs within a transaction when the same query produces different sets of rows at different times.
 幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
 为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，
 而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
@@ -894,7 +985,19 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
     如果不需要对数据进行更新值，那么推荐使用insert ignore，比如：多线程的插入相同的数据
     如果需要对数据进行更新最新的值，那么使用replace，比如：任务的结果，最后的更新时间
 
-## Example: 数据库插入数据时加锁 多线程(多job)重复insert
+### [InnoDB的七种锁](https://mp.weixin.qq.com/s/f4_o-6-JEbIzPCH09mxHJg)
+
+1. 自增锁(Auto-inc Locks)：表级锁，专门针对事务插入AUTO_INC的列，如果插入位置冲突，多个事务会阻塞，以保证数据一致性；
+2. 共享/排它锁(Shared and Exclusive Locks)：行级锁，S锁与X锁，强锁；
+3. 意向锁(Intention Locks)：表级锁，IS锁与IX锁，弱锁，仅仅表明意向；
+4. 插入意向锁(Insert Intention Locks)：针对insert的，如果插入位置不冲突，多个事务不会阻塞，以提高插入并发；
+5. 记录锁(Record Locks)：索引记录上加锁，对索引记录实施互斥，以保证数据一致性；
+6. 间隙锁(Gap Locks)：封锁索引记录中间的间隔，在RR下有效，防止间隔中被其他事务插入，防止“不可重复读”；
+7. 临键锁(Next-key Locks)：封锁索引记录，以及索引记录中间的间隔，在RR下有效，防止“幻读”；
+
+InnoDB的锁，与索引类型，事务的隔离级别相关
+
+### Example: 数据库插入数据时加锁 多线程(多job)重复insert
 
 1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`
 2. `select ... for update`, then insert
@@ -908,7 +1011,7 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 `insert ignore into table(name)  select  name from table2`
 4. 额外的表记录一个标示flag表示默认为N 没有JOB执行，第一个服务器进入JOB 把这个标示给更新成Y那么会成功返回update条数1，其他的三台机器则会update条数为0所以 if判断一下就好，然后在正常执行完和异常代码块里都还原一下
 
-### reference [select-for-update-with-insert-into](http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into)
+#### reference [select-for-update-with-insert-into](http://stackoverflow.com/questions/21261213/select-for-update-with-insert-into)
 
 `SELECT ... FOR UPDATE` with UPDATE
 
@@ -922,7 +1025,7 @@ However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for 
 
 If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn''t know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.
 
-### test case
+#### test case
 
 select nonexistent orderId, which is not a index column, it will lock the whole table;
 select nonexistent id, which is the PRIMARY KEY, it cannot lock any row;
@@ -954,6 +1057,56 @@ console 2:
 ```
 
 It pending to get the lock.
+
+## Doublewrite Buffer
+
+[MySQL 8.0 Reference Manual :: 15.6.4 Doublewrite Buffer](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)
+
+[InnoDB关键特性之double write - GeaoZhang - 博客园](https://www.cnblogs.com/geaozhang/p/7241744.html)
+
+[double write buffer，你居然没听过？- 架构师之路 沈剑](https://mp.weixin.qq.com/s/bkoQ9g4cIcFFZBnpVh8ERQ)
+
+### doublewrite 解决的问题
+
+脏页刷盘风险
+
+关于IO的最小单位：
+
+　　1、数据库IO的最小单位是16K（MySQL默认，oracle是8K）
+
+　　2、文件系统IO的最小单位是4K（也有1K的）
+
+　　3、磁盘IO的最小单位是512字节
+
+因此，存在IO写入导致page损坏的风险：
+
+Doublewrite Buffer 提高innodb的可靠性，用来解决部分写失败(partial page write页断裂)。
+
+出现问题的原因是**写磁盘不是原子操作，不能保证数据完整性**
+
+### Doublewrite Buffer 流程
+
+当有页数据要刷盘时：
+
+1. 页数据先memcopy到DWB的内存里；
+2. DWB的内存里，会先刷到DWB的磁盘上；
+3. DWB的内存里，再刷到数据磁盘存储上；
+
+DWB由128个页构成，容量只有2M。
+
+分析：
+
+1. DWB的内存的目的是 先不修改磁盘数据，这样避免写失败损坏老数据，保留完整的老的磁盘数据；
+2. 如果DWB的内存 完整写完，那新数据就保留下来了，无论磁盘数据是否已经修改，新数据是完整的；
+3. 如果 DWB 的内存没有完整写完，老的磁盘数据还没有修改，老数据是完整的。
+
+类比：新老数据各一份，只是修改指针指向，这样是一个原子操作。
+
+### Doublewrite Buffer 副作用
+
+1. Doublewrite 是一个buffer, 但其实它是开在物理文件上的一个buffer, 其实也就是file, 所以它会导致系统有更多的fsync操作, 而硬盘的fsync性能是很慢的, 所以它会降低mysql的整体性能。
+
+2. 但是，doublewrite buffer写入磁盘共享表空间这个过程是连续存储，是顺序写，性能非常高，(约占写的%10)，牺牲一点写性能来保证数据页的完整还是很有必要的。
 
 ## MySQL线上常见故障剖析
 
@@ -1170,6 +1323,8 @@ The original column names are lost and replaced by `@N`, where `N` is a column n
 ### InnoDB的崩溃恢复过程
 
 [InnoDB的崩溃恢复过程主要分为四个步骤](https://mp.weixin.qq.com/s/9lmuRJY1z87t1c9mAdYqdA)
+
+[MySQL 8.0 Reference Manual :: 15.18.2 InnoDB Recovery](https://dev.mysql.com/doc/refman/8.0/en/innodb-recovery.html#innodb-crash-recovery)
 
 1. redo log操作：保证已提交事务影响的最新数据刷到数据页里。从redo log中读取checkpoint LSN
 2. undo log操作：保证未提交事务影响的数据页回滚。
