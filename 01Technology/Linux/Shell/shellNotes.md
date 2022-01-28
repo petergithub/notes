@@ -73,6 +73,12 @@ echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一�
 
 ```
 
+#### 字符串拼接
+
+`str3=$name": "$url`  #中间可以出现别的字符串
+`str4="$name: $url"`  #这样写也可以
+`str5="${name}Script: ${url}index.html"`  #变量与字符串挨着 需要给变量名加上大括号
+
 #### 字符串替换 replace
 
 - `${var//\"/}` 将"替换成空
@@ -199,7 +205,10 @@ The `-o` and `-a` operators work with the test command or occur within single te
 - `set -e` 当有错误发生的时候abort执行
 - `set +e` 表示关闭`-e`选项, 同`-o errexit`
 - `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
+- `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
 - `bash -n scriptname`  # don't run commands; check for syntax errors only
+
+有些Linux命令，例如rm的-f参数可以强制忽略错误，此时脚本便无法捕捉到errexit，这样的参数在脚本里是不推荐使用的。
 
 #### `dirname $0`
 
@@ -219,9 +228,9 @@ The `-o` and `-a` operators work with the test command or occur within single te
 环境变量`OLDPWD`表示前一次的工作目录,
 环境变量`PWD`表示当前的工作目录.
 
-### Script
+## Script
 
-#### 向脚本传递参数
+### 向脚本传递参数
 
 ``` bash
     #! /bin/sh
@@ -240,7 +249,20 @@ output:
     11
 ```
 
-#### for
+### 封装函数
+
+尽量封装函数使用
+
+```sh
+log() { # classic logger
+    local prefix=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "${prefix} $@" >&2
+}
+
+log "INFO" "a message"
+```
+
+### for
 
 `array=( A B C D E F G )`
 `echo "${array[0]}"`
@@ -280,87 +302,6 @@ do
 done
 ```
 
-#### if/else流程控制
-
-``` bash
-    if condition
-    then
-         do something
-    elif condition
-    then
-        do something
-    elif condition
-    then
-        do something
-    else
-        do something
-    fi
-```
-
-```bash
-VAR1=var
-VAR2=var
-VAR3=var
-if [[ "$VAR1" = "$VAR2" ]] || [[ "$VAR1" = "$VAR3" ]]; then
-    echo "字符串是相等的。"
-else
-    echo "字符串是不相等的。"
-fi
-```
-
-#### switch流程控制
-
-``` bash
-case expression in
-    pattern1)
-        do something...
-        ;;
-    pattern2)
-        do something...
-        ;;
-    pattern2)
-        do something...
-        ;;
-esac
-
-
-case test_a_sentence in
-    *"test"*)
-        echo "in case test"
-        ;;
-    *)
-        echo "default case "
-        ;;
-esac
-```
-
-``` bash
-    if [ a || b && c ]; then
-    　 ....
-    elif ....; then
-    　 ....
-    else
-    　 ....
-    fi
-```
-
-``` bash
-
-    if [ a || b && c ]
-    then
-    　 ....
-    else
-    　 ....
-    fi
-```
-
-``` bash
-
-    while [ -n "$binnum" ]; do
-    　　...
-    done
-```
-
 ``` bash
 
     for x in one two three four
@@ -388,6 +329,83 @@ esac
     do
         echo $i
     done
+```
+
+### while
+
+``` bash
+
+    while [ -n "$binnum" ]; do
+    　　...
+    done
+```
+
+### if/else流程控制
+
+``` bash
+    if condition
+    then
+         do something
+    elif condition
+    then
+        do something
+    elif condition
+    then
+        do something
+    else
+        do something
+    fi
+```
+
+```bash
+VAR1=var
+VAR2=var
+VAR3=var
+if [[ "$VAR1" = "$VAR2" ]] || [[ "$VAR1" = "$VAR3" ]]; then
+    echo "字符串是相等的。"
+else
+    echo "字符串是不相等的。"
+fi
+
+ The right side of == is a shell pattern. If you need a regular expression, use =~ then.
+if [[ xaa.zip = *.zip ]]; then echo zip; else echo not zip; fi;
+
+```
+
+``` bash
+    if [ a || b && c ]; then
+    　 ....
+    elif ....; then
+    　 ....
+    else
+    　 ....
+    fi
+```
+
+### switch流程控制
+
+``` bash
+case expression in
+    pattern1|pattern4|pattern5)
+        do something...
+        ;;
+    pattern2)
+        do something...
+        ;;
+    pattern2)
+        do something...
+        ;;
+esac
+
+
+case test_a_sentence in
+    *"test"*)
+        echo "in case test"
+        ;;
+    *)
+        echo "default case "
+        ;;
+esac
 ```
 
 ``` bash
@@ -427,15 +445,21 @@ esac
     esac
 ```
 
-### example
+## example
 
-#### read each line from file
+### read each line from file
 
 1. while: `while read line;do echo $line; done < filename`
 2. cat | while: `cat filename | while read line; do echo $line; done;`
 3. for: `for line in $(cat filename); do echo $line; done;`
 
-#### 加减乘除
+### 加减乘除
+
+`expr 1 + 2` or `echo $((1+2))`
+`expr 1 - 2` or `echo $((1-2))`
+`expr 2 \* 3` or `expr 2 "*" 3` or `echo $((2*3))`  multiply should escape it like `\*`
+`expr 8 / 2` or `echo $((8/2))`
+`expr 8 % 2` or `echo $((8%2))`
 
 ```shell
 
@@ -445,7 +469,7 @@ esac
     done
 ```
 
-#### 日期自增
+### 日期自增
 
 ``` bash
 
@@ -460,7 +484,7 @@ esac
     done
 ```
 
-#### 时间比较
+### 时间比较
 
 [Shell比较两个日期的大小](http://www.linuxsong.org/2010/09/shell-date-compare/)
 在Shell中我们可以利用date命令比较两个日期的大小, 方法是先把日期转换成时间戳格式, 再进行比较.
@@ -484,4 +508,16 @@ date 的+%s可以将日期转换成时间戳格式,看下面的例子:
     else
         echo "$date1 < $date2"
     fi
+```
+
+### 测量请求时间
+
+```bash
+#!/bin/bash
+# 测量请求时间
+
+DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
+RESPONSE_TIME=`curl -o /dev/null -s -w '%{time_connect} %{time_starttransfer} %{time_total}\n' -I "https://www.baidu.com"`
+
+echo ${DATE} ${RESPONSE_TIME} >> curl.log
 ```

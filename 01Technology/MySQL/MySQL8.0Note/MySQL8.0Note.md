@@ -25,6 +25,53 @@ Beginning with MySQL 8.0.17, InnoDB supports the creation of a multi-valued inde
 
 A new form of the EXPLAIN statement, EXPLAIN ANALYZE, is implemented in MySQL 8.0.18, providing expanded information about the execution of SELECT statements in TREE format for each iterator used in processing the query, and making it possible to compare estimated cost with the actual cost of the query. This information includes startup cost, total cost, number of rows returned by this iterator, and the number of loops executed.
 
+## Chapter 8 Optimization
+
+8.1 Optimization Overview
+8.2 Optimizing SQL Statements
+8.3 Optimization and Indexes
+8.4 Optimizing Database Structure
+8.5 Optimizing for InnoDB Tables
+8.6 Optimizing for MyISAM Tables
+8.7 Optimizing for MEMORY Tables
+8.8 Understanding the Query Execution Plan
+8.9 Controlling the Query Optimizer
+8.10 Buffering and Caching
+8.11 Optimizing Locking Operations
+8.12 Optimizing the MySQL Server
+8.12.1 Optimizing Disk I/O
+8.12.2 Using Symbolic Links
+8.12.3 Optimizing Memory Use
+8.13 Measuring Performance (Benchmarking)
+8.14 Examining Server Thread (Process) Information
+
+### 8.5 Optimizing for InnoDB Tables
+
+8.5.1 Optimizing Storage Layout for InnoDB Tables
+8.5.2 Optimizing InnoDB Transaction Management
+8.5.3 Optimizing InnoDB Read-Only Transactions
+8.5.4 Optimizing InnoDB Redo Logging
+8.5.5 Bulk Data Loading for InnoDB Tables
+8.5.6 Optimizing InnoDB Queries
+8.5.7 Optimizing InnoDB DDL Operations
+8.5.8 Optimizing InnoDB Disk I/O
+8.5.9 Optimizing InnoDB Configuration Variables
+8.5.10 Optimizing InnoDB for Systems with Many Tables
+
+## Chapter 15 The InnoDB Storage Engine
+
+### 15.4 InnoDB Architecture
+
+The following diagram shows in-memory and on-disk structures that comprise the InnoDB storage engine architecture. For information about each structure, see Section 15.5, “InnoDB In-Memory Structures”, and Section 15.6, “InnoDB On-Disk Structures”.
+
+![Figure 15.1 InnoDB Architecture](image/2021-12-21-10-14-10.png)
+
+#### 15.5.1 Buffer Pool
+
+Buffer Pool LRU Algorithm
+
+![Figure 15.2 Buffer Pool List](image/2021-12-21-10-15-48.png)
+
 ## 主从复制
 
 [MySQL 并行复制演进及 MySQL 8.0 中基于 WriteSet 的优化 -雁南归](https://zhuanlan.zhihu.com/p/37129637)
