@@ -21,42 +21,206 @@ Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
 `for i in *; do cd /path/to/folder/$i ;mvn clean; done`
 `SCRIPT_PATH=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname ${S})`
 
-[Fastest way(s) to move the cursor on a terminal command line](https://stackoverflow.com/questions/657130/fastest-ways-to-move-the-cursor-on-a-terminal-command-line?rq=1)
-Use `Ctrl+x` followed by `Ctrl+e` to open the current line in the editor specified by $FCEDIT or $EDITOR or emacs (tried in that order).
-`bindkey` get all keybinding
-
-tr 合并换行 多行变一行
-concatenate multiple lines of output to one line `grep pattern file | tr '\n' ' '`
-Upper case to lower case  `tr [A-Z] [a-z]`
-Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 30" | tr -d " "`
-
-`ls -S` —— 按文件大小排序
 `chkconfig --list` a simple command-line tool for maintaining the /etc/rc[0-6].d directory hierarchy
 获取 IP 地址位置信息: `curl -s "http://ip.taobao.com/service/getIpInfo.php?ip=113.104.182.107" | jq '.data | .city + ", " +.region + ", " + .isp'`
 ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt + F2 unity`
 [Memcached服务端自动启动](http://www.cnblogs.com/technet/archive/2011/09/11/2173485.html)
 
 `ldd --version` get glibc version
-
 `sysctl -a` display all
 `sysctl -p` make effective
 
-为了方便地键入长命令, 在设置你的编辑器后（例如 `export EDITOR=vim`）, 键入 `ctrl-x, ctrl-e` 会打开一个编辑器来编辑当前命令. 在 `vi` 模式下则键入 `escape-v` 实现相同的功能.
+`trap`命令用于指定在接收到信号后将要采取的动作，常见的用途是在脚本程序被中断时完成清理工作。
+当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。
+例如：`trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行
+
+`ls -S` —— 按文件大小排序
+`mv {short,very_long}.txt` will move short.txt to very_long.txt
+`CTRL+h`: show hidden files
+`nautilus`: open your home folder
+`location`: make a command can be call anywhere
+`ln -sfn` update a symbolic link
+`ps -A -opid,stime,etime,args` 查看进程的启动时间
+`pstack` Linux命令查看某个进程的当前线程栈运行情况
+`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
+`last`    To find out when a particular user last logged in to the Linux or Unix server.
+`strace ls a`
+`strace -ffp 12114`
+strace 使用 `strace uptime 2>&1 | grep open`
+
+`fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
+`sudo service network-manager start`
+[network-manager](http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb)
+
+execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
+`$((1 + RANDOM % 1000))` random number between 1 and 1000
+
+`foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr
+`foo > allout.txt 2>&1` all output redirect to the same file
+`log4j.appender.console.target=System.err`
+`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出
+redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`
+
+get the MD5 hash `echo -n Welcome | md5sum`
+
+## Basic Command
+
+M-1 is meta-1 (Alt-1 in Ubuntu)
+C-1 is control-1
+
+[Keyboard problems, setting 3rd level chooser and Meta key in Unity](http://ubuntuforums.org/showthread.php?t=2220062)
+
+If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
+less /usr/share/X11/xkb/symbols/us
+
+### bash
+
+`man readline` to get the introduction to the combination of keys or documentation from [Readline Interaction](http://www.gnu.org/software/bash/manual/bash.html#Readline-Interaction)
+NB : LNEXT interpret the next character as a string. eg : for symbolize a `CR+LF` you must do the key
+combination `ctrl+v+return`, that will print `^M`
+The `M-`/`Meta` sequence means the `Alt` key in Linux/Windows, `Esc` in Mac
+
+为了方便地键入长命令, 在设置你的编辑器后（例如 `export EDITOR=vim`）, 键入 `ctrl-x, ctrl-e` 会打开一个编辑器来编辑当前命令. 在 `vi` 模式下则键入 `escape-v` 实现相同的功能. Use `Ctrl+x` followed by `Ctrl+e` to open the current line in the editor specified by `$FCEDIT` or `$EDITOR` or emacs (tried in that order).
 vimtutor: vim interactive guide
 `man readline` to get the introduction to the combination of keys
+`bindkey` get all keybinding
 Question: Cancel failed reverse-i-search in bash but keep what I typed in
 
-man manpath
-MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
-MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/bin        /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
+[Fastest way(s) to move the cursor on a terminal command line](https://stackoverflow.com/questions/657130/fastest-ways-to-move-the-cursor-on-a-terminal-command-line?rq=1)
 
-`openssl s_client -connect www.example.com:443`
+Add comments for multi-lines
+    press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
 
-ssh连接变得无响应了, 让连接立即终断 阻塞的终端上输入`Enter~.`三个字符就好了,表示终结当前SSH会话.
-其原理是, `~`符号是ssh命令中的转义字符, 就像我们平时编程中使用的`\`一样. 通过在ssh连接中输入`~?,` 你可以看到完整的命令帮助.
-`reset` 恢复出现问题的屏幕
+编辑命令
 
-move hidden files together:
+* CTRL+a : 移到命令行首
+* CTRL+e : 移到命令行尾
+* ALT+f : 按单词前移（右向）
+* ALT+b : 按单词后移（左向）
+* CTRL+xx: 在命令行首和光标之间移动
+* CTRL+u : 从光标处删除至命令行首 remove line command
+* CTRL+k : 从光标处删除至命令行尾
+* CTRL+w : 从光标处删除至字首
+* ALT+d : 从光标处删除至字尾 `esc +d`   Delete the Word after the cursor
+* CTRL+d : 删除光标处的字符
+* CTRL+h : 删除光标前的字符
+* CTRL+y : 粘贴至光标后
+* ALT+c : 从光标处更改为首字母大写的单词
+* ALT+u : 从光标处更改为全部大写的单词
+* ALT+l : 从光标处更改为全部小写的单词
+* CTRL+t : 交换光标处和之前的字符 It will reverse two characters
+* ALT+t : 交换光标处和之前的单词 `esc+t` transpose two adjacent words
+* ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
+
+重新执行命令
+
+* CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
+* CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+* CTRL+g: 从历史搜索模式退出
+* CTRL+p: 历史中的上一条命令
+* CTRL+n: 历史中的下一条命令
+* ALT+.: 使用上一条命令的最后一个参数
+
+控制命令
+
+* CTRL+l: 清屏
+* CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令
+* CTRL+s: 阻止屏幕输出
+* CTRL+q: 允许屏幕输出
+* CTRL+c: 终止命令
+* CTRL+z: 挂起命令
+
+Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node/Event-Designators.html#Event-Designators)
+
+* `!!` or `!-1` : 执行上一条命令 Run the last command-name
+* `!-2` : 执行倒数第二条命令
+* `!-3` : 执行倒数第三条命令
+* `!!:1` or `!^`: to call 1st arg, `echo !!:1`
+* `!!:2`    to call 2nd arg, `echo !!:2`
+* `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同
+* `!$:p`: 打印输出 !$ 的内容
+* `!*`: 上一条命令的所有参数
+* `!*:p`: 打印输出 `!*` 的内容
+
+* `!foo`: 执行最近的以 foo 开头的命令, 如 !ls
+* `!foo:p`: 仅打印输出, 而不执行
+* `^foo`: 删除上一条命令中的 foo
+* `^foo^foo`: 将上一条命令中的 foo 替换为 bar
+* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式，quick substitution
+  * `!!:gs/foo/bar/` 推荐使用
+  * `fc -s foo=bar` GNU bash, zsh
+  * `^foo^bar^:G` zsh
+  * `^foo^bar^` 未验证出来
+
+* `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响
+* `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
+
+Bash History: Correct / Repeat The Last Command With a Substitution
+echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
+`sudo su -` change to root user
+`su - username`(load new env) vs. `su username`
+
+友情提示
+
+   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
+   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
+    输入`du -sh dir`, 按回车执行命令
+    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行`du -sh dir`这条命令  like `watch -n 1 -d du -sh dir`
+    其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
+   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
+   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
+         CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+    The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'`         To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
+    or remove it altogether with `stty stop undef`.
+    or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
+    After that `C-s` would work in the given terminal.
+    Set it in ~/.bashrc to make it work in every terminal.
+        refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)
+   5. 在已经敲完的命令后按`CTRL+x CTRL+e`, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  `echo "export EDITOR=vim" >> ~/.bashrc`
+
+`ALT+.`把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
+undo     CTRL+/
+
+#### bash profile
+
+bash Startup Files: it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`
+ You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.
+add  one line in .profile
+`alias ls='ls --color=never'` #调用`\ls`使用原本的ls命令而不是别名
+add one line in .bashrc
+.bashrc:  `alias grep='grep --color=auto'`
+
+#### file carriage return & line feed 换行
+
+两个字符: 一个字符`Return`来移到第一列, 另一个字符`Line feed`来新增一行
+UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Mac人则认同`<Return> (CR) \r`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF) \r\n`
+在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".
+
+1. $ dos2unix myfile.txt
+2. vi `:%s/^M$//g` #去掉行尾的^M.
+    `:%s/^M//g` #去掉所有的^M.
+3. `sed -e 's/^M//n/g' myfile.txt` // evluate
+ `sed -i 's/^M//n/g' myfile.txt` // replace
+
+vi下显示回车换行符等特殊符号
+显示换行 `:set list` 进入`list mode`, 可以看到以`$`表示的换行符和以`^I`表示的制表符.
+退出`list mode` `:set nolist`
+
+删除换行
+可以用以下命令删除换行符:  `:%s/\n//g`
+可以用以下命令删除DOS文件中的回车符“^M”: `:%s/\r//g`
+可以用以下命令转换DOS回车符“^M”为真正的换行符: `:%s/\r/\r/g`
+
+`fileformats`选项, 用于处理文件格式问题
+`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择, 而将MS-DOS的文件格式做为第二选择
+`:set fileformat?` 检测到的文件格式会被存放在fileformat选项中
+`:set fileformat=unix` 将文件转换为UNIX格式的文件
+
+在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以`EOL`为结束符的
+`:set endofline` 设置文件以`EOL`结束符结尾
+`:set noendofline` 设置文件不以`EOL`结束符来结尾
+
+#### move hidden files together
 
 1. `shopt -s dotglob nullglob`: set shopt
 2. `move configuration/* .`: move files
@@ -69,119 +233,10 @@ move hidden files together:
 expands non-matching globs to zero arguments, rather than to themselves.
 [The-Shopt-Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin), [glob](http://mywiki.wooledge.org/glob)
 
-`trap`命令用于指定在接收到信号后将要采取的动作，常见的用途是在脚本程序被中断时完成清理工作。
-当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。
-例如：`trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行
+#### man manpath
 
-
-`mv {short,very_long}.txt` will move short.txt to very_long.txt
-`Alt + d`, `esc +d`   Delete the Word after the cursor.
-`esc+t` transpose two adjacent words
-`CTRL+h`: show hidden files
-`nautilus`: open your home folder
-`location`: make a command can be call anywhere
-/usr/share/icons/ubuntu-mono-dark/mimes/16
-tweak get the theme ubuntu-mono-dark
-`ln -sfn` update a symbolic link
-`strace ls a`
-`strace -ffp 12114`
-strace 使用 `strace uptime 2>&1 | grep open`
-
-`pstack` Linux命令查看某个进程的当前线程栈运行情况
-`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
-
-M-1 is meta-1 (Alt-1 in Ubuntu)
-C-1 is control-1
-`yum provides /usr/bin/ab`  discover which package contains the program `ab`
-
-man top
-`fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
-`sudo service network-manager start`
-[network-manager](http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb)
-
-send 100 requests with a concurrency of 50 requests to an URL
-`ab -n 100 -c 50 http://www.example.com/`
-
-send requests during 30 seconds with a concurrency of 50 requests to an URL
-`ab -t 30 -c 50 URL http://www.example.com/`
-
-execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
-`$((1 + RANDOM % 1000))` random number between 1 and 1000
-
-`foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr
-`foo > allout.txt 2>&1` all output redirect to the same file
-`log4j.appender.console.target=System.err`
-`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出
-redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`
-
-`dd if=/dev/zero of=10M.file bs=1M count=10`    在当前目录下生成一个10M的文件
-if(input file)告诉dd从哪个文件读取数据, 参数 of(output file)告诉dd读出的数据写入哪个文件中
-bs=1M表示每一次读写1M数据, count=50表示读写 50次, 这样就指定了生成文件的大小为50M
-dd做的只是文件拷贝工作
-
-`dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
-
-get the MD5 hash `echo -n Welcome | md5sum`
-
-`passwd <username>`    update password
-`id <username>`    get the user
-`id -nG <username>`    Find out user group identity
-`less /etc/group` or `groups`    Get all groups in system
-
-`sudo apt-get install -f` fixed it.
-
-pgrep 和 pkill
-pgrep -l apache2
-`ps -A -opid,stime,etime,args` 查看进程的启动时间
-`last`    To find out when a particular user last logged in to the Linux or Unix server.
-
-[Keyboard problems, setting 3rd level chooser and Meta key in Unity](http://ubuntuforums.org/showthread.php?t=2220062)
-
-If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
-less /usr/share/X11/xkb/symbols/us
-
-Set locale:
-`LANG=en_US.UTF-8`
-`export LANG`
-
-`locale -a | less` Query all supported locale
-or `less /usr/share/i18n/SUPPORTED` on a Debian or Ubuntu based system
-
-### Move Running Process to Background
-
-#### ALREADY RUNNING PROCESS INTO BACKGROUND
-
-1. CTRL+z
-2. `jobs`
- or alternate method which lists the PID (note the PID is not the jobnum, the job number is shell specific to the current bash session): jobs -l
-3. `bg %jobnum`
- or alternate method %jobnum & for example for the first job %1 &
-
-To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.
-Show the status of all background and suspended jobs: jobs
-Bring a job back into the foreground: `fg %jobnumber`
-Bring a job back into the background: `bg %jobnumber`
-
-#### ALREADY RUNNING PROCESS INTO NOHUP
-
-1. Run some SOMECOMMAND
-2. ctrl+z to stop (pause) the program and get back to the shell
-3. bg to run it in the background
-4. disown -h so that the process is not killed when the terminal closes
-5. Type exit to get out of the shell because now your good to go as the operation will run in the background in it own process so its not tied to a shell
-
-This process is the equivalent of running nohup SOMECOMMAND
-
-### LibreOffice
-
-CTRL+0 (zero)     Apply Default paragraph style
-CTRL+1     Apply Heading 1 paragraph style
-CTRL+ALT+PageDown: Navigating from comment to comment
-CTRL+ALT+c: create comment
-ALT+Insert, and then press the up or down arrow key:  insert a new row in a table
-ALT+Delete, and then press the up or down arrow key.
-
-## Basic Command
+MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
+MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/bin        /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
 
 ### vi
 
@@ -478,6 +533,9 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 
 `grep -l old *.htm | xargs sed -n "/old/p"`  (`-n` 静默替换)
 把web文件下所有文件中的`//old.example.com`替换为`//new.example.com`: `sed -i 's/\/\/new.example.com/\/\/old.example.com/g' $(grep -rl '//old.example.com' web/*)`
+
+pgrep 和 pkill
+pgrep -l apache2
 
 删除行尾空格: `%s/\s+$//g`
 删除行首多余空格: `%s/^\s*// 或者 %s/^ *//`
@@ -1013,7 +1071,7 @@ If you want a command to be run once at system boot, the correct solution is to 
 * system RC scripts (/etc/rc.local)
 * crontab with the `@reboot` special prefix (see manpage)
 
-#### logrotate
+### logrotate
 
 在/etc/logrotate.d/ 文件夹下, 新建nginx文件 内容如下
 `logrotate -d /etc/logrotate.d/nginx` 测试, 不会真的切割文件
@@ -1049,146 +1107,6 @@ If you want a command to be run once at system boot, the correct solution is to 
 ```
 
 [Nginx Log Rotation](https://www.nginx.com/resources/wiki/start/topics/examples/logrotation/)
-
-### bash
-
-`man readline` to get the introduction to the combination of keys or documentation from [Readline Interaction](http://www.gnu.org/software/bash/manual/bash.html#Readline-Interaction)
-NB : LNEXT interpret the next character as a string. eg : for symbolize a `CR+LF` you must do the key
-combination `ctrl+v+return`, that will print `^M`
-The `M-`/`Meta` sequence means the `Alt` key in Linux/Windows, `Esc` in Mac
-
-CTRL+u remove line command
-CTRL+t It will reverse two characters
-Add comments for multi-lines
-    press CTRL+v to enter visual block mode and press "down" until all the lines are marked. Then press I to insert at the beginning (of the block). The inserted characters will be inserted in each line at the left of the marked block.
-编辑命令
-
-* CTRL+a : 移到命令行首
-* CTRL+e : 移到命令行尾
-* ALT+f : 按单词前移（右向）
-* ALT+b : 按单词后移（左向）
-* CTRL+xx: 在命令行首和光标之间移动
-* CTRL+u : 从光标处删除至命令行首
-* CTRL+k : 从光标处删除至命令行尾
-* CTRL+w : 从光标处删除至字首
-* ALT+d : 从光标处删除至字尾
-* CTRL+d : 删除光标处的字符
-* CTRL+h : 删除光标前的字符
-* CTRL+y : 粘贴至光标后
-* ALT+c : 从光标处更改为首字母大写的单词
-* ALT+u : 从光标处更改为全部大写的单词
-* ALT+l : 从光标处更改为全部小写的单词
-* CTRL+t : 交换光标处和之前的字符
-* ALT+t : 交换光标处和之前的单词
-* ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
-
-重新执行命令
-
-* CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
-* CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-* CTRL+g: 从历史搜索模式退出
-* CTRL+p: 历史中的上一条命令
-* CTRL+n: 历史中的下一条命令
-* ALT+.: 使用上一条命令的最后一个参数
-
-控制命令
-
-* CTRL+l: 清屏
-* CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令
-* CTRL+s: 阻止屏幕输出
-* CTRL+q: 允许屏幕输出
-* CTRL+c: 终止命令
-* CTRL+z: 挂起命令
-
-Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node/Event-Designators.html#Event-Designators)
-
-* `!!` or `!-1` : 执行上一条命令 Run the last command-name
-* `!-2` : 执行倒数第二条命令
-* `!-3` : 执行倒数第三条命令
-* `!!:1` or `!^`: to call 1st arg, `echo !!:1`
-* `!!:2`    to call 2nd arg, `echo !!:2`
-* `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同
-* `!$:p`: 打印输出 !$ 的内容
-* `!*`: 上一条命令的所有参数
-* `!*:p`: 打印输出 `!*` 的内容
-
-* `!foo`: 执行最近的以 foo 开头的命令, 如 !ls
-* `!foo:p`: 仅打印输出, 而不执行
-* `^foo`: 删除上一条命令中的 foo
-* `^foo^foo`: 将上一条命令中的 foo 替换为 bar
-* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式，quick substitution
-  * `!!:gs/foo/bar/` 推荐使用
-  * `fc -s foo=bar` GNU bash, zsh
-  * `^foo^bar^:G` zsh
-  * `^foo^bar^` 未验证出来
-
-* `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响
-* `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
-
-Bash History: Correct / Repeat The Last Command With a Substitution
-echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
-`sudo su -` change to root user
-`su - username`(load new env) vs. `su username`
-
-友情提示
-
-   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
-   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
-    输入`du -sh dir`, 按回车执行命令
-    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行`du -sh dir`这条命令  like `watch -n 1 -d du -sh dir`
-    其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
-   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
-   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
-         CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-    The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'`         To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
-    or remove it altogether with `stty stop undef`.
-    or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
-    After that `C-s` would work in the given terminal.
-    Set it in ~/.bashrc to make it work in every terminal.
-        refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)
-   5. 在已经敲完的命令后按`CTRL+x CTRL+e`, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  `echo "export EDITOR=vim" >> ~/.bashrc`
-
-`ALT+.`把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
-undo     CTRL+/
-
-#### bash profile
-
-bash Startup Files: it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`
- You only want to see it on login, so you only want to place this in your .bash_profile. If you put it in your .bashrc, you'd see it every time you open a new terminal window.
-add  one line in .profile
-`alias ls='ls --color=never'` #调用`\ls`使用原本的ls命令而不是别名
-add one line in .bashrc
-.bashrc:  `alias grep='grep --color=auto'`
-
-#### file carriage return & line feed 换行
-
-两个字符: 一个字符`Return`来移到第一列, 另一个字符`Line feed`来新增一行
-UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Mac人则认同`<Return> (CR) \r`的解决办法, MS则坚持古老的`<Return><Line feed> (CRLF) \r\n`
-在Linux下使用vi来查看一些在Windows下创建的文本文件, 有时会发现在行尾有一些"^M". 有几种方法可以处理,注意: 这里的"^M"要使用"CTRL+v CTRL+m"生成, 而不是直接键入"^M".
-
-1. $ dos2unix myfile.txt
-2. vi `:%s/^M$//g` #去掉行尾的^M.
-    `:%s/^M//g` #去掉所有的^M.
-3. `sed -e 's/^M//n/g' myfile.txt` // evluate
- `sed -i 's/^M//n/g' myfile.txt` // replace
-
-vi下显示回车换行符等特殊符号
-显示换行 `:set list` 进入`list mode`, 可以看到以`$`表示的换行符和以`^I`表示的制表符.
-退出`list mode` `:set nolist`
-
-删除换行
-可以用以下命令删除换行符:  `:%s/\n//g`
-可以用以下命令删除DOS文件中的回车符“^M”: `:%s/\r//g`
-可以用以下命令转换DOS回车符“^M”为真正的换行符: `:%s/\r/\r/g`
-
-`fileformats`选项, 用于处理文件格式问题
-`:set fileformats=unix,dos` vim将UNIX文件格式做为第一选择, 而将MS-DOS的文件格式做为第二选择
-`:set fileformat?` 检测到的文件格式会被存放在fileformat选项中
-`:set fileformat=unix` 将文件转换为UNIX格式的文件
-
-在默认情况下, Vim认为文件是由行组成的, 并且文件最后一行是以`EOL`为结束符的
-`:set endofline` 设置文件以`EOL`结束符结尾
-`:set noendofline` 设置文件不以`EOL`结束符来结尾
 
 ### zip jar tar
 
@@ -1276,6 +1194,12 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 * 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
 * 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
 * 找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+
+### tr 合并换行 多行变一行
+
+concatenate multiple lines of output to one line `grep pattern file | tr '\n' ' '`
+Upper case to lower case  `tr [A-Z] [a-z]`
+Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 30" | tr -d " "`
 
 ### curl
 
@@ -1476,6 +1400,39 @@ man -k or apropos: key words search for command
 find out which command shell executes and to print binary(command) file location for specified command: which, whereis, type -a
 `locate indexserverconfig.xml`    find file based on index /var/lib/mlocate/mlocate.db
 `updatedb`    update index /var/lib/mlocate/mlocate.db as per /etc/updatedb.conf
+
+### Move Running Process to Background
+
+#### ALREADY RUNNING PROCESS INTO BACKGROUND
+
+1. CTRL+z
+2. `jobs`
+ or alternate method which lists the PID (note the PID is not the jobnum, the job number is shell specific to the current bash session): jobs -l
+3. `bg %jobnum`
+ or alternate method %jobnum & for example for the first job %1 &
+
+To place a foreground process in the background: suspend the foreground process (with CTRL+z) then enter the bg command to move the process into the background.
+Show the status of all background and suspended jobs: jobs
+Bring a job back into the foreground: `fg %jobnumber`
+Bring a job back into the background: `bg %jobnumber`
+
+#### ALREADY RUNNING PROCESS INTO NOHUP
+
+1. Run some SOMECOMMAND
+2. ctrl+z to stop (pause) the program and get back to the shell
+3. bg to run it in the background
+4. disown -h so that the process is not killed when the terminal closes
+5. Type exit to get out of the shell because now your good to go as the operation will run in the background in it own process so its not tied to a shell
+
+This process is the equivalent of running nohup SOMECOMMAND
+
+### ab
+
+send 100 requests with a concurrency of 50 requests to an URL
+`ab -n 100 -c 50 http://www.example.com/`
+
+send requests during 30 seconds with a concurrency of 50 requests to an URL
+`ab -t 30 -c 50 URL http://www.example.com/`
 
 ### Other
 
@@ -1811,6 +1768,15 @@ inotifywait --exclude '\.(part|swp)' -r -mq -e  modify,move_self,create,delete,m
 
 # execute: nohup watch.sh > /dev/null 2>&1 &
 ```
+
+### LibreOffice
+
+CTRL+0 (zero)     Apply Default paragraph style
+CTRL+1     Apply Heading 1 paragraph style
+CTRL+ALT+PageDown: Navigating from comment to comment
+CTRL+ALT+c: create comment
+ALT+Insert, and then press the up or down arrow key:  insert a new row in a table
+ALT+Delete, and then press the up or down arrow key.
 
 ## Miscellaneous
 
@@ -2177,11 +2143,16 @@ identify the directory which is using all your inodes:
 `dd if=/dev/zero of=/tmp/output bs=1G count=1 conv=fdatasync`
 `dd if=/dev/zero of=/tmp/output bs=8k count=256k conv=fdatasync; rm -f /tmp/output`
 上面命令测试了分别以每次8k和1g的大小, 写入1g文件的速度.
-`if`: 输入文件名,  /dev/zero 设备无穷尽地提供0
-`of`: 输出文件名
-`bs`: 块大小
-`count`: 次数
+`if`: input file 输入文件名,  /dev/zero 设备无穷尽地提供0
+`of`: output file 输出文件名
+`bs`: 块大小 表示每一次读写1M数据
+`count`: 表示读写次数
 `conv=fdatasync` : 实际写盘, 而不是写入Page Cache
+
+`dd if=/dev/zero of=10M.file bs=1M count=10`    在当前目录下生成一个10M的文件
+
+dd做的只是文件拷贝工作
+`dd if=/dev/zero of=test bs=1M count=0 seek=100` 此时创建的文件在文件系统中的显示大小为100M,但是并不实际占用block,占用空间为0, `du -m test`
 
 #### 硬盘读速度
 
@@ -2749,273 +2720,6 @@ Clear System Proxy Setting from the Command Line
 Finally, to remove manual/automatic proxy setting, and revert to no-proxy setting:
 `$ gsettings set org.gnome.system.proxy mode 'none'`
 
-#### SSH
-
-`ssh user@host`    以 user 用户身份连接到 host
-`ssh -p port user@host`    在端口 port 以 user 用户身份连接到 host
-`-f`    ssh将在后台运行
-`-N`    不执行命令, 仅转发端口
-`-T`    表示不为这个连接分配TTY
-`-g`    Allows remote hosts to connect to local forwarded ports.
-`-C`    压缩传送的数据
-`-i`    使用指定的密钥登录
-    It is required that your private key files are NOT accessible by others
-    Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
-`-t` Force pseudo-tty allocation for bash to use as an interactive shell
-`-o PreferredAuthentications=password` login with password,  默认会依次尝试 GSSAPI-based认证, host-based认证, public key认证, challenge response认证, password认证 这几种认证方式. PreferredAuthentications 可以修改顺序
-`-o PublicAuthentication=no`表示关闭公钥认证方式. 这样就能保证当服务端不支持密码认证时,也不会使用公钥认证.
-`--login` set up the login environment
-
-`sshpass` make ssh with password in command line
-
-`ssh -t user@server "mail && bash"`    Single command to login to SSH and run program
-`ssh user@host "bash --login -c 'command arg1 ...'"` will make the remote shell set up the login environment
-通过 SSH 来 mount 文件系统 `sshfs name@server:/path/to/folder /path/to/mount/point`
-
-escape_char (default: '~').  The escape character is only recognized at the beginning of a line.  The escape character followed by a dot ('.') closes the connection; followed by control-Z suspends the connection;
-`~.`    close the connection
-`~^Z`    suspends the connection
-`fg` reconnect
-
-`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"`    #Creates a new ssh key, using the provided email as a label #Generating public/private rsa key pair.
-`ssh-keygen -p` change the passphrase for an existing private key without regenerating the keypair
-`ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub` outputs the public key
-
-`ssh-copy-id user@host`    将公钥添加到 host 以实现无密码登录
-`ssh-copy-id -i ~/.ssh/id_rsa.pub username@host`
-`cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`    从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
-`ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys < ~/.ssh/id_rsa.pub'`
-
-`cd && tar czv src | ssh user@host 'tar xz'`    将$HOME/src/目录下面的所有文件, 复制到远程主机的$HOME/src/目录
-`ssh user@host 'tar cz src' | tar xzv`    将远程主机$HOME/src/目录下面的所有文件, 复制到用户的当前目录
-`ssh user@host 'bash -s' < local_script.sh` execute the local script on the remote server
-`vim scp://user@remoteserver//etc/hosts` Edit text files with VIM over ssh/scp
-
-`yes | pv | ssh $host "cat > /dev/null"`    实时SSH网络吞吐量测试 通过SSH连接到主机, 显示实时的传输速度, 将所有传输数据指向/dev/null, 需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
-`yes | pv | cat > /dev/null`
-
-`ssh user@host -l user "cat cmd.txt"`    通过SSH运行复杂的远程shell命令
-`mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"`    通过SSH将MySQL数据库复制到新服务器
-
-`ssh -oStrictHostKeyChecking=no user@host` you will not be prompted to accept a host key but with some waring sometimes.
-`ssh -oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null` you will not be prompted to accept a host key and makes warnings disappear
-
-ssh login log `/var/log/secure` is configured in /etc/ssh/sshd_config
-
-##### 开启认证代理连接转发功能
-
-[What is SSH Agent Forwarding and How Do You Use It?](https://www.cloudsavvyit.com/25/what-is-ssh-agent-forwarding-and-how-do-you-use-it/)
-[ssh转发代理：ssh-agent用法详解](https://www.cnblogs.com/f-ck-need-u/p/10484531.html)
-
-在 server 上使用本地的私钥来进行认证，不需要拷贝本地私钥到 server
-
-```bash
-# 开启代理
-ssh-agent
-# 添加密钥到ssh-agent的高速缓存中
-ssh-add ~/.ssh/id_rsa
-# 查看是否添加成功
-ssh-add -l
-
-# 注意 ssh 到第一台 server1 的时候，使用 -A 选项 开启认证代理连接转发功能
-ssh -A server1
-# 登录需要本地私钥的服务器，登陆其他 server2 的时候，只支持 ip 地址访问，可以在 server1 的 /etc/hosts 里面配置host，就可以通过主机名访问
-ssh -p port root@server2
-```
-
-ssh-agent的工作是依赖于环境变量 `SSH_AUTH_SOCK` 和 `SSH_AGENT_PID`
-
-##### Troubleshooting sshd
-
-[OpenSSH Configuring](https://help.ubuntu.com/community/SSH/OpenSSH/Configuring)
-
-1. `ps -ef | grep ssh`, `sudo ss -lnp | grep sshd` or `sudo netstat -anp | grep sshd`
-`root      3865     1  0 11:53 ?        00:00:00 /usr/sbin/sshd -D`
-2. `sudo service ssh restart`
-3. `less /var/log/syslog`
-4. `$(which sshd) -Ddp 10222`
-
-##### Troubleshooting ssh
-
-[networking_2ndEd ssh](https://docstore.mik.ua/orelly/networking_2ndEd/ssh/ch12_01.htm)
-
-###### Bad owner or permissions on .ssh/config
-
-chmod 600 .ssh/config
-
-###### Too many authentication failures
-
-> This is usually caused by inadvertently offering multiple ssh keys to the server. The server will reject any key after too many keys have been offered.
-> To prevent irrelevant keys from being offered, you have to explicitly specify this in every host entry in the ~/.ssh/config (on the client machine) file by adding IdentitiesOnly like so
-
-``` bash
--o 'IdentitiesOnly yes'
-
-Host www.somehost.com
-  IdentityFile ~/.ssh/key_for_somehost_rsa
-  IdentitiesOnly yes
-  Port 22
-```
-
-##### Keep SSH Sessions Alive 保持SSH连接不断线
-
-1. client: ssh -o ServerAliveInterval=60 username@host
-2. update .ssh/config
-源头发力的办法就是, 让ssh一直尝试与服务器通信, 不让其空闲下来, 间隔时间与服务器发keepalive的心跳包, 通过简单的ssh设置就能做到这一点
-vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
-`ServerAliveInterval <X>`
-`ServerAliveCountMax <Y>`
-上面的X表示, 两次心跳指令的发送间隔秒数, Y则代表发送指令的最大数量, 你可以根据你要离开的时间, 灵活的做出调整. 或者你也可以不对最大发送指令数量, 做限制, 只给出一个间隔时间, 保持心跳包接受顺畅就好
-
-> ServerAliveInterval: number of seconds that the client will wait before sending a null packet to the server (to keep the connection alive).
-> ClientAliveInterval: number of seconds that the server will wait before sending a null packet to the client (to keep the connection alive).
-> Setting a value of 0 (the default) will disable these features so your connection could drop if it is idle for too long.
-
-##### SSH隧道 端口转发(Port Forwarding)
-
-这是一种隧道(tunneling)技术
-[远程操作与端口转发](http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html )
-[Linux下ssh动态端口转发](https://www.chenyudong.com/archives/linux-ssh-port-dynamic-forward.html )
-[实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward )
-[SSH隧道：端口转发功能详解](https://www.cnblogs.com/f-ck-need-u/p/10482832.html)
-
-###### 动态转发
-
-`ssh -D <local port> <SSH Server>`    动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能
-`ssh -D 7070 remoteServer -gfNT` Dynamic forward all the connection by SOCKS
-`ssh -D 7070 -l username proxy.remotehost.com -gfNT -o ProxyCommand="connect -H web-proxy.oa.com:8080 %h %p "` 给ssh连接增加http代理, 如果你的PC无法直接访问到ssh服务器上，但是有http代理可以访问，那么可以为建立这个socks5的动态端口转发加上一个代理.
-其中ProxyCommand指定了使用`connect`程序(`sudo apt-get install connect-proxy`)来进行代理。通常还可以使用corkscrew来达到相同的效果。
-
-###### 本地端口转发
-
-localhost 连不上remoteSecret, remoteHost可以连通localhost和remoteSecret, 通过remoteHost连上remoteSecret
-`ssh -gL localPort:remoteSecret:remoteSecretPort remoteHost`    #在localhost执行本地端口转发Local forwarding:connect remoteSecret through remoteHost
-`ssh -gL <localhost>:<local port>:<remote host>:<remote port> <SSH hostname>`  # localhost 可以是 0.0.0.0 运行本地网络的其他机器连接
-
-其工作方式为：在本地指定一个由ssh监听的转发端口(localPort)，将远程主机的端口(remoteSecret:remoteSecretPort)映射为本地端口(localPort)，当有主机连接本地映射端口(localPort)时，本地ssh就将此端口的数据包转发给中间主机(remoteHost)，然后 remoteHost 再与远程主机的端口(remoteSecret:remoteSecretPort)通信。
-
-example 1: 通过 host3 的端口转发, ssh通过连接 localhost 登录 host2
-
-1. `ssh -gfNTL 9001:host2:22 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
-2. `ssh -p 9001 localhost` ssh登录本机的9001端口, 相当于连接host2的22端口
-
-example 2: 通过 host3 的端口转发, local 通过连接 localhost:9001 访问 host2:80
-
-1. `ssh -gfNTL 9001:host2:80 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
-2. `curl localhost:9001` ssh登录本机的9001端口, 相当于连接host2的22端口
-
-###### 远程端口转发
-
-localhost与remoteSecret之间无法连通, 必须借助remoteHost转发, 不过remoteHost是一台内网机器, 它可以连接外网的localhost, 但是反过来就不行, 外网的localhost连不上内网的remoteHost.
-解决办法:从remoteHost上建立与localhost的SSH连接, 然后在localhost上使用这条连接
-
-1. `ssh -R localPort:remoteSecret:remoteSecretPort localhost`    #在remoteHost执行
-2. `ssh -p localPort localhost`    #在localhost上SSH本机localPort, 即连接上了remoteSecret
-
-`ssh -R <localhost>:<local port>:<remote host>:<remote port> <SSH hostname>`    #远程端口转发remote forwarding
-
-##### Jumphost
-
-Bastion host 堡垒机 跳板机
-
-[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/ )
-
-Jumphosts are used as intermediate hops between your actual SSH target and yourself. Instead of using something like "unsecure" SSH agent forwarding, you can use ProxyCommand to proxy all your commands through your jumphost.
-You want to connect to HOST B and have to go through HOST A, because of firewalling, routing, access privileges
-+---+       +---+       +---+
-|You|   ->  | A |   ->  | B |
-+---+       +---+       +---+
-
-Classic SSH Jumphost configuration
-
-###### ProxyCommand
-
-A configuration like this will allow you to proxy through HOST A.
-
-``` bash
-
-    $ cat .ssh/config
-    Host host-a
-      Hostname 10.0.0.5
-      User your_username
-
-    Host host_b
-      Hostname 192.168.0.1
-      User your_username
-      Port 22
-      ProxyCommand ssh -q -W %h:%p host-a
-```
-
-Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that is the `ProxyCommand` being executed) and start the SSH session to your actual target.
-
-SSH Jumphost configuration with netcat (nc)
-Alternatively, if you can't/don't want to use ssh to tunnel your connections, you can also use nc (netcat).
-configure it in ./ssh/config with `ProxyCommand`
-`ProxyCommand ssh host-a nc -w 120 %h %p`
-
-If netcat is not available to you as a regular user, because permissions are limited, you can prefix it with sudo
-`ProxyCommand ssh host-a sudo nc -w 120 %h %p`
-
-###### ProxyJump
-
-Starting from OpenSSH 7.3, released August 2016, ssh support ProxyJump
-
-`ssh -J host1,host2,host3 user@host4.internal` A key thing to understand here is that this is not the same as ssh host1 then user@host1:~$ ssh host2, the -J jump parameter uses forwarding trickery so that the localhost is establishing the session with the next host in the chain.
-
-``` bash
-    Host host2
-        HostName 172.17.1.172
-        Port 22
-        IdentityFile ~/.ssh/id_rsa
-        #ProxyCommand ssh -q -W %h:%p jump
-        ProxyJump jump
-```
-
-##### 创建Kerberos的keytab文件
-
-```bash
-cd /data/
-ktutil
-addent -password -p username@GMAIL.COM -k 1 -e aes256-cts
-wkt username.keytab
-quit
-```
-
-alias ssh35="kinit username@GMAIL.COM -k -t ~/sp/username.keytab;ssh work@host1 -t 'ssh host2;bash -l'"
-ssh root@MachineB 'bash -s' < local_script.sh    #run local shell script on a remote machine
-trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
-
-#### pssh
-
-pssh  is  a  program  for executing ssh in parallel on a number of hosts.
-
-`pssh -ih /path/to/host.txt date` Pass list of hosts using a file
-`pssh -iH "host1 host2" date` Pass list of hosts manually
-`pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
-    Using `-o` or `--outdir` you can save standard output to files
-    Using `-e` or `--errdir` you can save standard error to files
-
-#### SCP
-
-`scp client_file user@host:filepath`    上传文件到服务器端
-`scp user@host:server_files client_file_path`    下载文件
-`scp -3 -P port1 ruser1@rhost1:/rpath/1 scp://ruser2@rhost2:port2/rpath/2` scp from rhost1 to rhost2
-`scp -3 host1:source_file host2:target_file`
-
-client_file 待上传的文件, 可以有多个, 多个文件之间用空格隔开. 也可以用*.filetype上传某个类型的全部文件
-user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
-
-#### Windows putty plink pscp
-
-pscp.exe -pw pwd filename username@host:directory/subdirectory
-plink -pw pwd username@host ls;ls
-plink -pw pwd username@host -m local_script.sh
-plink -i %putty%/privateKey.ppk
-Windows的控制台会把两个双引号之间的字符串作为一个参数传递给被执行的程序, 而不会把双引号也传递给程序
-所以错误命令C:\>plink 192.168.6.200 ls "-l"
-Windows控制台不认得单引号, 所以上面那个命令的正确用法应该是:
-c:\>plink 192.168.6.200 ls '-l'
-
 ### User
 
 `groupadd <groupName>`    Add a new group
@@ -3024,6 +2728,12 @@ c:\>plink 192.168.6.200 ls '-l'
 `usermod -G {groupname1,groupname2,...} <username>`    Remove user from group which is not list in the command
 `groups username`    To find group memebership for username
 `useradd --create-home --comment "Account for running Confluence" --shell /bin/bash confluence`
+
+`passwd <username>`    update password
+`vipw` 管理所有用户
+`id <username>`    get the user
+`id -nG <username>`    Find out user group identity
+`less /etc/group` or `groups`    Get all groups in system
 
 #### Steps to Create a New Sudo User
 

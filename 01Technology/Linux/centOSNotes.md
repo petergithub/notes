@@ -233,6 +233,7 @@ yum provides git
 `yum groupinfo 'Development Tools'` Display description and contents of a package group
 
 `yum provides /etc/passwd` or `yum whatprovides /etc/passwd` Display what package provides the file
+`yum provides /usr/bin/ab`  discover which package contains the program `ab`
 
 `yum check` check the local RPM database for problems
 `yum repolist` list software repositories
