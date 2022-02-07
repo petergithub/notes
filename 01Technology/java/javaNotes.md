@@ -2,6 +2,8 @@
 
 ## Recent
 
+Jakarta (/dʒəˈkɑːrtə/
+
 锁降级
 JEP draft: Concurrent Monitor Deflation http://openjdk.java.net/jeps/8183909
 不可不说的Java“锁”事 https://tech.meituan.com/2018/11/15/java-lock.html
@@ -30,8 +32,6 @@ concurrent: 主内存.寄存器是是运行时?
     /      \
 >-------------->>
 ```
-
-jcmd jhsdb
 
 [OpenJDK](https://openjdk.java.net/)
 
@@ -260,15 +260,19 @@ Solution: This exception usually arises when the socket operations performed on 
 ### 虚拟机监控工具
 
 [Troubleshooting Guide for Java SE 6 with HotSpot VM](http://www.oracle.com/technetwork/java/javase/memleaks-137499.html#gdysp)
-jps: 虚拟机进程状况工具  (Java Virtual Machine Process Status Tool)
-jstat: 虚拟机统计信息工具  (Java Virtual Machine Statistics Monitoring Tool)
-jinfo: Java配置信息工具
-jmap: Java内存映像工具  (Memory Map)
-jhat: 虚拟机堆转储快照分析工具  (Java Heap Analysis Tool)
-jstack: Java堆栈跟踪工具  (Stack Trace)
-HSDIS: JIT生成代码反汇编
-`jcmd 4874 VM.command_line` 打印指定线程的启动参数
+
+* jps: 虚拟机进程状况工具  (Java Virtual Machine Process Status Tool)
+* jstat: 虚拟机统计信息工具  (Java Virtual Machine Statistics Monitoring Tool)
+* jinfo: Java配置信息工具
+* jmap: Java内存映像工具  (Memory Map)
+* jhat: 虚拟机堆转储快照分析工具  (Java Heap Analysis Tool)
+* jstack: Java堆栈跟踪工具  (Stack Trace)
+* HSDIS: JIT生成代码反汇编
+* [jcmd](https://docs.oracle.com/en/java/javase/11/tools/jcmd.html) send diagnostic command requests to a running Java Virtual Machine (JVM)
+* [jhsdb](https://docs.oracle.com/en/java/javase/11/tools/jhsdb.html): You use the jhsdb tool to attach to a Java process or to a core dump from a crashed Java Virtual Machine (JVM).
+
 HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`
+
 [Serviceability in HotSpot](http://openjdk.java.net/groups/hotspot/docs/Serviceability.html)
 
 #### jmap
@@ -297,7 +301,55 @@ dump堆：-dump:[live],format=b,file=dump.bin
 在JDK 1.7之后，新增了一个命令行工具jcmd。它是一个多功能工具，可以用来导出堆，查看java进程，导出线程信息，执行GC等。
 jcmd拥有jmap的大部分功能，Oracle官方建议使用jcmd代替jmap
 
-* `jcmd pid help` 列出该虚拟机支持的所有命令
+[The jcmd Command](https://docs.oracle.com/en/java/javase/13/docs/specs/man/jcmd.html)
+
+```sh
+# jcmd pid help 列出该虚拟机支持的所有命令
+
+jcmd 8799 help
+8799:
+The following commands are available:
+JFR.stop
+JFR.start
+JFR.dump
+JFR.check
+VM.native_memory
+VM.check_commercial_features
+VM.unlock_commercial_features
+ManagementAgent.stop
+ManagementAgent.start_local
+ManagementAgent.start
+GC.rotate_log
+Thread.print
+GC.class_stats
+GC.class_histogram
+GC.heap_dump
+GC.run_finalization
+GC.run
+VM.uptime
+VM.flags
+VM.system_properties
+VM.command_line
+VM.version
+help
+
+For more information about a specific command use 'help <command>'.
+```
+
+#### jhsdb
+
+[jhsdb](https://docs.oracle.com/en/java/javase/11/tools/jhsdb.html)
+
+JCMD、JHSDB和基础工具的对比
+
+| 基础工具               |   JCMD                            |   JHSDB   |
+|     ---               | ---                               | ---       |
+| `jps -lm`               | jcmd                                | N/A |
+| `jmap -dump <pid>`      | `jcmd <pid> GC.heap_dump`          | jhsdb jmap --binaryheap |
+| `jmap-histo <pid>`      | `jcmd <pid> GC.class_histogram`    | jhsdb jmap --histo |
+| `jstack <pid>`          | `jcmd <pid> Thread.print`           | jhsdb jstack --locks |
+| `jinfo -sysprops <pid>` | `jcmd <pid> VM.system_properties`  | jhsdb info --sysprops |
+| `jinfo -flags <pid>`    | `jcmd <pid> VM.flags`               | jhsdb info --flags |
 
 #### jstack
 
@@ -425,18 +477,19 @@ Greys是一个JVM进程执行过程中的异常诊断工具，可以在不中断
 [新一代垃圾回收器ZGC的探索与实践 - 美团技术团队](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
 
 goals
-    Pause times do not exceed 10ms
-    Pause times do not increase with the heap or live-set size
-    Handle heaps ranging from a few hundred megabytes to multi terabytes in size
+
+* Pause times do not exceed 10ms
+* Pause times do not increase with the heap or live-set size
+* Handle heaps ranging from a few hundred megabytes to multi terabytes in size
 
 At a glance, ZGC is:
 
-    Concurrent
-    Region-based
-    Compacting
-    NUMA-aware
-    Using colored pointers
-    Using load barriers
+* Concurrent
+* Region-based
+* Compacting
+* NUMA-aware
+* Using colored pointers
+* Using load barriers
 
 江南白衣本衣 春天的旁边 [Java程序员的荣光，听R大论JDK11的ZGC](https://mp.weixin.qq.com/s/KUCs_BJUNfMMCO1T3_WAjw)
 > R大: 与标记对象的传统算法相比，ZGC在指针上做标记，在访问指针时加入Load Barrier（读屏障），比如当对象正被GC移动，指针上的颜色就会不对，这个屏障就会先把指针更新为有效地址再返回，也就是，永远只有单个对象读取时有概率被减速，而不存在为了保持应用与GC一致而粗暴整体的Stop The World。
