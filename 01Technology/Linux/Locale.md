@@ -56,7 +56,7 @@ LC_ALL=
 
 一般来说，我们在新装系统之后，默认的`locale`就是`C`或`POSIX`：C是系统默认的locale，而`POSIX`是`C`的别名，这是标准的`C Locale`。这里说的`C`其实就是`ASCII`编码。
 
-`POSIX`：可移植操作系统接口（Portable Operating System Interface of UNIX，缩写为 `POSIX` ）`POSIX`标准定义了操作系统应该为应用程序提供的接口标准
+`POSIX`：可移植操作系统接口（Portable Operating System Interface of UNIX，缩写为 `POSIX` ）`POSIX`标准定义了操作系统应该为应用程序提供的接口标准，是IEEE为要在各种UNIX操作系统上运行的软件而定义的一系列API标准的总称，其正式称呼为`IEEE 1003`，而国际标准名称为`ISO/IEC 9945`。
 
 Set locale:
 `LANG=en_US.UTF-8`
