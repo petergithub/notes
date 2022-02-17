@@ -363,9 +363,23 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 ## Apps
 
-[IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
-[ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
-[rustdesk 远程桌面软件](https://rustdesk.com/zh/)
-[Joplin is a free, open source note taking and to-do application](https://github.com/laurent22/joplin)
-[Typora — a markdown editor, markdown reader](https://typora.io/)
-[TablePlus | Modern, Native Tool for Database Management](https://tableplus.com/)
+* [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
+* [ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
+* [rustdesk 远程桌面软件](https://rustdesk.com/zh/)
+* [Joplin is a free, open source note taking and to-do application](https://github.com/laurent22/joplin)
+* [Typora — a markdown editor, markdown reader](https://typora.io/)
+* [TablePlus | Modern, Native Tool for Database Management](https://tableplus.com/)
+* [Go2Shell](http://zipzapmac.com/Go2Shell): Opens a terminal window to the current directory in Finder: `open -a iTerm`
+* [Mos](https://mos.caldis.me/) set scroll direction independently for your mouse
+* [Fantastical Calendar](https://flexibits.com/fantastical)
+* [jd-GUI](http://jd.benow.ca)
+* [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
+* [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
+* [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac, Command+drag; start with open -a /Applications/Vanilla.app in a script ~/.script/mac_startup.sh
+* [Open Web Monitor](http://openwebmonitor.netqon.com/)
+* [kap: screen record to gif](https://getkap.co/)
+* Airtest - UI Auto test
+* SwitchHosts - hosts /etc/hosts switch
+* [Bagel is a little native iOS network debugger](https://github.com/yagiz/Bagel)
+* NewFileMenuFree
+* Maccy: Lightweight clipboard manager for macOS

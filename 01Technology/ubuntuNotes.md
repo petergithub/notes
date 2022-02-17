@@ -262,6 +262,8 @@ Jump back:  Type `CTRL-T` or `CTRL-O` (repeat to go further back)
 `:set ic` / `:set noic`    vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`
 ignore case for just one search command, use  `\c` in the phrase:  `/ignore\c <ENTER>`
 `:set ru` / `:set noru`    Show the line and column number of the cursor position
+`:set list` / `:set nolist`   To display non-printable characters, such as control characters `$` is Newline, `^|` is Tab
+`:set listchars=nbsp:☠,tab:▸,eol:$,tab:>-,trail:~,extends:>,precedes:<` customized specified symbols to display.
 
 Typing ":set xxx" sets the option "xxx".  Some options are:
         'ic' 'ignorecase'       ignore upper/lower case when searching
@@ -537,6 +539,15 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 pgrep 和 pkill
 pgrep -l apache2
 
+#### sed
+
+[Regular Expressions - sed, a stream editor](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)
+
+[Linux Sed命令详解](https://qianngchn.github.io/wiki/4.html)
+
+多个模式 `sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'`
+删除行 `sed -i '/DELETE_LINE/d'`
+
 删除行尾空格: `%s/\s+$//g`
 删除行首多余空格: `%s/^\s*// 或者 %s/^ *//`
 删除沒有內容的空行: `%s/^$//`
@@ -560,8 +571,29 @@ pgrep -l apache2
 删除行首所有tab键 `s/^ [TAB]//g`
 删除所有tab键 `s/[TAB] *//g`
 
-delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
-`rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
+##### 删除行
+
+Delete first line or header line `sed 'Nd' file` Here N indicates Nth line in a file
+Delete last line or footer line or trailer line `sed '$d' file`
+Delete particular line `sed '2d' file`
+Delete range of lines `sed 'm,nd' file`, e.g. `sed '2,4d' file`
+Delete lines other than the first line or header line `sed '1!d' file`
+Delete empty lines or blank lines `sed '/^$/d' file`
+Delete lines that contain a pattern `sed '/debian/d' file`
+Delete lines that begin with specified character `sed '/^u/d' file`
+
+##### 不替换某些行
+
+```properties
+# filename message_en.properties
+key1">value1
+key2=value2
+key3=<font color="#6fa5e9">value3</font>
+```
+
+替换 "> 为 =，但是包含 font 标签的不替换，因为 font 标签结尾 "> 是正常的 `cat message_en.properties | sed -e '/font/! s/">/=/g'` 解释：`/font/!` 表示不匹配该行
+
+#### find
 
 `find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
 `find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`
@@ -580,16 +612,21 @@ delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xar
 
 `find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
 
-`find /home/admin -atime -1`  1天内访问过的文件
-`find /home/admin -ctime -1`  1天内状态改变过的文件
-`find /home/admin -mtime -1`  1天内修改过的文件
-`find /home/admin -amin -1`  1分钟内访问过的文件
-`find /home/admin -cmin -1`  1分钟内状态改变过的文件
-`find /home/admin -mmin -1`  1分钟内修改过的文件
+* `find /home/admin -atime -1`  1天内访问过的文件
+* `find /home/admin -ctime -1`  1天内状态改变过的文件
+* `find /home/admin -mtime -1`  1天内修改过的文件
+* `find /home/admin -amin -1`  1分钟内访问过的文件
+* `find /home/admin -cmin -1`  1分钟内状态改变过的文件
+* `find /home/admin -mmin -1`  1分钟内修改过的文件
 
 * `+n`     for greater than n,
 * `-n`     for less than n,
 * `n`      for exactly n.
+
+#### 删除时排除文件
+
+delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
+`rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
 
 #### 文件个数 count files in directory recursively
 
@@ -624,6 +661,14 @@ Unlike Ubuntu, BSD/macOS requires the extension to be explicitly specified. The 
 
 `for file in $(find . -name sync1.properties) do echo $file; done`
 `for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done`
+
+#### 文件内多字符串替换
+
+```sh
+# xml 文件格式的内容替换成 properties 的等号格式
+# sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'
+find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s#]]></entry>##g; s#</entry>##g; /<?xml version="1.0" encoding="UTF-8"?>/d; /DOCTYPE properties SYSTEM "http:\/\/java.sun.com\/dtd\/properties.dtd"/d; /<properties>/d; /<\/properties>/d' {} \;
+```
 
 #### 查找包含class的jar文件
 
@@ -1445,7 +1490,6 @@ EOF
 `watch -d -n 1 'df; ls -FlAt /path'` 实时某个目录下查看最新改动过的文件
 `watch -n 3 ls` 以3秒钟执行一个ls命令
 `cd -` 切换回上一个目录
-`source .profile` 使profile改动生效
 `wget -c file` continue stopped download
 `wget -r url` recursive download files from url
 `tnsping MDATADEV.DOMAIN.COM`
@@ -1501,28 +1545,34 @@ space 调整panel摆放方式
 CTRL+方向键     以1个单元格为单位移动边缘以调整当前面板大小
 ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大小
 
+#### tmux key binding
+
+* `L`           Switch the attached client back to the last session.
+* `l`           Move to the previously selected window.
+* `[`           Enter copy mode to copy text or view the history.
+
 #### Example: tmux scripts
 
 ``` bash
 
-    #!/bin/bash
-    SESSION_NAME=session0
-    WINDOW_NAME=win0
-    #Setup a session and setup a window for redis
-    tmux -2 new-session -d -s $SESSION_NAME -n $WINDOW_NAME
-    tmux split-window -h
-    tmux select-pane -t 0
-    tmux send-keys "cd ~/opt/redis-sentinel" C-m
-    tmux send-keys "startRedisMaster6380.sh" C-m
-    tmux select-pane -t 1
-    tmux send-keys "cd ~/opt/redis-sentinel" C-m
-    tmux send-keys "startRedisSlave6381.sh" C-m
-    tmux split-window -v
-    tmux select-pane -t 2
-    tmux send-keys "cd ~/opt/redis-sentinel" C-m
-    tmux send-keys "startRedisSlave6382.sh" C-m
+#!/bin/bash
+SESSION_NAME=session0
+WINDOW_NAME=win0
+#Setup a session and setup a window for redis
+tmux -2 new-session -d -s $SESSION_NAME -n $WINDOW_NAME
+tmux split-window -h
+tmux select-pane -t 0
+tmux send-keys "cd ~/opt/redis-sentinel" C-m
+tmux send-keys "startRedisMaster6380.sh" C-m
+tmux select-pane -t 1
+tmux send-keys "cd ~/opt/redis-sentinel" C-m
+tmux send-keys "startRedisSlave6381.sh" C-m
+tmux split-window -v
+tmux select-pane -t 2
+tmux send-keys "cd ~/opt/redis-sentinel" C-m
+tmux send-keys "startRedisSlave6382.sh" C-m
 
-    tmux new-window -t $SESSION_NAME:1 -n $WINDOW_NAME
+tmux new-window -t $SESSION_NAME:1 -n $WINDOW_NAME
 ```
 
 ### screen
