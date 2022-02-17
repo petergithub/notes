@@ -15,9 +15,13 @@ Synchronization and Object Locking https://wiki.openjdk.java.net/display/HotSpot
 `AtomicInteger`底层实现机制
 SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swagger-ui.html)
 
+[OpenJDK](https://openjdk.java.net/)
+
 concurrent: 主内存.寄存器是是运行时?
 
-并发Concurrent 并发指能够让多个任务在逻辑上交织执行的程序设计
+### Concurrent vs. Parallel
+
+并发 Concurrent 并发指能够让多个任务在逻辑上交织执行的程序设计
 
 ```shell
           --  --  --
@@ -25,15 +29,13 @@ concurrent: 主内存.寄存器是是运行时?
 >---- --    --  --  -- ---->>
 ```
 
-并行Parallel 并行指物理上同时执行
+并行 Parallel 并行指物理上同时执行
 
 ```shell
      ------
     /      \
 >-------------->>
 ```
-
-[OpenJDK](https://openjdk.java.net/)
 
 ### 常用参数
 
@@ -529,6 +531,32 @@ ZGC的八大特征
 ### Interrupts
 
 An interrupt is an indication to a thread that it should stop what it is doing and do something else
+
+线程的thread.interrupt()方法是中断线程，将会设置该线程的中断状态位，即设置为true，中断的结果线程是死亡、还是等待新的任务或是继续运行至下一步，就取决于这个程序本身。
+
+线程会不时地检测这个中断标示位，以判断线程是否应该被中断（中断标示值是否为true）。
+
+#### 判断线程是否被中断
+
+使用`Thread.currentThread().isInterrupted()`方法：因为它将线程中断标示位设置为true后，不会立刻清除中断标示位，即不会将中断标设置为false），
+
+不要使用`thread.interrupted()`：该方法调用后会将中断标示位清除，即重新设置为false
+
+#### 底层中断异常处理方式
+
+不要在你的底层代码里捕获`InterruptedException`异常后不处理，会处理不当。如果你不知道抛`InterruptedException`异常后如何处理，那么你有如下好的建议处理方式：
+
+1、在catch子句中，调用`Thread.currentThread.interrupt()`来设置中断状态（因为抛出异常后中断标示会被清除），让外界通过判断`Thread.currentThread().isInterrupted()`标示来决定是否终止线程还是继续下去，应该这样做：
+
+```java
+try {
+        sleep(delay);
+} catch (InterruptedException e) {
+    Thread.currentThread().isInterrupted();
+}
+```
+
+2、或者，更好的做法就是，不使用try来捕获这样的异常
 
 ### Joins
 

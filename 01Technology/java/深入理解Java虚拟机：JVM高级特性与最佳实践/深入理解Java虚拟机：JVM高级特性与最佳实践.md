@@ -68,7 +68,7 @@ Classes and metadata stored in the Metaspace
 [JVM源码分析之Metaspace解密-你假笨](JVM源码分析之Metaspace解密)
 
 [Java 内存分区之 堆外内存 Metaspace 元空间 取永久代PermGen 而代之 请叫我大师兄__](https://blog.csdn.net/qq_27093465/article/details/106758504)
-class metadata 用于记录一个 Java 类在 JVM 中的信息，包括但不限于 JVM class file format 的运行时数据： 
+class metadata 用于记录一个 Java 类在 JVM 中的信息，包括但不限于 JVM class file format 的运行时数据：
 1、Klass 结构，这个非常重要，把它理解为一个 Java 类在虚拟机内部的表示吧；
 2、method metadata，包括方法的字节码、局部变量表、异常表、参数信息等；
 3、常量池；
@@ -428,14 +428,18 @@ ZGC的运作过程：
 
 JDK 9 HotSpot所有功能的日志都收归到了“-Xlog”参数上: `-Xlog[:[selector][:[output][:[decorators][:output-options]]]]`
 
+```text
     33.125: [GC [DefNew: 3324K->152K（3712K），0.0025925 secs] 3324K->152K（11904K），0.0031680 secs]
     100.667: [Full GC [Tenured: 0K->210K（10240K），0.0149142 secs] 4603K->210K（19456K），[Perm : 2999K->2999K（21248K）]，0.0150007 secs] [Times: user=0.01 sys=0.00，real=0.02 secs]
+```
 
 最前面的数字"33.125："和"100.667："：代表了GC发生的时间，这个数字的含义是从Java虚拟机启动以来经过的秒数。
 
 GC日志开头的"［GC"和"［Full GC"：说明了这次垃圾收集的停顿类型，而不是用来区分新生代GC还是老年代GC的。如果有"Full"，说明这次GC是发生了Stop-The-World的，例如下面这段新生代收集器ParNew的日志也会出现"［Full GC"（这一般是因为出现了分配担保失败之类的问题，所以才导致STW）。如果是调用System.gc（）方法所触发的收集，那么在这里将显示"［Full GC （System）"。
 
+```text
     [Full GC 283.736: [ParNew: 261599K->261599K（261952K），0.0000288 secs]
+```
 
 接下来的"［DefNew"、"［Tenured"、"［Perm"：表示GC发生的区域，这里显示的区域名称与使用的GC收集器是密切相关的，例如上面样例所使用的Serial收集器中的新生代名为"Default New Generation"，所以显示的是"［DefNew"。如果是ParNew收集器，新生代名称就会变为"［ParNew"，意为"Parallel New Generation"。如果采用Parallel Scavenge收集器，那它配套的新生代称为"PSYoungGen"，老年代和永久代同理，名称也是由收集器决定的。
 
@@ -453,13 +457,15 @@ GC日志开头的"［GC"和"［Full GC"：说明了这次垃圾收集的停顿�
 * 动态对象年龄判定
 * 空间分配担保
 
-    Minor GC之前，虚拟机会先检查老年代最大可用连续空间是否大于新生代对象总空间
-    如果大于，则Minor GC是安全的
-    如果不大于，则会查看HandlePromotionFailure设置值是否允许担保失败
-        如果允许，则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小
-            如果大于，将进行一次Minor GC，尽管这次是有风险的
-            如果小于，那要改为进行Full GC
-        如果不允许冒险，那要改为进行Full GC
+```text
+Minor GC之前，虚拟机会先检查老年代最大可用连续空间是否大于新生代对象总空间
+如果大于，则Minor GC是安全的
+如果不大于，则会查看HandlePromotionFailure设置值是否允许担保失败
+   如果允许，则检查老年代最大可用连续空间是否大于历次晋升到老年代对象的平均大小
+      如果大于，将进行一次Minor GC，尽管这次是有风险的
+      如果小于，那要改为进行Full GC
+   如果不允许冒险，那要改为进行Full GC
+```
 
 ## 第４章 虚拟机性能监控、故障处理工具
 
@@ -580,19 +586,29 @@ Java语言是一门静态多分派、动态单分派的语言
 
 #### 8.4 动态类型语言支持
 
+JDK 7新增了一条字节码指令——`invokedynamic`指令，是为了实现动态类型语言(Dynamically Typed Language)支持，也是为实现Lambda表达式而做的技术储备。
+
 8.4.1 动态类型语言
+
+动态类型语言的关键特征是它的类型检查的主体过程是在运行期而不是编译期进行的，如 JavaScript、Python
 
 8.4.2 Java与动态类型
 
+Java虚拟机层面对动态类型语言的支持一直都还有所欠缺，JDK 7以前的字节码指令集中，4条方法调用指令(invokevirtual、invokespecial、invokestatic、 invokeinterface)的第一个参数都是被调用的方法的符号引用(CONSTANT_M ethodref_info或者 CONSTANT_InterfaceMethodref_info常量)，方法的符号引用在编译时产生，而动态类型语言只有在运行期才能确定方法的接收者。
+
+在Java虚拟机层面上提供动态类型的直接支持，便是JDK 7 时JSR-292提案中invokedy namic指令以及java.lang.invoke包出现的技术背景。
+
 8.4.3 java.lang.invoke包
 
-JDK 7时新加入的java.lang.invoke包[1]是JSR 292的一个重要组成部分，这个包的主要目的是在之前单纯依靠符号引用来确定调用的目标方法这条路之外，提供一种新的动态确定目标方法的机制，称为“方法句柄”（Method Handle）
+JDK 7时新加入的java.lang.invoke包是JSR 292的一个重要组成部分，这个包的主要目的是在之前单纯依靠符号引用来确定调用的目标方法这条路之外，提供一种新的动态确定目标方法的机制，称为“方法句柄”（Method Handle）
 
 8.4.4 invokedynamic指令
 
 某种意义上可以说invokedynamic指令与 MethodHandle机制的作用是一样的，都是为了解决原有4条“invoke*”指令方法分派规则完全固化在虚拟机之中的问题，把如何查找目标方法的决定权从虚拟机转嫁到具体用户代码之中，让用户（广义的用户，包含其他程序语言的设计者）有更高的自由度
 
 #### 8.5 基于栈的字节码解释执行引擎
+
+许多Java虚拟机的执行引擎在执 行Java代码的时候都有解释执行(通过解释器执行)和编译执行(通过即时编译器产生本地代码执 行)两种选择
 
 8.5.1 解释执行
 
@@ -604,7 +620,13 @@ Javac编译器输出的字节码指令流，基本上[1]是一种基于栈的指
 
 与之相对的另外一套常用的指令集架构是基于寄存器的指令集，最典型的就是x86的二地址指令集，如果说得更通俗一些就是现在我们主流PC机中物理硬件直接支持的指令集架构，这些指令依赖寄存器进行工作。
 
-基于栈的指令集主要优点是可移植，因为寄存器由硬件直接提供[2]，程序直接依赖这些硬件寄存器则不可避免地要受到硬件的约束。
+基于栈的指令集主要优点
+
+1. 是可移植，因为寄存器由硬件直接提供[2]，程序直接依赖这些硬件寄存器则不可避免地要受到硬件的约束。
+2. 代码相对更加紧凑(字节码中每个字节就对应一条指令，而多地址指令集中还需要存放参数)
+3. 编译器实现更加简单(不需要考虑空间分配的问题，所需空间都在栈上操作)等
+
+基于栈的指令集主要缺点是理论上执行速度相对来说会稍慢一些，所有主流物理机的指令集都是寄存器架构[3]也从侧面印证了这点。不过这里的执行速度是要局限在解释执行的状态下，如果经过即 时编译器输出成物理机上的汇编指令流，那就与虚拟机采用哪种指令集架构没有什么关系了
 
 8.5.3 基于栈的解释器执行过程
 
@@ -614,6 +636,7 @@ Javac编译器输出的字节码指令流，基本上[1]是一种基于栈的指
 
 [Tomcat 5.5](https://tomcat.apache.org/tomcat-5.5-doc/class-loader-howto.html)
 
+```text
             Bootstrap
               |
            Extension ClassLoader
@@ -625,9 +648,11 @@ Javac编译器输出的字节码指令流，基本上[1]是一种基于栈的指
      Catalina   Shared
                  /   \
             Webapp1  Webapp2 ...
+```
 
 [Tomcat 6.0 remove Shared ClassLoader](https://tomcat.apache.org/tomcat-6.0-doc/class-loader-howto.html)
 
+```text
           Bootstrap
               |
            System
@@ -635,45 +660,56 @@ Javac编译器输出的字节码指令流，基本上[1]是一种基于栈的指
            Common
            /     \
       Webapp1   Webapp2 ...
+```
 
 ### OSGi
 
 [Classloading](http://moi.vonos.net/java/osgi-classloaders/)
 
-    bootstrap ClassLoader （includes Java standard libraries from jre/lib/rt.jar etc）
-       ^
-    extension ClassLoader
-       ^
-    system ClassLoader （i.e. stuff on $CLASSPATH，including OSGi core code）
-       ^
-    OSGi environment ClassLoader
-       ^    （** Note: OSGi ClassLoaders forward lookups to parent ClassLoader only for some packages，e.g. java。*）
-       \
-        \   |-- OSGi ClassLoader for "system bundle"  -> （map of imported-package->ClassLoader）
-         \--|-- OSGi ClassLoader for bundle1    -> （map of imported-package->ClassLoader）
-            |-- OSGi ClassLoader for bundle2    -> （map of imported-package->ClassLoader）
-            |-- OSGi ClassLoader for bundle3    -> （map of imported-package->ClassLoader）
-                                         /
-                                        /
-          /========================================================================================\
-          |  shared bundle registry，holding info about all bundles and their exported-packages  |
-          \========================================================================================/
+```text
+bootstrap ClassLoader （includes Java standard libraries from jre/lib/rt.jar etc）
+   ^
+extension ClassLoader
+   ^
+system ClassLoader （i.e. stuff on $CLASSPATH，including OSGi core code）
+   ^
+OSGi environment ClassLoader
+   ^    （** Note: OSGi ClassLoaders forward lookups to parent ClassLoader only for some packages，e.g. java。*）
+   \
+   \   |-- OSGi ClassLoader for "system bundle"  -> （map of imported-package->ClassLoader）
+   \--|-- OSGi ClassLoader for bundle1    -> （map of imported-package->ClassLoader）
+      |-- OSGi ClassLoader for bundle2    -> （map of imported-package->ClassLoader）
+      |-- OSGi ClassLoader for bundle3    -> （map of imported-package->ClassLoader）
+                                    /
+                                    /
+      /========================================================================================\
+      |  shared bundle registry，holding info about all bundles and their exported-packages  |
+      \========================================================================================/
+```
 
 ### 字节码生成技术与动态代理的实现
 
-Javassist、CGLib、ASM 之类的字节码类库，JDK里面的Javac命令就是字节码生成技术的“老祖宗”，并且Javac也是一个由Java语言写成的程序，它的代码存放在OpenJDK的jdk.compiler\share\classes\com\sun\tools\javac目录中。
+Javassist、CGLib、ASM 之类的字节码类库，JDK里面的Javac命令就是字节码生成技术的“老祖宗”，并且Javac也是一个由Java语言写成的程序，它的代码存放在OpenJDK的`jdk.compiler\share\classes\com\sun\tools\javac`目录中。
 
-许多Java开发人员都使用过动态代理，即使没有直接使用过java.lang.reflect.Proxy或实现过java.lang.reflect.InvocationHandler接口，应该也用过Spring来做过Bean的组织管理。
+许多Java开发人员都使用过动态代理，即使没有直接使用过`java.lang.reflect.Proxy`或实现过`java.lang.reflect.InvocationHandler`接口，应该也用过Spring来做过Bean的组织管理。
 
 ### Backport工具：Java的时光机器
+
+“Java逆向移植”工具(Java Backporting Tools)把高版本JDK中编写的代码放到低版本JDK环境中去部署使用。比如Retrotranslator[1]和Retrolambda。
+
+Retrotranslator的作用是将JDK 5编译出来的Class文件转变为可以在JDK 1.4或1.3上部署的版本，它能很好地支持自动装箱、泛型、动态注解、枚举、变长参数、遍历循环、静态导入这些语法特性，甚至还可以支持JDK 5中新增的集合改进、并发包及对泛型、注解等的反射操作。
+
+Retrolambda[2]的作用与Retrotranslator是类似的，目标是将JDK 8的Lambda表达式和try-resourc语法转变为可以在JDK 5、JDK 6、JDK 7中使用的形式，同时也对接口默认方法提供了有限度的支持。
 
 ## 第四部分 程序编译与代码优化
 
 ## 第10章 前端编译与优化
 
-* 前端编译器：JDK的Javac、Eclipse JDT中的增量式编译器（ECJ）。
-* 即时编译器：HotSpot虚拟机的C1、C2编译器，Graal编译器。
-* 提前编译器：JDK的Jaotc、GNU Compiler for the Java（GCJ）、Excelsior JET。
+* 前端编译器，把*.java文件转变成*.class文件：JDK的Javac、Eclipse JDT中的增量式编译器（ECJ）。
+* 即时编译器(常称JIT编译器，Just In Time Compiler)，运行期把字节码转变成本地机器码：HotSpot虚拟机的C1、C2编译器，Graal编译器。
+* 静态的提前编译器(常称AOT编译器，Ahead Of Time Compiler)直接把程序编译成与目标机器指令集相关的二进制代码：JDK的Jaotc、GNU Compiler for the Java（GCJ）、Excelsior JET。
+
+### 10.2 Javac编译器
 
 ## 第11章 后端编译与优化
 
@@ -683,17 +719,57 @@ Javassist、CGLib、ASM 之类的字节码类库，JDK里面的Javac命令就是
 
 ### 11.3 提前编译器
 
+提前编译产品有两条明显的分支：
+
+* 一条分支是做与传统C、C++编译器类似的，在程序运行之前把程序代码编译成机器码的静态翻译工作;
+  * 直指即时编译的最大弱点：即时编译要占用程序运行时间和运算资源
+* 另外一条分支是动态提前编译(Dynamic AOT)或者即时编译缓存(JIT Caching)：把原本即时编译器在运行时要做的编译工作提前做好并保存下来，下次运行到这些代码(譬如公共库代码在被同一台机器其他Java进程使用)时直接把它加载进来使用。
+  * 本质是给即时编译器做缓存加速，去改善Java程序的启动时间，以 及需要一段时间预热后才能到达最高性能的问题
+
+即时编译器相对于提前编译器的优势：
+
+* 性能分析制导优化(Profile-Guided Optimization，PGO)：运行过程中，会不断收集性能监控信息
+* 激进预测性优化(Aggressive Speculative Optimization)
+* 链接时优化(Link-Time Optimization，LTO)，Java语言天生就是动态链接的，一个个Class文件在运行期被加载到虚拟机内存当中，然后在即时编译器里产生优化后的本地代码
+
 ### 11.4 编译器优化技术
 
 #### 11.4.1 优化技术概览
 
 #### 11.4.2 方法内联
 
+方法内联是把目标方法的代码原封不动地“复制”到发起调用的方法之中，避免发生真实的方法调用而已。
+
+在多数情况下Java虚拟机进行的方法内联都是一种激进优化。
+
 #### 11.4.3 逃逸分析 Escape Analysis
+
+逃逸分析的基本原理是: 分析对象动态作用域，当一个对象在方法里面被定义后，它可能被外部方法所引用，例如作为调用参数传递到其他方法中，这种称为方法逃逸;甚至还有可能被外部线程访问到，譬如赋值给可以在其他线程中访问的实例变量，这种称为线程逃逸;从不逃逸、方法逃逸到线程逃逸，称为对象由低到高的不同逃逸程度。
+
+如果能证明一个对象不会逃逸到方法或线程之外(换句话说是别的方法或线程无法通过任何途径访问到这个对象)，或者逃逸程度比较低(只逃逸出方法而不会逃逸出线程)，则可能为这个对象实例采取不同程度的优化
+
+* 栈上分配(Stack Allocations)
+  * 如果确定一个对象不会逃逸出线程之外，就让这个对象在栈上分配内存，对象所占用的内存空间就可以随栈帧出栈而销毁。
+  * 垃圾收集子系统的压力将会下降很多。栈上分配可以支持方法逃逸，但不能支持线程逃逸。
+  * HotSp ot中目前暂时还没有做这项优化，但一些其他的虚拟机(如Excelsior JET)使用了这项优化。
+* 标量替换(Scalar Replacement)
+  * 如果把一个Java对象拆散，根据程序访问的情况，将其用到的成员变量恢复为原始类型来访问，这个过程就称为标量替换
+  * 若一个数据已经无法再分解成更小的数据来表示了，Java虚拟机中的原始数据类型(int、long等数值类型及reference类型等)都不能再进一步分解了，那么这些数据就可以被称为标量
+  * 标量替换可以视作栈上分配的一种特例，实现更简单(不用考 虑整个对象完整结构的分配)，但对逃逸程度的要求更高，它不允许对象逃逸出方法范围内
+* 同步消除(Synchronization Elimination)
+  * 线程同步本身是一个相对耗时的过程，如果逃逸分析能够确定一个变量不会逃逸出线程，无法被其他线程访问，那么这个变量的读写肯定就不会有竞争，对这个变量实施的同步措施也就可以安全地消除掉。
 
 #### 11.4.4 公共子表达式消除
 
+如果一个表达式E之前已经被计算过了，并且从先前的计算到现在E中所有变量的值都没有发生变化，那么E 的这次出现就称为公共子表达式。对于这种表达式，没有必要花时间再对它重新进行计算，只需要直接用前面计算过的表达式结果代替E。
+
+如果这种优化仅限于程序基本块内，便可称为局部公共子表达式消除(Local Common Subexpression Elimination)，
+
+如果这种优化的范围涵盖了多个基本块，那就称为全局公共子表达式消除(Global Common Subexpression Elimination)。
+
 #### 11.4.5 数组边界检查消除
+
+数组边界检查消除(Array Bounds Checking Elimination)
 
 ### 11.5 实战：深入理解Graal编译器
 
@@ -716,7 +792,7 @@ Java内存模型的主要目标是定义虚拟机中将变量存储到内存和�
 
 关于主内存与工作内存之间的交互协议，Java内存模型中定义了以下8种操作来完成，虚拟机实现必须保证每一种操作都是原子的，不可再分的（对于double和long类型的变量来说，load，store，read和write操作在某些平台上允许例外）
 
-**注**:JSR-133文档已经放弃采用这8种操作来描述Java内存模型的访问协议。
+**注**:JSR-133文档已经放弃采用这8种操作来描述Java内存模型的访问协议。**简化为 read、write、lock 和 unlock 四种**，但这只是语言描述上的等价化简，Java内存模型的基础设计并未改变。
 
 1. lock: 作用于主内存变量，它把一个变量标识为一条线程独占状态
 2. unlock: 作用于主内存变量，它把一个处于锁定状态的变量释放，释放后的变量才可以被其他线程锁定
@@ -730,15 +806,49 @@ Java内存模型的主要目标是定义虚拟机中将变量存储到内存和�
 如果要把一个变量从主内存复制到工作内存，那就要顺序执行read，load操作。
 注意，Java内存模型只要求顺序执行，而不保证是连续执行。
 
-Java设计团队将Java内存模型的操作**简化为read、write、lock和unlock 四种**，但这只是语言描述上的等价化简，Java内存模型的基础设计并未改变。
-
 #### 12.3.3 volatile
 
 1. 保证此变量对所有线程的可见性
 2. 禁止指令重排序优化
-volatile一般情况下不能代替sychronized，因为volatile不能保证操作的原子性，即使只是i++，实际上也是由多个原子操作组成
+   1. volatile一般情况下不能代替sychronized，因为volatile不能保证操作的原子性，即使只是i++，实际上也是由多个原子操作组成
+
+#### 12.3.5 原子性、可见性与有序性
+
+##### 原子性(Atomicity)
+
+Java内存模型来直接保证的原子性变量操作包括read、load、assign、use、store和write这六个，我们大致可以认为，基本数据类型的访问、读写都是具备原子性的(例外就是long和double的非原子性协定，读者只要知道这件事情就可以了，无须太过在意这些几乎不会发生的例外情况)。
+
+如果应用场景需要一个更大范围的原子性保证(经常会遇到)，Java内存模型还提供了lock和 unlock操作来满足这种需求，尽管虚拟机未把lock和unlock操作直接开放给用户使用，但是却提供了更高层次的字节码指令monitorenter和monitorexit来隐式地使用这两个操作。这两个字节码指令反映到Java代码中就是同步块——synchronized关键字，因此在synchronized块之间的操作也具备原子性。
+
+##### 可见性(Visibility)
+
+Java内存模型是通过在变量修改后将新值同步回主内存，在变量读取前从主内存刷新变量值这种依赖主内存作为传递媒介的方式来实现可见性的，无论是普通变量还是volatile变量都是如此。普通变量与volatile变量的区别是，volatile的特殊规则保证了新值能立即同步到主内存，以及每次使用前立即从主内存刷新。因此我们可以说volatile保证了多线程操作时变量的可见性，而普通变量则不能保证这一点。
+
+除了volatile之外，Java还有两个关键字能实现可见性，它们是synchronized和final。
+
+* 同步块的可见性是由“对一个变量执行unlock操作之前，必须先把此变量同步回主内存中(执行store、write操作)”这条规则获得的。
+* final关键字的可见性是指:被final修饰的字段在构造器中一旦被初始化完成，并且构造器没有把“this”的引用传递出去(this引用逃逸是一件很危险的事情，其他线程有可能通过这个引用访问到“初始化了一半”的对象)，那么在其他线程中就能看见final字段的值。
+
+##### 有序性(Ordering)
+
+如果在本线程内观察，所有的操作都是有序的;如果在一个线程中观察另一个线程，所有的操作都是无序的。前半句是指“线程内似表现为串行的语义”(Within-ThreadAs-If-Serial Semantics)，后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。
+
+Java语言提供了volatile和synchronized两个关键字来保证线程之间操作的有序性，volatile关键字本身就包含了禁止指令重排序的语义，而synchronized则是由“一个变量在同一个时刻只允许一条线程对其进行lock操作”这条规则获得的，这个规则决定了持有同一个锁的两个同步块只能串行地进入。
 
 #### 12.3.6 先行发生原则
+
+先行发生是Java内存模型中定义的两项操作之间的偏序关系，比如说操作A先行发生于操作B，其实就是说在发生操作B之前，操作A产生的影响能被操作 B 观察到，“影响”包括修改了内存中共享变量的值、发送了消息、调用了方法等。
+
+Java内存模型下一些“天然的”先行发生关系，这些先行发生关系无须任何同步器协助就已经存在，可以在编码中直接使用。
+
+* 程序次序规则(Program Order Rule):在一个线程内，按照控制流顺序，书写在前面的操作先行 发生于书写在后面的操作。注意，这里说的是控制流顺序而不是程序代码顺序，因为要考虑分支、循 环等结构。
+* 管程锁定规则(Monitor Lock Rule):一个unlock操作先行发生于后面对同一个锁的lock操作。这 里必须强调的是“同一个锁”，而“后面”是指时间上的先后。
+* volatile变量规则(Volatile Variable Rule):对一个volatile变量的写操作先行发生于后面对这个变量 的读操作，这里的“后面”同样是指时间上的先后。
+* 线程启动规则(Thread Start Rule):Thread对象的start()方法先行发生于此线程的每一个动作。
+* 线程终止规则(Thread Termination Rule):线程中的所有操作都先行发生于对此线程的终止检 测，我们可以通过T hread::join()方法是否结束、T hread::isAlive()的返回值等手段检测线程是否已经终止 执行。
+* 线程中断规则(Thread Interruption Rule):对线程interrupt()方法的调用先行发生于被中断线程 的代码检测到中断事件的发生，可以通过T hread::int errup t ed()方法检测到是否有中断发生。
+* 对象终结规则(Finalizer Rule):一个对象的初始化完成(构造函数执行结束)先行发生于它的 finaliz e()方法的开始。
+* 传递性(Transitivity):如果操作A先行发生于操作B，操作B先行发生于操作C，那就可以得出 操作A先行发生于操作C的结论。
 
 ### 12.4 java与线程
 
@@ -757,17 +867,27 @@ Java线程的实现，从JDK 1.3起，“主流”平台上的“主流”商用
 
 Java使用的线程调度方式就是抢占式调度。
 
-Java 语言一共设置了10个级别的线程优先级（Thread.M IN_PRIORITY至Thread.M AX_PRIORITY）。在两个线程同时处于Ready状态时，优先级越高的线程越容易被系统选择执行。
+Java 语言一共设置了10个级别的线程优先级（Thread.MIN_PRIORITY至Thread.MAX_PRIORITY）。在两个线程同时处于Ready状态时，优先级越高的线程越容易被系统选择执行。
 
-不过，线程调度最终是由操作系统说了算，操作系统的线程优先级的概念并不见得能与Java线程的优先级一一对应
+不过，线程调度最终是由操作系统说了算，操作系统的线程优先级的概念并不见得能与Java线程的优先级一一对应。Windows平台的虚拟机中使用了除 THREAD_PRIORITY_IDLE之外的其余6种线程优先级，因此在Windows下设置线程优先级为1和2、3 和4、6和7、8和9的效果是完全相同的
 
 #### 12.4.3 状态转换 java.lang.Thread.State
 
+Java语言定义了6种线程状态，在任意一个时间点中，一个线程只能有且只有其中的一种状态，并且可以通过特定的方法在不同状态之间转换
+
 1. New
-2. Runnable
-3. Waiting
-4. Timed Waiting
-5. Blocked
+2. Runnable：包括操作系统线程状态中的Running和Ready ，也就是处于此状态的线程有可 能正在执行，也有可能正在等待着操作系统为它分配执行时间
+3. Waiting 无限期等待：处于这种状态的线程不会被分配处理器执行时间，它们要等待被其他线 程显式唤醒。以下方法会让线程陷入无限期的等待状态:
+   1. 没有设置Timeout 参数的Object::wait ()方法;
+   2. 没有设置Timeout 参数的Thread::join()方法;
+   3. LockSupport::park()方法。
+4. Timed Waiting 限期等待，处于这种状态的线程也不会被分配处理器执行时间，不过无须等待被其他线程显式唤醒，在一定时间之后它们会由系统自动唤醒。以下方法会让线程进入限期等待状态:
+   1. Thread::sleep()方法;
+   2. 设置了Timeout 参数的Object::wait()方法;
+   3. 设置了Timeout 参数的Thread::join()方法;
+   4. LockSupport::parkNanos()方法;
+   5. LockSupport::parkUntil()方法。
+5. Blocked：线程被阻塞了，“阻塞状态”与“等待状态”的区别是“阻塞状态”在等待着获取到一个排它锁，这个事件将在另外一个线程放弃这个锁的时候发生;而“等待状态”则是在等待一段时 间，或者唤醒动作的发生。在程序等待进入同步区域的时候，线程将进入这种状态。
 6. Terminated
 
 #### 12.5 Java与协程
@@ -778,8 +898,8 @@ Java 语言一共设置了10个级别的线程优先级（Thread.M IN_PRIORITY�
 
 ### 13.2 线程安全
 
-定义：当多个线程同时访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那就称这个对象是线程安全的。
--- Java并发编程实战（Java Concurrency In Practice）作者 Brian Goetz
+> 定义：当多个线程同时访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那就称这个对象是线程安全的。
+> -- Java并发编程实战（Java Concurrency In Practice）作者 Brian Goetz
 
 #### 13.2.1 Java语言中的线程安全
 
@@ -798,7 +918,7 @@ Java 语言一共设置了10个级别的线程优先级（Thread.M IN_PRIORITY�
 
 #### 13.2.2 线程安全的实现方法
 
-1.互斥同步（M utual Exclusion & Synchronization）是一种最常见也是最主要的并发正确性保障手段。
+1.互斥同步（Mutual Exclusion & Synchronization）是一种最常见也是最主要的并发正确性保障手段。
 
 同步是指在多个线程并发访问共享数据时，保证共享数据在同一个时刻只被一条（或者是一些，当使用信号量的时候）线程使用。
 
