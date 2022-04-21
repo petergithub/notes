@@ -101,7 +101,9 @@ brew install google-chrome
 
 
 # other software
-brew install mycli ncdu bat
+# jless https://jless.io/user-guide.html
+# jless can read files directly, or read JSON data from standard input 
+brew install mycli ncdu bat jless
 
 # How to replace Mac OS X utilities with GNU core utilities?
 # https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities

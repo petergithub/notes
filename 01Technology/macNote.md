@@ -254,6 +254,13 @@ Display: `Preference -> Profiles -> Colors -> Foreground: black, Background: whi
 
 Alt+U or click the icon to copy URL without encoding from address bar
 
+#### 在Chrome 浏览器上滚动截屏
+
+1. 打开 Chrome 浏览器，进入需要截图的网站页面
+2. 打开开发者工具：在页面任何地方点击鼠标右键，在弹出菜单中选择「检查」选项。或者使用快捷键组合：option + command + i。
+3. 打开命令行（command palette）：command + shift + p。
+4. 在命令行中输入「screen」，这时自动补齐功能会显示出一些包含 「Screen」 关键字的命令。移动方向键到「Capture full size screenshot」并回车,chrome就会自动下载整个页面截屏文件。
+
 ### firefox
 
 firefox profile location: `/users/$user/library/application support/firefox/profiles`
@@ -304,6 +311,7 @@ System Preferences -> Users & Groups -> Login Items
 [mac启动项](https://faichou.space/mac-startups/)
 man launchctl 查看, 比如很实用的有:
 
+```text
 launchctl load **
 launchctl unload **
 launchctl list
@@ -311,17 +319,34 @@ launchctl print user/$(id -u)
 launchctl print-disabled user/$(id -u)
 
 登录之后启动的进程
-     ~/Library/LaunchAgents         Per-user agents provided by the user.
-     /Library/LaunchAgents          Per-user agents provided by the administrator.
-     /Library/LaunchDaemons         System wide daemons provided by the administrator.
-     /System/Library/LaunchAgents   OS X Per-user agents.
-     /System/Library/LaunchDaemons  OS X System wide daemons.
+~/Library/LaunchAgents         Per-user agents provided by the user.
+/Library/LaunchAgents          Per-user agents provided by the administrator.
+/Library/LaunchDaemons         System wide daemons provided by the administrator.
+/System/Library/LaunchAgents   OS X Per-user agents.
+/System/Library/LaunchDaemons  OS X System wide daemons.
+```
 
 #### disable auto start
 
 load from `/Library/LaunchAgents`
 disable it `launchctl unload -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
 turn it back on `launchctl load -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
+
+### 停止系统更新提示
+
+```sh
+# 忽略系统升级到 macOS Monterey 更新提醒
+sudo softwareupdate --ignore "macOS Monterey"
+# prevent the red badge in System Preferences
+defaults write com.apple.systempreferences AttentionPrefBundleIDs 0
+# restart the Dock (without affecting the rest of your system) to reset the state of the System Preferences icon.
+killall Dock
+
+# 要使系统升级更新再次出现在 “软件更新” 中
+sudo softwareupdate --reset-ignored
+```
+
+[How to stop getting a reminder to update to Catalina in macOS](https://www.macworld.com/article/233450/how-to-stop-getting-a-reminder-to-update-to-catalina-in-macos.html)
 
 ### macbook pro合盖之后耗电很快:休眠时关闭 WiFi
 
@@ -361,6 +386,10 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 `brew switch openssl 1.0.2s`
 
+## Network
+
+[Mac 抓包 Recording a Packet Trace | Apple Developer Documentation](https://developer.apple.com/documentation/network/recording_a_packet_trace)
+
 ## Apps
 
 * [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
@@ -383,3 +412,4 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Bagel is a little native iOS network debugger](https://github.com/yagiz/Bagel)
 * NewFileMenuFree
 * Maccy: Lightweight clipboard manager for macOS
+* [DevToys For mac - ObuchiYuki/DevToysMac](https://github.com/ObuchiYuki/DevToysMac)
