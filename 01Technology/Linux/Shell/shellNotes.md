@@ -10,11 +10,15 @@
 
 `read -p "Press [Enter] key to continue"`
 `read -n 1 -p "Press any key to continue"`
-`sleep 2; echo 'end sleep 2 sec'`
 
-- `$?` 上一个命令的返回代码. 0为true, 1为false
-- `$$` 进程标识号
-- `$*` 该变量包含了所有输入的命令行参数值
+```sh
+# echo with date
+echo "`date` (print as a date result: Mar  9 17:20:49 CST 2022) end sleep 2 sec; date (print as date string: date)"
+```
+
+* `$?` 上一个命令的返回代码. 0为true, 1为false
+* `$$` 进程标识号
+* `$*` 该变量包含了所有输入的命令行参数值
 
 ## Shell 变量
 
@@ -81,8 +85,8 @@ echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一�
 
 #### 字符串替换 replace
 
-- `${var//\"/}` 将"替换成空
-- `${var/a/b}` 将a替换成b
+* `${var//\"/}` 将"替换成空
+* `${var/a/b}` 将a替换成b
 
 ### Shell 数组
 
@@ -150,6 +154,7 @@ EOF
 
 #### Common Bash comparisons
 
+```text
 Operator    Meaning    Example
 -z    Zero-length string    [ -z "$myvar" ]
 -z string string为空
@@ -175,6 +180,7 @@ Operator    Meaning    Example
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
 -e file     Check if file exists. Is true even if file is a directory but exists.     [ -e $file ] is true.
+```
 
 #### compound comparison
 
@@ -185,13 +191,13 @@ These are similar to the Bash comparison operators && and ||, used within double
 The `-o` and `-a` operators work with the test command or occur within single test brackets.
 
 ``` bash
-    if [ "$expr1" -a "$expr2" ]
-    # if  "$expr1" -a "$expr2"
-    then
-      echo "Both expr1 and expr2 are true."
-    else
-      echo "Either expr1 or expr2 is false."
-    fi
+if [ "$expr1" -a "$expr2" ]
+# if  "$expr1" -a "$expr2"
+then
+    echo "Both expr1 and expr2 are true."
+else
+    echo "Either expr1 or expr2 is false."
+fi
 ```
 
 ### 其他
@@ -200,13 +206,13 @@ The `-o` and `-a` operators work with the test command or occur within single te
 
 执行时传入 `bash -euxo pipefail script.sh` 或者`set -euxo pipefail` 放在脚本开头
 
-- `set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
-- `set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
-- `set -e` 当有错误发生的时候abort执行
-- `set +e` 表示关闭`-e`选项, 同`-o errexit`
-- `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
-- `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
-- `bash -n scriptname`  # don't run commands; check for syntax errors only
+* `set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
+* `set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
+* `set -e` 当有错误发生的时候abort执行
+* `set +e` 表示关闭`-e`选项, 同`-o errexit`
+* `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
+* `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
+* `bash -n scriptname`  # don't run commands; check for syntax errors only
 
 有些Linux命令，例如rm的-f参数可以强制忽略错误，此时脚本便无法捕捉到errexit，这样的参数在脚本里是不推荐使用的。
 
@@ -269,18 +275,29 @@ log "INFO" "a message"
 
 the  for  command  executes  list once for each positional parameter that is set
 positional parameter: space, line return
-`for VAR in LIST; do CMD; done;`
-`for VAR in *.zip; do CMD; done;`
-`for file in $(ls); do echo $file; done;`
-`for i in 1 2 3 4 5; do echo $i; done;`
-`for i in $(seq 1 5); do echo $i; done`
-`for i in {01..10}; do echo $i; done`
 
-`for (( EXP1; EXP2; EXP3 )); do command1;    command2;    command3; done;`
-`for (( i = 0; i < 5; i++)); do echo $i; done;`
+```sh
+for i in *; do cd $i ;gfa; cd -; done
 
-`IFS=- read -r x y z <<< foo-bar-baz; echo $x, $y, $z` 按变量IFS分割字符串并存到单独变量中
-`IFS=- read -ra parts <<< foo-bar-baz; echo $parts, ${parts[0]}, ${parts[1]}` 按变量IFS分割字符串并存到数组parts中
+for VAR in LIST; do CMD; done;
+
+for VAR in *.zip; do CMD; done;
+for file in $(ls); do echo $file; done;
+
+# 数字自增
+for i in 1 2 3 4 5; do echo $i; done;
+for i in $(seq 1 5); do echo $i; done
+for i in {01..10}; do echo $i; done
+for (( i = 0; i < 5; i++)); do echo $i; done;
+
+for (( EXP1; EXP2; EXP3 )); do command1; command2; command3; done;
+
+# 按变量IFS分割字符串并存到单独变量中
+IFS=- read -r x y z <<< foo-bar-baz; echo $x, $y, $z
+# 按变量IFS分割字符串并存到数组parts中
+IFS=- read -ra parts <<< foo-bar-baz; echo $parts, ${parts[0]}, ${parts[1]}
+
+```
 
 ```bash
 # 遍历对象
@@ -520,4 +537,27 @@ DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
 RESPONSE_TIME=`curl -o /dev/null -s -w '%{time_connect} %{time_starttransfer} %{time_total}\n' -I "https://www.baidu.com"`
 
 echo ${DATE} ${RESPONSE_TIME} >> curl.log
+```
+
+### batch execute sql
+
+```sh
+#!/bin/bash
+
+# for i in $(seq 0 98); do
+for (( i = 0; i < 5; i++)); do
+    #SQL="select id from db.table_$i limit 1";
+    SQL="ALTER TABLE db.table_$i PARTITION BY HASH(role_id % 997) PARTITIONS 997;";
+
+    echo `date` SQL: $SQL
+    RESULT=`mysql -h host -u username -ppassword -D db -e "$SQL"`
+    SQL="analyze table db.table_$i"
+    echo `date` SQL: $SQL
+    RESULT=`mysql -h host -u username -ppassword -D db -e "$SQL"`
+    echo `date` result: $RESULT
+
+    SEC=300
+    echo "sleep $SEC sec"
+    sleep $SEC;
+done
 ```

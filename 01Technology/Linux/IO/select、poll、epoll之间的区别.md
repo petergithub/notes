@@ -1,6 +1,6 @@
 # select、poll、epoll之间的区别
 
-[select和epoll 原理概述&优缺点比较_jiange_zh的博客-CSDN博客_epoll和select的区别](https://blog.csdn.net/jiange_zh/article/details/50811553)
+[epoll和select的区别](https://blog.csdn.net/jiange_zh/article/details/50811553)
 
 select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。但select，poll，epoll本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的，而异步I/O则无需自己负责进行读写，异步I/O的实现会负责把数据从内核拷贝到用户空间。关于这三种IO多路复用的用法，前面三篇总结写的很清楚，并用服务器回射echo程序进行了测试。连接如下所示：
 
@@ -15,7 +15,7 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 5. 如果所有设备返回的掩码都没有显示任何的事件触发，就去掉回调函数的函数指针，进入有限时的睡眠状态，再恢复和不断做poll，再作有限时的睡眠，直到其中一个设备有事件触发为止。
 6. 只要有事件触发，系统调用返回，将fd_set从内核空间拷贝到用户空间，回到用户态，用户就可以对相关的fd作进一步的读或者写操作了。
 
-[IO多路复用之select总结 - Rabbit_Dale - 博客园](https://www.cnblogs.com/Anker/archive/2013/08/14/3258674.html)
+[epoll和select的区别](https://blog.csdn.net/jiange_zh/article/details/50811553)
 
 ## poll实现 时间复杂度O(n)
 
@@ -39,9 +39,22 @@ epoll可以理解为event poll，不同于忙轮询和无差别轮询，epoll会
 
 1. 把socket放到epoll文件系统里file对象对应的红黑树上；
 2. 给内核中断处理程序注册一个回调函数，告诉内核，如果这个句柄的中断到了，就把它放到准备就绪list链表里。
-3. 调用epoll_wait时，做了以下事情：
+
+调用epoll_wait时，做了以下事情：
 
 观察list链表里有没有数据。有数据就返回，没有数据就sleep，等到timeout时间到后即使链表没数据也返回。而且，通常情况下即使我们要监控百万计的句柄，大多一次也只返回很少量的准备就绪句柄而已，所以，epoll_wait仅需要从内核态copy少量的句柄到用户态而已。
+
+总结如下：
+
+一颗红黑树，一张准备就绪句柄链表，少量的内核cache，解决了大并发下的socket处理问题。
+
+* 执行epoll_create时，创建了红黑树和就绪链表；
+* 执行epoll_ctl时，如果增加socket句柄，则检查在红黑树中是否存在，存在立即返回，不存在则添加到树干上，然后向内核注册回调函数，用于当中断事件来临时向准备就绪链表中插入数据;
+* 执行epoll_wait时立刻返回准备就绪链表里的数据即可。
+
+两种模式的区别：
+
+LT模式下，只要一个句柄上的事件一次没有处理完，会在以后调用epoll_wait时重复返回这个句柄，而ET模式仅在第一次返回。
 
 [IO多路复用之epoll总结 - Rabbit_Dale - 博客园](https://www.cnblogs.com/Anker/archive/2013/08/17/3263780.html)
 
