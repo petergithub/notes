@@ -398,6 +398,22 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 ## Troubleshooting
 
+### Pod exit code
+
+[Docker Container Exit Codes Explained | hoangtrinhj.com](https://hoangtrinhj.com/docker-container-exit-codes)
+
+[通过 Exit Code 定位 Pod 异常退出原因 | 腾讯云](https://intl.cloud.tencent.com/zh/document/product/457/35758)
+
+[SIGTERM : Linux Graceful Termination | Exit code 143, Signal 15](https://komodor.com/learn/sigterm-signal-15-exit-code-143-linux-graceful-termination/)
+
+Common exit codes associated with docker containers are:
+
+* Exit Code 0: Absence of an attached foreground process
+* Exit Code 1: Indicates failure due to application error
+* Exit Code 137: Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
+* Exit Code 139: Indicates failure as container received SIGSEGV
+* Exit Code 143: Indicates failure as container received SIGTERM
+
 ### [Troubleshooting a failed certificate request | cert-manager](https://cert-manager.io/docs/faq/troubleshooting/)
 
 There are several resources that are involved in requesting a certificate.
