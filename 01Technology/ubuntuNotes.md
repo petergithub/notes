@@ -63,6 +63,12 @@ redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`
 
 get the MD5 hash `echo -n Welcome | md5sum`
 
+### encode
+
+unicode编码，所以想转成utf8看中文
+printf %b '\u6df1\u5733'
+echo '["\u6df1\u5733"]' | jq .
+
 ## Basic Command
 
 M-1 is meta-1 (Alt-1 in Ubuntu)
@@ -675,11 +681,11 @@ find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s
 `find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done`
 `find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done`
 
-#### 文件及文件名乱码处理 删除文件名乱码文件
+#### 文件及文件名乱码处理 删除文件名乱码文件 重命名 rename
 
 1. `ls -i` print the index number of each file(文件的i节点) 12345
 2. `find . -inum 12345 -print -exec rm {} -r \;` rm
-3. `find . -inum 12345 -exec mv {} NewName \;` mv
+3. `find . -inum 23244066 -exec mv {} NewName \;` mv
 
 命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
@@ -1179,6 +1185,8 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 `tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/` -C 选项提取文件到指定目录
 `-exclude path/to/exclude` exclude files
 
+`GZIP=-9 tar cvfz path/to/folder` 指定压缩比率
+
 Extract multiple .tar.gz files with a single tar call
 `ls *.tar | xargs -i tar xf {}` or `cat *.tar | tar -xvf - -i`
 The `-i` option ignores the EOF at the end of the tar archives, from the man page:
@@ -1272,12 +1280,7 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 * `-F, --form`  `-F "filename=@file.tar.gz"` 上传文件
 * `-G, --get`  make all data specified with -d, --data, --data-binary or --data-urlencode to be used in an HTTP GET request instead of the POST request that otherwise would be used. The data will be appended to the URL with a '?' separator.
 * `--data-urlencode <data>` (HTTP) This posts data, similar to the other -d, --data options with the exception that this performs URL-encoding.
-
-#### encode
-
-unicode编码，所以想转成utf8看中文
-printf %b '\u6df1\u5733'
-echo '["\u6df1\u5733"]' | jq .
+* `-x` use proxy `curl -x http://127.0.0.1:1087 -Lv https://www.google.com`
 
 #### Sample
 
@@ -1730,28 +1733,32 @@ Parameters:
 * `-t` list the process id
 * `-r` repeat until interrupt
 * `+r` repeat until no open files found
-* `-i` network
+* `-i` network. selects the listing of files any of whose Internet address matches the address specified in i.  If no address is specified, this option selects the listing of all Internet and x.25 (HP-UX) network files. `-i:1433`
+* `-n` inhibits the conversion of network numbers to host names for network files.
+* `-P` inhibits the conversion of port numbers to port names for network files.
 
 Samples:
-List open files thread in order `lsof -n |awk '{print $1,$2}'|sort|uniq -c |sort -nr| head`
-List processes which opened a specific file: `lsof /var/log/syslog`
-List opened files under a directory: `lsof +D /var/log/`
-List opened files based on process names starting with: `lsof -c ssh -c init`
-can give multiple -c switch on a single command line.
-List processes using a mount point: `lsof /home`, `lsof +D /home/`
-List files opened by a specific user: `lsof -u username`
-Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the `^` to exclude only the particular user as follows: `lsof -u ^username`
-List all open files by a specific process: `lsof -p 1753`
-Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
-Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
 
-List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
-List processes which are listening on a particular port: `lsof -i :25`
-List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
+* List open files thread in order `lsof -n |awk '{print $1,$2}'|sort|uniq -c |sort -nr| head`
+* List processes which opened a specific file: `lsof /var/log/syslog`
+* List opened files under a directory: `lsof +D /var/log/`
+* List opened files based on process names starting with: `lsof -c ssh -c init`
+* can give multiple -c switch on a single command line.
+* List processes using a mount point: `lsof /home`, `lsof +D /home/`
+* List files opened by a specific user: `lsof -u username`
+* Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the `^` to exclude only the particular user as follows: `lsof -u ^username`
+* List all open files by a specific process: `lsof -p 1753`
+* Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
+* Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
+* List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
+* List processes which are listening on a particular port: `lsof -i :25`
+* List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
+* list only network files with TCP state LISTEN `lsof -iTCP -sTCP:LISTEN -P -n | less`
 
 ### Python
 
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
+
 `var = raw_input('Prompt')`
 `python -m SimpleHTTPServer 8000`  HTTP服务在8000号端口上侦听 Python 2
 `python -m http.server 7777` （使用端口 7777 和 Python 3）
@@ -2318,6 +2325,13 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
     查看路由过程中哪些节点是瓶颈
     查看带宽的使用情况
 
+##### 服务器中TIME_WAIT状态连接数较多
+
+```sh
+# 执行以下命令，确认TIME_WAIT状态的连接数过多。
+while true;do netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}';sleep 1;done | grep TIME_WAIT
+```
+
 ##### traceroute
 
 `Hop #     RTT 1     RTT 2     RTT 3     Name/IP Address`
@@ -2345,9 +2359,12 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
        Show numerical addresses instead of trying to determine symbolic  host,
        port or user names.
 
-`netstat -anp | grep PORT` Listening open ports
-`netstat -antup` 查看已建立的连接进程, 所占用的端口
-Mac OS X: `netstat -anv | grep PORT` 倒数第四个是进程号  或者 `lsof -i -P | grep 9091`
+Example
+
+* `netstat -anp | grep PORT` Listening open ports
+* `netstat -antup` 查看已建立的连接进程, 所占用的端口
+* `netstat -tulpn | grep sqlservr`
+* Mac OS X: `netstat -anv | grep PORT` 倒数第四个是进程号  或者 `lsof -i -P | grep 9091`
 
 ##### ss
 

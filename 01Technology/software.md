@@ -114,11 +114,18 @@ nslookup http://wsyc.lqwang.com/
 tracert http://haijia.bjxueche.net/
 
 ## Network tools
+
 ### putty显示中文
+
 在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.
 如果经常使用,把这些设置保存在session里面.
 
-### Proxy configuration
+### Proxy
+
+[mitmproxy](https://docs.mitmproxy.org/stable/)
+
+#### Proxy configuration
+
 file://path
 	On Windows, you have to use that syntax: file://C:/proxy.pac
 	On Unix, you have to use that syntax: file:///path/to/proxy.pac
@@ -258,7 +265,7 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 
 #### 运维工具组合的进化
 ##### 命令执行与配置管理
-Ansible, SaltStack, Puppet  
+Ansible, SaltStack, Puppet
 
 ##### 持续交付与代码
 Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
