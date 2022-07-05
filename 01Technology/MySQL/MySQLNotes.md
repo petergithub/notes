@@ -20,7 +20,8 @@ That ibdata1 isn't shrinking is a particularly annoying feature of MySQL. The ib
 慢日志 pt_query_digest
 pt-duplicate-key-checker tool included with Percona Toolkit,
 validate your planned changes carefully with a tool such as pt-upgrade
-二级索引 secondary index
+
+`show variables like 'innodb_page_size';`
 
 ## Recent
 
@@ -31,6 +32,8 @@ validate your planned changes carefully with a tool such as pt-upgrade
 [MySQL 8.0 Release Notes](https://dev.mysql.com/doc/relnotes/mysql/8.0/en/)
 [MySQL 8.0 Reference Manual](https://dev.mysql.com/doc/refman/8.0/en/)
 [MySQL Internals Manual](https://dev.mysql.com/doc/internals/en/)
+
+[MySQL Worklog Tasks](https://dev.mysql.com/worklog/) are design specifications for changes that may define past work, or be considered for future development.
 
 [3.1 MySQL Shell Commands](https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-commands.html)
 
@@ -119,7 +122,11 @@ UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 
 ### Select
 
+`select LAST_INSERT_ID();` returns the first AUTO_INCREMENT value that was set by the most recent INSERT or UPDATE statement that affected an AUTO_INCREMENT column.
 按年按月分组 `GROUP BY YEAR(record_date), MONTH(record_date)`
+按天分组 `select DATE_FORMAT(start_time,'%Y-%m-%d') days,count(*) count from test group by days;`
+
+时间函数 时间格式化 `FROM_UNIXTIME(timestamp,'%Y-%m-%d')`
 计算生日 `SELECT  TIMESTAMPDIFF(YEAR, birthday, CURDATE())`
 
 字符个数(in character): `SELECT CHARACTER_LENGTH("SQL字符长度") AS LengthOfString;`
@@ -192,6 +199,64 @@ To produce the set of records unique to Table A and Table B, we perform the same
 
 `SELECT * FROM TableA CROSS JOIN TableB`  cartesian product, this joins "everything to everything"
 
+```sql
+-- 三张表关联：A (id,xxx) B(id,xxx) C(id,xxx) 要根据相同的id显示三张表，做Left Join。
+
+SELECT XXX
+FROM ((A LEFT JOIN B ON A.id = B.id)
+LEFT JOIN C ON A.id = C.id)
+WHERE B.id Is Not Null
+
+-- 关联查询价格最高的文章
+select s1.article, s1.dealer, s1.price FROM shop s1 left join shop s2 ON s1.price > s2.price and s1.article = s2.article  where s2.price is null;
+
+```
+
+### exists 语句
+
+exists 语法为：
+
+```sql
+select *
+from table_a a
+where exists (select 1 from table_b b where b.id = b.id);
+```
+
+exists 对外表用 loop 逐条查询，每次查询都会查看 exists 的条件语句。
+
+当 exists 里的条件语句能够返回记录行时（无论返回多少记录行，只要能返回），条件就为真，返回当前 loop 到的这条记录。
+
+反之如果 exists 里的条件语句不能返回记录行，则当前 loop 到的这条记录被丢弃。
+
+exists 的条件就像一个 bool 条件，当能返回结果集则为 true，不能返回结果集则为 false。
+
+当子查询为 select NULL 时， mysql 仍然认为它是 True。
+
+#### in 与 exists 的区别
+
+1. 外层查询表小于子查询表，则用 exists，外层查询表大于子查询表，则用 in ，如果外层和子查询表差不多，则爱用哪个用哪个。
+2. not exists 比 not in 效率高。
+
+in 的遍历是在内存中遍历。 而 exists 需要查询数据库。
+
+查询数据库所消耗的性能更高，而内存比较快。
+
+##### in 语句：只执行一次
+
+确定给定的值是否与子查询或列表中的值相匹配。
+
+in 在查询的时候，首先查询子查询的表，然后将内表和外表做一个笛卡尔积，然后按照条件进行筛选。
+
+所以相对内表比较小的时候，in 的速度较快。
+
+##### exists 语句：执行n次（外表行数）
+
+指定一个子查询，检测行的存在。
+
+遍历循环外表，检查外表中的记录有没有和内表的的数据一致的。
+
+匹配得上就放入结果集。
+
 ### Case-sensitive
 
 make a case-sensitive query
@@ -217,6 +282,13 @@ SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2
 -- 查询倒数第二位是偶数 even  或者 mod(id / 10, 2) = 0
 SELECT id FROM `user` WHERE id / 10 % 2=0 limit 2;
 ```
+
+* `SUBSTR(string, start, length)`
+* `SUBSTRING_INDEX(string, delimiter, number)` returns a substring of a string before a specified number of delimiter occurs.
+  * `SELECT SUBSTRING_INDEX("www.example.com", ".", 2);` return `www.example`
+* `LOCATE(substring, string, start)` returns the position of the first occurrence of a substring in a string.
+  * `SELECT LOCATE("com", "a.com", 3) AS MatchPosition`; return `3`
+  * [MySQL LOCATE() Function](https://www.w3schools.com/sql/func_mysql_locate.asp)
 
 ### Complicated SQL
 
@@ -1026,6 +1098,11 @@ InnoDB的锁，与索引类型，事务的隔离级别相关
 
 同时，会在插入区间加插入意向锁(insert intention lock)，但这个并不会真正封锁区间，也不会阻止相同区间的不同KEY插入。
 
+insert时，当对存在的行进行锁的时候(主键)，mysql就只有行锁。当对未存在的行进行锁的时候(即使条件为主键)，mysql是会锁住一段范围（有gap锁）
+
+`insert into t3(xx,xx) on duplicate key update xx='XX';` 这个特有的 insert 语法语句, 对于主键来说，插入的行不管有没有存在，都会只有行锁
+
+
 ### Example: 数据库插入数据时加锁 多线程(多job)重复insert
 
 1. `insert into test.test_sql_type select 26,'name25',9,1,now() from dual where not exists (select * from test.test_sql_type where id = 26);`
@@ -1087,7 +1164,90 @@ console 2:
 
 It pending to get the lock.
 
-## Doublewrite Buffer
+## 内存使用
+
+[RDS MySQL如何查看消耗内存高的事件和线程](https://help.aliyun.com/document_detail/127477.htm)
+
+### [MySQL 实际内存分配情况介绍](https://help.aliyun.com/document_detail/51799.htm)
+
+共享内存
+
+```sql
+show variables where variable_name in (
+'innodb_buffer_pool_size','innodb_log_buffer_size','innodb_additional_mem_pool_size','key_buffer_size','query_cache_size'
+);
++-------------------------+------------+
+| Variable_name           | Value      |
++-------------------------+------------+
+| innodb_buffer_pool_size | 8589934592 |
+| innodb_log_buffer_size  | 8388608    |
+| key_buffer_size         | 16777216   |
++-------------------------+------------+
+```
+
+#### Session 私有内存
+
+```sql
+show variables where variable_name in (
+'read_buffer_size','read_rnd_buffer_size','sort_buffer_size','join_buffer_size','binlog_cache_size','tmp_table_size'
+);
++----------------------+---------+
+| Variable_name        | Value   |
++----------------------+---------+
+| binlog_cache_size    | 1048576 |
+| join_buffer_size     | 1048576 |
+| read_buffer_size     | 1048576 |
+| read_rnd_buffer_size | 262144  |
+| sort_buffer_size     | 2097152 |
+| tmp_table_size       | 2097152 |
++----------------------+---------+
+```
+
+### [How to find out the memory cost of each mysql connection? - Server Fault](https://serverfault.com/questions/92056/how-to-find-out-the-memory-cost-of-each-mysql-connection)
+
+```sql
+
+--  see how much memory is being used in MySQL:
+SHOW ENGINE INNODB STATUS;
+
+-- Maximum memory per connection
+-- If you want to know the maximum amount a connection can possibly use, it's this query:
+
+
+SELECT ( @@read_buffer_size
++ @@read_rnd_buffer_size
++ @@sort_buffer_size
++ @@join_buffer_size
++ @@binlog_cache_size
++ @@thread_stack
++ @@tmp_table_size
++ 2*@@net_buffer_length
+) / (1024 * 1024) AS MEMORY_PER_CON_MB;
+
+-- query each item
+SELECT @@read_buffer_size, @@read_rnd_buffer_size, @@sort_buffer_size, @@join_buffer_size, @@binlog_cache_size, @@thread_stack , @@tmp_table_size , 2*@@net_buffer_length ;
+
+```
+
+## I/O
+
+1. `innodb_flush_log_at_trx_commit` 2
+   1. 0 把日志缓冲写到日志文件，并且每秒钟刷新一次，但是事务提交时不做任何事。
+   2. 1 事务提交时，把事务日志从缓存区写到日志文件中，并且立刻写入到磁盘上。
+   3. 2 事务提交时，把事务日志从缓存区写到日志文件中，但不一定立刻写入到磁盘上。日志文件会每秒写入到磁盘，如果写入前系统崩溃，就会导致最后1秒的日志丢失。
+2. `sync_binlog` 1000
+   1. 1 事务提交后，将二进制日志文件写入磁盘并立即刷新，相当于同步写入磁盘，不经过系统缓存。
+   2. 1000 每写入1000次系统缓存就执行一次写入磁盘并刷新的操作，会有数据丢失的风险。
+
+### O_DIRECT
+
+这个设置依然使用fsync() 来刷新文件到磁盘，但是会通知操作系统不要缓存数据，也不要用预读。这个选项完全关闭了操作系统缓存，并且使所有的读和写都直接通过存储设备，避免了双重缓冲。
+
+在大部分系统上，这个实现用fcntl() 调用来设置文件描述符的O_DIRECT 标记，所以可以阅读fcntl(2) 的手册页来了解系统上这个函数的细节。
+
+如果使用O_DIRECT 选项，通常需要带有写缓存的RAID卡，并且设置为Write-Back策略 (16) ，因为这是典型的唯一能保持好性能的方法。
+
+### Doublewrite Buffer
 
 [MySQL 8.0 Reference Manual :: 15.6.4 Doublewrite Buffer](https://dev.mysql.com/doc/refman/8.0/en/innodb-doublewrite-buffer.html)
 
@@ -1095,17 +1255,15 @@ It pending to get the lock.
 
 [double write buffer，你居然没听过？- 架构师之路 沈剑](https://mp.weixin.qq.com/s/bkoQ9g4cIcFFZBnpVh8ERQ)
 
-### doublewrite 解决的问题
+#### doublewrite 解决的问题
 
 脏页刷盘风险
 
 关于IO的最小单位：
 
-　　1、数据库IO的最小单位是16K（MySQL默认，oracle是8K）
-
-　　2、文件系统IO的最小单位是4K（也有1K的）
-
-　　3、磁盘IO的最小单位是512字节
+1. 数据库IO的最小单位是16K（MySQL默认，oracle是8K）
+2. 文件系统IO的最小单位是4K（也有1K的）
+3. 磁盘IO的最小单位是512字节
 
 因此，存在IO写入导致page损坏的风险：
 
@@ -1113,7 +1271,7 @@ Doublewrite Buffer 提高innodb的可靠性，用来解决部分写失败(partia
 
 出现问题的原因是**写磁盘不是原子操作，不能保证数据完整性**
 
-### Doublewrite Buffer 流程
+#### Doublewrite Buffer 流程
 
 当有页数据要刷盘时：
 
@@ -1131,7 +1289,7 @@ DWB由128个页构成，容量只有2M。
 
 类比：新老数据各一份，只是修改指针指向，这样是一个原子操作。
 
-### Doublewrite Buffer 副作用
+#### Doublewrite Buffer 副作用
 
 1. Doublewrite 是一个buffer, 但其实它是开在物理文件上的一个buffer, 其实也就是file, 所以它会导致系统有更多的fsync操作, 而硬盘的fsync性能是很慢的, 所以它会降低mysql的整体性能。
 
@@ -1163,11 +1321,12 @@ DWB由128个页构成，容量只有2M。
 
 ### MySQL调优
 
-1.mysql嵌套子查询效率确实比较低
-2.可以将其优化成连接查询
-3.连接表时，可以先用where条件对表进行过滤，然后做表连接 (虽然mysql会对连表语句做优化)
-4.建立合适的索引
-5.学会分析sql执行计划，mysql会对sql进行优化，所以分析执行计划很重要
+1. mysql嵌套子查询效率确实比较低
+2. 可以将其优化成连接查询
+3. 连接表时，可以先用where条件对表进行过滤，然后做表连接 (虽然mysql会对连表语句做优化)
+4. 建立合适的索引
+5. 学会分析sql执行计划，mysql会对sql进行优化，所以分析执行计划很重要
+
 制定适当的存储引擎和字符编码
 例如:MySQL中强事务业务使用InnoDB，弱事务业务使用MyISAM，字符编码使用utf8_bin，ORACLE中无需制定存储引擎，只需要制定字符编码UTF-8
 mysql线上将采用一master多slave的方式来进行部署
@@ -1229,6 +1388,8 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 
 `explain SQL` query;  then `show warnings` to get the raw SQL clause
 
+[MySQL Internals Manual :: 8.1 Tracing the Optimizer Typical Usage](https://dev.mysql.com/doc/internals/en/optimizer-tracing-typical-usage.html)
+
 #### EXPLAIN列的解释
 
 table：显示这一行的数据是关于哪张表的
@@ -1242,7 +1403,7 @@ Extra：关于MYSQL如何解析查询的额外信息
 
 #### Type
 
-性能从最好到最差：system、const、eq_reg、ref、range、index和ALL
+性能从最好到最差：system、const、eq_ref、ref、range、index和ALL
 
 #### 需要强调rows是核心指标
 
@@ -1273,7 +1434,7 @@ Extra：关于MYSQL如何解析查询的额外信息
 
 ### MySQL压力测试
 
-1. mysqlslap的介绍及使用
+1. mysqlslap 的介绍及使用
 2. sysbench
 3. tpcc-mysql
 
@@ -1283,6 +1444,63 @@ To see the index for a specific table use SHOW INDEX: `SHOW INDEX FROM yourtable
 To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_NAME,INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS where table_schema = 'account';`
 mysql query escape %前面加两个反斜杠，比如
 `select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'`
+
+### Tracing the Optimizer
+
+```sql
+# Turn tracing on (it's off by default):
+SET optimizer_trace="enabled=on";
+SELECT ...; # your query here
+SELECT * FROM INFORMATION_SCHEMA.OPTIMIZER_TRACE;
+# possibly more queries...
+# When done with tracing, disable it:
+SET optimizer_trace="enabled=off";
+```
+
+### 优化 Order by
+
+[MySQL 8.0 Reference Manual :: 8.2.1.16 ORDER BY Optimization](https://dev.mysql.com/doc/refman/8.0/en/order-by-optimization.html)
+
+[MySQL排序内部原理探秘 - 云+社区 - 腾讯云](https://cloud.tencent.com/developer/article/1072184)
+
+1. 排序和查询的字段尽量少。只查询你用到的字段，不要使用select * ；使用limit查询必要的行数据；
+2. 优先添加合适的索引
+   1. 使用索引得到排序的结果
+   2. 使用索引筛选出数据
+3. 使用 filesort
+   1. 根据 system variable `sort_buffer_size`来判断是否能使用内存排序
+      1. as of MySQL 8.0.12, the optimizer allocates memory buffers incrementally as needed, up to the size indicated by the `sort_buffer_size`
+   2. A filesort operation **uses temporary disk files** as necessary if the result set is too large to fit in memory
+   3. As of 8.0.20, `max_length_for_sort_data` is deprecated, 用来决定`sort_mode`，默认值是 1024，比较大时会走全字段排序，导致内存占用比较多，可能会使用临时文件辅助排序，导致性能降低。
+   4. `max_sort_length` 控制放到 sort_buffer 的一行的数据大小。当MySQL必须排序BLOB 或TEXT 字段时，它只会把`max_sort_length`大小的前缀放到缓存，然后忽略剩下部分的值。（比如用户要查询的数据包含了 SUBSTRING_INDEX(col1, '.',2)）
+   5. Increase the `read_rnd_buffer_size` variable value so that more rows are read at a time.
+   6. Change the `tmpdir` system variable to point to a dedicated file system with large amounts of free space.
+4. 使用 `optimizer trace` 查看判断过程 [MySQL Internals: Tracing the Optimizer](https://dev.mysql.com/doc/internals/en/optimizer-tracing.html).
+   1. `optimizer trace` output includes a filesort_summary block
+   2. `peak_memory_used` indicates the maximum memory used at any one time during the sort.
+   3. The `sort_mode` value provides information about the contents of tuples in the sort buffer:
+      1. `<sort_key, rowid>`: This indicates that sort buffer tuples are pairs that contain the sort key value and row ID
+      2. `<sort_key, additional_fields>`: This indicates that sort buffer tuples contain the sort key value and columns referenced by the query
+      3. `<sort_key, packed_additional_fields>`: Like the previous variant, but the additional columns are packed tightly together instead of using a fixed-length encoding.
+
+Previously (MySQL 5.7 and lower), `GROUP BY` sorted implicitly under certain conditions. In MySQL 8.0, that no longer occurs, so specifying `ORDER BY NULL` at the end to suppress implicit sorting (as was done previously) is no longer necessary.
+
+### 优化 Group by
+
+[group by 怎么优化？](https://mp.weixin.qq.com/s/igGKepCsf-SUKChco4P6Lw)
+
+[MySQL 8.0 Reference Manual :: 8.2.1.17 GROUP BY Optimization](https://dev.mysql.com/doc/refman/8.0/en/group-by-optimization.html)
+
+Loose index scan的原理是只使用组合索引的前缀部分，而不是索引的全部键值
+
+[MySQL :: What is the "(scanning)" variant of a loose index scan?](https://dev.mysql.com/blog-archive/what-is-the-scanning-variant-of-a-loose-index-scan/)
+
+如果不能使用索引，Extra 里一般有 Using temporary 和 Using filesort
+
+1. 分组字段加索引
+2. order by null 不排序 （8.0 以前group by 会进行排序，之后就不会内部默认排序了）
+3. 尽量使用内存临时表
+4. 使用 `SQL_BIG_RESULT` 提示 MySQL 优化器直接用磁盘临时表。如果数据量实在过大，大到内存临时表都不够用了，这时就转向使用磁盘临时表。而发现不够用再转向这个过程也是很耗时的。
 
 ## Replication
 
@@ -1338,9 +1556,23 @@ bin log location default: /var/lib/mysql/binlog*
 The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`
 `SELECT ORDINAL_POSITION,COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, COLUMN_COMMENT, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'tbl_name';`
 
-`mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less`
-`mysqlbinlog binlog_files | mysql -u root -p`  To execute events from the binary log, process mysqlbinlog output using the mysql client
-`mysqlbinlog --read-from-remote-server -h localhost -uroot -p --base64-output=decode-rows -v -v binlog.000062`
+```sh
+#  --include-gtids    截取指定的gtid
+#  --exclude-gtids    排除指定的gtid
+#  --skip-gtids       跳过gtid的幂等性机制的检查，即截取日志的时候不带有gtid的信息
+mysqlbinlog --start-datetime="2018-02-16 19:25:10" --base64-output=decode-rows -v -v mysql-bin.000802 | less
+
+# 包含 gtid 可以和 show slave status 返回的 Executed_Gtid_Set 对比看当前执行的 SQL
+mysqlbinlog --no-defaults -v -v --base64-output=DECODE-ROWS mysql-bin.000802 > mysql-bin.000802.with.gtid.log
+
+# 按执行次数统计 SQL
+mysqlbinlog --no-defaults -v -v --base64-output=DECODE-ROWS --skip-gtids --start-datetime="2021-08-09 07:15:10" --stop-datetime="2021-08-09 07:25:10" mysql-bin.004157 | grep -Ew '### INSERT|### UPDATE|### DELETE' | awk '/###/ {if($0~/INSERT|UPDATE|DELETE/)count[$2" "$NF]++}END{for(i in count) print i,"\t",count[i]}' | column -t | sort -k3 -nr | head -n 20
+
+# To execute events from the binary log, process mysqlbinlog output using the mysql client
+mysqlbinlog binlog_files | mysql -u root -p
+
+mysqlbinlog --read-from-remote-server -h localhost -uroot -p --base64-output=decode-rows -v -v binlog.000062
+```
 
 [Point-in-Time (Incremental) Recovery Using the Binary Log](https://dev.mysql.com/doc/refman/5.7/en/point-in-time-recovery.html)
 
