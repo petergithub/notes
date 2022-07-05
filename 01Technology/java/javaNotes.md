@@ -2,20 +2,19 @@
 
 ## Recent
 
+non-volatile memory (NVM)：非易失性存储器（NVM）是一种计算机存储器，即使电源关闭也具有保存已保存数据的能力。 与易失性存储器不同，NVM不需要定期刷新其存储器数据
+
+non-uniform memory access (NUMA)：非统一内存访问（NUMA）是一种用于多处理器的电脑内存体设计，内存访问时间取决于处理器的内存位置
+
 Jakarta (/dʒəˈkɑːrtə/
 
-锁降级
-JEP draft: Concurrent Monitor Deflation http://openjdk.java.net/jeps/8183909
-不可不说的Java“锁”事 https://tech.meituan.com/2018/11/15/java-lock.html
-Java偏向锁是如何撤销的？ https://www.zhihu.com/question/57774162
-Java Language Specification Chapter 17. Threads and Locks https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html
-Synchronization and Object Locking https://wiki.openjdk.java.net/display/HotSpot/Synchronization
+[What's new in Java 11 (Changes in JDK 9, 10, 11)](https://www.hackingnote.com/en/java/java-11)
+
+[What's new in Java 17](https://www.hackingnote.com/en/java/java-17)
 
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
 SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swagger-ui.html)
-
-[OpenJDK](https://openjdk.java.net/)
 
 concurrent: 主内存.寄存器是是运行时?
 
@@ -39,10 +38,14 @@ concurrent: 主内存.寄存器是是运行时?
 
 ### 常用参数
 
-`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
-`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
--XX:+Pringflagsfinal 打印平台默认值
-[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)
+## Java website
+
+JDK 中新特性，Java 不同版本的比较可以参考，看看增加了哪些项，废弃了哪些项，或者是移除了哪些项
+
+* [Java Version Almanac Java版本年鉴](https://javaalmanac.io/): Collection of information about the history and future of Java.
+* [Foojay Almanac](https://foojay.io/almanac/jdk-17/): a central resource for the Java community’s daily ​information
+* [OpenJDK Java增强提案（JEP）](https://openjdk.java.net/jeps/0) 形式进行的变更
+* Oracle [发布说明](https://www.oracle.com/java/technologies/javase/16-relnote-issues.html) 可以查阅每个 Java 版本的详细信息
 
 ## Java 17
 
@@ -50,6 +53,8 @@ concurrent: 主内存.寄存器是是运行时?
 [JDK 17 readme](https://www.oracle.com/java/technologies/javase/jdk17-readme-downloads.html)
 [JDK 17 Tool Specifications](https://docs.oracle.com/en/java/javase/17/docs/specs/man/index.html)
 [JDK 17 New Feature](https://www.oracle.com/java/technologies/javase/17-relnote-issues.html#NewFeature)
+[What's new in Java 17](https://www.hackingnote.com/en/java/java-17/index.html)
+[Java Version Almanac - Java 17 - foojay](https://foojay.io/almanac/java-17/)
 [JDK 17 Books](https://docs.oracle.com/en/java/javase/17/books.html)
 
 ### Flight Recorder
@@ -59,25 +64,40 @@ concurrent: 主内存.寄存器是是运行时?
 
 ## Java 8
 
+[New APIs in Java 8 - javaalmanac.io](https://javaalmanac.io/jdk/8/apidiff/6/)
+
 method reference :: syntax (meaning “use this method as a value”
 `File[] hiddenFiles = new File(".").listFiles(File::isHidden);`
+
+## Java lock
+
+### 锁降级
+
+* [JEP draft: Concurrent Monitor Deflation](http://openjdk.java.net/jeps/8183909)
+* [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
+* [JEP 374: Deprecate and Disable Biased Locking, Release jdk 15](https://openjdk.java.net/jeps/374)
+  * [Java偏向锁是如何撤销的？](https://www.zhihu.com/question/57774162)
+* [Java Language Specification Chapter 17. Threads and Locks](https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html)
+* [Synchronization and Object Locking](https://wiki.openjdk.java.net/display/HotSpot/Synchronization)
 
 ## Java问题排查工具箱
 
 ### [Arthas](https://github.com/alibaba/arthas)
 
-[Quick Start](https://alibaba.github.io/arthas/en/quick-start.html)
+[Quick Start](https://alibaba.github.io/arthas/quick-start.html)
 download: `wget https://alibaba.github.io/arthas/arthas-boot.jar`
 startup: `java -jar arthas-boot.jar`
 
+查看变量值
 [watch](https://arthas.aliyun.com/doc/en/watch.html) to view the return object and parameters
 `watch Demo$Counter method {params,returnObj}`
 `watch com.company.EnvironmentEnum isAbroad {params,returnObj} -x 3`  more detail `-x`
 `watch com.company.Service method {params,returnObj} "params[0]==1 && params[1]==new java.sql.Timestamp(1572424327000L)" -x 3`
 `watch com.company.Service method "{params[0],throwExp}" -e -x 2` Check exceptions
 
+查看耗时
 [trace](https://alibaba.github.io/arthas/trace.html) 方法内部调用路径，并输出方法路径上的每个节点上耗时
-trace Demo$Counter getFactoryInfo #cost>10 -n 1
+trace Demo$Counter getFactoryInfo '#cost>10' -n 1
 `#cost > 10` 只会展示耗时大于10ms的调用路径
 `-n` 参数指定捕捉结果的次数
 
@@ -85,7 +105,34 @@ trace Demo$Counter getFactoryInfo #cost>10 -n 1
 
 sc Demo$Counter
 
-[Arthas的一些特殊用法文档说明 #71](https://github.com/alibaba/arthas/issues/71)
+#### [thread — Arthas 3.6.2 文档](https://arthas.aliyun.com/doc/thread.html)
+
+`thread -n 3` 展示当前最忙的前N个线程并打印堆栈
+`thread id`, 显示指定线程的运行堆栈
+`thread -b`, 找出当前阻塞其他线程的线程
+`thread –state` ，查看指定状态的线程
+
+#### ognl
+
+[ognl Arthas的一些特殊用法文档说明 #71](https://github.com/alibaba/arthas/issues/71)
+
+```sh
+# 将结果按name属性投影：
+watch com.taobao.container.Test test "params[0].{ #this.name }"
+# 按条件过滤：
+watch com.taobao.container.Test test "params[0].{? #this.name == null }" -x 2
+# 过滤后统计：
+watch com.taobao.container.Test test "params[0].{? #this.age > 10 }.size()" -x 2
+# 查看第一个参数的size：
+watch com.taobao.container.Test test "params[0].size()"
+# 判断字符串相等 比如第一个参数是String类型：
+watch com.demo.Test test 'params[0]=="xyz"'
+# 判断long型
+watch com.demo.Test test 'params[0]==123456789L'
+# 同时判断两个值
+watch com.demo.Test test 'params[0]==1L,params[0]=="xyz"'
+
+```
 
 #### Demo
 
@@ -122,8 +169,8 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### checklist from linux to application process
 
-1. `top` 看出pid为 12666 的java进程占用了较多的cpu资源
-2. `top -Hp 12666` 查看该进程下各线程的CPU资源, 可以找到占资源较多的线程pid 为 12666 (12666 用 16 进制表示为 0x321e)
+1. `top` 看出进程 pid为 12666 的java进程占用了较多的cpu资源
+2. `top -Hp 12666` 查看该进程下各线程的CPU资源, 可以找到占资源较多的 线程pid 为 12830 (12830 用 16 进制表示为 0x321e)
 3. `jstack 12666 | grep nid=0x321e` 查看当前java进程的堆栈状态
 
 ### 内存检查步骤
@@ -151,10 +198,10 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### jemalloc 查看堆外内存 anon
 
-[native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )
-[Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )
-[Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )
-[Using jemalloc to get to the bottom of a memory leak](https://gdstechnology.blog.gov.uk/2015/12/11/using-jemalloc-to-get-to-the-bottom-of-a-memory-leak/ )
+* [native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )
+* [Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )
+* [Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )
+* [Using jemalloc to get to the bottom of a memory leak](https://gdstechnology.blog.gov.uk/2015/12/11/using-jemalloc-to-get-to-the-bottom-of-a-memory-leak/ )
 
 1. Starting your JVM with jemalloc `export LD_PRELOAD=/usr/local/lib/libjemalloc.so`
 2. Configuring the profiler `export MALLOC_CONF=prof:true,lg_prof_interval:30,lg_prof_sample:17,prof_prefix:/path/to/jeprof/output/jeprof`
@@ -163,9 +210,9 @@ Solution: This exception usually arises when the socket operations performed on 
 
 #### gperf 查看堆外内存
 
-[Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )
-[perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )
-[Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )
+* [Work with Google performance tools](http://alexott.net/en/writings/prog-checking/GooglePT.html )
+* [perftools查看堆外内存并解决hbase内存溢出](http://koven2049.iteye.com/blog/1142768 )
+* [Gperftools Heap Leak Checker](https://gperftools.github.io/gperftools/heap_checker.html )
 
 1. `export GPERF_HOME=/path/to/gperftools-2.7`
 2. `export LD_PRELOAD=$GPERF_HOME/lib/libtcmalloc.so HEAPCHECK=normal`
@@ -236,11 +283,14 @@ Solution: This exception usually arises when the socket operations performed on 
 
 ### jvm log 时间格式
 
-打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`
-打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`
-`-Xloggc` 需要使用绝对路径
-`-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
-`-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
+* 打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`
+* 打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`
+* `-Xloggc` 需要使用绝对路径
+* `-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
+* `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
+* `java -XX:+PrintFlagsFinal -version` 打印平台默认值
+
+[HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)
 [Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)
 
 ### ClassLoader相关工具
@@ -276,6 +326,18 @@ Solution: This exception usually arises when the socket operations performed on 
 HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`
 
 [Serviceability in HotSpot](http://openjdk.java.net/groups/hotspot/docs/Serviceability.html)
+
+#### Default gc for Java different version
+
+`java -XX:+PrintFlagsFinal -version | grep Use | grep GC | grep true` 查看默认使用的 GC
+
+| version       | GC                  |
+|---            |---                  |
+| Java 9 ~ 17   | G1 garbage collector|
+| Java 8 server | parallel collector  |
+| Java 8 client | serial collector    |
+| Java 7 server | parallel collector  |
+| Java 7 client | serial collector    |
 
 #### jmap
 
@@ -356,7 +418,7 @@ JCMD、JHSDB和基础工具的对比
 #### jstack
 
 jstack 可以告诉你当前所有JVM线程正在做什么，包括用户线程和虚拟机线程，你可以用它来查看线程栈，并且结合Lock信息来检测是否发生了死锁和死锁的线程。
-另外在用top -H看到占用CPU非常高的pid时，可以转换成16进制后在jstack dump出来的文件中搜索，看看到底是什么线程占用了CPU。
+另外在用`top -H`看到占用CPU非常高的pid时，可以转换成16进制后在`jstack dump`出来的文件中搜索，看看到底是什么线程占用了CPU。
 
 #### jhat
 
@@ -452,6 +514,12 @@ Old Generation            | Implied from overall Java heap size minus the young 
 
 ### Other tools
 
+#### [GCeasy](https://gceasy.io/)
+
+Universal GC Log Analyzer: Upload GC Log File
+
+Industry's first machine learning guided Garbage collection log analysis tool. GCeasy has in-built intelligence to auto-detect problems in the JVM & Android GC logs and recommend solutions to it.
+
 #### [GCViewer](https://github.com/chewiebug/GCViewer)
 
 GCViewer is a little tool that visualizes verbose GC output generated by Sun / Oracle, IBM, HP and BEA Java Virtual Machines.
@@ -470,7 +538,31 @@ Greys是一个JVM进程执行过程中的异常诊断工具，可以在不中断
 
 再偷偷告诉你，因为HouseMD是基于字节码分析来做的，所以理论上运行在JVM的语言都可以用它，包括Groovy，Clojure都可以。
 
-## JVM
+## GC
+
+### GC 选型
+
+选择正确的 GC 算法，唯一可行的方式就是去尝试，并找出不合理的地方，一般性的指导原则：
+
+* 如果考虑吞吐优先，CPU 尽量都用于处理业务，用 Parallel GC；
+* 如果考虑有限的低延迟，且每次 GC 时间尽量短，用 CMS GC；
+* 如果堆较大，同时希望整体来看平均 GC 时间可控，使用 G1 GC。
+
+对于内存大小的考量：
+
+* 一般 4G 以上，算是比较大，用 G1 GC 的性价比较高。
+* 一般超过 8G，比如 16G-64G 内存，非常推荐使用 G1 GC。
+* 更大内存或者低延迟要求非常苛刻，用 ZGC 。
+
+特别地：OpenJDK 11下推荐使用 G1 而不是 ZGC（16+版本推荐）。
+
+### G1
+
+各种 GC 发生的时机
+
+* Young GC：在 Young 区满了/分配内存失败的时候，回收 Young 区的堆内存。
+* Mixed GC：在 Young 区满了且 Old 区达到一定比例时，回收 Young 区+部分 Old 的堆内存。
+* Full GC：在堆内存满了的时候，启动 Full GC，尝试回收整个堆内存。
 
 ### ZGC - JDK 11
 
@@ -502,7 +594,7 @@ ZGC的八大特征
  这里的并发(Concurrent)，说的是应用线程与GC线程齐头并进，互不添堵。
 说几乎，就是还有三个非常短暂的STW的阶段，所以ZGC并不是Zero Pause GC啦
 2. 并发执行的保证机制，就是Colored Pointer 和 Load Barrier
- Colored Pointer 从64位的指针中，借了几位出来表示Finalizable、Remapped、Marked1、Marked0。 所以它不支持32位指针也不支持压缩指针， 且堆的上限是4TB
+ Colored Pointer 从64位的指针中，借了几位出来表示Finalizable、Remapped、Marked1、Marked0。 所以它不支持32位指针也不支持压缩指针， 且堆的大小支持 8MB to 16TB
 3. 像G1一样划分Region，但更加灵活
 4. 和G1一样会做Compacting－压缩
  粗略了几十倍地过一波回收流程，小阶段都被略过了哈:
@@ -541,6 +633,13 @@ An interrupt is an indication to a thread that it should stop what it is doing a
 使用`Thread.currentThread().isInterrupted()`方法：因为它将线程中断标示位设置为true后，不会立刻清除中断标示位，即不会将中断标设置为false），
 
 不要使用`thread.interrupted()`：该方法调用后会将中断标示位清除，即重新设置为false
+
+```java
+//Thread.java
+public void interrupt()            //t.interrupt() 打断t线程（设置t线程某给标志位f=true，并不是打断线程的运行）. 实例方法，设置线程中断标志（打扰一下，你该处理一下中断）
+public boolean isInterrupted()     //t.isInterrupted() 查询打断标志位是否被设置（是不是曾经被打断过）. 实例方法，有没有人打扰我？
+public static boolean interrupted()//Thread.interrupted() 查看“当前”线程是否被打断，如果被打断，恢复标志位.  静态方法，有没有人打扰我（当前线程）？复位！
+```
 
 #### 底层中断异常处理方式
 
