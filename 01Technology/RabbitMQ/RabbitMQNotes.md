@@ -2,6 +2,8 @@
 
 [RabbitMQ Server](https://github.com/rabbitmq/rabbitmq-server/)
 
+/usr/local/rabbitmq/sbin/rabbitmq-server  -detached &     加上启动参数 detached
+
 ## [Troubleshooting Guidance](https://www.rabbitmq.com/troubleshooting.html)
 
 crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
@@ -20,6 +22,7 @@ crash file /usr/local/rabbitmq/var/lib/rabbitmq/erl_crash.dump
 # start stop
 service rabbitmq-server start
 service rabbitmq-server stop
+service rabbitmq-server restart
 service rabbitmq-server status
 rabbitmqctl status
 # 环境信息
@@ -48,6 +51,7 @@ rabbitmqctl set_permissions -p / admin ".*" ".*" ".*"
 
 rabbitmqctl add_vhost vhost_name
 rabbitmqctl set_permissions -p vhost_name admin ".*" ".*" ".*"
+rabbitmqctl list_user_permissions admin
 ```
 
 RabbitMQ has a web management console. To enable web management console run : `rabbitmq-plugins enable rabbitmq_management`
@@ -116,6 +120,10 @@ Exchange分发消息时根据类型的不同分发策略有区别，目前共四
 topic 交换器通过模式匹配分配消息的路由键属性，将路由键和某个模式进行匹配，此时队列需要绑定到一个模式上。它将路由键和绑定键的字符串切分成单词，这些单词之间用点隔开。它同样也会识别两个通配符：符号`#`和符号`*`。`#`匹配0个或多个单词，`*`匹配不多不少一个单词。
 
 ![topic 交换器](image/exchange.topic.png)
+
+### RabbitMQ vs. Kafka vs. ActiveMQ vs. RocketMQ
+
+[入门RabbitMQ消息队列，看这篇文章就够了 - 掘金](https://juejin.cn/post/6844904113788944397)
 
 ## Installation
 
