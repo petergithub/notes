@@ -230,6 +230,42 @@ add in gitconfig
 [i18n]commitencoding = utf-8
 说明：如果没有这一条，虽然我们在本地用 $ git log 看自己的中文修订没问题，但，一、我们的 log 推到服务器后会变成乱码；二、别人在 Linux 下推的中文 log 我们 pull 过来之后看起来也是乱码。这是因为，我们的 commit log 会被先存放在项目的 .git/COMMIT_EDITMSG 文件中；在中文 Windows 里，新建文件用的是 GB2312 的编码；但是 Git 不知道，当成默认的 utf-8 的送出去了，所以就乱码了。有了这条之后，Git 会先将其转换成 utf-8，再发出去，于是就没问题了。
 
+## Git verbose information
+
+[Git - Verbose Mode: Debug Fatal Errors - ShellHacks](https://www.shellhacks.com/git-verbose-mode-debug-fatal-errors/)
+Debug Git command:
+
+```sh
+$ GIT_TRACE=true \
+GIT_CURL_VERBOSE=true \
+GIT_SSH_COMMAND="ssh -vvv" \
+git clone git://host.xz/path/to/repo.git
+Debug Git-related issues with the maximum level of verbosity:
+
+$ GIT_TRACE=true \
+GIT_CURL_VERBOSE=true \
+GIT_SSH_COMMAND="ssh -vvv" \
+GIT_TRACE_PACK_ACCESS=true \
+GIT_TRACE_PACKET=true \
+GIT_TRACE_PACKFILE=true \
+GIT_TRACE_PERFORMANCE=true \
+GIT_TRACE_SETUP=true \
+GIT_TRACE_SHALLOW=true \
+git clone git://host.xz/path/to/repo.git
+```
+
+| Option | Description |
+| --- | --- |
+| `GIT_TRACE=true` | Enable general trace messages |
+| `GIT_CURL_VERBOSE=true` | Print HTTP headers (similar to `curl -v`) |
+| `GIT_SSH_COMMAND="ssh -vvv"` | Print SSH debug messages (similar to `ssh -vvv)` |
+| `GIT_TRACE_PACK_ACCESS=true` | Enable trace messages for all accesses to any packs |
+| `GIT_TRACE_PACKET=true` | Enable trace messages for all packets coming in or out of a given program |
+| `GIT_TRACE_PACKFILE=true` | Enable tracing of packfiles sent or received by a given program |
+| `GIT_TRACE_PERFORMANCE=true` | Enable performance related trace messages |
+| `GIT_TRACE_SETUP=true` | Enable trace messages printing the `.git`, working tree and current working directory after Git has completed its setup phase |
+| `GIT_TRACE_SHALLOW=true` | Enable trace messages that can help debugging fetching/cloning of shallow repositories |
+
 ## Examples
 
 ### create repository
