@@ -84,15 +84,18 @@ UTF-8文件的BOM是“EF BB BF”，但是UTF-8的字节顺序是不变的，�
 
 ### 大端小端简介
 
+使用情况 [Endianness Overview - Wikipedia](https://en.wikipedia.org/wiki/Endianness#Overview)
+
 * 大端：最高有效字节在前面，摩托罗拉（Motorola）的PowerPC系列，IBM，TCP/IP 网络传输 使用
-* 小端：最低有效字节在前面，Intel的 x86系列
+* 小端：最低有效字节在前面，Intel的 x86系列, most ARM implementations, base RISC-V implementations
+* File formats can use either ordering
 
 ARM既可以工作在大端模式，也可以工作在小端模式，一般ARM都默认是小端模式
 
-十六进制的 0x1A2B3C4D
+十六进制的 0xABCD1234
 
-* 大端表示为 1A 2B 3C 4D
-* 小端表示为 4D 3C 2B 1A
+* 大端表示为 AB CD 12 34
+* 小端表示为 34 12 CD AB
 
 ### 大端小端详细介绍
 
@@ -137,6 +140,8 @@ MSB的意思是：全称为Most Significant Bit，在二进制数中属于最高
 LSB的意思是：全称为Least Significant Bit，在二进制数中意为最低有效位，一般来说，MSB位于二进制树的最左侧，LSB位于二进制数的最右侧。
 
 ### 大端模式的优势
+
+[字节序探析：大端与小端的比较 - 阮一峰的网络日志](https://www.ruanyifeng.com/blog/2022/06/endianness-analysis.html)
 
 基于其存储特点，符号位在所表示的数据的内存的第一个字节中，便于快速判断数据的正负和大小（CPU做数值运算时从内存中依顺序依次从低位地址到高位地址取数据进行运算，大端就会最先拿到数据的(高字节的)符号位）。
 

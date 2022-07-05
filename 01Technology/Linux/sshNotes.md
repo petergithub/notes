@@ -2,12 +2,13 @@
 
 `ssh -p port user@host`    在端口 port 以 user 用户身份连接到 host
 
+* `-C`    压缩传送的数据
 * `-f`    ssh将在后台运行
+* `-g`    Allows remote hosts to connect to local forwarded ports.
+* `-i`    使用指定的密钥登录
+* `-L 3307:remoteHost:3306` - Creates a local port forwarding. The local port (3307), the destination IP (remoteHost) and the remote port (3306) are separated with a colon (:).
 * `-N`    不执行命令, 仅转发端口
 * `-T`    表示不为这个连接分配TTY
-* `-g`    Allows remote hosts to connect to local forwarded ports.
-* `-C`    压缩传送的数据
-* `-i`    使用指定的密钥登录
   * It is required that your private key files are NOT accessible by others
   * Keys need to be only readable(400 or 600 is fine)  chmod 600 ~/.ssh/id_rsa
 * `-t` Force pseudo-tty allocation for bash to use as an interactive shell

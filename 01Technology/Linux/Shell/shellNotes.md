@@ -561,3 +561,19 @@ for (( i = 0; i < 5; i++)); do
     sleep $SEC;
 done
 ```
+
+### monitor process script
+
+```bash
+#!/bin/env bash
+# Desc:Monitor RabbitMQ processs
+
+DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
+PID=$(ps aux | grep -v grep | grep /usr/local/erlang/lib/erlang/erts-8.3/bin/beam.smp)
+if [ -z "$PID" ];then
+ echo ${DATE} "Restart RabbitMQ" >> ~/logs/scripts/rabbitmq-monitor.log
+ service rabbitmq-server start
+else
+ echo ${DATE} "Service RabbitMQ is running" >> ~/logs/scripts/rabbitmq-monitor.log
+fi
+```
