@@ -76,6 +76,24 @@ EvictedKeys 因内存满而淘汰的key总数
 
 ## Performance
 
+### [Redis 变慢问题的 Checklist](https://time.geekbang.org/column/article/dbfab3b1b37b27e980756e0b2042186a/share?code=B4DpWbLTTWwh2J-qoenyDrjUMJmEMYzFjIA5fd%2FVh4c%3D&source=app_share&oss_token=33f0026d90c6e4c7)
+
+摘自 [Redis 核心技术与实战 - 蒋德钧](https://time.geekbang.org/column/intro/100056701)
+
+遇到 Redis 性能变慢时，按照这些步骤逐一检查，高效地解决问题。
+
+1. 获取 Redis 实例在当前环境下的基线性能。
+2. 是否用了慢查询命令？如果是的话，就使用其他命令替代慢查询命令，或者把聚合计算命令放在客户端做。
+3. 是否对过期 key 设置了相同的过期时间？对于批量删除的 key，可以在每个 key 的过期时间上加一个随机数，避免同时删除。
+4. 是否存在 bigkey？ 对于 bigkey 的删除操作，如果你的 Redis 是 4.0 及以上的版本，可以直接利用异步线程机制减少主线程阻塞；如果是 Redis 4.0 以前的版本，可以使用 SCAN 命令迭代删除；对于 bigkey 的集合查询和聚合操作，可以使用 SCAN 命令在客户端完成。
+5. Redis AOF 配置级别是什么？业务层面是否的确需要这一可靠性级别？如果我们需要高性能，同时也允许数据丢失，可以将配置项 no-appendfsync-on-rewrite 设置为 yes，避免 AOF 重写和 fsync 竞争磁盘 IO 资源，导致 Redis 延迟增加。当然， 如果既需要高性能又需要高可靠性，最好使用高速固态盘作为 AOF 日志的写入盘。
+6. 当 Redis 实例的数据量大时，无论是生成 RDB，还是 AOF 重写，都会导致 fork 耗时严重
+7. Redis 实例的内存使用是否过大？发生 swap 了吗？如果是的话，就增加机器内存，或者是使用 Redis 集群，分摊单机 Redis 的键值对数量和内存压力。同时，要避免出现 Redis 和其他内存需求大的应用共享机器的情况。
+8. 在 Redis 实例的运行环境中，是否启用了透明大页机制？如果是的话，直接关闭内存大页机制就行了。
+9. 是否运行了 Redis 主从集群？如果是的话，把主库实例的数据量大小控制在 2~4GB，以免主从复制时，从库因加载大的 RDB 文件而阻塞。
+10. 是否使用了多核 CPU 或 NUMA 架构的机器运行 Redis 实例？使用多核 CPU 时，可以给 Redis 实例绑定物理核；使用 NUMA 架构时，注意把 Redis 实例和网络中断处理程序运行在同一个 CPU Socket 上。
+11. 网卡压力过大。分析：a) TCP/IP层延迟变大，丢包重传变多 b) 是否存在流量过大的实例占满带宽。解决：a) 机器网络资源监控，负载过高及时报警 b) 提前规划部署策略，访问量大的实例隔离部署
+
 ### Redis常用的删除策略有以下三种
 
 * 被动删除（惰性删除）：当读/写一个已经过期的Key时，会触发惰性删除策略，直接删除掉这个Key;
@@ -117,7 +135,7 @@ Redis 将 serverCron 作为时间事件来运行，从而确保它每隔一段�
 > 数据分布[Redis-rdb-tools](https://github.com/sripathikrishnan/redis-rdb-tools)
 `sudo pip install rdbtools`
 
-``` sql
+```sql
 #使用 redis-rdb-tools 生成内存快照
 rdb -c memory dump.rdb > memory.csv;
 
@@ -211,7 +229,7 @@ Redis的value存储中文后，get之后显示16进制的字符串”\xe4\xb8\xa
 13  flushdb                //删除当前数据库中所有key,此方法不会失败。慎用
 14  flushall               //删除所有数据库中的所有key，此方法不会失败。更加慎用
 
-#### [SCAN](https://redis.io/commands/scan)
+### [SCAN](https://redis.io/commands/scan)
 
 SCAN return value is an array of two values
 
@@ -222,6 +240,14 @@ SCAN return value is an array of two values
 eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
 `redis-cli --scan | head -10`
 `redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
+
+#### SCAN命令时，不会漏key，但可能会得到重复的key
+
+这主要和Redis的Rehash机制有关。
+
+1. 为什么不会漏key？Redis在SCAN遍历全局哈希表时，采用*高位进位法*的方式遍历哈希桶（可网上查询图例，一看就明白），当哈希表扩容后，通过这种算法遍历，旧哈希表中的数据映射到新哈希表，依旧会保留原来的先后顺序，这样就可以保证遍历时不会遗漏也不会重复。
+
+2. 为什么SCAN会得到重复的key？这个情况主要发生在哈希表缩容。已经遍历过的哈希桶在缩容时，会映射到新哈希表没有遍历到的位置，所以继续遍历就会对同一个key返回多次。
 
 ### string 类型数据操作命令
 
