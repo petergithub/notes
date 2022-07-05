@@ -77,6 +77,13 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preloa
 
 CSR (Certificate Signing Request)
 
+cer 格式 等价于 PEM 格式，使用 vi 打开 copy 到的内容是一样的
+
+格式介绍：
+
+* cer 格式
+* PEM 格式
+
 #### Create CSR and Key Without Prompt using OpenSSL
 
 `openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`
@@ -102,6 +109,7 @@ Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocr
 * Check a PKCS#12 file (.pfx or .p12) `openssl pkcs12 -info -in keyStore.p12`
 * Connect to 443 `openssl s_client -connect www.example.com:443`
 * Extract the certificate from the .p12 file to a .pem file `openssl pkcs12 -in certificate.p12 -out certificate.pem -nodes`
+* Extract the certificate from the .cer file to a .pem file `openssl x509 -in certificate.cer -out certificate.pem -outform PEM`
 * Get expired date from URL `openssl s_client -connect example.com:443 -servername example.com 2>/dev/null | openssl x509 -noout -dates`
 * Get expired date `openssl x509 -noout -enddate -in certificate.pem`
 * Get expired date `openssl x509 -noout -dates -in nginx/05/ssl/example.com.crt`
@@ -138,3 +146,19 @@ The fields, required in CSR are listed below:
 |/O=    |Organization        |Global Security
 |/OU=   |Organizational Unit |IT Department
 |/CN=   |Common Name         |example.com (the domain name the Certificate will be issued for, e.g. *.example.com)
+
+## [acme 生成证书](https://github.com/acmesh-official/acme.sh/wiki/说明)
+
+```sh
+# 下载生成脚本
+curl  https://get.acme.sh | sh -s email=my@example.com
+
+# 执行脚本生成证书
+acme.sh --issue  -d www.example.com --webroot  /data/www/acme
+
+# 脚本添加 crontab 自动更新证书
+47 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
+
+# 获取过期时间
+openssl x509 -noout -enddate -in www.example.com.cer
+```
