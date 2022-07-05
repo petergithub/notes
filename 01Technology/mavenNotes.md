@@ -49,6 +49,7 @@ mvn install 在本地Repository中安装jar    mvn clean install 删除再编译
 mvn install:install-file -DgroupId=com.lowagie -DartifactId=itextasian -Dversion=1.0 -Dpackaging=jar -Dfile=c:\sp\doing\itextasian.jar
 mvn site  生成项目相关信息的网站
 mvn exec:java -Dexec.mainClass=org.sonatype.mavenbook.weather.Main Exec 插件让我们能够在不往classpath载入适当的依赖的情况下, 运行这个程序
+统一修改父子版本号 `mvn versions:set -DnewVersion=xxx-SNAPSHOT/RELEASE`
 
 ## Advanced
 
@@ -207,7 +208,7 @@ mvn dependency:list -e -U -X
 
 ### Proxy
 
-`export MAVEN_OPTS="-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080"`  
+`export MAVEN_OPTS="-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080"`
 or `mvn -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080`
 
 ## Introduction to the Standard Directory Layout

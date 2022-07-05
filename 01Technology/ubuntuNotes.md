@@ -21,7 +21,8 @@ Convert a number from decimal to hexadecimal: `printf '%x\n' 255`
 `for i in *; do cd /path/to/folder/$i ;mvn clean; done`
 `SCRIPT_PATH=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname ${S})`
 
-`chkconfig --list` a simple command-line tool for maintaining the /etc/rc[0-6].d directory hierarchy
+`chkconfig --list [serviceName]` a simple command-line tool for maintaining the /etc/rc[0-6].d directory hierarchy
+`chkconfig serviceName on/off`
 获取 IP 地址位置信息: `curl -s "http://ip.taobao.com/service/getIpInfo.php?ip=113.104.182.107" | jq '.data | .city + ", " +.region + ", " + .isp'`
 ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt + F2 unity`
 [Memcached服务端自动启动](http://www.cnblogs.com/technet/archive/2011/09/11/2173485.html)
@@ -353,7 +354,10 @@ read the output of an external command.  For example, `:r !ls`  reads the output
 `:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入`:help :w`）, 会提到命令`:w!{cmd}`, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. `tee`是一个把stdin保存到文件的小工具. 而`%`, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件.
 `:help cmdline-special` to see meaning of `%`
-replace a character by a newline in Vim: Use `\r` instead of `\n`.
+replace a character by a newline in Vim: Use `\r` instead of `\n`
+
+`:g, :global` Hide all matching lines in Vim, `:g/FIND`
+`:g!, :global!` Hide all not matching lines in Vim, `:g!/FIND` or `:v/FIND`
 
 `.` 命令重复上次的修改.
 修改在这里就是插入、删除或者替换文本. 能够重复是一个非常强大的机制. 如果你基于它来安排你的编辑, 许多修改将变得只是敲.键. 留意其间的其他修改, 因为它会替代你原来要重复的修改. 相反, 你可以用m命令先标记这个位置, 继续重复你的修改, 稍后再返回到这个位置.
@@ -499,6 +503,12 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `y`替换，`n`不替换，`a`替换所有，`q`放弃，`l`替换第一个并进入插入模式，`^E`和`^Y`是提示你用`Ctrl+e`或`Ctrl+y`来滚动屏幕的
 
 ### less
+
+`less -n -i -S`
+
+* `-i, --ignore-case` Causes searches to ignore case;
+* `-n` Suppresses line  numbers
+* `-S` Causes lines longer than the screen width to be chopped rather than folded
 
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
@@ -728,7 +738,7 @@ ls -1 | awk 'ORS=","' | head -c -1
 # 或者
 ls -1 | paste -sd "," -
 
-# awk求和 sum
+# 求和 sum
 echo "00:05:42,913 33884 314" | awk '{ len += $2; cost += $3 } END {print len, cost, len/cost}'
 # 求TCP重传率
 cat /proc/net/snmp | grep Tcp | grep -v RetransSegs | awk '{print $13/$12}'
@@ -739,6 +749,9 @@ awk '/Host $youralias/ { print $2; getline; print $2;}' ~/.ssh/config
 # Using bash shell function inside AWK: system(cmd) executes cmd and returns its exit status
 # download in batch
 ossutil ls oss://path/to/202109/02/ | sort -k 2 | awk '$2>"14:28:00" && $2<"14:32:00" {print $8; system("ossutil cp " $8 " .")}'
+
+# url decode with unquote_plus,  url encode with quote_plus
+less confluence.ognl.attack.log | python -c "import sys, urllib as ul; [sys.stdout.write(ul.unquote_plus(l)) for l in sys.stdin]" | less
 ```
 
 `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
@@ -757,6 +770,23 @@ awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is sam
  with `'\''` you close the opening `'`, then print a literal `'` by escaping it and finally open the ' again.
 escape square brackets: Brackets `[` need double escape `\\`: `\\[`
 
+awk escape double quote: `"\""` [Print double quotes in unix Awk](http://www.unixcl.com/2012/07/print-double-quotes-in-unix-awk.html)
+
+```sh
+# escape double quote
+cat file.txt
+# 6289693505455 Plan_DAIL_30D_AA
+awk '{print $2,"\""$1"\""}' file.txt
+# Plan_DAIL_30D_AA "6289693505455"
+
+#Assigning the quotes sequence to a variable x
+$ awk -v x="\"" '{print $2,x$1x}' file.txt
+#Using octal code of double quotes
+$ awk '{print $2,"\042"$1"\042"}' file.txt
+#Using ASCII code of double quotes
+$ awk '{print $2,"\x22"$1"\x22"}'  file.txt
+```
+
 ##### 日志解析
 
 ```bash
@@ -766,6 +796,17 @@ awk '$9!~200 && $9!~302 && $9!~304 && $9!~403'
 # 按时间区间查询:
 awk '{if ($1>startTime && $1<endTime) {print $0}}' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log
 awk '$1>=startTime && $1<=endTime' startTime="2016-09-18T10:37:23" endTime="2016-09-18T10:37:37" awkTime.log
+
+# 解析日志 将每个IP访问的页面数进行从小到大排序：
+awk '{++S[$1]} END {for (a in S) print S[a],a}' log_file | sort -n
+# 文件流量统计
+cat /www/logs/access.2011-08-03.log |awk '{sum[$7]+=$10}END{for(i in sum){print sum[i],i}}'|sort -rn|more
+
+# 查出运行速度最慢的脚本
+grep -v 0$ access.2010-11-05.log | awk -F '\" ' '{print $4" " $1}' web.log | awk '{print $1" "$8}' | sort -n -k 1 -r | uniq > /tmp/slow_url.txt
+
+# 刪除一个月前的日志
+rm -f /www/logs/access.log.$(date -d '-1 month' +'%Y-%m')*
 ```
 
 ##### awk 16进制转换
@@ -794,7 +835,6 @@ awk还支持命令文件 `awk -f awk_file data_file`
 Initialization and Final Action
 
 ``` bash
-
     Syntax:
     BEGIN { Actions}
     {ACTION} # Action for everyline in a file
@@ -1000,15 +1040,15 @@ So signal 0 will not actually in fact send anything to your process's PID, but w
 
 ``` bash
 
-    #!/bin/bash
+#!/bin/bash
 
-    PID=$(pgrep sleep)
-    if ! kill -0 $PID 2>/dev/null; then
-      echo "you don't have permissions to kill PID:$PID"
-      exit 1
-    fi
+PID=$(pgrep sleep)
+if ! kill -0 $PID 2>/dev/null; then
+    echo "you don't have permissions to kill PID:$PID"
+    exit 1
+fi
 
-    kill -9 $PID
+kill -9 $PID
 ```
 
 ### date
@@ -1066,19 +1106,19 @@ crontab特殊的符号说明
 
 ``` bash
 
-    Graphically:
+Graphically:
 
-     ┌────────── minute (0 - 59)
-     │ ┌──────── hour (0 - 23)
-     │ │ ┌────── day of month (1 - 31)
-     │ │ │ ┌──── month (1 - 12)
-     │ │ │ │ ┌── day of week (0 - 6 => Sunday - Saturday, or
-     │ │ │ │ │                1 - 7 => Monday - Sunday)
-     ↓ ↓ ↓ ↓ ↓
-     * * * * * command to be executed
+    ┌────────── minute (0 - 59)
+    │ ┌──────── hour (0 - 23)
+    │ │ ┌────── day of month (1 - 31)
+    │ │ │ ┌──── month (1 - 12)
+    │ │ │ │ ┌── day of week (0 - 6 => Sunday - Saturday, or
+    │ │ │ │ │                1 - 7 => Monday - Sunday)
+    ↓ ↓ ↓ ↓ ↓
+    * * * * * command to be executed
 
-    MAILTO=username@example.org
-    5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
+MAILTO=username@example.org
+5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
 ```
 
 log path: `/var/log/messages` or `/var/log/cron*`
@@ -1121,6 +1161,12 @@ If you want a command to be run once at system boot, the correct solution is to 
 
 * system RC scripts (/etc/rc.local)
 * crontab with the `@reboot` special prefix (see manpage)
+
+#### [Unable to run a service command via cron - Stack Overflow](https://stackoverflow.com/questions/8127433/unable-to-run-a-service-command-via-cron)
+
+Failed with `service service_name start`
+
+sbin is not in the path when run via cron. Specify the full path to service. This is probably either `/sbin/service` or `/usr/sbin/service`. You can find the path on your system by running `which service`.
 
 ### logrotate
 
@@ -1250,7 +1296,7 @@ cut命令可以从一个文本文件或者文本流中提取文本列
 
 ### tr 合并换行 多行变一行
 
-concatenate multiple lines of output to one line `grep pattern file | tr '\n' ' '`
+concatenate multiple lines of output to one line (merge) `grep pattern file | tr '\n' ' '`
 Upper case to lower case  `tr [A-Z] [a-z]`
 Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 30" | tr -d " "`
 
@@ -2711,13 +2757,16 @@ stick bit:chmod 1755 xxx
 ### Kernel
 
 Find Out If Running Kernel Is 32 Or 64 Bit (find out if my Linux server CPU can run a 64 bit kernel version (apps) or not)
-    `uname -a`    print system information:
+
+`uname -a`    print system information:
+
 Find Out CPU is 32bit or 64bit?
-    `grep flags /proc/cpuinfo`
-    CPU Modes:
-        lm flag means Long mode cpu - 64 bit CPU
-        Real mode 16 bit CPU
-        Protected Mode is 32-bit CPU
+
+`grep flags /proc/cpuinfo`
+CPU Modes:
+    lm flag means Long mode cpu - 64 bit CPU
+    Real mode 16 bit CPU
+    Protected Mode is 32-bit CPU
 
 ### Network Command
 
@@ -2960,10 +3009,10 @@ Here, only the most important directories in the system will be presented.
 ### [Source code](https://peteris.rocks/blog/htop/#source-code)
 
 ``` bash
-    $ which uptime
-    /usr/bin/uptime
-    $ dpkg -S /usr/bin/uptime
-    procps: /usr/bin/uptime
+$ which uptime
+/usr/bin/uptime
+$ dpkg -S /usr/bin/uptime
+procps: /usr/bin/uptime
 ```
 
 Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.
@@ -2973,3 +3022,39 @@ If you scroll to the bottom of the page, you'll see links to the source code rep
 
 * Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
 * Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
+
+## 入侵排查思路
+
+[第2篇:Linux入侵排查 · 应急响应实战笔记](https://xzbzq.github.io/Emergency-Response-Notes/Summary/第2篇：Linux入侵排查.html)
+
+### 基本使用
+
+```sh
+1、用户信息文件/etc/passwd
+root:x:0:0:root:/root:/bin/bash
+account:password:UID:GID:GECOS:directory:shell
+用户名：密码：用户ID：组ID：用户说明：家目录：登陆之后shell
+注意：无密码只允许本机登陆，远程不允许登陆
+
+2、影子文件/etc/shadow
+root:$6$oGs1PqhL2p3ZetrE$X7o7bzoouHQVSEmSgsYN5UD4.kMHx6qgbTqwNVC5oOAouXvcjQSt.Ft7ql1WpkopY0UV9ajBwUt1DpYxTCVvI/:16809:0:99999:7:::
+用户名：加密密码：密码最后一次修改日期：两次密码的修改时间间隔：密码有效期：密码修改到期到的警告天数：密码过期之后的宽限天数：账号失效时间：保留
+who     查看当前登录用户（tty本地登陆  pts远程登录）
+w       查看系统信息，想知道某一时刻用户的行为
+uptime  查看登陆多久、多少用户，负载
+```
+
+### 入侵排查
+
+```sh
+1、查询特权用户特权用户(uid 为0)
+[root@localhost ~]# awk -F: '$3==0{print $1}' /etc/passwd
+2、查询可以远程登录的帐号信息
+[root@localhost ~]# awk '/\$1|\$6/{print $1}' /etc/shadow
+3、除root帐号外，其他帐号是否存在sudo权限。如非管理需要，普通帐号应删除sudo权限
+[root@localhost ~]# more /etc/sudoers | grep -v "^#\|^$" | grep "ALL=(ALL)"
+4、禁用或删除多余及可疑的帐号
+    usermod -L user    禁用帐号，帐号无法登录，/etc/shadow第二栏为!开头
+    userdel user       删除user用户
+    userdel -r user    将删除user用户，并且将/home目录下的user目录一并删除
+```

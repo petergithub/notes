@@ -184,7 +184,10 @@ edit settings.json and add this line: "editor.mouseWheelZoom": true
 or go to settings CTRL + , or File > Preferences > Settings and search for mouseWheelZoom
 
 执行文字相关的导航或操作时将用作文字分隔符的字符(比如双击选中文字, 只会选中下面分隔符中的文字)
+
+```sh
 "editor.wordSeparators": "`~!@#$%^&*()-=+[{]}\\|;:'\",.<>/！（）｛｝【】、；：’”，。《》？?"
+```
 
 #### vs code plugin
 
@@ -194,6 +197,7 @@ or go to settings CTRL + , or File > Preferences > Settings and search for mouse
 [Markdown All in One](https://marketplace.visualstudio.com/items?itemName=yzhang.markdown-all-in-one#keyboard-shortcuts-1)
 [PicGo - A fast and powerful image uploading plugin](https://marketplace.visualstudio.com/items?itemName=Spades.vs-picgo)
 [Better Outline](https://marketplace.visualstudio.com/items?itemName=adamerose.better-outline): text outline
+[To delete an entire block of whitespace or tab, and reduce the time programmers need to press backspace](https://marketplace.visualstudio.com/items?itemName=jasonlhy.hungry-delete)
 
 ### Mac common
 
@@ -297,7 +301,7 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 
 ### WPS
 
-COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown) 切换到上/下一个工作表 Sheet
+`COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown)` 切换到上/下一个工作表 Sheet
 Cloud document storage location: /Users/pu/Library/Containers/com.kingsoft.wpsoffice.mac/Data/Library/Application Support/Kingsoft/WPS Cloud Files/userdata/qing/filecache
 
 ## Manage
@@ -413,3 +417,4 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * NewFileMenuFree
 * Maccy: Lightweight clipboard manager for macOS
 * [DevToys For mac - ObuchiYuki/DevToysMac](https://github.com/ObuchiYuki/DevToysMac)
+* [Open Source SQL Editor and Database Manager | Beekeeper Studio](https://www.beekeeperstudio.io/) sqllite
