@@ -271,6 +271,20 @@ G1                  |                |    -XX:+UseG1GC
 Note that this stands true for Java 8，for older Java versions the available combinations might differ a bit.
 The table is from [GC Algorithms: Implementations](https://plumbr.eu/handbook/garbage-collection-algorithms-implementations )
 
+Deprecated and removed:
+
+* [JEP 214: Remove GC Combinations Deprecated in JDK 8](https://openjdk.java.net/jeps/214)
+  * DefNew + CMS       : -XX:-UseParNewGC -XX:+UseConcMarkSweepGC
+  * ParNew + Serial Old : -XX:+UseParNewGC
+  * ParNew + iCMS      : -Xincgc
+  * ParNew + iCMS      : -XX:+CMSIncrementalMode -XX:+UseConcMarkSweepGC
+  * DefNew + iCMS      : -XX:+CMSIncrementalMode -XX:+UseConcMarkSweepGC -XX:-UseParNewGC
+  * CMS foreground     : -XX:+UseCMSCompactAtFullCollection
+  * CMS foreground     : -XX:+CMSFullGCsBeforeCompaction
+  * CMS foreground     : -XX:+UseCMSCollectionPassing
+* JEP-366: Deprecate the ParallelScavenge + SerialOld GC Combination, JDK 14
+* JEP-363: Remove the Concurrent Mark Sweep (CMS) Garbage Collector, JDK 14
+
 ### 3.5 经典垃圾收集器
 
 #### 3.5.1 Serial 收集器
@@ -291,6 +305,8 @@ The table is from [GC Algorithms: Implementations](https://plumbr.eu/handbook/ga
 除了一个面向低延迟一个面向高吞吐量的目标不一致外，技术上的原因是Parallel Scavenge收集器及后面提到的G1收集器等都没有使用HotSpot中原本设计的垃圾收集器的分代框架，而选择另外独立实现。Serial、ParNew 收集器则共用了这部分的框架代码，详细可参考：[Our Collectors 2) Why doesn't "ParNew" and "Parallel Old" work together?](https://blogs.oracle.com/jonthecollector/our-collectors)
 
 #### 3.5.3 Parallel Scavenge 收集器
+
+JEP-366: Deprecate the ParallelScavenge + SerialOld GC Combination, JDK 14
 
 是一个新生代收集器，使用复制算法的并行多线程收集器
 优点：GC自适应的调节策略（GC Ergonomics） 不需要手工指定新生代的大小、Eden与Survivor区的比例、晋升老年代对象年龄等细节参数
@@ -321,6 +337,8 @@ Parallel Scavenge收集器与ParNew收集器的一个重要区别是它具有自
 应用场景：在注重吞吐量以及CPU资源敏感的场合，都可以优先考虑Parallel Scavenge加Parallel Old收集器。
 
 #### 3.5.6 CMS（Concurrent Mark Sweep）收集器
+
+JEP-363: Remove the Concurrent Mark Sweep (CMS) Garbage Collector, JDK 14
 
 以获取最短回收停顿时间为目标，基于"标记-清除"算法  过程
 
@@ -965,7 +983,20 @@ HotSpot虚拟机的对象头（Object Header）分为两部分，第一部分用
 4. 如果CAS 替换失败则说明当前时间锁对象已被某个线程占有，那么此时当前线程只有通过自旋的方式去获取锁。如果在自旋一定次数后仍为获得锁，那么轻量级锁将会升级成重量级锁。**升级成重量级锁带来的变化就是对象头中锁标志位将变为 10（重量级锁），MarkWord 中存储的也就是指向互斥量（重量级锁）的指针。（注意！！！此时，锁对象头的 MarkWord 已经发生了改变）。**
    这时轻量级锁解锁时，通过 CAS 判断 Mark Word 中的栈指针，替换会失败，需要唤醒等待的线程。
 
+![hotspot lock inflation](image/hotspot.lock.inflation.png)
+
+![hotspot object markword](image/hotspot.object.markword.png)
+
 ##### 13.3.5 偏向锁
+
+[JEP 374: Deprecate and Disable Biased Locking](https://openjdk.java.net/jeps/374)
+
+Motivation
+
+* 过去看到的性能提升在今天远未见明显。 自从在HotSpot中引入偏向锁定以来，在现代处理器上执行原子指令的成本已经降低。
+* 许多受益于偏向锁定的应用程序都是使用早期Java集合API的较旧的遗留应用程序，这些API在每次访问（例如Hashtable和Vector ）上都进行同步。
+* 较新的应用程序通常使用Java 1.2中针对单线程场景引入的非同步集合（例如， HashMap和ArrayList ），或者针对Java 5中针对多线程场景使用的性能更高的并发数据结构。
+* 围绕线程池队列和工作线程构建的应用程序通常在禁用偏置锁定的情况下性能更好。
 
 如果说轻量级锁是在无竞争的情况下使用CAS操作去消除同步使用的互斥量，那偏向锁就是在无竞争的情况下把整个同步都消除掉，连CAS操作都不去做了。
 
