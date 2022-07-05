@@ -32,9 +32,11 @@ connect from a container to a service on the host: connect to the special DNS na
 - `-v, --volume "/path/to/host/machine:/path/to/container`
 - `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
 
+`docker logs -f containerID`
+
 `docker start -i <image_id>` Start a existed container
-`docker attach <container_id>` Attach a running container
-`docker exec -it [containerID] /bin/bash` 进入正在运行的容器  `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container
+`docker attach <containerID>` Attach a running container
+`docker exec -it containerID /bin/bash` 进入正在运行的容器  `[Ctrl-p] + [Ctrl-q]` Exit without shutting down a container
 `docker inspect containerID` 查看信息
 `docker update --restart=no $(docker ps -a -q)` updates the restart-policy
 
@@ -136,6 +138,8 @@ start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
 start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorflow`
 `docker run --name redis -p 6379:6379 -d redis`
 `docker run --name mongo -d mongo:4.2.7`
+
+Jenkins with blue ocean: `docker run -d -p 8081:8080 -p 50000:50000 -v /data/docker/jenkins/jenkins_home:/var/jenkins_home -v /usr/share/apache-maven:/usr/local/maven    -v /etc/localtime:/etc/localtime --name jenkins jenkinsci/blueocean:1.25.5`
 
 ### CentOS
 
