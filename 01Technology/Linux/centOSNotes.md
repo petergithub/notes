@@ -43,6 +43,9 @@ Enable: `setenforce enforcing`
 开放 22 端口 `iptables -I INPUT -p tcp --dport 22 -j ACCEPT`
 保存： `service iptables save`
 
+Debian/Ubuntu: `iptables-save > /etc/iptables/rules.v4`
+RHEL/CentOS: `iptables-save > /etc/sysconfig/iptables`
+
 #### 关闭防火墙
 
 1） 永久性生效
@@ -178,11 +181,6 @@ echo "baseurl=http://mirror.centos.org/centos" | tee -a /etc/yum.repos.d/myrepo.
 echo "gpgcheck=0" | tee -a /etc/yum.repos.d/myrepo.repo
 echo "enabled=1" | tee -a /etc/yum.repos.d/myrepo.repo
 
-# 阿里云CentOS 6 EOL如何切换源 https://help.aliyun.com/document_detail/193569.htm
-mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
-wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-6.repo
-
-
 yum update -y
 # Modify NTP Server
 echo "server ntp1.aliyun.com" | tee /etc/ntp.conf
@@ -273,6 +271,7 @@ sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.
 # http://mirrors.aliyun.com/centos/6/os/x86_64/repodata/repomd.xml: [Errno 14] PYCURL ERROR 22 - "The requested URL returned error: 404 Not Found"
 # change to http://mirrors.aliyun.com/centos http://mirrors.aliyun.com/centos-vault/centos
 vi then `%s#/centos/#/centos-vault/centos/#g`
+sed -i -e '#/centos/#/centos-vault/centos/' /etc/yum.repos.d/CentOS-Base.repo
 
 yum clean all && yum check-update && yum makecache
 
@@ -422,3 +421,41 @@ $ loginctl show-user ruanyf
 
 `journalctl -b` 查看系统本次启动的日志
 `journalctl -b -1` 查看上一次启动的日志（需更改设置）
+
+## CentOS Stream 8
+
+[CentOS Stream 8 : Server World](https://www.server-world.info/en/note?os=CentOS_Stream_8&p=ssh&f=6)
+
+### Package Management with dnf Package Manager
+
+`DNF` is simply the next generation package manager (after `YUM`) for RPM based Linux distributions such as CentOS, RHEL, Fedora etc.
+
+`dnf makecache` Updating Package Repository Cache
+`dnf repolist --all` Listing Enabled and Disabled Package Repositories
+`dnf repolist --enabled`  list only the enabled repositories
+`dnf list --all` Listing All Available Packages
+`dnf list --installed` Listing All Installed Packages
+`dnf search "Programming Language"` Searching for Packages
+`dnf repoquery *kvm*` Searching for Packages in Specific Repositories, search for packages by their package name, all the packages that has kvm in the package name is listed.
+`dnf repoquery *centos* --repo extras` Searching for Packages in Specific Repositories, use `–repo` option to define which package repository to search
+`dnf repoquery *centos* --repo BaseOS`
+
+`dnf provides */ifconfig` Searching for Packages that Provides Specific File
+`dnf provides */bin/tree` find the package name that provides the tree command
+`dnf provides */libssl.so*`
+
+`dnf info tree` Learning More about Packages
+
+`dnf install httpd` Installing Packages
+`dnf reinstall httpd` Reinstalling Packages
+`dnf remove httpd` Removing Packages
+
+#### Doing a System Upgrade
+
+`dnf check-update`  check for whether software updates are available
+`dnf upgrade-minimal` do a minimal software update. Minimal software update will only install absolutely required security patches.
+
+`dnf upgrade` full system update
+
+`dnf clean all` clean DNF package caches
+`dnf autoremove` Remove Unnecessary Packages
