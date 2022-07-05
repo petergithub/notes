@@ -2,7 +2,7 @@
 
 ## Hadoop
 
-[Reference](https://www.tutorialspoint.com/hbase/hbase_installation.htm)  
+[Reference](https://www.tutorialspoint.com/hbase/hbase_installation.htm)
 
 1. start hadoop: $HADOOP_HOME/sbin/start-all.sh
 2. stop hadoop: $HADOOP_HOME/sbin/stop-all.sh
@@ -12,25 +12,25 @@
 
 ### Hadoop Configuration
 
-`/etc/hadoop/conf/capacity-scheduler.xml`  
-`yarn.scheduler.capacity.resource-calculator`  
-`org.apache.hadoop.yarn.util.resource.DefaultResourceCalculator` It considers only memory  
-`org.apache.hadoop.yarn.util.resource.DominantResourceCalculato` It uses both cpu and memory.  
+`/etc/hadoop/conf/capacity-scheduler.xml`
+`yarn.scheduler.capacity.resource-calculator`
+`org.apache.hadoop.yarn.util.resource.DefaultResourceCalculator` It considers only memory
+`org.apache.hadoop.yarn.util.resource.DominantResourceCalculato` It uses both cpu and memory.
 
 ### Command
 
 [Hadoop FileSystem Shell](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/FileSystemShell.html )
 `hadoop fs -help ls`
 `hadoop fs -ls`
-`hdfs dfs -put source target` copy files  
+`hdfs dfs -put source target` copy files
 `hdfs dfs -cat /user/hadoop/data.txt` cat path/to/file
 
 ### Change replication factor
 
 [How to change an running HDFS cluster's replication factor?](https://www.systutorials.com/qa/1295/how-to-change-an-running-hdfs-clusters-replication-factor)
-First, the replication factor is client decided.  
-Second, the replication factor is per-file configuration.  
-Hence, the configuration only changes the client and takes effect for new files.  
+First, the replication factor is client decided.
+Second, the replication factor is per-file configuration.
+Hence, the configuration only changes the client and takes effect for new files.
 For existing files, you need to manually re-set the replication factor: `hadoop fs -setrep -R -w 2 /path/to/file`
 
 set `dfs.replication=2` in `$HADOOP_HOME/etc/hadoop/hdfs-site.xml`
@@ -65,8 +65,8 @@ Get the replication factor using the stat hdfs command tool: `hdfs dfs -stat %r 
 3. 重新读取配置 `hadoop dfsadmin  -refreshNodes`
 4. `hdfs dfsadmin -report`
 可以看到该节点会处于`Decommission Status : Decommission in progress`的状态。
-等待数据迁移完成之后，该状态变为 `Decommission Status : Decommissioned`  
-在该节点上停止进程： `hadoop-daemon.sh stop datanode` 删除slaves文件中的对应主机名即可  
+等待数据迁移完成之后，该状态变为 `Decommission Status : Decommissioned`
+在该节点上停止进程： `hadoop-daemon.sh stop datanode` 删除slaves文件中的对应主机名即可
 
 ### Verifying Hadoop Installation
 
@@ -81,7 +81,7 @@ Get the replication factor using the stat hdfs command tool: `hdfs dfs -stat %r 
 
 #### `core-site.xml`
 
-The core-site.xml file contains information such as the port number used for Hadoop instance, memory allocated for file system, memory limit for storing data, and the size of Read/Write buffers.  
+The core-site.xml file contains information such as the port number used for Hadoop instance, memory allocated for file system, memory limit for storing data, and the size of Read/Write buffers.
 
 ``` xml
 
@@ -95,7 +95,7 @@ The core-site.xml file contains information such as the port number used for Had
 
 #### `hdfs-site.xml`
 
-The hdfs-site.xml file contains information such as the value of replication data, namenode path, and datanode path of your local file systems, where you want to store the Hadoop infrastructure.  
+The hdfs-site.xml file contains information such as the value of replication data, namenode path, and datanode path of your local file systems, where you want to store the Hadoop infrastructure.
 
 ``` xml
 
@@ -119,7 +119,7 @@ The hdfs-site.xml file contains information such as the value of replication dat
 
 #### `mapred-site.xml`
 
-This file is used to specify which MapReduce framework we are using. By default, Hadoop contains a template of yarn-site.xml  
+This file is used to specify which MapReduce framework we are using. By default, Hadoop contains a template of yarn-site.xml
 
 ``` xml
 
@@ -149,48 +149,6 @@ http://localhost:50070 NameNode Web Interface (HDFS layer)
 http://localhost:50090
 http://localhost:50030 JobTracker Web Interface (MapReduce layer)
 http://localhost:50060 TaskTracker Web Interface (MapReduce layer)
-
-## HBase
-
-[quickstart](https://hbase.apache.org/book.html#quickstart)
-
-### Startup
-
-`conf/hbase-site.xml` is the main HBase configuration file
-
-1. Start HBase: `bin/start-hbase.sh`
-2. Stop HBase: `bin/stop-hbase.sh`
-3. Start HBase Master Server `bin/local-master-backup.sh start 2` (number signifies specific server)
-4. Start Region `bin/local-regionservers.sh start 3`
-5. Connect to HBase: `./bin/hbase shell`, Exit the HBase Shell: `quit`
-
-### Basic command
-
-`table_help`, `status`, `version`, `whoami`
-`list` list tables, `describe 'table name'` **Single quote is required**
-4. Create a table: `create 'test', 'columnFamily'`
-5. List Information About your Table: `list 'test'`
-6. Put data into your table: `put 'test', 'row1', 'cf:a', 'value1'`
-7. Scan the table for all data at once: `scan 'test'`, `scan 't1', { TIMERANGE => [0, 1416083300000] }`
-8. Get a single row of data: `get 'test', 'row1'`
-9. Disable a table: `disable 'test'`, `enable 'test'`  
- If you want to delete a table or change its settings, as well as in some other situations, you need to disable the table first  
-10. Drop the table: `drop 'test'`
-`hbase> scan 'test-table', {'LIMIT' => 5}` Command like SQL LIMIT in HBase
-11. `count 'tablename', CACHE => 1000` 配置正确的 CACHE 时速度非常快, 上述计数一次取 1000 行。如果行很大，请将 CACHE 设置得较低。默认是每次读取一行。
-
-### Add Node
-
-1. HMaster节点的配置regionservers `echo node04 >> $HBASE_HOME/conf/regionservers`
-2. 在新节点中通过下面命令启动HRegionServer: `hbase-daemon.sh start regionserver`
-3. 验证HRegionServer：`jps | grep -e HRegionServer -e DataNode -e QuorumPeerMain -e DataNode`
-
-### Remove Node
-
-1. `graceful_stop.sh node04` 会自动先设置 `balance_switch` 为 false, 然后关闭hbase, 再设置为 true
-2. `hbase-daemon.sh stop regionserver` 需要?
-3. `http://hmaster_ip:16010/master-status` 查看状态
-4. 从文件 `$HBASE_HOME/conf/regionservers` 删掉 `node4`
 
 ## Hive
 
@@ -224,38 +182,38 @@ Get all setting: `hive -e "set -v;" > ~/config.txt`
 
 [LanguageManual Select](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select )
 Hive will print information to standard error such as the time taken to run a query during the course of operation.
-`SELECT current_database()`  
+`SELECT current_database()`
 字符串s 转整型 `cast(s as int)`
-`SHOW PARTITIONS table_name`  
-`INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;`  
-`INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;`  
+`SHOW PARTITIONS table_name`
+`INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;`
+`INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;`
 
 #### Config
 
-`SET hive.execution.engine=tez;`  
-`SET tez.queue.name=queueName;`  
+`SET hive.execution.engine=tez;`
+`SET tez.queue.name=queueName;`
 
 ##### hiveconf
 
 [LanguageManual VariableSubstitution](https://cwiki.apache.org/confluence/display/Hive/LanguageManual+VariableSubstitution )
-test.sql: `select * from foo where day >= '${hiveconf:CURRENT_DATE}'`  
-`hive --hiveconf CURRENT_DATE='2012-09-16' -f test.hql`  
-`hive --hiveconf CONF='this is conf' -e '!echo ${hiveconf:CONF};'`  
+test.sql: `select * from foo where day >= '${hiveconf:CURRENT_DATE}'`
+`hive --hiveconf CURRENT_DATE='2012-09-16' -f test.hql`
+`hive --hiveconf CONF='this is conf' -e '!echo ${hiveconf:CONF};'`
 
-`hive> set hiveconf:CONF=conf1;`  
-`hive> set hiveconf:CONF;`  
+`hive> set hiveconf:CONF=conf1;`
+`hive> set hiveconf:CONF;`
 
 ##### hivevar
 
-`set hivevar:tablename=mytable;`  
-`hive> source /path/to/setup.hql;` # setup.hql which sets a tablename variable  
-or `hive> select * from ${tablename}`  
-or `hive> select * from ${hivevar:tablename}`  
+`set hivevar:tablename=mytable;`
+`hive> source /path/to/setup.hql;` # setup.hql which sets a tablename variable
+or `hive> select * from ${tablename}`
+or `hive> select * from ${hivevar:tablename}`
 
-`hive --hivevar TABLE_NAME=mytable -f test.hql`  
-`hive --hivevar VAR='this is var' -e '!echo ${VAR};'`  
-`hive> set hivevar:VAR=var1;`  
-`hive> set hivevar:VAR;`  
+`hive --hivevar TABLE_NAME=mytable -f test.hql`
+`hive --hivevar VAR='this is var' -e '!echo ${VAR};'`
+`hive> set hivevar:VAR=var1;`
+`hive> set hivevar:VAR;`
 
 #### Advanced
 
@@ -287,7 +245,7 @@ cube简称数据魔方，可以实现hive多个任意维度的查询，cube(a,b,
 * dumping data out from a query into a file using silent mode `hive -S -e 'select a.col from tab1 a' > a.txt`
 * running a script non-interactively from local disk `hive -f /home/my/hive-script.sql`
 * running a script non-interactively from a Hadoop supported filesystem `hive -f hdfs://<namenode>:<port>/hive-script.sql`, `hive -f s3://mys3bucket/s3-script.sql ``
-* output information to log: `hive --hiveconf tez.queue.name=sysopt -e "select t.dt,t.times,count(distinct t.uuid) from(select dt,uuid,count(uuid) times from data_warehouse.dw_app_orc_dt where dt = '20170420' group by dt,uuid order by dt) t group by t.dt, t.times limit 10;" >> test.log 2>&1`  
+* output information to log: `hive --hiveconf tez.queue.name=sysopt -e "select t.dt,t.times,count(distinct t.uuid) from(select dt,uuid,count(uuid) times from data_warehouse.dw_app_orc_dt where dt = '20170420' group by dt,uuid order by dt) t group by t.dt, t.times limit 10;" >> test.log 2>&1`
 
 ##### Export file
 
@@ -297,4 +255,4 @@ cube简称数据魔方，可以实现hive多个任意维度的查询，cube(a,b,
 ### Hive Configuration
 
 [Hive Configuration Properties](https://cwiki.apache.org/confluence/display/Hive/Configuration+Properties#ConfigurationProperties-Tez )
-`set hive.groupby.skewindata=true;` Hive will trigger an additional MapReduce job whose map output will randomly distribute to the reducer to avoid data skew  
+`set hive.groupby.skewindata=true;` Hive will trigger an additional MapReduce job whose map output will randomly distribute to the reducer to avoid data skew
