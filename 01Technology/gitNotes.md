@@ -18,7 +18,7 @@ git merge --squash --no-ff
 `git log -m --name-only` List all modified files in git merge commit
 `git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git rev-list --all | xargs git grep <string>`
-`ssh -v git@gitlab.com` get `Welcome to GitLab, Anonymous!`
+`ssh -Tv git@gitlab.com` get `Welcome to GitLab, Anonymous!`
 
 `HEAD^` 上一个版本
 `HEAD^^` `HEAD~2` 倒数第2个版本
@@ -200,7 +200,41 @@ Add hooks for `git merge` and `git checkout`
 1. create `.git/hooks/post-checkout` and `.git/hooks/post-merge` (for `git pull` also)
 2. `chmod ug+x .git/hooks/post-checkout .git/hooks/post-merge`
 
+## [Git - Submodules 子模块](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+
+```sh
+git config --global diff.submodule log
+# git config --global log.submodule true
+git config --global status.submoduleSummary true
+git config --global fetch.recurseSubmodules on-demand
+```
+
+`git submodule update --init --recursive --remote` Submodule heads are generally detached
+
+### 添加子模块
+
+`git submodule add URL`，新增了配置文件 `.gitmodules`
+
+### Cloning a Project with Submodules
+
+`git clone --recurse-submodules URL`
+
+To initialize, fetch and checkout any nested submodules `git submodule update --init --recursive`
+
+### Working on a Project with Submodules
+
+`git diff --submodule` you can see that the submodule was updated
+ If you don’t want to type --submodule every time you run git diff, you can set it as the default format by setting the `diff.submodule` config value to “log”. `git config --global diff.submodule log`
+
+`git submodule update --remote`, go into submodules and fetch and update. This command will by default assume that you want to update the checkout to the master branch of the submodule repository.
+
+you can set it in either your .gitmodules file (so everyone else also tracks it), or just in your local .git/config file. Let’s set it in the .gitmodules file: `git config -f .gitmodules submodule.DbConnector.branch stable`  track that repository’s “stable” branch,
+
+see log of commits `git log -p --submodule`, config it as default
+
 ## Git configuration
+
+Show all config and its origin: `git config --list --show-origin`
 
 ### git auto complete　自动补全
 
