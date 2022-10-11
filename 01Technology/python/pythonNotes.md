@@ -107,6 +107,16 @@ Install a project in editable mode (i.e. setuptools “develop mode”) from a l
 
 ### Virtual environment
 
+```sh
+# Create an environment
+$ mkdir myproject
+$ cd myproject
+$ python3 -m venv venv
+
+# Activate the environment
+$ . venv/bin/activate
+```
+
 #### Basic Usage
 
 [Pipenv & Virtual Environments](https://docs.python-guide.org/dev/virtualenvs/)

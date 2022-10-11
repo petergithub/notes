@@ -119,6 +119,17 @@ openssl s_client -connect -showcerts example.com:443 -servername example.com
 openssl s_client -connect example.com:443 -servername example.com 2>/dev/null
 openssl s_client -connect -debug example.com:443 -servername example.com
 
+#### 证书文件与私钥不匹配
+
+比较方式
+
+```sh
+# 证书 md5
+openssl x509 -noout -modulus -in certificate.crt|openssl md5
+# 私钥 md5
+openssl rsa -noout -modulus -in  private.key|openssl md5
+```
+
 #### Options
 
 openssl req certificate request generating utility

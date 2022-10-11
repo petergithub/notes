@@ -45,9 +45,6 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 `pstack` Linux命令查看某个进程的当前线程栈运行情况
 `ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
 `last`    To find out when a particular user last logged in to the Linux or Unix server.
-`strace ls a`
-`strace -ffp 12114`
-strace 使用 `strace uptime 2>&1 | grep open`
 
 `fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
 `sudo service network-manager start`
@@ -502,6 +499,23 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 提示`replace with hehe (y/n/a/q/l/^E/^Y)?`
 `y`替换，`n`不替换，`a`替换所有，`q`放弃，`l`替换第一个并进入插入模式，`^E`和`^Y`是提示你用`Ctrl+e`或`Ctrl+y`来滚动屏幕的
 
+#### 文件名编码转换
+
+`convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换
+转换文件名由GBK为UTF8 :  `convmv -r -f cp936 -t utf8 --notest --nosmart *`
+
+#### 查看文件编码
+
+`file <fileName>`
+Vim中查看文件编码 `:set fileencoding`
+
+#### 文件编码转换
+
+1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式 `:set fileencoding=utf-8`
+2. enconv 转换文件 编码 , 比如要将一个GBK编码 的文件 转换成UTF-8编码 , 操作如下 `enconv -L zh_CN -x UTF-8 filename`
+3. iconv 转换, iconv的命令格式如下: `iconv -f fromEncoding -t toEncoding inputfile -o outputfile`
+  比如将一个GBK编码 的文件 转换成 UTF-8 编码 `iconv -f GBK -t UTF-8 file1 -o file2`
+
 ### less
 
 `less -n -i -S`
@@ -519,7 +533,7 @@ Display only lines which match the pattern; lines which do not match the pattern
 `&arp|dns`  will display lines containing arp or dns
 `!` can invert any of the above: `&!event`
 
-### find grep sed
+### grep
 
 grep pattern files - 搜索 files 中匹配 pattern 的内容
 grep -r pattern dir - 递归搜索 dir 中匹配 pattern 的内容
@@ -555,7 +569,7 @@ escape square brackets with backslash:   `grep "test\[1]" log.txt`
 pgrep 和 pkill
 pgrep -l apache2
 
-#### sed
+### sed
 
 [Regular Expressions - sed, a stream editor](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)
 
@@ -587,7 +601,7 @@ pgrep -l apache2
 删除行首所有tab键 `s/^ [TAB]//g`
 删除所有tab键 `s/[TAB] *//g`
 
-##### 删除行
+#### 删除行
 
 Delete first line or header line `sed 'Nd' file` Here N indicates Nth line in a file
 Delete last line or footer line or trailer line `sed '$d' file`
@@ -598,7 +612,7 @@ Delete empty lines or blank lines `sed '/^$/d' file`
 Delete lines that contain a pattern `sed '/debian/d' file`
 Delete lines that begin with specified character `sed '/^u/d' file`
 
-##### 不替换某些行
+#### 不替换某些行
 
 ```properties
 # filename message_en.properties
@@ -609,7 +623,7 @@ key3=<font color="#6fa5e9">value3</font>
 
 替换 "> 为 =，但是包含 font 标签的不替换，因为 font 标签结尾 "> 是正常的 `cat message_en.properties | sed -e '/font/! s/">/=/g'` 解释：`/font/!` 表示不匹配该行
 
-#### find
+### find
 
 `find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
 `find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`
@@ -625,6 +639,7 @@ key3=<font color="#6fa5e9">value3</font>
 `find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
 `find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`  File’s data was last modified n*24 hours ago
 `find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
+`find . -type l -ls` To list all of the symlinks or symbolic links or soft links in a Linux system, run
 
 `find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
 
@@ -698,23 +713,6 @@ find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s
 3. `find . -inum 23244066 -exec mv {} NewName \;` mv
 
 命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
-
-##### 文件名编码转换
-
-`convmv -f srcEncode -t targetEncode [options] file` #linux文件名编码批量转换
-转换文件名由GBK为UTF8 :  `convmv -r -f cp936 -t utf8 --notest --nosmart *`
-
-##### 查看文件编码
-
-`file <fileName>`
-Vim中查看文件编码 `:set fileencoding`
-
-##### 文件编码转换
-
-1. 在Vim中直接进行转换文件 编码 ,比如将一个文件 转换成utf-8格式 `:set fileencoding=utf-8`
-2. enconv 转换文件 编码 , 比如要将一个GBK编码 的文件 转换成UTF-8编码 , 操作如下 `enconv -L zh_CN -x UTF-8 filename`
-3. iconv 转换, iconv的命令格式如下: `iconv -f fromEncoding -t toEncoding inputfile -o outputfile`
-  比如将一个GBK编码 的文件 转换成 UTF-8 编码 `iconv -f GBK -t UTF-8 file1 -o file2`
 
 ### awk
 
@@ -1028,6 +1026,8 @@ execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
 `find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`
 
 replace: `seq 3| xargs -I % echo http://example.com/persons/%.tar`
+
+两个变量 `echo {1..8} | xargs -n2 sh -c 'echo "the number $1 comes before $2"' sh`
 
 ### kill
 
@@ -1443,7 +1443,7 @@ wget 'http://www.example.com:9000/json' \
 
 ### rsync
 
-`rsync -avPz src/ dest` Copy contents of `src/` to destination
+`rsync -Pavz src/ dest` Copy contents of `src/` to destination
 
 * `-a` 等于 `-rlptgoD`
 * `-r` 是递归
@@ -1548,7 +1548,7 @@ ntsysv 就会*出图形界面给你选择(有的则显示在里面), 如果在�
 常见的场景是由于某种原因`ls`无法使用(内存不足、动态连接库丢失等等), 因为shell通常可以做`*`扩展, 所以我们可以用 `echo * == ls`
 `killall proc` kill all processes named proc
 
-## Advanced command
+## Tool
 
 ### Tmux
 
@@ -1801,6 +1801,20 @@ Samples:
 * List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
 * list only network files with TCP state LISTEN `lsof -iTCP -sTCP:LISTEN -P -n | less`
 
+### strace 跟踪进程中的系统调用
+
+strace常用来跟踪进程执行时的系统调用和所接收的信号。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。
+
+* `strace command` 执行名称为command的命令或程序并跟踪系统调用
+* `strace -p procid` 跟踪ID为的procid的进程系统调用情况
+* `strace -c -p procid` 统计ID为的procid的进程系统调用次数与用时，按CTRL+C结束统计，执行结果如下：
+
+example:
+
+`strace ls a`
+`strace -ffp 12114`
+strace 使用 `strace uptime 2>&1 | grep open`
+
 ### Python
 
 The command to print a prompt to the screen and to store the resulting input into a variable named var is:
@@ -1922,6 +1936,52 @@ gMTP connect to android from Ubuntu
 
 `zdump -v /etc/localtime` examine the contents of the time zone files
 
+2 的次方表
+
+```text
+Power           Exact Value         Approx Value        Bytes
+---------------------------------------------------------------
+7                             128
+8                             256
+10                           1024   1 thousand           1 KB
+16                         65,536                       64 KB
+20                      1,048,576   1 million            1 MB
+30                  1,073,741,824   1 billion            1 GB
+32                  4,294,967,296                        4 GB
+40              1,099,511,627,776   1 trillion           1 TB
+```
+
+每个程序员都应该知道的延迟数
+
+CPU -> 内存 -> SSD -> 磁盘 -> 网络
+纳秒 -> 微秒 -> 毫秒 -> 毫秒 -> 秒
+
+```text
+Latency Comparison Numbers
+--------------------------
+L1 cache reference                           0.5 ns
+Branch mispredict                            5   ns
+L2 cache reference                           7   ns                      14x L1 cache
+Mutex lock/unlock                           25   ns
+Main memory reference                      100   ns                      20x L2 cache, 200x L1 cache
+Compress 1K bytes with Zippy            10,000   ns       10 us
+Send 1 KB bytes over 1 Gbps network     10,000   ns       10 us
+Read 4 KB randomly from SSD*           150,000   ns      150 us          ~1GB/sec SSD
+Read 1 MB sequentially from memory     250,000   ns      250 us
+Round trip within same datacenter      500,000   ns      500 us
+Read 1 MB sequentially from SSD*     1,000,000   ns    1,000 us    1 ms  ~1GB/sec SSD, 4X memory
+Disk seek                           10,000,000   ns   10,000 us   10 ms  20x datacenter roundtrip
+Read 1 MB sequentially from 1 Gbps  10,000,000   ns   10,000 us   10 ms  40x memory, 10X SSD
+Read 1 MB sequentially from disk    30,000,000   ns   30,000 us   30 ms 120x memory, 30X SSD
+Send packet CA->Netherlands->CA    150,000,000   ns  150,000 us  150 ms
+
+Notes
+-----
+1 ns = 10^-9 seconds
+1 us = 10^-6 seconds = 1,000 ns
+1 ms = 10^-3 seconds = 1,000 us = 1,000,000 ns
+```
+
 ### Performance
 
 [Linux Performance](http://www.brendangregg.com/linuxperf.html )
@@ -1930,7 +1990,7 @@ gMTP connect to android from Ubuntu
 #### [Linux Perf Analysis in 60s Checklist](http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html)
 
 1. `uptime` ⟶  load averages
-2. `dmesg -T | tail` ⟶  kernel errors
+2. `dmesg -T | tail` ⟶  kernel errors 输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`
 3. `vmstat 1` ⟶  overall stats by time
 4. `mpstat -P ALL 1` ⟶  CPU balance
 5. `pidstat 1` ⟶  process usage
@@ -1940,9 +2000,8 @@ gMTP connect to android from Ubuntu
 9. `sar -n TCP,ETCP 1` ⟶   TCP stats
 10. `top` ⟶  check overview
 
-11. `dmesg -T | tail` 输出系统日志的最后10行, `less /var/log/messages` or `less /var/log/dmesg`
-12. `sysstat`工具与负载历史回放
-13. `dstat`
+11. `sysstat`工具与负载历史回放
+12. `dstat`
 
 ```bash
 # dmesg -T 可以转换成可读时间
@@ -2839,22 +2898,22 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 ### User
 
 `groupadd <groupName>`    Add a new group
+`gpasswd --delete username groupName`  remove a user from a group groupName `/etc/group`
+`groups username`    To find group memebership for username
+
+`useradd -g <groupName> --create-home --comment "Account for running Confluence" --shell /bin/zsh confluence`
 `useradd -g <groupName> <username>`    Add a new user to primary group
 `useradd -G <groupName> <username>`    Add a new user to secondary group
 `usermod -G {groupname1,groupname2,...} <username>`    Remove user from group which is not list in the command
-`groups username`    To find group memebership for username
-`useradd --create-home --comment "Account for running Confluence" --shell /bin/bash confluence`
+`usermod -aG sudoGroup username` add the user to the sudo group `/etc/sudoers`, edit it by `visudo`.
+    sudo group: wheel in CentOS, sudo in Ubuntu
+configure sudo to never ask for your password. add the following line: `username ALL=(ALL) NOPASSWD: ALL` in the bottom of the file.
 
 `passwd <username>`    update password
 `vipw` 管理所有用户
 `id <username>`    get the user
 `id -nG <username>`    Find out user group identity
 `less /etc/group` or `groups`    Get all groups in system
-
-#### Steps to Create a New Sudo User
-
-add a new user `adduser username`
-add the user to the sudo group `usermod -aG wheel username`
 
 ### Software manage
 
@@ -2952,11 +3011,16 @@ Type Disks in Dash, and you will get:
 Click on the little gears, to get the sub menu, and choose Edit Mount Options. After that you will see:
 Change the Automatic Mount Options to ON. do that to all the drives that you need mounted on start-up.
 Note: Be careful with you modify, it may cause the system not to work properly.
+
 先用FDISK命令查看一下磁盘的UUID
+
+```sh
 $sudo fdisk -l
  id username
 vi /etc/fstab
  /dev/sda3      /media/program    ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0    #defaults = rw, suid, dev, exec, auto, nouser, and async.
+```
+
 auto= mounted at boot
 noauto= not mounted at boot
 user= when mounted the mount point is owned by the user who mounted the partition
