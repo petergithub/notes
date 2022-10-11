@@ -125,6 +125,10 @@ topic 交换器通过模式匹配分配消息的路由键属性，将路由键�
 
 [入门RabbitMQ消息队列，看这篇文章就够了 - 掘金](https://juejin.cn/post/6844904113788944397)
 
+## Erlang 垃圾回收
+
+[Erlang垃圾回收](https://www.ttalk.im/2021/11/erlang-garbage-collector.html)
+
 ## Installation
 
 [Downloading and Installing RabbitMQ](https://www.rabbitmq.com/download.html)
@@ -139,7 +143,7 @@ topic 交换器通过模式匹配分配消息的路由键属性，将路由键�
 
 install erlang
 
-``` bash
+```bash
 wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
 dpkg -i erlang-solutions_1.0_all.deb
 apt update
@@ -153,3 +157,24 @@ install rabbitmq `apt-get install rabbitmq-server`
 #### Virtual Hosts
 
 In multi-tenant environments, use a separate vhost for each tenant/environment, e.g. project1_development, project1_production, project2_development, project2_production, and so on.
+
+### Monitor
+
+### monitor rabbitMQ by shell
+
+```bash
+#!/bin/env bash
+# Desc:Monitor RabbitMQ processs
+# config crontab
+# * * * * * /data/apps/shell/rabbitmq-monitor.sh >> /data/logs/scripts/rabbitmq-monitor.log 2>&1
+
+DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
+TARGET="vhost_name"
+RESULT=$(/usr/sbin/rabbitmqctl list_vhosts | grep $TARGET)
+if [ "$RESULT" == "$TARGET" ];then
+ echo ${DATE} "Service RabbitMQ is running. result $RESULT"
+else
+ echo ${DATE} "Restart RabbitMQ"
+ /sbin/service rabbitmq-server start
+fi
+```
