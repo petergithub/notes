@@ -11,24 +11,24 @@ The join method allows one thread to wait for the completion of another. If t is
 [Interrupts](https://docs.oracle.com/javase/tutorial/essential/concurrency/interrupt.html)
 An interrupt is an indication to a thread that it should stop what it is doing and do something else
 
-synchronization:  
+synchronization:
 
-1. Mutual Exclusion or Atomic or Critical Section临界区  
+1. Mutual Exclusion or Atomic or Critical Section临界区
 2. Memory Visibility
 
-同步: 原子性Atomic,内存可见性  
+同步: 原子性Atomic,内存可见性
 重排序Reordering, Happens-Before 排序
 
 [不可不说的Java“锁”事-美团](https://tech.meituan.com/2018/11/15/java-lock.html)
 
-易出现并发问题情形:  
-竞态条件Race Condition  
-读取-修改-写入read-modify-write  
-先检查后执行操作Check-Then-Act  
+易出现并发问题情形:
+竞态条件Race Condition
+读取-修改-写入read-modify-write
+先检查后执行操作Check-Then-Act
 
 ## ThreadLocal
 
-是线程局部变量(local variable).  
+是线程局部变量(local variable).
 就是为每一个使用该变量的线程都提供一个变量值的副本，是每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突.从线程的角度看，就好像每一个线程都完全拥有该变量.
 
 使用场景
@@ -70,7 +70,7 @@ synchronization:
 
 #### [JDK 5.0 中更灵活、更具可伸缩性的锁定机制](https://www.ibm.com/developerworks/cn/java/j-jtp10264/index.html)
 
-java.util.concurrent.lock 中的 Lock 框架是锁定的一个抽象，它允许把锁定的实现作为 Java 类，而不是作为语言的特性来实现。这就为 Lock 的多种实现留下了空间，各种实现可能有不同的调度算法、性能特性或者锁定语义。 ReentrantLock 类实现了 Lock ，它拥有与 synchronized 相同的并发性和内存语义，但是添加了类似轮询锁、定时锁等候和可中断锁等候的一些特性。此外，它还提供了在激烈争用情况下更佳的性能  
+java.util.concurrent.lock 中的 Lock 框架是锁定的一个抽象，它允许把锁定的实现作为 Java 类，而不是作为语言的特性来实现。这就为 Lock 的多种实现留下了空间，各种实现可能有不同的调度算法、性能特性或者锁定语义。 ReentrantLock 类实现了 Lock ，它拥有与 synchronized 相同的并发性和内存语义，但是添加了类似轮询锁、定时锁等候和可中断锁等候的一些特性。此外，它还提供了在激烈争用情况下更佳的性能
 
 #### [synchronized的字节码表示](https://www.cnblogs.com/javaminer/p/3889023.html)
 
@@ -120,9 +120,9 @@ Thread类优先级常量有三个：
 
 ``` java
 
-    static int MIN_PRIORITY  //1
-    static int NORM_PRIORITY //5
-    static int MAX_PRIORITY  //10
+static int MIN_PRIORITY  //1
+static int NORM_PRIORITY //5
+static int MAX_PRIORITY  //10
 ```
 
 如果没有明确设置，默认线程优先级为常数5, 即Thread.NORM_PRIORITY.
@@ -136,8 +136,8 @@ Thread类优先级常量有三个：
     * 当一个线程访问object的一个synchronized(this)同步代码块时，其他线程对object中所有其它synchronized(this)同步代码块的访问将被阻塞.
     * 当一个线程访问object的一个synchronized(this)同步代码块时，它就获得了这个object的对象锁.结果，其它线程对该object对象所有同步代码部分的访问都被暂时阻塞.
 
-    第一点：synchronized用来标识一个普通方法时，表示一个线程要执行该方法，必须取得该方法所在的对象的锁.  
-    第二点：synchronized用来标识一个静态方法时，表示一个线程要执行该方法，必须获得该方法所在的类的类锁.  
+    第一点：synchronized用来标识一个普通方法时，表示一个线程要执行该方法，必须取得该方法所在的对象的锁.
+    第二点：synchronized用来标识一个静态方法时，表示一个线程要执行该方法，必须获得该方法所在的类的类锁.
     第三点：synchronized修饰一个代码块.类似这样：synchronized(obj) { //code.... }.表示一个线程要执行该代码块，必须获得obj的锁.这样做的目的是减小锁的粒度，保证当不同块所需的锁不冲突时不用对整个对象加锁.利用零长度的byte数组对象做obj非常经济.
 
 2. volatile比同步简单，只适合于控制对基本变量(整数、布尔变量等)的单个实例的访问.java中的volatile关键字与C++中一样，用volatile修饰的变量在读写操作时不会进行优化(取cache里的值以提高io速度)，而是直接对主存进行操作，这表示所有线程在任何时候看到的volatile变量值都相同.
@@ -185,8 +185,8 @@ Java Doc: `java.util.concurrent.ThreadPoolExecutor.execute(Runnable)`
 
 任务性质不同的任务可以用不同规模的线程池分开处理。
 
-* CPU密集型任务配置尽可能小的线程，如配置Ncpu+1个线程的线程池  
-* IO密集型任务则由于线程并不是一直在执行任务，则配置尽可能多的线程，如2*Ncpu  
+* CPU密集型任务配置尽可能小的线程，如配置Ncpu+1个线程的线程池
+* IO密集型任务则由于线程并不是一直在执行任务，则配置尽可能多的线程，如2*Ncpu
 * 混合型的任务，如果可以拆分，则将其拆分成一个CPU密集型任务和一个IO密集型任务，只要这两个任务执行的时间相差不是太大，那么分解后执行的吞吐率要高于串行执行的吞吐率，如果这两个任务执行时间相差太大，则没必要进行分解。
  我们可以通过Runtime.getRuntime().availableProcessors()方法获得当前设备的CPU个数。
 
@@ -200,10 +200,10 @@ Java Doc: `java.util.concurrent.ThreadPoolExecutor.execute(Runnable)`
 
 #### 线程池的监控
 
-通过线程池提供的参数进行监控。线程池里有一些属性在监控线程池的时候可以使用  
-    `taskCount`: 线程池需要执行的任务数量  
-    `completedTaskCount`: 线程池在运行过程中已完成的任务数量。小于或等于taskCount  
-    `largestPoolSize`: 线程池曾经创建过的最大线程数量。通过这个数据可以知道线程池是否满过。如等于线程池的最大大小，则表示线程池曾经满了  
-    `getPoolSize`: 线程池的线程数量。如果线程池不销毁的话，池里的线程不会自动销毁，所以这个大小只增不+ getActiveCount: 获取活动的线程数  
+通过线程池提供的参数进行监控。线程池里有一些属性在监控线程池的时候可以使用
+    `taskCount`: 线程池需要执行的任务数量
+    `completedTaskCount`: 线程池在运行过程中已完成的任务数量。小于或等于taskCount
+    `largestPoolSize`: 线程池曾经创建过的最大线程数量。通过这个数据可以知道线程池是否满过。如等于线程池的最大大小，则表示线程池曾经满了
+    `getPoolSize`: 线程池的线程数量。如果线程池不销毁的话，池里的线程不会自动销毁，所以这个大小只增不+ getActiveCount: 获取活动的线程数
 
 通过扩展线程池进行监控。通过继承线程池并重写线程池的 `beforeExecute`, `afterExecute和terminated` 方法，我们可以在任务执行前，执行后和线程池关闭前干一些事情。如监控任务的平均执行时间，最大执行时间和最小执行时间等。这几个方法在线程池里是空方法。如: `protected void beforeExecute(Thread t, Runnable r) { }`

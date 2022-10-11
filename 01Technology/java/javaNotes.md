@@ -2,6 +2,8 @@
 
 ## Recent
 
+[Backend Developer Roadmap: Learn to become a modern backend developer](https://roadmap.sh/backend)
+
 non-volatile memory (NVM)：非易失性存储器（NVM）是一种计算机存储器，即使电源关闭也具有保存已保存数据的能力。 与易失性存储器不同，NVM不需要定期刷新其存储器数据
 
 non-uniform memory access (NUMA)：非统一内存访问（NUMA）是一种用于多处理器的电脑内存体设计，内存访问时间取决于处理器的内存位置
@@ -14,9 +16,8 @@ Jakarta (/dʒəˈkɑːrtə/
 
 `java.util.concurrent.CopyOnWriteArrayList`
 `AtomicInteger`底层实现机制
-SpringBoot和Swagger结合提高API开发效率  [URL](http://localhost:8080/swagger-ui.html)
 
-concurrent: 主内存.寄存器是是运行时?
+`strace -o call.syscalls.log java example` 输出系统调用日志
 
 ### Concurrent vs. Parallel
 
@@ -37,6 +38,12 @@ concurrent: 主内存.寄存器是是运行时?
 ```
 
 ### 常用参数
+
+* `java -XX:+PrintFlagsFinal -version` 查看JVM参数的默认值
+* `-Xss256k, -XX:ThreadStackSize=1024` default Linux/x86 (64-bit): 1 MB
+* `-XX:MaxMetaspaceSize=128m` 默认值很大，`CompressedClassSpaceSize` 默认也有1G
+
+[Configuring Stack Sizes in the JVM | Baeldung](https://www.baeldung.com/jvm-configure-stack-sizes)
 
 ## Java website
 
@@ -80,6 +87,152 @@ method reference :: syntax (meaning “use this method as a value”
 * [Java Language Specification Chapter 17. Threads and Locks](https://docs.oracle.com/javase/specs/jls/se7/html/jls-17.html)
 * [Synchronization and Object Locking](https://wiki.openjdk.java.net/display/HotSpot/Synchronization)
 
+## JVM 内存分配
+
+在Java虚拟机中，内存分为三个代：新生代（New）、老生代（Old）、永久代（Perm）。
+（1）新生代New：新建的对象都存放这里
+（2）老生代Old：存放从新生代New中迁移过来的生命周期较久的对象。新生代New和老生代Old共同组成了堆内存。
+（3）永久代Perm：是非堆内存的组成部分。主要存放加载的Class类级对象如class本身，method，field等等。
+
+* 堆内存 = 年轻代 + 年老代 + 永久代
+* 年轻代 = Eden区 + 两个Survivor区（From和To）
+
+如果出现java.lang.OutOfMemoryError: Java heap space异常，说明Java虚拟机的堆内存不够。原因有二：
+（1）Java虚拟机的堆内存设置不够，可以通过参数-Xms1g、-Xmx2g来调整。
+（2）代码中创建了大量大对象，并且长时间不能被垃圾收集器收集（存在被引用）。
+
+如果出现java.lang.OutOfMemoryError: PermGen space，说明是Java虚拟机对永久代Perm内存设置不够。
+一般出现这种情况，都是程序启动需要加载大量的第三方jar包。例如：在一个Tomcat下部署了太多的应用。
+
+从代码的角度，软件开发人员主要关注java.lang.OutOfMemoryError: Java heap space异常，减少不必要的对象创建，同时避免内存泄漏。
+
+### Metaspace
+
+`MetaspaceSize` 默认20.8M左右(x86下开启c2模式)，主要是控制metaspaceGC发生的初始阈值，也是最小阈值，但是触发metaspaceGC的阈值是不断变化的，与之对比的主要是指Klass Metaspace与NoKlass Metaspace两块committed的内存和。
+
+`MaxMetaspaceSize` 默认基本是无穷大，但是我还是建议大家设置这个参数，因为很可能会因为没有限制而导致metaspace被无止境使用(一般是内存泄漏)而被OS Kill。这个参数会限制metaspace(包括了Klass Metaspace以及NoKlass Metaspace)被committed的内存大小，会保证committed的内存不会超过这个值，一旦超过就会触发GC，这里要注意和MaxPermSize的区别，MaxMetaspaceSize并不会在jvm启动的时候分配一块这么大的内存出来，而MaxPermSize是会分配一块这么大的内存的。
+
+[JVM源码分析之Metaspace解密-阿里云开发者社区](https://developer.aliyun.com/article/73601)
+
+### 分析对象的内存占用
+
+在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分:
+
+* 对象头(Header)：在32位和64位的虚拟机(未开启压缩指针)中分别为 32 bit（4 字节）和 64 bit（8 字节）
+* 实例数据(Instance Data)
+* 对齐填充(Padding)：以8字节对齐
+
+对象头中一般包含两个部分:
+
+* 标记字 Mark Word，占用一个机器字，也就是8字节。
+* 类型指针，占用一个机器字，也就是8个字节。如果堆内存小于32GB，JVM默认会开启指针压缩，则只占用4个字节。
+* 如果是数组，对象头中还会多出一个部分: 数组长度，int值，占用4字节。
+
+举例来说，下面的 `MyOrder` 类的每个对象会占用40个字节。
+
+```java
+public class MyOrder{
+   private long orderId;
+   private long userId;
+   private byte state;
+   private long createMillis;
+}
+```
+
+计算方式为:
+
+* 对象头占用12字节：Mark Word 8字节，指针压缩后占用4个字节
+* 每个long类型的字段占用8字节，3个long字段占用24字节。
+* byte 字段占用1个字节。
+
+以上合计 37字节，加上以8字节对齐，则实际占用40个字节。
+
+## GC
+
+### Default gc for Java different version
+
+`java -XX:+PrintFlagsFinal -version | grep Use | grep GC | grep true` 查看默认使用的 GC
+
+| version       | GC                   |
+| ------------- | -------------------- |
+| Java 9 ~ 17   | G1 garbage collector |
+| Java 8 server | parallel collector   |
+| Java 8 client | serial collector     |
+| Java 7 server | parallel collector   |
+| Java 7 client | serial collector     |
+
+### GC 选型
+
+选择正确的 GC 算法，唯一可行的方式就是去尝试，并找出不合理的地方，一般性的指导原则：
+
+* 如果考虑吞吐优先，CPU 尽量都用于处理业务，用 Parallel GC；
+* 如果考虑有限的低延迟，且每次 GC 时间尽量短，用 CMS GC；
+* 如果堆较大，同时希望整体来看平均 GC 时间可控，使用 G1 GC。
+
+对于内存大小的考量：
+
+* 一般 4G 以上，算是比较大，用 G1 GC 的性价比较高。
+* 一般超过 8G，比如 16G-64G 内存，非常推荐使用 G1 GC。
+* 更大内存或者低延迟要求非常苛刻，用 ZGC 。
+
+特别地：OpenJDK 11下推荐使用 G1 而不是 ZGC（16+版本推荐）。
+
+### G1
+
+各种 GC 发生的时机
+
+* Young GC：在 Young 区满了/分配内存失败的时候，回收 Young 区的堆内存。
+* Mixed GC：在 Young 区满了且 Old 区达到一定比例时，回收 Young 区+部分 Old 的堆内存。
+* Full GC：在堆内存满了的时候，启动 Full GC，尝试回收整个堆内存。
+
+### ZGC - JDK 11
+
+[Z Garbage Collector](https://wiki.openjdk.java.net/display/zgc/Main)
+
+[新一代垃圾回收器ZGC的探索与实践 - 美团技术团队](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
+
+goals
+
+* Pause times do not exceed 10ms
+* Pause times do not increase with the heap or live-set size
+* Handle heaps ranging from a few hundred megabytes to multi terabytes in size
+
+At a glance, ZGC is:
+
+* Concurrent
+* Region-based
+* Compacting
+* NUMA-aware
+* Using colored pointers
+* Using load barriers
+
+江南白衣本衣 春天的旁边 [Java程序员的荣光，听R大论JDK11的ZGC](https://mp.weixin.qq.com/s/KUCs_BJUNfMMCO1T3_WAjw)
+> R大: 与标记对象的传统算法相比，ZGC在指针上做标记，在访问指针时加入Load Barrier（读屏障），比如当对象正被GC移动，指针上的颜色就会不对，这个屏障就会先把指针更新为有效地址再返回，也就是，永远只有单个对象读取时有概率被减速，而不存在为了保持应用与GC一致而粗暴整体的Stop The World。
+
+ZGC的八大特征
+
+1. 所有阶段几乎都是并发执行的
+ 这里的并发(Concurrent)，说的是应用线程与GC线程齐头并进，互不添堵。
+说几乎，就是还有三个非常短暂的STW的阶段，所以ZGC并不是Zero Pause GC啦
+2. 并发执行的保证机制，就是 Colored Pointer 和 Load Barrier
+ Colored Pointer 从64位的指针中，借了几位出来表示Finalizable、Remapped、Marked1、Marked0。 所以它不支持32位指针也不支持压缩指针， 且堆的大小支持 8MB to 16TB
+3. 像G1一样划分Region，但更加灵活
+4. 和G1一样会做Compacting－压缩
+ 粗略了几十倍地过一波回收流程，小阶段都被略过了哈:
+ 4.1. Pause Mark Start －初始停顿标记
+ 4.2. Concurrent Mark －并发标记
+ 4.3. Relocate － 移动对象
+ 4.4. Remap － 修正指针
+ 上一个阶段的Remap，和下一个阶段的Mark是混搭在一起完成的，这样非常高效，省却了重复遍历对象图的开销。
+5. 没有G1占内存的Remember Set，没有Write Barrier的开销
+6. 支持Numa架构
+ 现在多CPU插槽的服务器都是Numa架构
+7. 并行
+8. 单代
+ 没分代，应该是ZGC唯一的弱点了. 所以R大说ZGC的水平，处于AZul早期的PauselessGC  与 分代的C4算法之间 － C4在代码里就叫GPGC，Generational Pauseless GC。
+ 分代原本是因为most object die young的假设，而让新生代和老生代使用不同的GC算法。但C4已经是全程并发算法了，为什么还要分代呢？
+ R大说：因为分代的C4能承受的对象分配速度(Allocation Rate)， 大概是原始PGC的10倍。
+
 ## Java问题排查工具箱
 
 ### [Arthas](https://github.com/alibaba/arthas)
@@ -100,6 +253,7 @@ startup: `java -jar arthas-boot.jar`
 trace Demo$Counter getFactoryInfo '#cost>10' -n 1
 `#cost > 10` 只会展示耗时大于10ms的调用路径
 `-n` 参数指定捕捉结果的次数
+默认情况下，trace不会包含jdk里的函数调用，如果希望trace jdk里的函数，需要显式设置`--skipJDKMethod false`。
 
 `trace -E com.test.ClassA|org.test.ClassB method1|method2|method3` 用正则表匹配路径上的多个类和函数，一定程度上达到多层trace的效果
 
@@ -188,25 +342,42 @@ Solution: This exception usually arises when the socket operations performed on 
 
 * java8 给HotSpot VM引入了 NMT 特性，可以用于追踪JVM的内部内存使用
 * Enable NMT `-XX:NativeMemoryTracking=[off | summary | detail]`
+* Optionally print memory usage when the application terminates `-XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics`
 * Use jcmd to Access NMT Data `jcmd <pid> VM.native_memory [summary | detail | baseline | summary.diff | detail.diff | shutdown] [scale= KB | MB | GB]`
 * [Oracle Technology Network - Native Memory Tracking](https://docs.oracle.com/javase/8/docs/technotes/guides/vm/nmt-8.html)
 * [Java Platform, Standard Edition Troubleshooting Guide - 2.7 Native Memory Tracking](https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr007.html)
 
 * 使用`-XX:NativeMemoryTracking=summary`可以用于开启NMT，其中该值默认为off，可以设置summary、detail来开启；开启的话，大概会增加5%-10%的性能消耗；使用-XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics可以在jvm shutdown的时候输出整体的native memory统计；其他的可以使用`jcmd pid VM.native_memory`相关命令进行查看、diff、shutdown等
-* 整个memory主要包含了Java Heap、Class、Thread、Code、GC、Compiler、Internal、Other、Symbol、Native Memory Tracking、Arena Chunk这几部分；其中reserved表示应用可用的内存大小，committed表示应用正在使用的内存大小
+* 整个memory主要包含了Java Heap、Class、Thread、Code、GC、Compiler、Internal、Other、Symbol、Native Memory Tracking、Arena Chunk这几部分；其中 `reserved` 表示应用可用的内存大小，`committed` 表示应用正在使用的内存大小
 * [聊聊HotSpot VM的Native Memory Tracking](https://cloud.tencent.com/developer/article/1406522)
 
+Create a baseline and get differences over time
+
+* `jcmd <pid> VM.native_memory baseline`
+* `jcmd <pid> VM.native_memory detail.diff`
+
 #### jemalloc 查看堆外内存 anon
+
+[jemalloc-5.3.0.tar.bz2](https://github.com/jemalloc/jemalloc/releases/download/5.3.0/jemalloc-5.3.0.tar.bz2)
 
 * [native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )
 * [Use Case: Leak Checking](https://github.com/jemalloc/jemalloc/wiki/Use-Case:-Leak-Checking )
 * [Debugging Java Native Memory Leaks](http://www.evanjones.ca/java-native-leak-bug.html )
 * [Using jemalloc to get to the bottom of a memory leak](https://gdstechnology.blog.gov.uk/2015/12/11/using-jemalloc-to-get-to-the-bottom-of-a-memory-leak/ )
 
-1. Starting your JVM with jemalloc `export LD_PRELOAD=/usr/local/lib/libjemalloc.so`
-2. Configuring the profiler `export MALLOC_CONF=prof:true,lg_prof_interval:30,lg_prof_sample:17,prof_prefix:/path/to/jeprof/output/jeprof`
-3. Run your program
-4. Finding the needle `jeprof --show_bytes --gif /usr/bin/java /path/to/jeprof/output/jeprof.*.heap > out.gif`
+1. Install jemalloc following [native-jvm-leaks](https://github.com/jeffgriffith/native-jvm-leaks )
+   1. `./configure --enable-prof`
+   2. `make`
+   3. `sudo make install`
+2. Starting your JVM with jemalloc `export LD_PRELOAD=/usr/local/lib/libjemalloc.so`
+3. Configuring the profiler `export MALLOC_CONF=prof:true,lg_prof_interval:31,lg_prof_sample:17,prof_prefix:/path/to/jeprof/output/jeprof`
+   1. In this case `2^31` is about 2GB, so every 2GB of memory allocation, we'll get a .heap output file specified in the prof_prefix location
+4. Run your program
+5. Finding the needle `jeprof --show_bytes --gif $(which java) /path/to/jeprof/output/jeprof.*.heap > out.gif`
+6. Compare two profile dumps: `jeprof --text $(which java) --base=jeprof.15139.16.i16.heap /jeprof.15139.27.i27.heap`
+7. export to gif with `dot` which provided by
+   1. `sudo yum install -y graphviz`
+   2. `sudo yum --enablerepo=powertools install -y graphviz-gd`
 
 #### gperf 查看堆外内存
 
@@ -217,7 +388,7 @@ Solution: This exception usually arises when the socket operations performed on 
 1. `export GPERF_HOME=/path/to/gperftools-2.7`
 2. `export LD_PRELOAD=$GPERF_HOME/lib/libtcmalloc.so HEAPCHECK=normal`
 3. `export HEAPPROFILE=/path/to/gperf/output.heap`
-4. Run program `$GPERF_HOME/bin/pprof --text /usr/bin/java $HEAPPROFILE.*.heap > gperf.output.text`
+4. Run program `$GPERF_HOME/bin/pprof --text $(which java) $HEAPPROFILE.*.heap > gperf.output.text`
 
 #### Valgrind
 
@@ -286,12 +457,43 @@ Solution: This exception usually arises when the socket operations performed on 
 * 打印绝对时间 `-XX:+PrintGCDetails -XX:+PrintGCDateStamps`
 * 打印相对时间 `-XX:+PrintGCDetails -XX:+PrintGCTimeStamps`
 * `-Xloggc` 需要使用绝对路径
-* `-verbose:gc -Xloggc:/path/to/gc.pid%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
+* `-verbose:gc -Xloggc:/path/to/gc.%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps`
 * `-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/path/to/hprof -XX:ErrorFile=/path/to/hs_err_pid%p.log`
 * `java -XX:+PrintFlagsFinal -version` 打印平台默认值
 
 [HotSpot VM Command-Line Options](https://docs.oracle.com/javase/7/docs/webnotes/tsg/TSG-VM/html/clopts.html)
 [Fatal Error Log](http://www.oracle.com/technetwork/java/javase/felog-138657.html#gbwcy)
+
+### java 9 以上日志格式
+
+[OpenJDK 11 JVM日志相关参数解析与使用_JKX_geek的博客-CSDN博客](https://blog.csdn.net/JKX_geek/article/details/104873302)
+
+java -Xlog:help
+
+配置什么日志可以被输出
+
+`java -Xlog:all=warning`
+
+输出gc相关的日志 `java -Xlog:gc`
+仅输出gc heap相关的日志 `java -Xlog:gc+heap`
+
+配置日志输出到哪里
+
+file=, 也可以直接指定文件名，file=可以被省略 `java -Xlog:gc*:file=/project/log/gc.log,filecount=50,filesize=50m`
+
+示例：`java -Xlog:gc*=info:file=/project/log/gc.log,filecount=50,filesize=50m:time -version`
+
+#### 动态修改JVM日志级别
+
+通过 jcmd 动态修改 JVM 日志配置， 主要命令是VM.log， 假设我们的 JVM 进程是22,
+
+* 查看命令格式 `jcmd 22  VM.log`
+* 查看当前日志参数配置 `jcmd 22 VM.log list`
+* 让日志另起一个文件输出 `jcmd 22 VM.log rotate`
+* 关闭所有日志，并清理日志相关参数 `jcmd 22 VM.log disable`
+* 新增日志配置输出 `jcmd 22 VM.log output=/project/core/log/gc.log output_options="filecount=50,filesize=100M" decorators="utctime,level,tags" what="gc*=debug"`
+* 修改日志配置输出 保持与现有的某个output一致，就是修改配置，但是 output_options 只要设定了，就不能改，只能通过 disable 关闭所有日志之后重新设置。
+* 修改配置级别为info: `jcmd 22 VM.log output=/project/core/log/gc.log what="gc*=info"`
 
 ### ClassLoader相关工具
 
@@ -326,18 +528,6 @@ Solution: This exception usually arises when the socket operations performed on 
 HSDB: `java -cp sa-jdi.jar sun.jvm.hotspot.HSDB`
 
 [Serviceability in HotSpot](http://openjdk.java.net/groups/hotspot/docs/Serviceability.html)
-
-#### Default gc for Java different version
-
-`java -XX:+PrintFlagsFinal -version | grep Use | grep GC | grep true` 查看默认使用的 GC
-
-| version       | GC                  |
-|---            |---                  |
-| Java 9 ~ 17   | G1 garbage collector|
-| Java 8 server | parallel collector  |
-| Java 8 client | serial collector    |
-| Java 7 server | parallel collector  |
-| Java 7 client | serial collector    |
 
 #### jmap
 
@@ -406,14 +596,14 @@ For more information about a specific command use 'help <command>'.
 
 JCMD、JHSDB和基础工具的对比
 
-| 基础工具               |   JCMD                            |   JHSDB   |
-|     ---               | ---                               | ---       |
-| `jps -lm`               | jcmd                                | N/A |
-| `jmap -dump <pid>`      | `jcmd <pid> GC.heap_dump`          | jhsdb jmap --binaryheap |
-| `jmap-histo <pid>`      | `jcmd <pid> GC.class_histogram`    | jhsdb jmap --histo |
-| `jstack <pid>`          | `jcmd <pid> Thread.print`           | jhsdb jstack --locks |
-| `jinfo -sysprops <pid>` | `jcmd <pid> VM.system_properties`  | jhsdb info --sysprops |
-| `jinfo -flags <pid>`    | `jcmd <pid> VM.flags`               | jhsdb info --flags |
+| 基础工具                | JCMD                              | JHSDB                   |
+| ----------------------- | --------------------------------- | ----------------------- |
+| `jps -lm`               | jcmd                              | N/A                     |
+| `jmap -dump <pid>`      | `jcmd <pid> GC.heap_dump`         | jhsdb jmap --binaryheap |
+| `jmap-histo <pid>`      | `jcmd <pid> GC.class_histogram`   | jhsdb jmap --histo      |
+| `jstack <pid>`          | `jcmd <pid> Thread.print`         | jhsdb jstack --locks    |
+| `jinfo -sysprops <pid>` | `jcmd <pid> VM.system_properties` | jhsdb info --sysprops   |
+| `jinfo -flags <pid>`    | `jcmd <pid> VM.flags`             | jhsdb info --flags      |
 
 #### jstack
 
@@ -438,10 +628,12 @@ jstack 可以告诉你当前所有JVM线程正在做什么，包括用户线程�
     S0C、S1C、S0U、S1U：Survivor 0/1区容量（Capacity）和使用量（Used）
     EC、EU：Eden区容量和使用量
     OC、OU：年老代容量和使用量
-    PC、PU：永久代容量和使用量
     YGC、YGT：年轻代GC次数和GC耗时
     FGC、FGCT：Full GC次数和Full GC耗时
     GCT：GC总耗时
+    PC、PU：永久代容量和使用量
+    MC & MU：单位 KB，Klass Metaspace以及NoKlass Metaspace两者总共committed的内存大小 和 使用量
+    CCSC & CCSU：单位 KB，Klass Metaspace的已经被commit的内存大小 和 使用量
 
 #### jVisualVM
 
@@ -474,37 +666,18 @@ VisualVM reports two metrics related to the duration, but there is a significant
 [C = char
 [L = any non-primitives(Object)
 
-### JVM内存分配
-
-在Java虚拟机中，内存分为三个代：新生代（New）、老生代（Old）、永久代（Perm）。
-（1）新生代New：新建的对象都存放这里
-（2）老生代Old：存放从新生代New中迁移过来的生命周期较久的对象。新生代New和老生代Old共同组成了堆内存。
-（3）永久代Perm：是非堆内存的组成部分。主要存放加载的Class类级对象如class本身，method，field等等。
-
-* 堆内存 = 年轻代 + 年老代 + 永久代
-* 年轻代 = Eden区 + 两个Survivor区（From和To）
-
-如果出现java.lang.OutOfMemoryError: Java heap space异常，说明Java虚拟机的堆内存不够。原因有二：
-（1）Java虚拟机的堆内存设置不够，可以通过参数-Xms1g、-Xmx2g来调整。
-（2）代码中创建了大量大对象，并且长时间不能被垃圾收集器收集（存在被引用）。
-
-如果出现java.lang.OutOfMemoryError: PermGen space，说明是Java虚拟机对永久代Perm内存设置不够。
-一般出现这种情况，都是程序启动需要加载大量的第三方jar包。例如：在一个Tomcat下部署了太多的应用。
-
-从代码的角度，软件开发人员主要关注java.lang.OutOfMemoryError: Java heap space异常，减少不必要的对象创建，同时避免内存泄漏。
-
 #### Guidelines for Calculating Java Heap Sizing
 
 Refer to Java Performance
 
 ##### Table 7-3 Guidelines for Calculating Java Heap Sizing
 
-Space                     | Command Line Option             | Occupancy Factor
-----                      |---                              |---
-Java heap                 | -Xms and -Xmx                   | 3x to 4x old generation space occupancy after full garbage collection
-Permanent Generation      | -XX:PermSize -XX:MaxPermSize    | 1.2x to 1.5x permanent generation space occupancy after full garbage collection
-Young Generation          | -Xmn 1x to 1.5x                 | old generation space occupancy after full garbage collection
-Old Generation            | Implied from overall Java heap size minus the young generation size | 2x to 3x old generation space occupancy after full garbage collection
+| Space                | Command Line Option                                                 | Occupancy Factor                                                                |
+| -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Java heap            | -Xms and -Xmx                                                       | 3x to 4x old generation space occupancy after full garbage collection           |
+| Permanent Generation | -XX:PermSize -XX:MaxPermSize                                        | 1.2x to 1.5x permanent generation space occupancy after full garbage collection |
+| Young Generation     | -Xmn 1x to 1.5x                                                     | old generation space occupancy after full garbage collection                    |
+| Old Generation       | Implied from overall Java heap size minus the young generation size | 2x to 3x old generation space occupancy after full garbage collection           |
 
 ##### Refine Young Generation Size
 
@@ -537,80 +710,6 @@ Greys是一个JVM进程执行过程中的异常诊断工具，可以在不中断
 更多的用法可以参考详细的[WiKi](https://github.com/CSUG/HouseMD)
 
 再偷偷告诉你，因为HouseMD是基于字节码分析来做的，所以理论上运行在JVM的语言都可以用它，包括Groovy，Clojure都可以。
-
-## GC
-
-### GC 选型
-
-选择正确的 GC 算法，唯一可行的方式就是去尝试，并找出不合理的地方，一般性的指导原则：
-
-* 如果考虑吞吐优先，CPU 尽量都用于处理业务，用 Parallel GC；
-* 如果考虑有限的低延迟，且每次 GC 时间尽量短，用 CMS GC；
-* 如果堆较大，同时希望整体来看平均 GC 时间可控，使用 G1 GC。
-
-对于内存大小的考量：
-
-* 一般 4G 以上，算是比较大，用 G1 GC 的性价比较高。
-* 一般超过 8G，比如 16G-64G 内存，非常推荐使用 G1 GC。
-* 更大内存或者低延迟要求非常苛刻，用 ZGC 。
-
-特别地：OpenJDK 11下推荐使用 G1 而不是 ZGC（16+版本推荐）。
-
-### G1
-
-各种 GC 发生的时机
-
-* Young GC：在 Young 区满了/分配内存失败的时候，回收 Young 区的堆内存。
-* Mixed GC：在 Young 区满了且 Old 区达到一定比例时，回收 Young 区+部分 Old 的堆内存。
-* Full GC：在堆内存满了的时候，启动 Full GC，尝试回收整个堆内存。
-
-### ZGC - JDK 11
-
-[Z Garbage Collector](https://wiki.openjdk.java.net/display/zgc/Main)
-
-[新一代垃圾回收器ZGC的探索与实践 - 美团技术团队](https://tech.meituan.com/2020/08/06/new-zgc-practice-in-meituan.html)
-
-goals
-
-* Pause times do not exceed 10ms
-* Pause times do not increase with the heap or live-set size
-* Handle heaps ranging from a few hundred megabytes to multi terabytes in size
-
-At a glance, ZGC is:
-
-* Concurrent
-* Region-based
-* Compacting
-* NUMA-aware
-* Using colored pointers
-* Using load barriers
-
-江南白衣本衣 春天的旁边 [Java程序员的荣光，听R大论JDK11的ZGC](https://mp.weixin.qq.com/s/KUCs_BJUNfMMCO1T3_WAjw)
-> R大: 与标记对象的传统算法相比，ZGC在指针上做标记，在访问指针时加入Load Barrier（读屏障），比如当对象正被GC移动，指针上的颜色就会不对，这个屏障就会先把指针更新为有效地址再返回，也就是，永远只有单个对象读取时有概率被减速，而不存在为了保持应用与GC一致而粗暴整体的Stop The World。
-
-ZGC的八大特征
-
-1. 所有阶段几乎都是并发执行的
- 这里的并发(Concurrent)，说的是应用线程与GC线程齐头并进，互不添堵。
-说几乎，就是还有三个非常短暂的STW的阶段，所以ZGC并不是Zero Pause GC啦
-2. 并发执行的保证机制，就是Colored Pointer 和 Load Barrier
- Colored Pointer 从64位的指针中，借了几位出来表示Finalizable、Remapped、Marked1、Marked0。 所以它不支持32位指针也不支持压缩指针， 且堆的大小支持 8MB to 16TB
-3. 像G1一样划分Region，但更加灵活
-4. 和G1一样会做Compacting－压缩
- 粗略了几十倍地过一波回收流程，小阶段都被略过了哈:
- 4.1. Pause Mark Start －初始停顿标记
- 4.2. Concurrent Mark －并发标记
- 4.3. Relocate － 移动对象
- 4.4. Remap － 修正指针
- 上一个阶段的Remap，和下一个阶段的Mark是混搭在一起完成的，这样非常高效，省却了重复遍历对象图的开销。
-5. 没有G1占内存的Remember Set，没有Write Barrier的开销
-6. 支持Numa架构
- 现在多CPU插槽的服务器都是Numa架构
-7. 并行
-8. 单代
- 没分代，应该是ZGC唯一的弱点了. 所以R大说ZGC的水平，处于AZul早期的PauselessGC  与 分代的C4算法之间 － C4在代码里就叫GPGC，Generational Pauseless GC。
- 分代原本是因为most object die young的假设，而让新生代和老生代使用不同的GC算法。但C4已经是全程并发算法了，为什么还要分代呢？
- R大说：因为分代的C4能承受的对象分配速度(Allocation Rate)， 大概是原始PGC的10倍。
 
 ## Java™ Tutorials
 
@@ -649,9 +748,9 @@ public static boolean interrupted()//Thread.interrupted() 查看“当前”线�
 
 ```java
 try {
-        sleep(delay);
+  sleep(delay);
 } catch (InterruptedException e) {
-    Thread.currentThread().isInterrupted();
+  Thread.currentThread().isInterrupted();
 }
 ```
 
@@ -764,3 +863,7 @@ Java中实际上有四种强度不同的引用，从强到弱它们分别是，�
 * J：其他帧类型，包括编译后的 Java 帧
 
 `libgtk-x11-2.0.so.0+0x19fcf4`：和程序计数器（pc）表达的含义一样，但是用的是本地 so 库+偏移量的方式。
+
+## 字节码
+
+如果实际项目中需要进行基础的字节码操作，可以考虑使用更加高层次视角的类库，例如[Byte Buddy](https://bytebuddy.net/#/)等。

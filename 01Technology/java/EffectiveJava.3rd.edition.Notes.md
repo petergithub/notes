@@ -135,7 +135,7 @@ static void copy(String src, String dst) throws IOException {
 
 ### Item 31: Use bounded wildcards to increase API flexibility
 
-为了获得最大限度的灵活性，要在表示生产者或者消费者的输入参数上 使用通配符类型. 
+为了获得最大限度的灵活性，要在表示生产者或者消费者的输入参数上 使用通配符类型.
 `PECS` 表示 producer-extends, consumer-super。换句话说，如果参数化类型表示一个生产者 T，就使用`<? extends T>`;如果它表示一个消费者 T，就使用 `<? super T>`,  所有的 comparable和 comparator 都是消费者, 所以使用时始终应该是 `Comparable<? super b>` 优先于 `Comparable<T>`
 
 ### Item 32: Combine generics and varargs judiciously
@@ -168,7 +168,7 @@ Objects.requireNonNull 方法
 * 必须保护性地设计程序
 * Date 已经过时了，不应该在新代码中使用, 使用 Instant (或 LocalDateTime, 或者 ZonedDateTime )代替 Date, 因为 Instant (以及另一个 java.time 类)是不可变的(详见第 17 条)
 
-如果一个类包含有从客户端得到或者返回到客户端的可变组件，这个类就必须保护性地拷贝这些组件.  
+如果一个类包含有从客户端得到或者返回到客户端的可变组件，这个类就必须保护性地拷贝这些组件.
 如果拷贝的成本受到限制，并且类信任它的客户端不会不恰当地修改组件，就可以在文档中指明客户端的职责是不得修改受到影响的组件，以此来代替保护性拷贝
 
 ### 第51条 谨慎设计方法签名
@@ -219,7 +219,7 @@ java.util.Arrays#asList
 
 * 要么抛出异常
 * 要么返回 null (假设返回类型是一个对象引用类型)
-* Optinal<T>类代表的是一 个不可变的容器，它可以存放单个非 null 的 T 引用，或者什么内容都没有
+* `Optinal<T>`类代表的是一个不可变的容器，它可以存放单个非 null 的 T 引用，或者什么内容都没有
 
 Optional 使用注意:
 

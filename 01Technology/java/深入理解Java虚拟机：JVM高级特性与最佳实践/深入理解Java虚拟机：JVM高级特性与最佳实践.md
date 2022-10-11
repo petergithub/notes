@@ -65,7 +65,7 @@ Classes and metadata stored in the Metaspace
 
 元空间的JVM参数有两个：-XX:MetaspaceSize=N和 -XX:MaxMetaspaceSize=N，对于64位JVM来说，元空间的默认初始大小是20.75MB，默认的元空间的最大值是无限。MaxMetaspaceSize用于设置metaspace区域的最大值，MetaspaceSize表示metaspace首次使用不够而触发FGC的阈值，只对触发起作用，
 
-[JVM源码分析之Metaspace解密-你假笨](JVM源码分析之Metaspace解密)
+[JVM源码分析之Metaspace解密-你假笨](https://developer.aliyun.com/article/73601)
 
 [Java 内存分区之 堆外内存 Metaspace 元空间 取永久代PermGen 而代之 请叫我大师兄__](https://blog.csdn.net/qq_27093465/article/details/106758504)
 class metadata 用于记录一个 Java 类在 JVM 中的信息，包括但不限于 JVM class file format 的运行时数据：
