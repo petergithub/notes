@@ -63,6 +63,7 @@ validate your planned changes carefully with a tool such as pt-upgrade
 `SHOW CREATE TABLE`
 删除数据表: `DROP TABLE 表名；`
 将表中记录清空: `DELETE FROM 表名;`
+duplicate table structure and data: `CREATE TABLE partnership_0803 AS SELECT * FROM partnership;`
 
 ### User management
 
@@ -1000,6 +1001,26 @@ mysql  Ver 14.14 Distrib 5.7.17, for Linux (x86_64) using  EditLine wrapper, [My
 D:\ProgramFiles\MySQL Workbench 6.3.3 CE (winx64)\data\main_menu.xml
 /usr/share/mysql-workbench/data/main_menu.xml
 
+### mysql_config_editor — MySQL Configuration Utility
+
+[MySQL 8.0 Reference Manual :: 4.6.7 mysql_config_editor — MySQL Configuration Utility](https://dev.mysql.com/doc/refman/8.0/en/mysql-config-editor.html)
+
+```sh
+# -h,–host=name 添加host到登陆文件中
+# -G，–login-path=name 在登录文件中为login path添加名字（默认为client）
+# -p,–password 在登陆文件中添加密码（该密码会被mysql_config_editor自动加密）
+# -u，–user 添加用户名到登陆文件中
+# -S,–socket=name 添加sock文件路径到登陆文件中
+# -P，–port=name 添加登陆端口到登陆文件中
+
+mysql_config_editor print --all             #显示所有的login-path信息
+mysql_config_editor print --login-path=test #显示执行的login-path配置
+mysql_config_editor set --login-path=client --host=localhost --user=root --port=3306 --password
+mysql_config_editor remove --login-path=test # 删除配置
+
+mysql --login-path=client # defalut 是 client
+```
+
 ## Transaction
 
 [Using the Transaction Information Schema Tables](https://dev.mysql.com/doc/innodb-plugin/1.0/en/innodb-information-schema-examples.html)
@@ -1038,7 +1059,41 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 幻读（phantom read）：The so-called phantom problem occurs within a transaction when the same query produces different sets of rows at different times.
 幻读和不可重复读区别: 幻读是指其他事务的新增(insert)数据，不可重复读是指其他事务的更改数据（update, delete）
 为了避免这两种情况，采取的对策是不同的，防止读取到更改数据，只需要对操作的数据添加行级锁，阻止操作中的数据发生变化，
+
 而防止读取到新增数据，则往往需要添加表级锁——将整个表锁定，防止新增数据（Oracle使用多版本数据的方式实现）
+
+### MVCC
+
+[面试必问的 MySQL，你懂了吗？ - 知乎](https://zhuanlan.zhihu.com/p/150089208)
+
+[MySQL 8.0 MVCC 核心原理解析（核心源码） - 知乎](https://zhuanlan.zhihu.com/p/286775643)
+
+MVCC 只作用于 RC（Read Committed）和 RR（Repeatable Read）级别，因为 RU（Read Uncommitted）总是读取最新的数据版本，而不是符合当前事务版本的数据行。而 Serializable 则会对所有读取的行都加锁。这两种级别都不需要 MVCC 的帮助。
+
+以 RR 级别为例：每开启一个事务时，系统会给该事务会分配一个事务 Id，在该事务执行第一个 select 语句的时候，会生成一个当前时间点的事务快照 ReadView，主要包含以下几个属性：
+
+trx_ids：生成 ReadView 时当前系统中活跃的事务 Id 列表，就是还未执行事务提交的。
+up_limit_id：低水位，取 trx_ids 中最小的那个，trx_id 小于该值都能看到。
+low_limit_id：高水位，生成 ReadView 时系统将要分配给下一个事务的id值，trx_id 大于等于该值都不能看到。
+creator_trx_id：生成该 ReadView 的事务的事务 Id。
+
+以上内容是对于 RR 级别来说，而对于 RC 级别，其实整个过程几乎一样，唯一不同的是生成 ReadView 的时机，
+
+* RR 级别只在事务开始时生成一次，之后一直使用该 ReadView。
+* RC 级别则在每次 select 时，都会生成一个 ReadView。
+
+#### MVCC 解决了幻读了没有
+
+* 快照读：生成一个事务快照（ReadView），之后都从这个快照获取数据。普通 select 语句就是快照读。
+* 当前读：读取数据的最新版本。常见的 update/insert/delete、还有 select ... for update、select ... lock in share mode 都是当前读。
+
+对于快照读，MVCC 因为因为从 ReadView 读取，所以必然不会看到新插入的行，所以天然就解决了幻读的问题。
+
+而对于当前读的幻读，MVCC 是无法解决的。需要使用 Gap Lock 或 Next-Key Lock（Gap Lock + Record Lock）来解决。
+
+#### 经常有人说 Repeatable Read 解决了幻读是什么情况
+
+SQL 标准中规定的 RR 并不能消除幻读，但是 MySQL 的 RR 可以，靠的就是 Gap 锁。在 RR 级别下，Gap 锁是默认开启的，而在 RC 级别下，Gap 锁是关闭的。
 
 ### 锁机制
 
@@ -1061,7 +1116,7 @@ SELECT @@GLOBAL.tx_isolation, @@tx_isolation, @@session.tx_isolation;
 
 1. 自增锁(Auto-inc Locks)：表级锁，专门针对事务插入AUTO_INC的列，如果插入位置冲突，多个事务会阻塞，以保证数据一致性；
 2. 共享/排它锁(Shared and Exclusive Locks)：行级锁，S锁与X锁，强锁；
-3. 意向锁(Intention Locks)：表级锁，IS锁与IX锁，弱锁，仅仅表明意向；
+3. 意向锁(Intention Locks)：表级锁，IS锁与IX锁，弱锁，仅仅表明意向，意向锁只会和表级的X，S发生冲突，不会与行级的共享 / 排他锁互斥；
 4. 插入意向锁(Insert Intention Locks)：针对insert的，如果插入位置不冲突，多个事务不会阻塞，以提高插入并发；
 5. 记录锁(Record Locks)：索引记录上加锁，对索引记录实施互斥，以保证数据一致性；
 6. 间隙锁(Gap Locks)：封锁索引记录中间的间隔，在RR下有效，防止间隔中被其他事务插入，防止“不可重复读”；
@@ -1101,7 +1156,6 @@ InnoDB的锁，与索引类型，事务的隔离级别相关
 insert时，当对存在的行进行锁的时候(主键)，mysql就只有行锁。当对未存在的行进行锁的时候(即使条件为主键)，mysql是会锁住一段范围（有gap锁）
 
 `insert into t3(xx,xx) on duplicate key update xx='XX';` 这个特有的 insert 语法语句, 对于主键来说，插入的行不管有没有存在，都会只有行锁
-
 
 ### Example: 数据库插入数据时加锁 多线程(多job)重复insert
 
