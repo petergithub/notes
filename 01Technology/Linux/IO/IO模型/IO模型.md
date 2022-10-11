@@ -1,14 +1,46 @@
 # I/O
 
-[10 分钟看懂 NIO 底层原理](https://www.cnblogs.com/crazymakercircle/p/10225159.html)
+## 概念 同步异步 synchronous/asynchronous 阻塞非阻塞 blocking/non-blocking
+
+参考 Unix Networking Programming Col 1, Chapter 6.
+
+### Asynchronous, Non-Blocking, Event-Base architectures
+
+[What's the difference between: Asynchronous, Non-Blocking, Event-Base architectures? - Stack Overflow](https://stackoverflow.com/questions/7931537/whats-the-difference-between-asynchronous-non-blocking-event-base-architectu/9489547#9489547)
+
+**Asynchronous** Asynchronous literally means not synchronous. Email is asynchronous. You send a mail, you don't expect to get a response NOW. But it is not non-blocking. Essentially what it means is an architecture where "components" send messages to each other without expecting a response immediately. HTTP requests are synchronous. Send a request and get a response.
+
+**Non-Blocking** This term is mostly used with IO. What this means is that when you make a system call, it will return immediately with whatever result it has without putting your thread to sleep (with high probability). For example non-blocking read/write calls return with whatever they can do and expect caller to execute the call again. try_lock for example is non-blocking call. It will lock only if lock can be acquired. Usual semantics for systems calls is blocking. read will wait until it has some data and put calling thread to sleep.
+
+**Event-base** This term comes from libevent. non-blocking read/write calls in themselves are useless because they don't tell you "when" should you call them back (retry). select/epoll/IOCompletionPort etc are different mechanisms for finding out from OS "when" these calls are expected to return "interesting" data. libevent and other such libraries provide wrappers over these event monitoring facilities provided by various OSes and give a consistent API to work with which runs across operating systems. Non-blocking IO goes hand in hand with Event-base.
+
+I think these terms overlap. For example HTTP protocol is synchronous but HTTP implementation using non-blocking IO can be asynchronous. Again a non-blocking API call like read/write/try_lock is synchronous (it immediately gives a response) but "data handling" is asynchronous.
+
+### asynchronous and non-blocking calls? also between blocking and synchronous
+
+[asynchronous and non-blocking calls? also between blocking and synchronous - Stack Overflow](https://stackoverflow.com/questions/2625493/asynchronous-and-non-blocking-calls-also-between-blocking-and-synchronous)
+
+In many circumstances they are different names for the same thing, but in some contexts they are quite different. So it depends. Terminology is not applied in a totally consistent way across the whole software industry.
+
+For example in the classic sockets API, a non-blocking socket is one that simply returns immediately with a special "would block" error message, whereas a blocking socket would have blocked. You have to use a separate function such as select or poll to find out when is a good time to retry.
+
+But asynchronous sockets (as supported by Windows sockets), or the asynchronous IO pattern used in .NET, are more convenient. You call a method to start an operation, and the framework calls you back when it's done. Even here, there are basic differences. Asynchronous Win32 sockets "marshal" their results onto a specific GUI thread by passing Window messages, whereas .NET asynchronous IO is free-threaded (you don't know what thread your callback will be called on).
+
+So **they don't always mean the same thing**. To distil the socket example, we could say:
+
+* **Blocking and synchronous** mean the same thing: you call the API, it hangs up the thread until it has some kind of answer and returns it to you.
+* **Non-blocking** means that if an answer can't be returned rapidly, the API returns immediately with an error and does nothing else. So there must be some related way to query whether the API is ready to be called (that is, to simulate a wait in an efficient way, to avoid manual polling in a tight loop).
+* **Asynchronous** means that the API always returns immediately, having started a "background" effort to fulfil your request, so there must be some related way to obtain the result.
 
 ## Java IO读写原理
 
-用户程序进行IO的读写，基本上会用到read&write两大系统调用。可能不同操作系统，名称不完全一样，但是功能是一样的。
+[10 分钟看懂 NIO 底层原理](https://www.cnblogs.com/crazymakercircle/p/10225159.html)
 
-先强调一个基础知识：read系统调用，并不是把数据直接从物理设备，读数据到内存。write系统调用，也不是直接把数据，写入到物理设备。
+用户程序进行IO的读写，基本上会用到 `read & write` 两大系统调用。可能不同操作系统，名称不完全一样，但是功能是一样的。
 
-read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而write系统调用，是把数据从进程缓冲区复制到内核缓冲区。这个两个系统调用，都不负责数据在内核缓冲区和磁盘之间的交换。底层的读写交换，是由操作系统kernel内核完成的。
+先强调一个基础知识：`read`系统调用，并不是把数据直接从物理设备，读数据到内存。`write`系统调用，也不是直接把数据，写入到物理设备。
+
+`read`系统调用，是把数据从内核缓冲区复制到进程缓冲区；而`write`系统调用，是把数据从进程缓冲区复制到内核缓冲区。这个两个系统调用，都不负责数据在内核缓冲区和磁盘之间的交换。底层的读写交换，是由操作系统kernel内核完成的。
 
 ### 内核缓冲与进程缓冲区
 
@@ -40,15 +72,17 @@ read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而w
 
 ## 四种主要的IO模型
 
+Unix Networking Programming Col 1, Chapter 6.
+
 常见的IO模型有四种：
 
 1. 同步阻塞IO（Blocking IO）
 
-    首先，解释一下这里的**阻塞与非阻塞**：
+    首先，解释一下这里的**阻塞与非阻塞（blocking/non-blocking）**：
 
     * 阻塞IO，指的是需要内核IO操作彻底完成后，才返回到用户空间，执行用户的操作。阻塞指的是用户空间程序的执行状态，用户空间程序需等到IO操作彻底完成。传统的IO模型都是同步阻塞IO。在java中，默认创建的socket都是阻塞的。
 
-    其次，解释一下**同步与异步**：
+    其次，解释一下**同步与异步（synchronous/asynchronous）**：
     * 同步IO，是一种用户空间与内核空间的调用发起方式。同步IO是指用户空间线程是主动发起IO请求的一方，内核空间是被动接受方。异步IO则反过来，是指内核kernel是主动发起IO请求的一方，用户线程是被动接受方。
 
 2. 同步非阻塞IO（Non-blocking IO）
@@ -123,7 +157,7 @@ read系统调用，是把数据从内核缓冲区复制到进程缓冲区；而w
 
 ## IO多路复用模型(I/O multiplexing）
 
-即经典的Reactor设计模式，有时也称为异步阻塞IO，Java中的Selector和Linux中的epoll都是这种模型
+即经典的 Reactor 设计模式，有时也称为异步阻塞IO，Java中的 Selector 和 Linux 中的 epoll 都是这种模型
 
 如何避免同步非阻塞NIO模型中轮询等待的问题呢？这就是IO多路复用模型。
 

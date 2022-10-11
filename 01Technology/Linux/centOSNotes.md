@@ -447,6 +447,7 @@ $ loginctl show-user ruanyf
 `dnf info tree` Learning More about Packages
 
 `dnf install httpd` Installing Packages
+`dnf --enablerepo=powertools install graphviz-gd` enable repository powertools to install package
 `dnf reinstall httpd` Reinstalling Packages
 `dnf remove httpd` Removing Packages
 
