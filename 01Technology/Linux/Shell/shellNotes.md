@@ -19,6 +19,7 @@ echo "`date` (print as a date result: Mar  9 17:20:49 CST 2022) end sleep 2 sec;
 * `$?` 上一个命令的返回代码. 0为true, 1为false
 * `$$` 进程标识号
 * `$*` 该变量包含了所有输入的命令行参数值
+* `$0` is a magic variable for the full path of the executed script. If your script is invoked as "`sh script-name`", then `$0` will be exactly "script-name". [self-deleting shell script - Stack Overflow](https://stackoverflow.com/questions/8981164/self-deleting-shell-script/1086907#1086907)
 
 ## Shell 变量
 
@@ -108,7 +109,7 @@ value3
 或者
 
 ```bash
-可以单独定义数组的各个分量：
+# 可以单独定义数组的各个分量：
 
 array_name[0]=value0
 array_name[1]=value1
@@ -566,14 +567,44 @@ done
 
 ```bash
 #!/bin/env bash
-# Desc:Monitor RabbitMQ processs
+# Desc:Monitor processs by ps
+# config crontab
+# * * * * * /data/apps/shell/monitor.sh >> /data/logs/scripts/monitor.log 2>&1
 
 DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
-PID=$(ps aux | grep -v grep | grep /usr/local/erlang/lib/erlang/erts-8.3/bin/beam.smp)
-if [ -z "$PID" ];then
- echo ${DATE} "Restart RabbitMQ" >> ~/logs/scripts/rabbitmq-monitor.log
- service rabbitmq-server start
+PROCESS="process_name"
+PID=$(ps aux | grep -v grep | grep $PROCESS)
+if [ -z "$PID" ]; then
+ echo ${DATE} "Restart $PROCESS"
+ service $PROCESS start
 else
- echo ${DATE} "Service RabbitMQ is running" >> ~/logs/scripts/rabbitmq-monitor.log
+ echo ${DATE} "Service $PROCESS is running"
+fi
+
+TARGET="vhost_name"
+RESULT=$(/usr/sbin/rabbitmqctl list_vhosts | grep $TARGET)
+if [ "$RESULT" == "$TARGET" ];then
+ echo ${DATE} "Service RabbitMQ is running. result $RESULT"
+else
+ echo ${DATE} "Restart RabbitMQ"
+ /sbin/service rabbitmq-server start
+fi
+```
+
+### RabbitMQ monitor
+
+```bash
+#!/bin/env bash
+# Desc:Monitor RabbitMQ processs
+# * * * * * /data/apps/shell/monitor.sh >> /data/logs/scripts/monitor.log 2>&1
+
+DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
+TARGET="vhost_name"
+RESULT=$(/usr/sbin/rabbitmqctl list_vhosts | grep $TARGET)
+if [ "$RESULT" == "$TARGET" ];then
+ echo ${DATE} "Service RabbitMQ is running. result $RESULT"
+else
+ echo ${DATE} "Restart RabbitMQ"
+ /sbin/service rabbitmq-server start
 fi
 ```

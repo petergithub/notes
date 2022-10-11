@@ -56,8 +56,8 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 
 ### 远程 copy 文件
 
-* `cd && tar czv src | ssh user@host 'tar xz'`    将$HOME/src/目录下面的所有文件, 复制到远程主机的$HOME/src/目录
-* `ssh user@host 'tar cz src' | tar xzv`    将远程主机$HOME/src/目录下面的所有文件, 复制到用户的当前目录
+* `cd && tar czv src | ssh user@host 'tar xz'`    将`$HOME/src/`目录下面的所有文件, 复制到远程主机的`$HOME/src/`目录
+* `ssh user@host 'tar cz src' | tar xzv`    将远程主机`$HOME/src/`目录下面的所有文件, 复制到用户的当前目录
 * `vim scp://user@remoteserver//etc/hosts` Edit text files with VIM over ssh/scp
 * `mysqldump --add-drop-table --extended-insert --force --log-error=error.log -uUSER -pPASS OLD_DB_NAME | ssh -C user@newhost "mysql -uUSER -pPASS NEW_DB_NAME"`    通过SSH将MySQL数据库复制到新服务器
 * `sshfs name@server:/path/to/folder /path/to/mount/point` 通过 SSH 来 mount 文件系统
@@ -102,7 +102,7 @@ ssh-agent的工作是依赖于环境变量 `SSH_AUTH_SOCK` 和 `SSH_AGENT_PID`
 
 ### Bad owner or permissions on .ssh/config
 
-chmod 600 .ssh/config
+`chmod 600 .ssh/config`
 
 ### Too many authentication failures
 
