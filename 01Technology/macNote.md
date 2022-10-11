@@ -31,134 +31,7 @@ correct with quote: `find . -name '*_uk.xml'`
 
 Safari Developer Tools: Safari > Preferences > Advanced > Show Develop menu in menu bar, Then from the Safari “Develop” menu select  “Show Web Inspector” or use the keyboard shortcut Option+Command+i
 
-## Development
-
-### IDEA
-
-Reimport: File -> Invalidate Caches/Restart
-
-new line above: `Command+Option+Enter`
-new line after: `Shift+Enter`
-move line up/down: `Option+Shift+up/down`
-duplicate line: `Command+D`
-import class: `Option+Enter`
-`Option+Shift+Space` Smart code completion
-`Command+Shift+8`: Column selection mode (Vertical selection)
-`Command+Shift+A`: Display all command, Help -> Find Action
-`Command+F12`: list all method in current file
-`F3` Toggle bookmark
-`Comand+F3` show bookmark list
-`Command+Option+L`: reformat code
-`Command+Option+O`: list all method and variable, search through all Symbols
-`Command+Option+B` or `Command+Option+Left Click` : Implementation code
-`Option+F7` 代码调用
-`Command+Shift+F12` 代码窗口最大化
-`Command+;` Project structure > `Command+N` import module
-`Fn+Command+Right` go to end of the file
-`Fn+Command+Left` go to home of the file
-`Command+J` to complete any valid Live Template abbreviation
-`Esc` The ⎋ key in any tool window moves the focus to the editor.
-`Shift+Esc` moves the focus to the editor and also hides the current (or last active) tool window.
-`F12` key moves the focus from the editor to the last focused tool window.
-`Command+Shift+8` block selection
-"Fully Expand Tree Node" in settings->Keymap set mouse shortcut like `ALT+[Wheel Down]`
-Set "Collapse Node" keyshort to `ALT+[Wheel Up]`
-
-Load/Unload modules is like close project in eclipse
-
-#### 调试快捷键
-
-F7：Step into
-F8：Step over
-F9：Run
-Shift+F7：Smart step into（弹出对话框让你选择进入哪个方法）
-Shift+F8：Step out
-Ctrl+F8 / Command+F8：Toggle Breakpoint
-Option+F8：Evaluate expression
-Option+F9：Run To Cursor
-
-##### Config
-
-ln -s ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1 ~/Library/Preferences/IdeaIC2019.1
-pycharm: Directories Used by PyCharm https://www.jetbrains.com/help/pycharm/directories-used-by-the-ide-to-store-settings-caches-plugins-and-logs.html
- Configuration directory: ~/Library/Application Support/JetBrains/PyCharmCE2020.1
- Plugins directory:     ~/Library/Application Support/JetBrains/<product><version>/plugins
- Logs directory:     ~/Library/Logs/JetBrains/<product><version>
-
-1. To enable repeating j: type this in the mac terminal: `defaults write -g ApplePressAndHoldEnabled -bool false`
-2. Preference -> KeyMap -> completion ->
-    `Ctrl+Space` to `Shift+Space`
-    `Ctrl+F` disable (for vim)
-3. Code completion match case: Preference > Editor > General > Code Completion > Match case: uncheck
-4. Preferences -> Editor -> General -> Show quick documentation on mouse move
-5. Preferences -> Editor -> General -> Smart Keys -> Jump outside closing bracket/quote with Tab
-6. Preference | Code Style | Java | Imports | Set Class count to use import with '*' and Names count to use static import with '*' fields as 999
-7. "Apropos" terminal pops up when typing cmd+shift+A to get actions: System Preferences | Keyboard | Shortcuts | Services | disable Search man Page Index in Terminal
-8. Preferences -> Editor -> File and code templates -> Includes tab (on the right). There is a template header
-9. Preferences -> Editor -> Java -> Comment Code -> uncheck "Line comment at first column", check "Add a space at comment start"
-
-```java
-/**
-* @author Myname
-*/
-```
-
-9. Live template: Preferences -> Editor -> Live template, location: ~/Library/Preferences/IdeaIC2018.3/templates/user.xml
-example:
-log.enter
-$LOGGER$.debug("Enter $METHOD_NAME$ $EXPR_COPY$ {}", $EXPR$);
-LOGGER resolveLoggerInstance   Default: log
-METHOD_NAME methodName()
-EXPR variableOfType("")
-EXPR_COPY escapeString(EXPR)
-
-log.enter.multiple
-$LOGGER$.debug("Enter $METHOD_NAME$ $PARAMS_FORMAT$", $PARAMS$);
-METHOD_NAME methodName()
-PARAMS_FORMAT groovyScript("_1.collect{it+' {}'}.join(' ')", methodParameters())
-PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
-
-##### Vim
-
-config path: `~/.ideavimrc`
-Allocating conflicting keystrokes to IdeaVim: Preference -> Editor -> Vim Emulation -> Set Handler as IDE for (CTRL+C, CTRL+R, CTRL+T)
-[IdeaVIM Reference Manual SCROLL](http://ideavim.sourceforge.net/vim/scroll.html)
-`zz` line [count] at center of window (default cursor line)
-
-##### Add External Tool
-
-###### open current path in iTerm
-
-1. Preferences -> Tools -> External Tools -> Add -> Program: open -> Arguments: -a iTerm $FileDir$
-2. Preferences -> Apperarance & Behavior -> Menus and Toolbars -> Main Toolbar -> Add
-3. Keymap -> search "iTerm" -> Add keyboard shortcut "Command+Shift+i"
-
-##### [Directories used](https://intellij-support.jetbrains.com/hc/en-us/articles/206544519)
-
-PRODUCT: IdeaIC2018.3
-Configuration (idea.config.path): `~/Library/Preferences/<PRODUCT><VERSION>`
-Caches (idea.system.path): `~/Library/Caches/<PRODUCT><VERSION>`
-Plugins (idea.plugins.path): `~/Library/Application Support/<PRODUCT><VERSION>`
-Logs (idea.log.path): `~/Library/Logs/<PRODUCT><VERSION>`
-Location of user-defined keymaps: `~/Library/Preferences/IdeaIC2018.2/keymaps/`
-
-Help > Edit Custom Properties > create default idea.properties under idea.config.path: ~/Library/Preferences/IdeaIC2019.1/idea.properties
-soft link: ~/Library/Preferences/IdeaIC2019.1 -> to ~/Dropbox/pcSetting/idea.community/IdeaIC2019.1
-
-##### Plugin
-
-[Free MyBatis plugin](https://plugins.jetbrains.com/plugin/8321-free-mybatis-plugin)
-[Smart Tomcat](https://plugins.jetbrains.com/plugin/9492-smart-tomcat)
-[IdeaVimExtension](https://plugins.jetbrains.com/plugin/9615-ideavimextension): switch to English input method in normal mode and restore input method in insert mode.
-GsonFormat: 把json格式的内容转成Object
-RestfulToolkit: `Command+back slash`
-[Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
-[RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\`
-Rainbow Brackets
-Grep Console: highlight the editor - nice for analyzing logs
-Maven Helper, Key Promoter, Spring Assistant, GenerateAllSetter
-JRebel for IntelliJ: 热部署插件
-.env files support: 把.env文件中的内容给放到项目运行的环境变量中去
+## Software
 
 ### vs code
 
@@ -286,6 +159,16 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 `date +%s` get current timstamp
 `date +%U` display week number of this year
 
+### mycli
+
+[Docs](https://www.mycli.net/docs)
+
+Connect using a username, hostname and database name: `mycli -u my_user -h my_host.com my_database`
+
+Connect using a DSN: `mycli mysql://my_user@my_host.com:3306/my_database`
+
+[Commands](https://www.mycli.net/commands)
+
 ### 代理服务器 AnyProxy
 
 1. 以支持 Https 方式启动 `anyproxy --intercept`
@@ -293,11 +176,6 @@ firefox profile location: `/users/$user/library/application support/firefox/prof
 3. 客户端设置代理 [链接](http://ip:8001)
  [代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)
  [AnyProxy](http://anyproxy.io/cn)
-
-### Homebrew update 慢
-
-设置代理 `alias setproxy="export http_proxy=http://127.0.0.1:1087;export https_proxy=http://127.0.0.1:1087;"`
-或者 使用国内镜像
 
 ### WPS
 
@@ -378,9 +256,148 @@ pass in proto tcp from any to any port 1234
 
 restart the service  `sudo pfctl -f /etc/pf.conf`
 
-### Issue
+### How to Set a Short User Password?
 
-#### dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
+[command line - How to Set a Short User Password in macOS Mojave and Later (10.14+) - Ask Different](https://apple.stackexchange.com/questions/337468/how-to-set-a-short-user-password-in-macos-mojave-and-later-10-14)
+
+edit policy file
+
+1. Export current policy: `pwpolicy getaccountpolicies | awk 'NR>1' > ~/Desktop/file.plist`
+2. Edit the policy file, change the quoted part to your Regex. `policyAttributePassword matches '^$|.{4,}+'`
+3. Import policy file for account username: `pwpolicy setaccountpolicies -u username ~/Desktop/file.plist`
+4. chang password for account: `sudo passwd username`
+
+`^$|.{4,}+` for a 4 character length password.
+
+### [How to Write NTFS Drives on macOS Monterey](https://techsviewer.com/how-to-write-ntfs-drives-on-macos-monterey/)
+
+Method 1: Using Terminal to Enable Writing to NTFS Drives
+
+```sh
+diskutil list
+# Replace the “disk2s1” section with the Indentifier of your NTFS drive.
+sudo mkdir /Volumes/disk2s1
+sudo mount -t ntfs -o rw,auto,nobrowse /dev/disk2s1 /Volumes/disk2s1
+```
+
+## Network
+
+[Mac 抓包 Recording a Packet Trace | Apple Developer Documentation](https://developer.apple.com/documentation/network/recording_a_packet_trace)
+
+## brew Homebrew
+
+```sh
+brew install default location: /usr/local/Cellar
+brew search <package_name>      # 搜索
+brew install <package_name>     # 安装一个软件
+brew update                     # 从服务器上拉取，并更新本地 brew 的包目录
+brew upgrade <package_name>     # 更新软件
+brew outdated                   # 查看你的软件中哪些有新版本可用
+brew cleanup                    # 清理老版本。使用 `-n` 参数，不会真正执行，只是打印出真正运行时会做什么。
+brew list --versions            # 查看你安装过的包列表（包括版本号）
+brew link <package_name>        # 将软件的当前最新版本软链到`/usr/local`目录下
+brew unlink <package_name>      # 将软件在`/usr/local`目录下的软链接删除。
+brew info                       # 显示软件的信息
+brew deps                       # 显示包依赖
+brew services start <package_name>  # 设置自启动
+brew services stop <package_name>  # 去掉自启动
+
+check software info from brew: brew info mysql
+install with brew: brew install tig autojump
+search with brew cask: brew cask search chrome
+install with brew cask: brew install --cask google-chrome
+startup with brew: brew services start nginx
+brew switch another version: brew switch python 3.6.5_1
+brew uninstall <package_name>
+```
+
+### Homebrew update 慢 设置代理
+
+设置代理 `alias setproxy="export http_proxy=http://127.0.0.1:1087;export https_proxy=http://127.0.0.1:1087;"`
+
+### 使用国内镜像
+
+[homebrew | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/homebrew/)
+
+[Homebrew更换国内镜像源_mb5fed4c003aebe的技术博客_51CTO博客](https://blog.51cto.com/u_15072811/3441116)
+
+Homebrew主要由四部分组成：
+
+| 名称             | 说明                       | 文件位置                    |
+| ---------------- | ------------------------ | --------------------------- |
+| brew             | Homebrew源代码仓库         | brew --repo                 |
+| homebrew-core    | Homebrew核心软件仓库       | brew --repo homebrew/core   |
+| homebrew-bottles | Homebrew预编译二进制软件包 | 设置 HOMEBREW_BOTTLE_DOMAIN |
+| homebrew-cask    | MacOS客户端应用            |                             |
+
+默认数据源
+
+* brew.git: `https://github.com/Homebrew/brew.git`
+* brew-core.git: `https://github.com/Homebrew/homebrew-core.git`
+
+其他数据源，替换域名使用
+
+* 阿里云数据源： `https://mirrors.aliyun.com`
+* 清华大学数据源：`https://mirrors.tuna.tsinghua.edu.cn`
+
+#### 查看当前使用的数据源
+
+```sh
+# 查看配置信息命令
+brew config
+
+# Git仓库直接查看
+cd "$(brew --repo)" && git remote -v
+cd "$(brew --repo homebrew/core)" && git remote -v
+```
+
+#### 更新数据源
+
+```sh
+# 如果用户设置了环境变量 HOMEBREW_BREW_GIT_REMOTE 和 HOMEBREW_CORE_GIT_REMOTE，则每次执行 brew update 时，brew 程序本身和 Core Tap (homebrew-core) 的远程将被自动设置。推荐用户将这两个环境变量设置加入 shell 的 profile 设置中
+
+export HOMEBREW_BREW_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git"
+export HOMEBREW_CORE_GIT_REMOTE="https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git"
+export HOMEBREW_BOTTLE_DOMAIN="https://mirrors.tuna.tsinghua.edu.cn/homebrew/homebrew-bottles"
+
+# # 手动更换 brew.git
+cd "$(brew --repo)" && git remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/homebrew/brew.git
+# 手动更换 core, cask, cask-fonts, cask-drivers, cask-versions, command-not-found
+for tap in core cask{,-fonts,-drivers,-versions} command-not-found; do
+    brew tap --custom-remote --force-auto-update "homebrew/${tap}" "https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-${tap}.git"
+done
+brew update # 执行更新
+
+brew config # 查看当前配置
+
+# 更换 homebrew-bottles
+echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew/homebrew-bottles' >> ~/.zshrc
+```
+
+#### 复原数据源
+
+```sh
+# 删除 shell 的 profile 设置中的环境变量 HOMEBREW_BREW_GIT_REMOTE, HOMEBREW_CORE_GIT_REMOTE 和 HOMEBREW_BOTTLE_DOMAIN
+brew update # 执行更新
+
+# brew 程序本身，Homebrew / Linuxbrew 相同
+unset HOMEBREW_BREW_GIT_REMOTE
+git -C "$(brew --repo)" remote set-url origin https://github.com/Homebrew/brew
+
+# 以下针对 macOS 系统上的 Homebrew
+unset HOMEBREW_CORE_GIT_REMOTE
+BREW_TAPS="$(BREW_TAPS="$(brew tap 2>/dev/null)"; echo -n "${BREW_TAPS//$'\n'/:}")"
+for tap in core cask{,-fonts,-drivers,-versions} command-not-found; do
+    if [[ ":${BREW_TAPS}:" == *":homebrew/${tap}:"* ]]; then  # 只复原已安装的 Tap
+        brew tap --custom-remote "homebrew/${tap}" "https://github.com/Homebrew/homebrew-${tap}"
+    fi
+done
+
+```
+
+## Issue
+
+### dyld: Library not loaded: /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
 
 `ls -al /usr/local/Cellar/openssl`
 
@@ -390,13 +407,15 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 `brew switch openssl 1.0.2s`
 
-## Network
+### dyld: Library not loaded: /usr/local/opt/readline/lib/libreadline.7.dylib
 
-[Mac 抓包 Recording a Packet Trace | Apple Developer Documentation](https://developer.apple.com/documentation/network/recording_a_packet_trace)
+1. find readline version: `brew info readline`
+2. switch to the version above: `brew switch readline 8.0.0`
 
 ## Apps
 
 * [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
+* NTFS 读写工具：Paragon NTFS / Tuxera NTFS（100+ 元）—— NTFS Tool（免费）
 * [ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
 * [rustdesk 远程桌面软件](https://rustdesk.com/zh/)
 * [Joplin is a free, open source note taking and to-do application](https://github.com/laurent22/joplin)
@@ -407,8 +426,10 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Fantastical Calendar](https://flexibits.com/fantastical)
 * [jd-GUI](http://jd.benow.ca)
 * [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
+* 窗口管理神器：Magnet（18 元）—— Rectangle（免费）
 * [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
 * [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac, Command+drag; start with open -a /Applications/Vanilla.app in a script ~/.script/mac_startup.sh
+* 菜单栏图标管理：Bartender（109 元）—— Hidden Bar（免费）
 * [Open Web Monitor](http://openwebmonitor.netqon.com/)
 * [kap: screen record to gif](https://getkap.co/)
 * Airtest - UI Auto test
@@ -418,3 +439,7 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * Maccy: Lightweight clipboard manager for macOS
 * [DevToys For mac - ObuchiYuki/DevToysMac](https://github.com/ObuchiYuki/DevToysMac)
 * [Open Source SQL Editor and Database Manager | Beekeeper Studio](https://www.beekeeperstudio.io/) sqllite
+* VeraCrypt, TrueCrypt-7.2-Mac-OS-X
+* 垃圾清理：CleanMyMac X（248 元/年）——腾讯柠檬清理（免费）
+* 全能截图工具：CleanShot X（200 元）/ Xnip（50 元）——iShot（免费）
+* 解压缩：Bandizip（118 元）/ 解忧（45 元）——eZip（免费）
