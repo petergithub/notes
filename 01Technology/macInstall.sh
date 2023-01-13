@@ -26,11 +26,9 @@ echo "export JAVA_HOME=$JAVA_8_HOME" >> ~/.zsh.mac
 git -C "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-core" remote set-url origin https://github.com/Homebrew/homebrew-core
 # 国内 Mac 安装 Homebrew 可能会跳的坑一览 https://zhuanlan.zhihu.com/p/383707713
 # tar: Error opening archive: Failed to open when upgrade using brew https://apple.stackexchange.com/questions/424091/tar-error-opening-archive-failed-to-open-when-upgrade-using-brew
-# 替换homebrew-bottles  ~/.zprofile：
+# 替换homebrew-bottles  ~/.zshrc：
 # Homebrew-bottles 镜像使用帮助 https://mirrors.tuna.tsinghua.edu.cn/help/homebrew-bottles/
-# echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.zprofile
-echo $HOMEBREW_BOTTLE_DOMAIN
-https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles/bottles
+# echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' >> ~/.zshrc
 export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 
 # echo $SHELL
@@ -136,7 +134,7 @@ PATH="/usr/local/gnubin:$PATH"
 # https://apple.stackexchange.com/questions/310443/how-can-i-filter-out-unwanted-search-results-in-alfred-ie-node-modules-folder
 # Go to Preferences -> Spotlight -> Privacy (TAB) Then add the folders you want to exclude to that list.
 ### Maccy: Lightweight clipboard manager for macOS
-brew install --cask xmind calibre virtualbox alfred karabiner-elements maccy postman
+brew install --cask xmind calibre virtualbox alfred karabiner-elements maccy postman broot
 
 # Visual Studio Code (vscode)
 ## Setting for IntelliSense https://code.visualstudio.com/docs/editor/intellisense
@@ -190,7 +188,8 @@ chmod 0644 /etc/synthetic.conf
 # [Go2Shell](http://zipzapmac.com/Go2Shell): Opens a terminal window to the current directory in Finder: `open -a iTerm`
 # [Mos](https://mos.caldis.me/) set scroll direction independently for your mouse
 # [Fantastical Calendar](https://flexibits.com/fantastical)
-# [jd-GUI](http://jd.benow.ca)
+# [jd-GUI](http://jd.benow.ca) 
+#    export JAVA_HOME=$(/usr/libexec/java_home -v1.8.0_301) in /Applications/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh  
 # [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
 # [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
 # [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac, Command+drag; start with open -a /Applications/Vanilla.app in a script ~/.script/mac_startup.sh
@@ -202,6 +201,7 @@ chmod 0644 /etc/synthetic.conf
 # [Bagel is a little native iOS network debugger](https://github.com/yagiz/Bagel)
 # NewFileMenuFree
 # Maccy: Lightweight clipboard manager for macOS
+# [Broot](https://dystroy.org/broot/) Get an overview of a directory
 
 ## Config
 ### Tap to click
@@ -249,6 +249,9 @@ chmod 0644 /etc/synthetic.conf
     # Write to Windows NTFS USB Disk Drives on macOS Mojave and Sierra with FUSE for macOS
     # https://coolestguidesontheplanet.com/how-to-write-to-windows-ntfs-external-disk-drives-on-macos-mojave-and-sierra/
     # https://www.howtogeek.com/236055/how-to-write-to-ntfs-drives-on-a-mac/
+
+# Try NTFS Tool https://github.com/ntfstool/ntfstool
+
 1. Disable SIP(System Integrity Protection)
 1.1 Reboot Mac into Recovery Mode by rebooting and holding down Command+R
 1.2 Utilities -> Terminal
@@ -266,10 +269,10 @@ brew install gromgit/fuse/ntfs-3g-mac
 4. Update /sbin/mount_ntfs
 # ll /sbin/mount_ntfs
 # lrwxr-xr-x 1 root 65 Jan  1  2020 /sbin/mount_ntfs -> /System/Library/Filesystems/ntfs.fs/Contents/Resources/mount_ntfs
-# Find your root mount's device - run mount and chop off the last s, e.g. if your root is /dev/disk1s5s1, you'll mount /dev/disk1s5
+# Find your root mount's device - run mount and chop off the last s, e.g. if your root is /dev/disk2s5s1, you'll mount /dev/disk2s5
 #  mount
-# /dev/disk1s5s1 on / (apfs, sealed, local, read-only, journaled)
-DISK_PATH=/dev/disk1s5
+# /dev/disk2s5s1 on / (apfs, sealed, local, read-only, journaled)
+DISK_PATH=/dev/disk2s5
 MOUNT_PATH=~/mount
 mkdir $MOUNT_PATH
 sudo mount -o nobrowse -t apfs $DISK_PATH $MOUNT_PATH
@@ -281,32 +284,3 @@ sudo bless --folder $MOUNT_PATH/System/Library/CoreServices --bootefi --create-s
 
 5. Reboot and re-enable SIP with command: csrutil enable
 6. Check status: csrutil status
-
-## brew command
-# brew install default location: /usr/local/Cellar
-# brew search <package_name>      # 搜索
-# brew install <package_name>     # 安装一个软件
-# brew update                     # 从服务器上拉取，并更新本地 brew 的包目录
-# brew upgrade <package_name>     # 更新软件
-# brew outdated                   # 查看你的软件中哪些有新版本可用
-# brew cleanup                    # 清理老版本。使用 `-n` 参数，不会真正执行，只是打印出真正运行时会做什么。
-# brew list --versions            # 查看你安装过的包列表（包括版本号）
-# brew link <package_name>        # 将软件的当前最新版本软链到`/usr/local`目录下
-# brew unlink <package_name>      # 将软件在`/usr/local`目录下的软链接删除。
-# brew info                       # 显示软件的信息
-# brew deps                       # 显示包依赖
-# brew services start <package_name>	# 设置自启动
-# check software info from brew: brew info mysql
-# install with brew: brew install tig autojump
-# search with brew cask: brew cask search chrome
-# install with brew cask: brew install --cask google-chrome
-# startup with brew: brew services start nginx
-# brew switch another version: brew switch python 3.6.5_1
-# brew uninstall <package_name>
-
-## issues
-
-### dyld: Library not loaded: /usr/local/opt/readline/lib/libreadline.7.dylib
-
-1. find readline version: `brew info readline`
-2. switch to the version above: `brew switch readline 8.0.0`

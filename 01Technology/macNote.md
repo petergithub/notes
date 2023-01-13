@@ -123,6 +123,18 @@ To change this permanently go to System Preferences > Security & Privacy. On the
 
 block selection: `Command+Option+Left Click`
 
+iTerm 在远程的服务器上右键 scp 下载：
+
+1. 在远程的服务器上安装安装 Shell Integration
+2. 在启动脚本中添加 export hostname
+
+    ```sh
+    export iterm2_hostname=YOUR_REMOTE_HOSTNAME_IN_LOCAL_SSH_CONFIG
+    test -e "${HOME}/.iterm2_shell_integration.`basename $SHELL`" && source "${HOME}/.iterm2_shell_integration.`basename $SHELL`"
+    ```
+
+3. 重新登陆，或者手动 source 文件 `iterm2_shell_integration`，当命令行最左边出现小的蓝色三角形的时候就是成功了，这时候 ls 到文件就可以右键下载了
+
 #### Settings
 
 Display: `Preference -> Profiles -> Colors -> Foreground: black, Background: white, Bold: gray, Minimum contrast: middle`
@@ -267,7 +279,7 @@ edit policy file
 3. Import policy file for account username: `pwpolicy setaccountpolicies -u username ~/Desktop/file.plist`
 4. chang password for account: `sudo passwd username`
 
-`^$|.{4,}+` for a 4 character length password.
+`^$|.{3,}+` for a 4 character length password.
 
 ### [How to Write NTFS Drives on macOS Monterey](https://techsviewer.com/how-to-write-ntfs-drives-on-macos-monterey/)
 
