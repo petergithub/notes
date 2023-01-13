@@ -71,9 +71,7 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preloa
 
 浏览器在获取该响应头后，在 max-age 的时间内，如果遇到 HTTP 连接，就会通过 307 跳转強制使用 HTTPS 进行连接，并忽略其它的跳转设置（如 301 重定向跳转）
 
-## OpenSSL
-
-### [Create CSR using OpenSSL Without Prompt (Non-Interactive)](https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/ )
+## PEM, DER, CRT, and CER
 
 CSR (Certificate Signing Request)
 
@@ -84,7 +82,53 @@ cer 格式 等价于 PEM 格式，使用 vi 打开 copy 到的内容是一样的
 * cer 格式
 * PEM 格式
 
-#### Create CSR and Key Without Prompt using OpenSSL
+filename extensions, such as .crt, .cer, .pem, or .der generally map to two major encoding schemes for X.509 certificates and keys: PEM (Base64 ASCII), and DER (binary).
+
+[PEM, DER, CRT, and CER: X.509 Encodings and Conversions - SSL.com](https://www.ssl.com/guide/pem-der-crt-and-cer-x-509-encodings-and-conversions/#)
+
+### PEM (originally “Privacy Enhanced Mail”)
+
+PEM (originally “Privacy Enhanced Mail”) is the most common format for X.509 certificates, CSRs, and cryptographic keys. A PEM file is a text file containing one or more items in Base64 ASCII encoding, each with plain-text headers and footers (e.g. `-----BEGIN CERTIFICATE-----` and -----END CERTIFICATE-----). A single PEM file could contain an end-entity certificate, a private key, or multiple certificates forming a complete chain of trust.
+
+PEM files are usually seen with the extensions `.crt`, `.pem`, `.cer`, and `.key` (for private keys), but you may also see them with different extensions. For example, the SSL.com CA bundle file available from the download table in a certificate order has the extension .ca-bundle.
+
+View contents of PEM certificate file `openssl x509 -in CERTIFICATE.pem -text -noout`
+
+### PKCS#7 (also known as P7B)
+
+`PKCS#7` (also known as P7B) is a container format for digital certificates that is most often found in Windows and Java server contexts, and usually has the extension `.p7b`. PKCS#7 files are not used to store private keys.
+
+Convert PEM certificate with chain of trust to PKCS#7 `openssl crl2pkcs7 -nocrl -certfile CERTIFICATE.pem -certfile MORE.pem -out CERTIFICATE.p7b`
+
+### PKCS#12 (also known as PKCS12 or PFX)
+
+`PKCS#12` (also known as PKCS12 or PFX) is a common binary format for storing a certificate chain and private key in a single, encryptable file, and usually have the filename extensions `.p12` or `.pfx`.
+
+Convert PEM certificate with chain of trust and private key to PKCS#12 `openssl pkcs12 -export -out CERTIFICATE.pfx -inkey PRIVATEKEY.key -in CERTIFICATE.crt -certfile MORE.crt`
+
+Extract Only Private Key `openssl pkcs12 -info -in INFILE.p12 -nodes -nocerts`
+SavePrivate Keys to Files `openssl pkcs12 -in INFILE.p12 -out OUTFILE.key -nodes -nocerts`
+
+Extract Only Certificates `openssl pkcs12 -info -in INFILE.p12 -nokeys`
+Save Certificates to Files `openssl pkcs12 -in INFILE.p12 -out OUTFILE.crt -nokeys`
+
+### DER (Distinguished Encoding Rules)
+
+DER (Distinguished Encoding Rules) is a binary encoding for X.509 certificates and private keys. Unlike PEM, DER-encoded files do not contain plain text statements such as `-----BEGIN CERTIFICATE-----`. DER files are most commonly seen in Java contexts.
+
+Convert DER-encoded certificate to PEM `openssl x509 -inform der -in DER_CERTIFICATE.der -out PEM_CERTIFICATE.pem`
+Convert PEM certificate to DER `openssl x509 -outform der -in CERTIFICATE.pem -out CERTIFICATE.der`
+
+View contents of DER-encoded certificate file `openssl x509 -inform der -in CERTIFICATE.der -text -noout`
+Convert DER-encoded certificate to PEM `openssl x509 -inform der -in CERTIFICATE.der -out CERTIFICATE.pem`
+
+To convert a DER certificate to PKCS#12 it should first be converted to PEM, then combined with any additional certificates and/or private key.
+
+## OpenSSL
+
+### [Create CSR using OpenSSL Without Prompt (Non-Interactive)](https://www.shellhacks.com/create-csr-openssl-without-prompt-non-interactive/ )
+
+Create CSR and Key Without Prompt using OpenSSL
 
 `openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`
 
@@ -92,14 +136,14 @@ cer 格式 等价于 PEM 格式，使用 vi 打开 copy 到的内容是一样的
 
 `openssl req -new -key example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Global Security/OU=IT Department/CN=example.com"`
 
-#### Convert private key version
+### Convert private key version
 
 Newer versions of OpenSSL say `BEGIN PRIVATE KEY` because they contain the private key + an OID that identifies the key type (this is known as PKCS8 format). Old versions of OpenSSL say `BEGIN RSA PRIVATE KEY`
 To get the old-style key (known as either PKCS1 or traditional OpenSSL format) you can do this:
 `openssl rsa -in server.key -out server_new.key`
 Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocrypt -in privkey.pem`
 
-#### Checking Using OpenSSL
+### Checking Using OpenSSL
 
 [The Most Common OpenSSL Commands](https://www.sslshopper.com/article-most-common-openssl-commands.html)
 
@@ -115,11 +159,11 @@ Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocr
 * Get expired date `openssl x509 -noout -dates -in nginx/05/ssl/example.com.crt`
 * Get expired date `openssl pkcs12 -in certificate.p12 -nodes | openssl x509 -noout -enddate`
 
-openssl s_client -connect -showcerts example.com:443 -servername example.com
+openssl s_client -connect example.com:443 -showcerts -servername example.com
 openssl s_client -connect example.com:443 -servername example.com 2>/dev/null
 openssl s_client -connect -debug example.com:443 -servername example.com
 
-#### 证书文件与私钥不匹配
+### 证书文件与私钥不匹配
 
 比较方式
 
@@ -130,7 +174,7 @@ openssl x509 -noout -modulus -in certificate.crt|openssl md5
 openssl rsa -noout -modulus -in  private.key|openssl md5
 ```
 
-#### Options
+### openssl Options
 
 openssl req certificate request generating utility
 -nodes if a private key is created it will not be encrypted
