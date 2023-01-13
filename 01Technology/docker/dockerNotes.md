@@ -22,15 +22,15 @@ connect from a container to a service on the host: connect to the special DNS na
 `docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container
 `docker run = docker create + docker start`
 
-- `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
-- `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
-- `-i` 让容器的标准输入保持打开
-- `-p` [host:]port:dockerPort
-- `-d` 后台运行
-- `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
-- `--rm` 在容器终止运行后自动删除容器文件
-- `-v, --volume "/path/to/host/machine:/path/to/container`
-- `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
+* `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
+* `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
+* `-i` 让容器的标准输入保持打开
+* `-p` [host:]port:dockerPort
+* `-d` 后台运行
+* `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
+* `--rm` 在容器终止运行后自动删除容器文件
+* `-v, --volume "/path/to/host/machine:/path/to/container`
+* `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
 
 `docker logs -f containerID`
 
@@ -46,9 +46,9 @@ connect from a container to a service on the host: connect to the special DNS na
 
 `docker ps` Show running containers
 
-- `-a, --all` Show all containers (default shows just running)
-- `-n, --last int` Show n last created containers (includes all states) (default -1)
-- `-l, --latest` Show the latest created container (includes all states)
+* `-a, --all` Show all containers (default shows just running)
+* `-n, --last int` Show n last created containers (includes all states) (default -1)
+* `-l, --latest` Show the latest created container (includes all states)
 
 `docker system df` 磁盘占用
 
@@ -131,6 +131,12 @@ https://mirror.ccs.tencentyun.com
 [Troubleshooting Container Networking](https://success.docker.com/article/troubleshooting-container-networking)
 `docker run -it --rm --network container:issue-container-name nicolaka/netshoot`
 
+## Disk clean
+
+[Prune unused Docker objects | Docker Documentation](https://docs.docker.com/config/pruning/)
+
+`docker system prune` is a shortcut that prunes images, containers, and networks. Volumes are not pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
+
 ## Sample
 
 start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
@@ -165,7 +171,11 @@ CMD ["/usr/sbin/init"]
 * WORKDIR /data：指定接下来的工作路径为/data。
 * RUN yum install -y iproute：在`/data`目录下，运行`yum`命令安装依赖。注意，安装后所有的依赖，都将打包进入 image 文件, 可以包含多个RUN命令
 * EXPOSE 8080：将容器 `8080` 端口暴露出来， 允许外部连接这个端口。
-* CMD 命令在容器启动后执行, 只能有一个
+* CMD 命令在容器启动后执行, 只能有一个 有两种格式
+  * shell 格式：`CMD <命令>`。实际的命令会被包装为 `sh -c` 的参数的形式进行执行，先运行一个 shell 进程。
+  * exec 格式：`CMD ["可执行文件", "参数1", "参数2"...]`。推荐使用 exec 格式，这类格式在解析时会被解析为 JSON 数组，因此一定要使用双引号 "，而不要使用单引号。
+* 当指定了 ENTRYPOINT 后，CMD 的含义就发生了改变，不再是直接的运行其命令，而是将 CMD 的内容作为参数传给 ENTRYPOINT 指令，换句话说实际执行时，将变为：
+`<ENTRYPOINT> "<CMD>"`
 
 创建 image 文件 `docker image build -t imageName /path/to/DockerfileFolder`
 `docker run -p 8080:8080 -it imageName /bin/bash`
