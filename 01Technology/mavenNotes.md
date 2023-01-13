@@ -7,7 +7,7 @@
 `-U` (aka `--update-snapshots`): force maven update local repository
 `mvn dependency:list -e -U -X`
 `mvn eclipse:eclipse -DdownloadSources`
-`-Dmaven.test.skip`
+`-Dmaven.test.skip` = `-DskipTests`
 `mvn test -Dtest=TestPaypal -Plocal`
 
 ``` bash

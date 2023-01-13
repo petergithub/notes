@@ -495,3 +495,14 @@ location /api/ {
     proxy_pass http://app-h5.dev.picooc.cn/;
 }
 ```
+
+## 安全配置
+
+隐藏Nginx后端服务指定Header的状态
+
+```sh
+# 1、打开conf/nginx.conf配置文件（或主配置文件中的inlude文件）；
+# 2、在http下配置proxy_hide_header项； 增加或修改为
+proxy_hide_header X-Powered-By;
+proxy_hide_header Server;
+```

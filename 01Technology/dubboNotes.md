@@ -5,13 +5,13 @@
 ## Recent
 Dubbo 网络传输协议: netty, mina, grizzly.
 
-	<dubbo:protocol server="netty"/> netty.jar 
+	<dubbo:protocol server="netty"/> netty.jar
     如果<dubbo:protocol server="mina"/>或<dubbo:protocol server="grizzly"/>，则换成mina.jar或grizzly.jar。
     如果<protocol name="rmi"/>，则不需要。
 
 Dubbo协议 	Stable 	采用NIO复用单一长连接，并使用线程池并发处理请求，减少握手和加大并发效率，性能较好（推荐使用） 	在大文件传输时，单一连接会成为瓶颈 	可用于生产环境 	Alibaba
 Rmi协议 	Stable 	可与原生RMI互操作，基于TCP协议 	偶尔会连接失败，需重建Stub 	可用于生产环境 	Alibaba
-Hessian协议 	Stable 	可与原生Hessian互操作，基于HTTP协议 	需hessian.jar支持，http短连接的开销大 	可用于生产环境 	 
+Hessian协议 	Stable 	可与原生Hessian互操作，基于HTTP协议 	需hessian.jar支持，http短连接的开销大 	可用于生产环境
 
 ## Question
 DefaultFuture
@@ -19,7 +19,7 @@ Dubbo管理控制台 except dubbo-admin
 
 1) hessian serialization bug?:  private entity id is missing if parent class id existing
 
-TCP粘包英文 tcp stick package/unpacking 
+TCP粘包英文 tcp stick package/unpacking
 Netty FixedLengthFrameDecoder
 Fragmentation should be transparent to a TCP application. Keep in mind that TCP is a stream protocol: you get a stream of data, not packets! If you are building your application based on the idea of complete data packets then you will have problems unless you add an abstraction layer to assemble whole packets from the stream and then pass the packets up to the application.
 A the "application layer" a TCP packet (well, segment really; TCP at its own layer doesn't know from packets) is never fragmented, since it doesn't exist. The application layer is where you see the data as a stream of bytes, delivered reliably and in order.
@@ -29,8 +29,8 @@ A the "application layer" a TCP packet (well, segment really; TCP at its own lay
 Warn:
 `Failed to save registry store file, cause: Can not lock the registry cache file /home/work/.dubbo/dubbo-registry-zookeeper1.cache, ignore and retry later, maybe multi java process use the file, please config: dubbo.registry.file=xxx.properties`
 
-###
-分布式架构下系统间交互的5种通信模式
+### 分布式架构下系统间交互的5种通信模式
+
 1. request/response模式（同步模式）：客户端发起请求一直阻塞到服务端返回请求为止。
 2. Callback（异步模式）：客户端发送一个RPC请求给服务器，服务端处理后再发送一个消息给消息发送端提供的callback端点，此类情况非常合适以下场景：A组件发送RPC请求给B，B处理完成后，需要通知A组件做后续处理。
 3. Future模式：客户端发送完请求后，继续做自己的事情，返回一个包含消息结果的Future对象。客户端需要使用返回结果时，使用Future对象的.get(),如果此时没有结果返回的话，会一直阻塞到有结果返回为止。
@@ -112,15 +112,15 @@ RMI协议的Invoker转为Exporter发生在RmiProtocol类的export方法，
 
 #### 消费者消费一个服务的详细过程
 ![消费者消费一个服务的详细过程](http://dubbo.io/dubbo_rpc_refer.jpg-version=1&modificationDate=1335250516000.jpg )
-上图是服务消费的主过程：  
-首先ReferenceConfig类的init方法调用Protocol的refer方法生成Invoker实例(如上图中的红色部分)，这是服务消费的关键。接下来把Invoker转换为客户端需要的接口(如：HelloWorld)。  
-关于每种协议如RMI/Dubbo/Web service等它们在调用refer方法生成Invoker实例的细节和上一章节所描述的类似。  
+上图是服务消费的主过程：
+首先ReferenceConfig类的init方法调用Protocol的refer方法生成Invoker实例(如上图中的红色部分)，这是服务消费的关键。接下来把Invoker转换为客户端需要的接口(如：HelloWorld)。
+关于每种协议如RMI/Dubbo/Web service等它们在调用refer方法生成Invoker实例的细节和上一章节所描述的类似。
 
 ### dubbo 提供方变化后如何通知调用方
-注册中心为Zookeeper时, 消费者方有一个线程ZkEventThread去监听Zookeeper的变化, 如果状态有变化, 就通知消费者  
+注册中心为Zookeeper时, 消费者方有一个线程ZkEventThread去监听Zookeeper的变化, 如果状态有变化, 就通知消费者
 
 ```
-	
+
 	Daemon Thread [ZkClient-EventThread-15-127.0.0.1:2181] (Suspended (breakpoint at line 410 in AbstractRegistry))
 		ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410
 		ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273
@@ -167,7 +167,7 @@ com.alibaba.dubbo.remoting.Client
 如果采用常规的hessian服务，服务提供者很容易就被压跨，
 通过单一连接，保证单一消费者不会压死提供者，
 长连接，减少连接握手验证等，
-并使用异步IO，复用线程池，防止C10K问题。 
+并使用异步IO，复用线程池，防止C10K问题。
 
 dubbo 通信机制 分布式架构下系统间交互的5种通信模式
 1. request/response模式（同步模式）：客户端发起请求一直阻塞到服务端返回请求为止。
@@ -183,7 +183,7 @@ dubbo how to handle this?单一
 维护任何一个长连接都需要心跳机制
 
 Dubbo的性能如何？compare with http connection
-采用NIO复用单一长连接，并使用线程池并发处理请求，减少握手和加大并发效率，性能较好（推荐使用） 
+采用NIO复用单一长连接，并使用线程池并发处理请求，减少握手和加大并发效率，性能较好（推荐使用）
 Dubbo通过长连接减少握手，通过NIO及线程池在单连接上并发拼包处理消息，通过二进制流压缩数据，比常规HTTP等短连接协议更快。在阿里巴巴内部，每天支撑2000多个服务，30多亿访问量，最大单机支撑每天近1亿访问量
 
 #### 序列化
@@ -191,7 +191,7 @@ Dubbo通过长连接减少握手，通过NIO及线程池在单连接上并发拼
 com.alibaba.dubbo.common.serialize.Serialization
 com.alibaba.dubbo.common.serialize.ObjectInput
 com.alibaba.dubbo.common.serialize.ObjectOutput
-Hessian Serialization 	Stable 	性能较好，多语言支持（推荐使用） 	Hessian的各版本兼容性不好，可能和应用使用的Hessian冲突，Dubbo内嵌了hessian3.2.1的源码 
+Hessian Serialization 	Stable 	性能较好，多语言支持（推荐使用） 	Hessian的各版本兼容性不好，可能和应用使用的Hessian冲突，Dubbo内嵌了hessian3.2.1的源码
 
 DubboCodec类中序列化工作的入口
 com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.decodeBody(Channel, InputStream, byte[])
@@ -202,17 +202,17 @@ com.alibaba.dubbo.rpc.protocol.dubbo.DubboCodec.deserialize(Serialization, URL, 
 ## Code Logic
 client(url: dubbo://52.0.147.224:20893/com.tcl.settlement.api.service.ISettleService?anyhost=true&application=operation-web&check=false&codec=dubbo&dubbo=2.5.3&heartbeat=60000&interface=com.tcl.settlement.api.service.ISettleService&loadbalance=random&methods=getSettleStatements,getSettleCards&owner=yangchen&payload=209715200&pid=2203&retries=2&revision=1.0.0-20151118.094911-5&side=consumer&timeout=100000&timestamp=1449214275206&version=1.0.0)
 ### Miscellaneous(Misc)
-(1)com.alibaba.dubbo.container.Main 
-(2)java.util.ServiceLoader 
-(3)com.alibaba.dubbo.common.extension.ExtensionLoader 
-(4)com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper 
-(5)com.alibaba.dubbo.demo.consumer.DemoConsumer 
-(6)com.alibaba.dubbo.demo.provider.DemoProvider 
-(7)com.alibaba.dubbo.container.spring.SpringContainer 
-(8)com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler 
-(9)com.alibaba.dubbo.config.spring.schema.DubboBeanDefinitionParser 
-(A)com.alibaba.dubbo.config.spring.ServiceBean 
-(B)com.alibaba.dubbo.config.spring.ReferenceBean 
+(1)com.alibaba.dubbo.container.Main
+(2)java.util.ServiceLoader
+(3)com.alibaba.dubbo.common.extension.ExtensionLoader
+(4)com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper
+(5)com.alibaba.dubbo.demo.consumer.DemoConsumer
+(6)com.alibaba.dubbo.demo.provider.DemoProvider
+(7)com.alibaba.dubbo.container.spring.SpringContainer
+(8)com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
+(9)com.alibaba.dubbo.config.spring.schema.DubboBeanDefinitionParser
+(A)com.alibaba.dubbo.config.spring.ServiceBean
+(B)com.alibaba.dubbo.config.spring.ReferenceBean
  (1)读代码第三招(debug)和一个心法(思路) (2)钩子 ShutdownHook，kill 和man的使用 (3)守护线程 Thread.setDaemon(true) (4)同步块范围对象控制，CountDownLatch (5)SPI基本思想，DCL，动态编译，包装调用链 (6)Dubbo RPC调用的实际动作 (7)jenv(jevn.io)管理java环境 (8)Spring的一点handler和listener知识
 
 ### Dubbo project
@@ -272,13 +272,13 @@ serialize层放在common模块中，以便更大程度复用。
 #### 发送请求：
 ```
 HeaderExchangeClient --> request -->
-   HeaderExchangeChannel-->request--> 
+   HeaderExchangeChannel-->request-->
 -->req=new Request()
 -->DefaultFuture future = new DefaultFuture(channel, req, timeout);
 -->NettyClient->send(req)
--->NettyChannel-->send(req,boolean sent) 
+-->NettyChannel-->send(req,boolean sent)
 -->NettyHander-->writeRequested
----> encode 
+---> encode
 --->Netty->channel+writebuffer,writetask （放到IO线程的任务队列）
 --->NioWorker -->processWriteTaskQueue
 --->write0 （在IO线程里发送数据）
@@ -297,7 +297,7 @@ NettyHander --> messageReceived
 --->DefaultChannelHandler --->received
 --> （O线程解码完后，交给线程池处理。）
 executor.execute(new ChannelEventRunnable(channel, handler ,ChannelState.RECEIVED, message));
--->ChannelEventRunnable -->run 
+-->ChannelEventRunnable -->run
 -->HeaderExchangeHandler.received
 ----->HeaderExchangeHandler--》handleResponse
 --->DefaultFuture.received(channel, response);
@@ -310,123 +310,123 @@ dubbo处理handler所使用的线程并非来自netty提供的I/O Work线程，�
 
 #### Consumer send message
 ```
-Thread [main] (Suspended (breakpoint at line 233 in DefaultFuture))	
-	DefaultFuture.doSent() line: 233	
-	DefaultFuture.sent(Channel, Request) line: 228	
-	HeaderExchangeHandler.sent(Channel, Object) line: 137	
-	DecodeHandler(AbstractChannelHandlerDelegate).sent(Channel, Object) line: 36	
-	AllChannelHandler(WrappedChannelHandler).sent(Channel, Object) line: 78	
-	HeartbeatHandler.sent(Channel, Object) line: 58	
-	MultiMessageHandler(AbstractChannelHandlerDelegate).sent(Channel, Object) line: 36	
-	NettyClient(AbstractPeer).sent(Channel, Object) line: 116	
-	NettyHandler.writeRequested(ChannelHandlerContext, MessageEvent) line: 102	
-	NettyHandler(SimpleChannelHandler).handleDownstream(ChannelHandlerContext, ChannelEvent) line: 266	
-	DefaultChannelPipeline.sendDownstream(DefaultChannelPipeline$DefaultChannelHandlerContext, ChannelEvent) line: 591	
-	DefaultChannelPipeline.sendDownstream(ChannelEvent) line: 582	
-	Channels.write(Channel, Object, SocketAddress) line: 611	
-	Channels.write(Channel, Object) line: 578	
-	NioClientSocketChannel(AbstractChannel).write(Object) line: 251	
-	NettyChannel.send(Object, boolean) line: 98	
-	NettyClient(AbstractClient).send(Object, boolean) line: 270	
-	NettyClient(AbstractPeer).send(Object) line: 51	
-	HeaderExchangeChannel.request(Object, int) line: 112	
-	HeaderExchangeClient.request(Object, int) line: 91	
-	ReferenceCountExchangeClient.request(Object, int) line: 81	
-	DubboInvoker<T>.doInvoke(Invocation) line: 96	
-	DubboInvoker<T>(AbstractInvoker<T>).invoke(Invocation) line: 144	
-	ListenerInvokerWrapper<T>.invoke(Invocation) line: 74	
-	MonitorFilter.invoke(Invoker<?>, Invocation) line: 75	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	FutureFilter.invoke(Invoker<?>, Invocation) line: 53	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	ConsumerContextFilter.invoke(Invoker<?>, Invocation) line: 48	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	RegistryDirectory$InvokerDelegete<T>(InvokerWrapper<T>).invoke(Invocation) line: 53	
-	FailoverClusterInvoker<T>.doInvoke(Invocation, List<Invoker<T>>, LoadBalance) line: 77	
-	FailoverClusterInvoker<T>(AbstractClusterInvoker<T>).invoke(Invocation) line: 227	
-	MockClusterInvoker<T>.invoke(Invocation) line: 72	
-	InvokerInvocationHandler.invoke(Object, Method, Object[]) line: 52	
-	proxy0.sayHello(String) line: not available	
-	Consumer.main(String[]) line: 40	
+Thread [main] (Suspended (breakpoint at line 233 in DefaultFuture))
+	DefaultFuture.doSent() line: 233
+	DefaultFuture.sent(Channel, Request) line: 228
+	HeaderExchangeHandler.sent(Channel, Object) line: 137
+	DecodeHandler(AbstractChannelHandlerDelegate).sent(Channel, Object) line: 36
+	AllChannelHandler(WrappedChannelHandler).sent(Channel, Object) line: 78
+	HeartbeatHandler.sent(Channel, Object) line: 58
+	MultiMessageHandler(AbstractChannelHandlerDelegate).sent(Channel, Object) line: 36
+	NettyClient(AbstractPeer).sent(Channel, Object) line: 116
+	NettyHandler.writeRequested(ChannelHandlerContext, MessageEvent) line: 102
+	NettyHandler(SimpleChannelHandler).handleDownstream(ChannelHandlerContext, ChannelEvent) line: 266
+	DefaultChannelPipeline.sendDownstream(DefaultChannelPipeline$DefaultChannelHandlerContext, ChannelEvent) line: 591
+	DefaultChannelPipeline.sendDownstream(ChannelEvent) line: 582
+	Channels.write(Channel, Object, SocketAddress) line: 611
+	Channels.write(Channel, Object) line: 578
+	NioClientSocketChannel(AbstractChannel).write(Object) line: 251
+	NettyChannel.send(Object, boolean) line: 98
+	NettyClient(AbstractClient).send(Object, boolean) line: 270
+	NettyClient(AbstractPeer).send(Object) line: 51
+	HeaderExchangeChannel.request(Object, int) line: 112
+	HeaderExchangeClient.request(Object, int) line: 91
+	ReferenceCountExchangeClient.request(Object, int) line: 81
+	DubboInvoker<T>.doInvoke(Invocation) line: 96
+	DubboInvoker<T>(AbstractInvoker<T>).invoke(Invocation) line: 144
+	ListenerInvokerWrapper<T>.invoke(Invocation) line: 74
+	MonitorFilter.invoke(Invoker<?>, Invocation) line: 75
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	FutureFilter.invoke(Invoker<?>, Invocation) line: 53
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	ConsumerContextFilter.invoke(Invoker<?>, Invocation) line: 48
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	RegistryDirectory$InvokerDelegete<T>(InvokerWrapper<T>).invoke(Invocation) line: 53
+	FailoverClusterInvoker<T>.doInvoke(Invocation, List<Invoker<T>>, LoadBalance) line: 77
+	FailoverClusterInvoker<T>(AbstractClusterInvoker<T>).invoke(Invocation) line: 227
+	MockClusterInvoker<T>.invoke(Invocation) line: 72
+	InvokerInvocationHandler.invoke(Object, Method, Object[]) line: 52
+	proxy0.sayHello(String) line: not available
+	Consumer.main(String[]) line: 40
 ```
 
 #### Consumer await()
 `done.await(timeout, TimeUnit.MILLISECONDS)`
 ```
-Thread [main] (Suspended (breakpoint at line 96 in DefaultFuture))	
-	DefaultFuture.get(int) line: 96	
-	DefaultFuture.get() line: 84	
-	DubboInvoker<T>.doInvoke(Invocation) line: 96	
-	DubboInvoker<T>(AbstractInvoker<T>).invoke(Invocation) line: 144	
-	ListenerInvokerWrapper<T>.invoke(Invocation) line: 74	
-	MonitorFilter.invoke(Invoker<?>, Invocation) line: 75	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	FutureFilter.invoke(Invoker<?>, Invocation) line: 53	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	ConsumerContextFilter.invoke(Invoker<?>, Invocation) line: 48	
-	ProtocolFilterWrapper$1.invoke(Invocation) line: 91	
-	RegistryDirectory$InvokerDelegete<T>(InvokerWrapper<T>).invoke(Invocation) line: 53	
-	FailoverClusterInvoker<T>.doInvoke(Invocation, List<Invoker<T>>, LoadBalance) line: 77	
-	FailoverClusterInvoker<T>(AbstractClusterInvoker<T>).invoke(Invocation) line: 227	
-	MockClusterInvoker<T>.invoke(Invocation) line: 72	
-	InvokerInvocationHandler.invoke(Object, Method, Object[]) line: 52	
-	proxy0.sayHello(String) line: not available	
-	Consumer.main(String[]) line: 41	
+Thread [main] (Suspended (breakpoint at line 96 in DefaultFuture))
+	DefaultFuture.get(int) line: 96
+	DefaultFuture.get() line: 84
+	DubboInvoker<T>.doInvoke(Invocation) line: 96
+	DubboInvoker<T>(AbstractInvoker<T>).invoke(Invocation) line: 144
+	ListenerInvokerWrapper<T>.invoke(Invocation) line: 74
+	MonitorFilter.invoke(Invoker<?>, Invocation) line: 75
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	FutureFilter.invoke(Invoker<?>, Invocation) line: 53
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	ConsumerContextFilter.invoke(Invoker<?>, Invocation) line: 48
+	ProtocolFilterWrapper$1.invoke(Invocation) line: 91
+	RegistryDirectory$InvokerDelegete<T>(InvokerWrapper<T>).invoke(Invocation) line: 53
+	FailoverClusterInvoker<T>.doInvoke(Invocation, List<Invoker<T>>, LoadBalance) line: 77
+	FailoverClusterInvoker<T>(AbstractClusterInvoker<T>).invoke(Invocation) line: 227
+	MockClusterInvoker<T>.invoke(Invocation) line: 72
+	InvokerInvocationHandler.invoke(Object, Method, Object[]) line: 52
+	proxy0.sayHello(String) line: not available
+	Consumer.main(String[]) line: 41
 ```
 
 #### Consumer messageReceived
 ```
-Daemon Thread [New I/O client worker #1-1] (Suspended (breakpoint at line 116 in DubboCodec))	
-	DubboCodec.decodeBody(Channel, InputStream, byte[]) line: 116	
-	DubboCodec(ExchangeCodec).decode(Channel, ChannelBuffer, int, byte[]) line: 126	
-	DubboCodec(ExchangeCodec).decode(Channel, ChannelBuffer) line: 87	
-	DubboCountCodec.decode(Channel, ChannelBuffer) line: 46	
-	NettyCodecAdapter$InternalDecoder.messageReceived(ChannelHandlerContext, MessageEvent) line: 134	
-	NettyCodecAdapter$InternalDecoder(SimpleChannelUpstreamHandler).handleUpstream(ChannelHandlerContext, ChannelEvent) line: 80	
-	DefaultChannelPipeline.sendUpstream(DefaultChannelPipeline$DefaultChannelHandlerContext, ChannelEvent) line: 564	
-	DefaultChannelPipeline.sendUpstream(ChannelEvent) line: 559	
-	Channels.fireMessageReceived(Channel, Object, SocketAddress) line: 274	
-	Channels.fireMessageReceived(Channel, Object) line: 261	
-	NioWorker.read(SelectionKey) line: 349	
-	NioWorker.processSelectedKeys(Set<SelectionKey>) line: 280	
-	NioWorker.run() line: 200	
-	ThreadRenamingRunnable.run() line: 108	
-	DeadLockProofWorker$1.run() line: 44	
-	ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142	
-	ThreadPoolExecutor$Worker.run() line: 617	
-	Thread.run() line: 745	
-	
+Daemon Thread [New I/O client worker #1-1] (Suspended (breakpoint at line 116 in DubboCodec))
+	DubboCodec.decodeBody(Channel, InputStream, byte[]) line: 116
+	DubboCodec(ExchangeCodec).decode(Channel, ChannelBuffer, int, byte[]) line: 126
+	DubboCodec(ExchangeCodec).decode(Channel, ChannelBuffer) line: 87
+	DubboCountCodec.decode(Channel, ChannelBuffer) line: 46
+	NettyCodecAdapter$InternalDecoder.messageReceived(ChannelHandlerContext, MessageEvent) line: 134
+	NettyCodecAdapter$InternalDecoder(SimpleChannelUpstreamHandler).handleUpstream(ChannelHandlerContext, ChannelEvent) line: 80
+	DefaultChannelPipeline.sendUpstream(DefaultChannelPipeline$DefaultChannelHandlerContext, ChannelEvent) line: 564
+	DefaultChannelPipeline.sendUpstream(ChannelEvent) line: 559
+	Channels.fireMessageReceived(Channel, Object, SocketAddress) line: 274
+	Channels.fireMessageReceived(Channel, Object) line: 261
+	NioWorker.read(SelectionKey) line: 349
+	NioWorker.processSelectedKeys(Set<SelectionKey>) line: 280
+	NioWorker.run() line: 200
+	ThreadRenamingRunnable.run() line: 108
+	DeadLockProofWorker$1.run() line: 44
+	ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142
+	ThreadPoolExecutor$Worker.run() line: 617
+	Thread.run() line: 745
+
 com.alibaba.dubbo.remoting.transport.dispatcher.ChannelEventRunnable.run()
-Daemon Thread [DubboClientHandler-172.17.42.1:20880-thread-1] (Suspended (breakpoint at line 57 in ChannelEventRunnable$1))	
-ChannelEventRunnable$1.<clinit>() line: 57	
-ChannelEventRunnable.run() line: 57	
-ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142	
-ThreadPoolExecutor$Worker.run() line: 617	
-Thread.run() line: 745	
+Daemon Thread [DubboClientHandler-172.17.42.1:20880-thread-1] (Suspended (breakpoint at line 57 in ChannelEventRunnable$1))
+ChannelEventRunnable$1.<clinit>() line: 57
+ChannelEventRunnable.run() line: 57
+ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142
+ThreadPoolExecutor$Worker.run() line: 617
+Thread.run() line: 745
 ```
 
 #### Consumer signal
 `done.signal()`
 ```
-Daemon Thread [DubboClientHandler-172.17.42.1:20880-thread-2] (Suspended (breakpoint at line 257 in DefaultFuture))	
-	DefaultFuture.doReceived(Response) line: 257	
-	DefaultFuture.received(Channel, Response) line: 240	
-	HeaderExchangeHandler.handleResponse(Channel, Response) line: 96	
-	HeaderExchangeHandler.received(Channel, Object) line: 177	
-	DecodeHandler.received(Channel, Object) line: 52	
-	ChannelEventRunnable.run() line: 82	
-	ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142	
-	ThreadPoolExecutor$Worker.run() line: 617	
-	Thread.run() line: 745	
+Daemon Thread [DubboClientHandler-172.17.42.1:20880-thread-2] (Suspended (breakpoint at line 257 in DefaultFuture))
+	DefaultFuture.doReceived(Response) line: 257
+	DefaultFuture.received(Channel, Response) line: 240
+	HeaderExchangeHandler.handleResponse(Channel, Response) line: 96
+	HeaderExchangeHandler.received(Channel, Object) line: 177
+	DecodeHandler.received(Channel, Object) line: 52
+	ChannelEventRunnable.run() line: 82
+	ThreadPoolExecutor.runWorker(ThreadPoolExecutor$Worker) line: 1142
+	ThreadPoolExecutor$Worker.run() line: 617
+	Thread.run() line: 745
 ```
 
-#### Registry 
+#### Registry
 
 #### Notify
 
 
 
-### dubbo的编解码，序列化和通信 
+### dubbo的编解码，序列化和通信
 http://blog.kazaff.me/2015/02/11/dubbo的编解码，序列化和通信/
 
 #### 通信实现
@@ -516,7 +516,7 @@ com.alibaba.dubbo.remoting.transport.netty.NettyCodecAdapter.InternalDecoder.mes
 	        }
 	    }
 	} while (message.readable());
-```                
+```
 这里首先要做的是把当前message的读索引保存到局部变量saveReaderIndex中，用于后面的消息回滚。后面紧接着是对消息的decode，这里的codec是DubboCountCodec对象实体，这里需要注意一点，DubboCountCodec的decode每次只会解析出一个完整的dubbo协议栈，带着这个看看decode的实现。
 
 `com.alibaba.dubbo.rpc.protocol.dubbo.DubboCountCodec.decode(Channel, ChannelBuffer)`
@@ -558,7 +558,7 @@ com.alibaba.dubbo.remoting.exchange.support.DefaultFuture.get(int)
 Lock here.
 
 DefaultFuture就是客户端并发请求线程阻塞的对象
- 
+
 	com.alibaba.dubbo.rpc.protocol.dubbo.DubboInvoker.doInvoke(Invocation)
 ->	com.alibaba.dubbo.remoting.exchange.support.DefaultFuture.get(int)
 
@@ -569,10 +569,10 @@ DefaultFuture就是客户端并发请求线程阻塞的对象
 -> 	com.alibaba.dubbo.remoting.exchange.support.DefaultFuture.doReceived(Response)
 Unlock here.
 
-DefaultFuture.received(Channel, Response)中通过id，DefaultFuture.FUTURES可以拿到具体的那个DefaultFuture对象，它就是上面我们提到的，阻塞请求线程的那个对象	
+DefaultFuture.received(Channel, Response)中通过id，DefaultFuture.FUTURES可以拿到具体的那个DefaultFuture对象，它就是上面我们提到的，阻塞请求线程的那个对象
 
 
-	com.alibaba.dubbo.remoting.transport.netty.NettyHandler.messageReceived(ChannelHandlerContext, MessageEvent) 
+	com.alibaba.dubbo.remoting.transport.netty.NettyHandler.messageReceived(ChannelHandlerContext, MessageEvent)
 -> 	com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeHandler.received(Channel, Object)
 -> 	com.alibaba.dubbo.remoting.exchange.support.header.HeaderExchangeHandler.handleRequest(ExchangeChannel, Request)
 -> 	com.alibaba.dubbo.rpc.protocol.dubbo.DubboProtocol.requestHandler.new ExchangeHandlerAdapter() {...}.reply(ExchangeChannel, Object)
@@ -580,7 +580,7 @@ DefaultFuture.received(Channel, Response)中通过id，DefaultFuture.FUTURES可�
 
 ### 注册中心启动过程:RegistryProtocol?
 启动注册中心服务.默认使用netty框架，NettyServer来完成的.接收消息时，抛开dubbo协议的解码器，调用类的顺序是
-1 NettyHandler -> NettyServer -> MultiMessageHandler -> HeartbeatHandler -> AllDispatcher -> 
+1 NettyHandler -> NettyServer -> MultiMessageHandler -> HeartbeatHandler -> AllDispatcher ->
 2 DecodeHandler -> HeaderExchangeHandler -> RegistryReceiver -> RegistryValidator -> RegistryFailover -> RegistryExecutor
 
 ### Provider start process:ServiceConfig,DubboProtocol
@@ -652,24 +652,24 @@ com.alibaba.dubbo.rpc.RpcException: Fail to start server(url: dubbo://172.27.2.2
 (3)创建代理类，发起consumer远程调用时，实际调用的是InvokerInvocationHandler
 
 consumer的启动过程是通过ReferenceConfig的get方法进行的，具体步骤是:
-1. 配置文件的解析ReferenceBean`com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler`实现对dubbo:reference的解析 
+1. 配置文件的解析ReferenceBean`com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler`实现对dubbo:reference的解析
 2. 获得服务代理
 	 在`DemoService demoService = (DemoService)context.getBean("demoService")`时ReferenceBean作为FactoryBean实现DemoService接口的代理对象的创建，见源码：
 
 ```java
 com.alibaba.dubbo.config.spring.ReferenceBean.getObject()
 com.alibaba.dubbo.config.ReferenceConfig.get()
-com.alibaba.dubbo.config.ReferenceConfig.init() 
+com.alibaba.dubbo.config.ReferenceConfig.init()
 ```
 
  获得protocol,cluster,proxyFactory接口的实例，实际调用如下：
 protocol -> Protocol$Adaptive -> ProtocolListenerWrapper
 cluster -> FailoverCluster
-proxyFactory -> JavassistProxyFactory 
+proxyFactory -> JavassistProxyFactory
 
  createProxy 方法解析：
  1. 获得URL，从dubbo:reference ，url属性或者从loadRegistries();通过注册中心配置拼装URL。设置URL的protocol为Constants.REGISTRY_PROTOCOL registry
- 2. 获得 invoker = protocol.refer(interfaceClass, urls.get(0)); 
+ 2. 获得 invoker = protocol.refer(interfaceClass, urls.get(0));
  Protocol$Adaptive-->根据URL的协议获得 com.alibaba.dubbo.rpc.protocol.ProtocolListenerWrapper->com.alibaba.dubbo.rpc.protocol.ProtocolFilterWrapper-->com.alibaba.dubbo.registry.support.RegistryProtocol.refer(interfaceClass, urls.get(0)) ->  com.alibaba.dubbo.registry.support.RegistryProtocol.refer->
 	  1. RegistryFactory--getRegistry  RegistryFactory根据url配置可能是DubboRegistryFactory，MulticastRegistryFactory，ZookeeperRegistryFactory
 	  2. new RegistryDirectory  创建注册中心目录服务
@@ -695,23 +695,23 @@ proxyFactory -> JavassistProxyFactory
 	    Object localObject = this.jdField_handler_of_type_JavaLangReflectInvocationHandler.invoke(this, jdField_methods_of_type_ArrayOfJavaLangReflectMethod[0], arrayOfObject);
 	    return ((String)localObject);
 	  }
-	
+
 	  public Object $echo(Object paramObject) {
 	    Object[] arrayOfObject = new Object[1];
 	    arrayOfObject[0] = paramObject;
 	    Object localObject = this.jdField_handler_of_type_JavaLangReflectInvocationHandler.invoke(this, jdField_methods_of_type_ArrayOfJavaLangReflectMethod[1], arrayOfObject);
 	    return ((Object)localObject);
 	  }
-	
+
 	  public proxy1(InvocationHandler paramInvocationHandler) {
 	    this.jdField_handler_of_type_JavaLangReflectInvocationHandler = paramInvocationHandler;
 	  }
 	}
 ```
-返回proxy1，xxx接口的子类。 
+返回proxy1，xxx接口的子类。
  4. 动态代理背后的故事，以dubbo协议的通信为例
   从生成的proxy1的代码我们可以看到  sayHello(String str)时调用了 InvokerInvocationHandler.invoke(Object proxy, Method method, Object[] args) -> invoker.invoke(new RpcInvocation(method, args)).recreate();
-这里的invoker是对 com.alibaba.dubbo.rpc.protocol.dubbo.DubboInvoker 的层层包装，实现负载均衡、失败转移（FailoverClusterInvoker）、InvokerListener，InvokerChain的顺序调用。由Protocol.refer生成 
+这里的invoker是对 com.alibaba.dubbo.rpc.protocol.dubbo.DubboInvoker 的层层包装，实现负载均衡、失败转移（FailoverClusterInvoker）、InvokerListener，InvokerChain的顺序调用。由Protocol.refer生成
 FailoverClusterInvoker.doInvoke(Invocation, List<Invoker<T>>, **LoadBalance**)
 再来具体看看实际执行远程调用DubboInvoker
 DubboInvoker.doInvoke() -> (Result) currentClient.request();  调用ExchangeClient发起请求
@@ -724,13 +724,13 @@ DubboInvoker.doInvoke() -> (Result) currentClient.request();  调用ExchangeClie
 	<dubbo:argument index="1" callback="true" />
 </dubbo:method>
 ```
-callback为true的，DubboCodec在服务端自动生成参数代理， 通过RPC远程调用消费者的方法。此时的invoker为ChannelWrappedInvoker发起的请求，由DubboProtocol得requestHandler处理received--》  
+callback为true的，DubboCodec在服务端自动生成参数代理， 通过RPC远程调用消费者的方法。此时的invoker为ChannelWrappedInvoker发起的请求，由DubboProtocol得requestHandler处理received--》
 ```
 	if (message instanceof Invocation) {
 		reply((ExchangeChannel) channel, message);
 	}
 ```
- 比如消费者 subscribe 时，com.alibaba.dubbo.registry.support.SimpleRegistryService 处理完成后要调用消费者的NotifyLisenter.notify(urls)  
+ 比如消费者 subscribe 时，com.alibaba.dubbo.registry.support.SimpleRegistryService 处理完成后要调用消费者的NotifyLisenter.notify(urls)
  消费者在发送请求时，DubboCodec根据URL中配置的方法的某一个参数的callback属性是否为true来自动发布服务，以接受服务端的callback
 
 Entry class: com.alibaba.dubbo.config.spring.ReferenceBean
@@ -742,18 +742,18 @@ com.alibaba.dubbo.config.spring.ReferenceBean.afterPropertiesSet()
 com.alibaba.dubbo.config.ReferenceConfig.init()
 com.alibaba.dubbo.config.ReferenceConfig.createProxy(Map<String, String>)
 Protocol$Adpative.refer(Class, URL) line: 392
-ProtocolFilterWrapper.refer(Class<T>, URL) line: 60	
-ProtocolListenerWrapper.refer(Class<T>, URL) line: 63	
-RegistryProtocol.refer(Class<T>, URL) line: 254	
-RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271	
-RegistryDirectory<T>.subscribe(URL) line: 133	
-ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
-ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114	
+ProtocolFilterWrapper.refer(Class<T>, URL) line: 60
+ProtocolListenerWrapper.refer(Class<T>, URL) line: 63
+RegistryProtocol.refer(Class<T>, URL) line: 254
+RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271
+RegistryDirectory<T>.subscribe(URL) line: 133
+ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189
+ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114
 
 ### Invocation
 Consumer对于服务接口的透明调用
 基于Javassist的动态代理模式，自动生成代理类。通过InvokerInvocationHandler的invoker调用：
-return invoker.invoke(new RpcInvocation(method, args)).recreate(); 
+return invoker.invoke(new RpcInvocation(method, args)).recreate();
 
 invoker RPC通信，基于mina、netty等
 1. Invocation，一次具体的调用，包含方法名、参数类型、参数
@@ -773,14 +773,14 @@ doInvoke()分为oneWay、async、sync调用
 
 #### Wrapper帮助类
 提高调用某一个类的某一个方法的性能（避免反射调用）
-使用javassist动态生成一个Wrapper的子类，实现抽象方法invokeMethod， 
+使用javassist动态生成一个Wrapper的子类，实现抽象方法invokeMethod，
 
 #### Exchanger
 http://gaofeihang.cn/archives/255
 
 从Client的角度对通信流程进行梳理
 在一个框架中我们通常把负责数据交换和网络通信的组件叫做Exchanger.Dubbo中每个Invoker都维护了一个ExchangeClient的引用，并通过它和远程的Server进行通信.整个与ExchangeClient相关的类图如下
-![Dubbo-Exchanger](http://gaofeihang.cn/wp-content/uploads/2015/04/Dubbo-Exchanger.jpg "Dubbo-Exchanger") 
+![Dubbo-Exchanger](http://gaofeihang.cn/wp-content/uploads/2015/04/Dubbo-Exchanger.jpg "Dubbo-Exchanger")
 1. ExchangeClient只有一个常用的实现类，HeaderExchangeClient
 2. 在Invoker需要发送数据时，单程发送使用的是ExchangeClient的send方法，需要返回结果的使用request方法
 3. 最终send方法传递到channel的send，而request方法则是通过构建ResponseFuture和调用send组合实现的.接下来的重点就是这个Channel参数如何来构建
@@ -833,28 +833,28 @@ JavassistProxyFactory
 Provider初始化时会调用doRegister方法向注册中心发起注册
 
 ``` java
-ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114	
-ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
-RegistryProtocol.export(Invoker<T>) line: 117	
-ProtocolListenerWrapper.export(Invoker<T>) line: 54	
-ProtocolFilterWrapper.export(Invoker<T>) line: 53	
-Protocol$Adpative.export(Invoker) line: not available	
-ServiceBean<T>(ServiceConfig<T>).doExportUrlsFor1Protocol(ProtocolConfig, List<URL>) line: 488	
-ServiceBean<T>(ServiceConfig<T>).doExportUrls() line: 284	
-ServiceBean<T>(ServiceConfig<T>).doExport() line: 245	
-ServiceBean<T>(ServiceConfig<T>).export() line: 144	
-ServiceBean<T>.onApplicationEvent(ApplicationEvent) line: 109	
-SimpleApplicationEventMulticaster$1.run() line: 78	
-SyncTaskExecutor.execute(Runnable) line: 49	
-SimpleApplicationEventMulticaster.multicastEvent(ApplicationEvent) line: 76	
-ClassPathXmlApplicationContext(AbstractApplicationContext).publishEvent(ApplicationEvent) line: 274	
-ClassPathXmlApplicationContext(AbstractApplicationContext).finishRefresh() line: 736	
-ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 383	
-ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139	
-ClassPathXmlApplicationContext.<init>(String[]) line: 93	
-SpringContainer.start() line: 50	
-Main.main(String[]) line: 80	
-DemoProvider.main(String[]) line: 21	
+ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114
+ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189
+RegistryProtocol.export(Invoker<T>) line: 117
+ProtocolListenerWrapper.export(Invoker<T>) line: 54
+ProtocolFilterWrapper.export(Invoker<T>) line: 53
+Protocol$Adpative.export(Invoker) line: not available
+ServiceBean<T>(ServiceConfig<T>).doExportUrlsFor1Protocol(ProtocolConfig, List<URL>) line: 488
+ServiceBean<T>(ServiceConfig<T>).doExportUrls() line: 284
+ServiceBean<T>(ServiceConfig<T>).doExport() line: 245
+ServiceBean<T>(ServiceConfig<T>).export() line: 144
+ServiceBean<T>.onApplicationEvent(ApplicationEvent) line: 109
+SimpleApplicationEventMulticaster$1.run() line: 78
+SyncTaskExecutor.execute(Runnable) line: 49
+SimpleApplicationEventMulticaster.multicastEvent(ApplicationEvent) line: 76
+ClassPathXmlApplicationContext(AbstractApplicationContext).publishEvent(ApplicationEvent) line: 274
+ClassPathXmlApplicationContext(AbstractApplicationContext).finishRefresh() line: 736
+ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 383
+ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139
+ClassPathXmlApplicationContext.<init>(String[]) line: 93
+SpringContainer.start() line: 50
+Main.main(String[]) line: 80
+DemoProvider.main(String[]) line: 21
 ```
 
 #### Consumer
@@ -862,86 +862,86 @@ Provider初始化时会调用doRegister方法向注册中心发起注册.那么�
 com.alibaba.dubbo.registry.support.FailBackRegistry的subscribe方法
 
 ``` java
-ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114	
-ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
-RegistryDirectory<T>.subscribe(URL) line: 133	
-RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271	
-RegistryProtocol.refer(Class<T>, URL) line: 254	
-ProtocolListenerWrapper.refer(Class<T>, URL) line: 63	
-ProtocolFilterWrapper.refer(Class<T>, URL) line: 60	
-Protocol$Adpative.refer(Class, URL) line: not available	
-ReferenceBean<T>(ReferenceConfig<T>).createProxy(Map<String,String>) line: 392	
-ReferenceBean<T>(ReferenceConfig<T>).init() line: 300	
-ReferenceBean<T>(ReferenceConfig<T>).get() line: 138	
-ReferenceBean<T>.getObject() line: 65	
-FactoryBeanRegistrySupport$1.run() line: 121	
-AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]	
-DefaultListableBeanFactory(FactoryBeanRegistrySupport).doGetObjectFromFactoryBean(FactoryBean, String, boolean) line: 116	
-DefaultListableBeanFactory(FactoryBeanRegistrySupport).getObjectFromFactoryBean(FactoryBean, String, boolean) line: 91	
-DefaultListableBeanFactory(AbstractBeanFactory).getObjectForBeanInstance(Object, String, String, RootBeanDefinition) line: 1288	
-DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 275	
-DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185	
-DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164	
-BeanDefinitionValueResolver.resolveReference(Object, RuntimeBeanReference) line: 269	
-BeanDefinitionValueResolver.resolveValueIfNecessary(Object, Object) line: 104	
-DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).applyPropertyValues(String, BeanDefinition, BeanWrapper, PropertyValues) line: 1245	
-DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).populateBean(String, AbstractBeanDefinition, BeanWrapper) line: 1010	
-DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).doCreateBean(String, RootBeanDefinition, Object[]) line: 472	
-AbstractAutowireCapableBeanFactory$1.run() line: 409	
-AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]	
-DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).createBean(String, RootBeanDefinition, Object[]) line: 380	
-AbstractBeanFactory$1.getObject() line: 264	
-DefaultListableBeanFactory(DefaultSingletonBeanRegistry).getSingleton(String, ObjectFactory) line: 222	
-DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 261	
-DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185	
-DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164	
-DefaultListableBeanFactory.preInstantiateSingletons() line: 429	
-ClassPathXmlApplicationContext(AbstractApplicationContext).finishBeanFactoryInitialization(ConfigurableListableBeanFactory) line: 728	
-ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 380	
-ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139	
-ClassPathXmlApplicationContext.<init>(String[]) line: 93	
-SpringContainer.start() line: 50	
-Main.main(String[]) line: 80	
-DemoConsumer.main(String[]) line: 21	
+ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 114
+ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189
+RegistryDirectory<T>.subscribe(URL) line: 133
+RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271
+RegistryProtocol.refer(Class<T>, URL) line: 254
+ProtocolListenerWrapper.refer(Class<T>, URL) line: 63
+ProtocolFilterWrapper.refer(Class<T>, URL) line: 60
+Protocol$Adpative.refer(Class, URL) line: not available
+ReferenceBean<T>(ReferenceConfig<T>).createProxy(Map<String,String>) line: 392
+ReferenceBean<T>(ReferenceConfig<T>).init() line: 300
+ReferenceBean<T>(ReferenceConfig<T>).get() line: 138
+ReferenceBean<T>.getObject() line: 65
+FactoryBeanRegistrySupport$1.run() line: 121
+AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]
+DefaultListableBeanFactory(FactoryBeanRegistrySupport).doGetObjectFromFactoryBean(FactoryBean, String, boolean) line: 116
+DefaultListableBeanFactory(FactoryBeanRegistrySupport).getObjectFromFactoryBean(FactoryBean, String, boolean) line: 91
+DefaultListableBeanFactory(AbstractBeanFactory).getObjectForBeanInstance(Object, String, String, RootBeanDefinition) line: 1288
+DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 275
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164
+BeanDefinitionValueResolver.resolveReference(Object, RuntimeBeanReference) line: 269
+BeanDefinitionValueResolver.resolveValueIfNecessary(Object, Object) line: 104
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).applyPropertyValues(String, BeanDefinition, BeanWrapper, PropertyValues) line: 1245
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).populateBean(String, AbstractBeanDefinition, BeanWrapper) line: 1010
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).doCreateBean(String, RootBeanDefinition, Object[]) line: 472
+AbstractAutowireCapableBeanFactory$1.run() line: 409
+AccessController.doPrivileged(PrivilegedAction<T>, AccessControlContext) line: not available [native method]
+DefaultListableBeanFactory(AbstractAutowireCapableBeanFactory).createBean(String, RootBeanDefinition, Object[]) line: 380
+AbstractBeanFactory$1.getObject() line: 264
+DefaultListableBeanFactory(DefaultSingletonBeanRegistry).getSingleton(String, ObjectFactory) line: 222
+DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class, Object[], boolean) line: 261
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String, Class, Object[]) line: 185
+DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 164
+DefaultListableBeanFactory.preInstantiateSingletons() line: 429
+ClassPathXmlApplicationContext(AbstractApplicationContext).finishBeanFactoryInitialization(ConfigurableListableBeanFactory) line: 728
+ClassPathXmlApplicationContext(AbstractApplicationContext).refresh() line: 380
+ClassPathXmlApplicationContext.<init>(String[], boolean, ApplicationContext) line: 139
+ClassPathXmlApplicationContext.<init>(String[]) line: 93
+SpringContainer.start() line: 50
+Main.main(String[]) line: 80
+DemoConsumer.main(String[]) line: 21
 ```
 
 #### Notify
-Thread [main] (Suspended (breakpoint at line 410 in AbstractRegistry))	
-	owns: ReferenceBean<T>  (id=46)	
-	owns: ConcurrentHashMap<K,V>  (id=47)	
-	ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410	
-	ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273	
-	ZookeeperRegistry(FailbackRegistry).notify(URL, NotifyListener, List<URL>) line: 259	
-	ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 170	
-	ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189	
-	RegistryDirectory<T>.subscribe(URL) line: 133	
-	RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271	
-	RegistryProtocol.refer(Class<T>, URL) line: 254	
-	ProtocolListenerWrapper.refer(Class<T>, URL) line: 63	
-	ProtocolFilterWrapper.refer(Class<T>, URL) line: 60	
-	Protocol$Adpative.refer(Class, URL) line: 18	
-	ReferenceBean<T>(ReferenceConfig<T>).createProxy(Map<String,String>) line: 392	
-	ReferenceBean<T>(ReferenceConfig<T>).init() line: 300	
-	ReferenceBean<T>(ReferenceConfig<T>).get() line: 138	
-	ReferenceBean<T>.getObject() line: 65	
-	DefaultListableBeanFactory(FactoryBeanRegistrySupport).doGetObjectFromFactoryBean(FactoryBean<?>, String) line: 168	
-	DefaultListableBeanFactory(FactoryBeanRegistrySupport).getObjectFromFactoryBean(FactoryBean<?>, String, boolean) line: 103	
-	DefaultListableBeanFactory(AbstractBeanFactory).getObjectForBeanInstance(Object, String, String, RootBeanDefinition) line: 1512	
-	DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class<T>, Object[], boolean) line: 250	
-	DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 193	
-	ClassPathXmlApplicationContext(AbstractApplicationContext).getBean(String) line: 956	
-	Consumer.main(String[]) line: 40	
+Thread [main] (Suspended (breakpoint at line 410 in AbstractRegistry))
+	owns: ReferenceBean<T>  (id=46)
+	owns: ConcurrentHashMap<K,V>  (id=47)
+	ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410
+	ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273
+	ZookeeperRegistry(FailbackRegistry).notify(URL, NotifyListener, List<URL>) line: 259
+	ZookeeperRegistry.doSubscribe(URL, NotifyListener) line: 170
+	ZookeeperRegistry(FailbackRegistry).subscribe(URL, NotifyListener) line: 189
+	RegistryDirectory<T>.subscribe(URL) line: 133
+	RegistryProtocol.doRefer(Cluster, Registry, Class<T>, URL) line: 271
+	RegistryProtocol.refer(Class<T>, URL) line: 254
+	ProtocolListenerWrapper.refer(Class<T>, URL) line: 63
+	ProtocolFilterWrapper.refer(Class<T>, URL) line: 60
+	Protocol$Adpative.refer(Class, URL) line: 18
+	ReferenceBean<T>(ReferenceConfig<T>).createProxy(Map<String,String>) line: 392
+	ReferenceBean<T>(ReferenceConfig<T>).init() line: 300
+	ReferenceBean<T>(ReferenceConfig<T>).get() line: 138
+	ReferenceBean<T>.getObject() line: 65
+	DefaultListableBeanFactory(FactoryBeanRegistrySupport).doGetObjectFromFactoryBean(FactoryBean<?>, String) line: 168
+	DefaultListableBeanFactory(FactoryBeanRegistrySupport).getObjectFromFactoryBean(FactoryBean<?>, String, boolean) line: 103
+	DefaultListableBeanFactory(AbstractBeanFactory).getObjectForBeanInstance(Object, String, String, RootBeanDefinition) line: 1512
+	DefaultListableBeanFactory(AbstractBeanFactory).doGetBean(String, Class<T>, Object[], boolean) line: 250
+	DefaultListableBeanFactory(AbstractBeanFactory).getBean(String) line: 193
+	ClassPathXmlApplicationContext(AbstractApplicationContext).getBean(String) line: 956
+	Consumer.main(String[]) line: 40
 
 
-Daemon Thread [ZkClient-EventThread-15-127.0.0.1:2181] (Suspended (breakpoint at line 410 in AbstractRegistry))	
-	ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410	
-	ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273	
-	ZookeeperRegistry(FailbackRegistry).notify(URL, NotifyListener, List<URL>) line: 259	
-	ZookeeperRegistry.access$400(ZookeeperRegistry, URL, NotifyListener, List) line: 45	
-	ZookeeperRegistry$3.childChanged(String, List<String>) line: 159	
-	ZkclientZookeeperClient$2.handleChildChange(String, List<String>) line: 82	
-	ZkClient$7.run() line: 568	
-	ZkEventThread.run() line: 71	
+Daemon Thread [ZkClient-EventThread-15-127.0.0.1:2181] (Suspended (breakpoint at line 410 in AbstractRegistry))
+	ZookeeperRegistry(AbstractRegistry).notify(URL, NotifyListener, List<URL>) line: 410
+	ZookeeperRegistry(FailbackRegistry).doNotify(URL, NotifyListener, List<URL>) line: 273
+	ZookeeperRegistry(FailbackRegistry).notify(URL, NotifyListener, List<URL>) line: 259
+	ZookeeperRegistry.access$400(ZookeeperRegistry, URL, NotifyListener, List) line: 45
+	ZookeeperRegistry$3.childChanged(String, List<String>) line: 159
+	ZkclientZookeeperClient$2.handleChildChange(String, List<String>) line: 82
+	ZkClient$7.run() line: 568
+	ZkEventThread.run() line: 71
 
 
 ### ExtensionLoader
@@ -959,7 +959,7 @@ JDK标准的SPI扩展机制，参见：java.util.ServiceLoader
 Dubbo通过ServiceLoader扫描到所有Protocol实现
 
 Dubbo中具有SPI标记的接口有:
-http://gaofeihang.cn/archives/278 
+http://gaofeihang.cn/archives/278
 CacheFactory
 Compiler
 ExtensionFactory
@@ -1004,7 +1004,7 @@ ExtensionLoader是一个单例工厂类，它对外暴露getExtensionLoader静�
 extension by name以及supported extension。
 
 #### Activate extension
-getActivateExtension(URL url, String[] values, String group) 
+getActivateExtension(URL url, String[] values, String group)
 activate extension都需要传入url参数，这里涉及到Activate注解，这个注解主要用处是标注在插件接口实现类上，用来配置该扩展实现类激活条件。在Dubbo框架里面的Filter的各种实现类都通过Activate标注，用来描述该Filter什么时候生效。比如MonitorFilter通过Activate标注用来告诉Dubbo框架这个Filter是在服务提供端和消费端会生效的；而TimeoutFilter则是只在服务提供端生效，消费端是不会调用该Filter；ValidationFilter要激活的条件除了在消费端和服务提供端激活，它还配置了value，这个表述另一个激活条件，上面介绍要获取activate extension都需要传入URL对象，那么这个value配置的值则表述URL必须有指定的参数才可以激活这个扩展。例如ValidationFilter则表示URL中必须包含参数validation(Constants.VALIDATION_KEY常量的值就是validation)，否则即使是消费端和服务端都不会激活这个扩展实现，仔细的同学还会发现在ValidationFilter中的Activate注解还有一个参数order，这是表示一种排序规则。因为一个接口的实现有多种，返回的结果是一个列表，如果不指定排序规则，那么可能列表的排序不可控，为了实现这个所以添加了order属性用来控制排序，其中order的值越大，那么该扩展实现排序就越靠前。除了通过order来控制排序，还有before和after来配置当前扩展的位置，before和after配置的值是扩展的别名（扩展实现的别名是在图23中等号左边内容，下面出现的别名均是此内容）。
 
 ``` java
@@ -1029,13 +1029,13 @@ getAdaptiveExtension 利用代码生成创建以下接口的适配器类：
 Protocol
 Cluster
 ProxyFactory
-等等 
+等等
 
 ##### 某个接口实现对应的适配器
 先对第一种途径进行介绍，这种途径也最好理解，对于这种途径Dubbo也提供了一个注解Adaptive，他用来标注在接口的某个实现上，表示这个实现并不是提供具体业务支持，而是作为该接口的适配器。对于这种途径的使用在Dubbo框架中ExtensionFactory的实现类AdaptiveExtensionFactory就是实现适配的功能，它的类被Adaptive进行了标注，那么当调用ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension()的时候将会返回AdaptiveExtensionFactory实体，用来适配ExtensionFactory接口的SPIExtensionFactory和SpringExtensionFactory两种实现，在AdaptiveExtensionFactory将会根据运行时的状态来确定具体调用ExtensionFactory的哪个实现。
 
 ##### Dubbo框架动态生成适配器类
-而第二种相对于第一种来说就隐晦一点，是ExtensionLoader通过分析接口配置的adaptive规则动态生成adaptive类并且加载到ClassLoader中，来实现动态适配。配置adaptive的规则也是通过Adaptive注解来设置，该注解有一个value属性，通过设置这个属性便可以设置该接口的Adaptive的规则，上面说过服务调用的所有数据均可以从URL获取（Dubbo的URL总线模式），那么需要Dubbo帮我们动态生成adaptive的扩展接口的方法入参必须包含URL，这样才能根据运行状态动态选择具体实现。这里列举一下Transporter接口中配置adaptive规则。 
+而第二种相对于第一种来说就隐晦一点，是ExtensionLoader通过分析接口配置的adaptive规则动态生成adaptive类并且加载到ClassLoader中，来实现动态适配。配置adaptive的规则也是通过Adaptive注解来设置，该注解有一个value属性，通过设置这个属性便可以设置该接口的Adaptive的规则，上面说过服务调用的所有数据均可以从URL获取（Dubbo的URL总线模式），那么需要Dubbo帮我们动态生成adaptive的扩展接口的方法入参必须包含URL，这样才能根据运行状态动态选择具体实现。这里列举一下Transporter接口中配置adaptive规则。
 
 ##### Transporter接口中配置adaptive规则
 ```java
@@ -1071,7 +1071,7 @@ Transporter接口提供了两个方法，一个是connect（用来创建客户�
 
 	package com.alibaba.dubbo.remoting;
 	import com.alibaba.dubbo.common.extension.ExtensionLoader;
-	
+
 	public class Transporter$Adpative implements com.alibaba.dubbo.remoting.Transporter{
 	public com.alibaba.dubbo.remoting.Client connect(
 		com.alibaba.dubbo.common.URL arg0, com.alibaba.dubbo.remoting.ChannelHandler arg1)
@@ -1083,10 +1083,10 @@ Transporter接口提供了两个方法，一个是connect（用来创建客户�
 		if(extName == null)
 			throw new IllegalStateException("Fail to get extension(com.alibaba.dubbo.remoting.Transporter) name from url(" + url.toString() + ") use keys([client, transporter])");
 		com.alibaba.dubbo.remoting.Transporter extension = (com.alibaba.dubbo.remoting.Transporter)ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.remoting.Transporter.class).getExtension(extName);
-		
+
 		return extension.connect(arg0, arg1);
 	}
-	
+
 	public com.alibaba.dubbo.remoting.Server bind(
 		com.alibaba.dubbo.common.URL arg0, com.alibaba.dubbo.remoting.ChannelHandler arg1)
 		throws com.alibaba.dubbo.remoting.RemotingException {
@@ -1097,7 +1097,7 @@ Transporter接口提供了两个方法，一个是connect（用来创建客户�
 		if(extName == null)
 			throw new IllegalStateException("Fail to get extension(com.alibaba.dubbo.remoting.Transporter) name from url(" + url.toString() + ") use keys([server, transporter])");
 		com.alibaba.dubbo.remoting.Transporter extension = (com.alibaba.dubbo.remoting.Transporter)ExtensionLoader.getExtensionLoader(com.alibaba.dubbo.remoting.Transporter.class).getExtension(extName);
-		
+
 		return extension.bind(arg0, arg1);
 	}
 	}
@@ -1118,7 +1118,7 @@ Dubbo的SPI规范除了上面说的在制定文件夹下面描述服务的实现
 
 #### Example: 基于Dubbo的ExtensionLoader实施插件化
 
-插件化的第一步是抽象一个接口，从定义了插件的规范，那么我们先创建一个MyExtension接口，并且标注了SPI注解，同时制定默认实现是别名为default的扩展实现。 
+插件化的第一步是抽象一个接口，从定义了插件的规范，那么我们先创建一个MyExtension接口，并且标注了SPI注解，同时制定默认实现是别名为default的扩展实现。
 ``` java
 
 	@SPI("default")
@@ -1190,31 +1190,31 @@ classes/
             └── TestExtension.class
 ``` java
 
-	ExtensionLoader<T>.injectExtension(T) line: 547	
-	ExtensionLoader<T>.createExtension(String) line: 509	
-	ExtensionLoader<T>.getExtension(String) line: 319	
-	AdaptiveExtensionFactory.<init>() line: 40	
-	NativeConstructorAccessorImpl.newInstance0(Constructor<?>, Object[]) line: not available [native method]	
-	NativeConstructorAccessorImpl.newInstance(Object[]) line: 62	
-	DelegatingConstructorAccessorImpl.newInstance(Object[]) line: 45	
-	Constructor<T>.newInstance(Object...) line: 422	
-	Class<T>.newInstance() line: 442	
-	ExtensionLoader<T>.createAdaptiveExtension() line: 721	
-	ExtensionLoader<T>.getAdaptiveExtension() line: 455	
-	ExtensionLoader<T>.<init>(Class<?>) line: 129	
-	ExtensionLoader<T>.getExtensionLoader(Class<T>) line: 121	
-	TestExtension.main(String[]) line: 13	
+	ExtensionLoader<T>.injectExtension(T) line: 547
+	ExtensionLoader<T>.createExtension(String) line: 509
+	ExtensionLoader<T>.getExtension(String) line: 319
+	AdaptiveExtensionFactory.<init>() line: 40
+	NativeConstructorAccessorImpl.newInstance0(Constructor<?>, Object[]) line: not available [native method]
+	NativeConstructorAccessorImpl.newInstance(Object[]) line: 62
+	DelegatingConstructorAccessorImpl.newInstance(Object[]) line: 45
+	Constructor<T>.newInstance(Object...) line: 422
+	Class<T>.newInstance() line: 442
+	ExtensionLoader<T>.createAdaptiveExtension() line: 721
+	ExtensionLoader<T>.getAdaptiveExtension() line: 455
+	ExtensionLoader<T>.<init>(Class<?>) line: 129
+	ExtensionLoader<T>.getExtensionLoader(Class<T>) line: 121
+	TestExtension.main(String[]) line: 13
 ```
-Example: get DefaultExtention	
+Example: get DefaultExtention
 ``` java
 
-	ExtensionLoader<T>.injectExtension(T) line: 547	
-	ExtensionLoader<T>.createExtension(String) line: 509	
-	ExtensionLoader<T>.getExtension(String) line: 319	
-	ExtensionLoader<T>.getDefaultExtension() line: 336	
-	AdaptiveExtension.sayHello(String, ExtensionType) line: 12	
-	TestExtension.main(String[]) line: 17	
-	
+	ExtensionLoader<T>.injectExtension(T) line: 547
+	ExtensionLoader<T>.createExtension(String) line: 509
+	ExtensionLoader<T>.getExtension(String) line: 319
+	ExtensionLoader<T>.getDefaultExtension() line: 336
+	AdaptiveExtension.sayHello(String, ExtensionType) line: 12
+	TestExtension.main(String[]) line: 17
+
 ```
 
 #### ExtensionLoader几个重要的属性结构
@@ -1226,26 +1226,26 @@ http://bbs.dubboclub.net/read-3.html
 
 	public class ExtensionLoader<T> {
 	private static final ConcurrentMap<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<Class<?>, ExtensionLoader<?>>();
-	      
+
 	private static final ConcurrentMap<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<Class<?>, Object>();
-	      
+
 	private final Class<?> type;
-	      
+
 	private final ExtensionFactory objectFactory;
-	      
+
 	private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<Map<String,Class<?>>>();
 	private final Holder<Object> cachedAdaptiveInstance = new Holder<Object>();
 }
 ```
 1、可以看到EXTENSION_LOADERS属性是一个static final的，那么说明应该是一个常量，这个就是用来装载dubbo的所有扩展点的ExtensionLoader，在Dubbo中，每种类型的扩展点都会有一个与其对应的ExtensionLoader，类似jvm中每个Class都会有一个ClassLoader,每个ExtensionLoader会包含多个该扩展点的实现，类似一个ClassLoader可以加载多个具体的类，但是不同的ExtensionLoader之间是隔离的，这点也和ClassLoader类似。那么理解dubbo的ExtensionLoader可以拿ClassLoader来进行类比，这样会加快自己对它的理解。
 2、另一个常量属性是EXTENSION_INSTANCES，他是一个具体扩展类的实体，用于缓存，防止由于扩展点比较重，导致会浪费没必要的资源，所以在实现扩展点的时候，一定要确保扩展点可单例化，否则可能会出现问题。
-3、另一个重要的属性是type，这里的type一般是接口，用于制定扩展点的类型，因为dubbo的扩展点申明是SPI的方式，所以某一个类型扩展点，就需要申明一个扩展点接口。比如ExtensionFactory扩展点申明如下： 
+3、另一个重要的属性是type，这里的type一般是接口，用于制定扩展点的类型，因为dubbo的扩展点申明是SPI的方式，所以某一个类型扩展点，就需要申明一个扩展点接口。比如ExtensionFactory扩展点申明如下：
 
-``` java 
+``` java
 
 	@SPI
 	public interface ExtensionFactory {
-	      
+
 	/**
 	 * Get extension.
 	 *
@@ -1254,11 +1254,11 @@ http://bbs.dubboclub.net/read-3.html
 	 * @return object instance.
 	 */
 	<T> T getExtension(Class<T> type, String name);
-	      
+
 	}
 ```
 dubbo加载某个类型的扩展点是会遍历三个目录(META-INF/services/,META-INF/dubbo/,META-INF/dubbo/internal/)下面查找type.getName的文件，里面的内容格式是extendName=classFullName,所以说type是告诉dubbo扩展点的类型，以及查找该类型扩展点的方式。
-4、扩展点相互依赖注入，dubbo通过ExtensionFactory来解决，比如SpringExtensionFactory和SpiExtensionFactory,不同扩展点之间肯定存在依赖，那么其扩展点从哪里获取，就全部交给ExtensionFactory来实现，通过上面ExtensionFactory代码可以了解，要获取某个个具体的扩展点实现需要知道两个参数，第一个是扩展点类型，用于得到是哪个类型的扩展点，第二个是该扩展实现的名称，用于在某一类型的扩展中找到对应的实现。注意：在dubbo中ExtensionFactory也被当作是一个扩展，那么就更说明在dubbo中无处不是扩展，另一个注意点是：只有ExtensionFactory扩展的ExtensionLoader的objectFactory是null，其他的扩展的都必须有一个ExtensionFactory实现赋值给objectFactory属性。通过下面代码可以得知： 
+4、扩展点相互依赖注入，dubbo通过ExtensionFactory来解决，比如SpringExtensionFactory和SpiExtensionFactory,不同扩展点之间肯定存在依赖，那么其扩展点从哪里获取，就全部交给ExtensionFactory来实现，通过上面ExtensionFactory代码可以了解，要获取某个个具体的扩展点实现需要知道两个参数，第一个是扩展点类型，用于得到是哪个类型的扩展点，第二个是该扩展实现的名称，用于在某一类型的扩展中找到对应的实现。注意：在dubbo中ExtensionFactory也被当作是一个扩展，那么就更说明在dubbo中无处不是扩展，另一个注意点是：只有ExtensionFactory扩展的ExtensionLoader的objectFactory是null，其他的扩展的都必须有一个ExtensionFactory实现赋值给objectFactory属性。通过下面代码可以得知：
 ``` java
 
 	private ExtensionLoader(Class<?> type) {
@@ -1266,14 +1266,14 @@ dubbo加载某个类型的扩展点是会遍历三个目录(META-INF/services/,M
     objectFactory = (type == ExtensionFactory.class ? null : ExtensionLoader.getExtensionLoader(ExtensionFactory.class).getAdaptiveExtension());
 }
 ```
-5、上面的代码又告诉我们一个信息，在ExtensionLoader.getExtensionLoader(ExtensionFactory.class)之后，不是直接返回某个扩展点，而是调用getAdaptiveExtension来获取一个扩展的适配器，这是为什么呢？因为一个扩展点有多个具体扩展的实现，那么直接通过ExtensionLoader直接返回一个扩展是不可靠的，需要一个适配器来根据实际情况返回具体的扩展实现。所以这里就有了cachedAdaptiveInstance属性的存在，dubbo里面的每个扩展的ExtensionLoader都有一个cachedAdaptiveInstance，这个属性的类型必须实现ExtensionLoader.type接口，这就是设计模式中的适配器模式。比如ExtensionFactory扩展点就有AdaptiveExtensionFactory适配器。扩展点的适配器可以是自己通过@Adaptive，也可以不提供实现，由dubbo通过动态生成Adaptive来提供一个适配器类。此处需要注意：Adaptive也是扩展点的某个实现，下面例举出ExtensionFactory扩展点的适配器： 
+5、上面的代码又告诉我们一个信息，在ExtensionLoader.getExtensionLoader(ExtensionFactory.class)之后，不是直接返回某个扩展点，而是调用getAdaptiveExtension来获取一个扩展的适配器，这是为什么呢？因为一个扩展点有多个具体扩展的实现，那么直接通过ExtensionLoader直接返回一个扩展是不可靠的，需要一个适配器来根据实际情况返回具体的扩展实现。所以这里就有了cachedAdaptiveInstance属性的存在，dubbo里面的每个扩展的ExtensionLoader都有一个cachedAdaptiveInstance，这个属性的类型必须实现ExtensionLoader.type接口，这就是设计模式中的适配器模式。比如ExtensionFactory扩展点就有AdaptiveExtensionFactory适配器。扩展点的适配器可以是自己通过@Adaptive，也可以不提供实现，由dubbo通过动态生成Adaptive来提供一个适配器类。此处需要注意：Adaptive也是扩展点的某个实现，下面例举出ExtensionFactory扩展点的适配器：
 ``` java
 
 	@Adaptive
 	public class AdaptiveExtensionFactory implements ExtensionFactory {
-	      
+
 	private final List<ExtensionFactory> factories;
-	      
+
 	public AdaptiveExtensionFactory() {
 	    ExtensionLoader<ExtensionFactory> loader = ExtensionLoader.getExtensionLoader(ExtensionFactory.class);
 	    List<ExtensionFactory> list = new ArrayList<ExtensionFactory>();
@@ -1282,7 +1282,7 @@ dubbo加载某个类型的扩展点是会遍历三个目录(META-INF/services/,M
 	    }
 	    factories = Collections.unmodifiableList(list);
 	}
-	      
+
 	public <T> T getExtension(Class<T> type, String name) {
 	    for (ExtensionFactory factory : factories) {
 	        T extension = factory.getExtension(type, name);
@@ -1294,14 +1294,14 @@ dubbo加载某个类型的扩展点是会遍历三个目录(META-INF/services/,M
 	}
 	}
 ```
-6、关于dubbo扩展点最后一个重要的属性就是cachedClasses,这个就是存储当前ExtensionLoader有哪些扩展点实现，从而可以实例化出某个具体的扩展点实体，cachedClasses声明为Holder<Map<String, Class<?>>>类型，其实可以理解为是Map<String, Class<?>>类型，Map的key是在type.getName文件中的=之前的内容，value这是这个扩展点实现的类对象了。 
+6、关于dubbo扩展点最后一个重要的属性就是cachedClasses,这个就是存储当前ExtensionLoader有哪些扩展点实现，从而可以实例化出某个具体的扩展点实体，cachedClasses声明为Holder<Map<String, Class<?>>>类型，其实可以理解为是Map<String, Class<?>>类型，Map的key是在type.getName文件中的=之前的内容，value这是这个扩展点实现的类对象了。
 
 通过上面分析，已经知道了dubbo可以做什么，以及dubbo的扩展点实现有了基本的了解。那么总结一下dubbo扩展点几个要点
 1、一个扩展点类型一定是一个接口
 2、一个扩展点一定对应一个ExtensionLoader
 3、一个ExtensionLoader一定有一个Adapter
 4、一个扩展点可以有多个实现，并且都是用一个ExtensionLoader进行加载
-5、一个ExtensionLoader（除去ExtensionFactory扩展）都要有一个ExtensionFactory 
+5、一个ExtensionLoader（除去ExtensionFactory扩展）都要有一个ExtensionFactory
 
 ### Dubbo回声测试
 http://my.oschina.net/jasonultimate/blog/420580
@@ -1402,7 +1402,7 @@ Dubbo里有很多这种代码.这也是一种工厂模式，只是实现类的�
 2、装饰器模式
 Dubbo在启动和调用阶段都大量使用了装饰器模式.以Provider提供的调用链为例，具体的调用链代码是在ProtocolFilterWrapper的buildInvokerChain完成的，具体是将注解中含有group=provider的Filter实现，按照order排序，最后的调用顺序是
 ```
-EchoFilter -> ClassLoaderFilter -> GenericFilter -> ContextFilter -> ExceptionFilter -> 
+EchoFilter -> ClassLoaderFilter -> GenericFilter -> ContextFilter -> ExceptionFilter ->
 TimeoutFilter -> MonitorFilter -> TraceFilter
 ```
 更确切地说，这里是装饰器和责任链模式的混合使用.例如，EchoFilter的作用是判断是否是回声测试请求，是的话直接返回内容，这是一种责任链的体现.而像ClassLoaderFilter则只是在主功能上添加了功能，更改当前线程的ClassLoader，这是典型的装饰器模式.
@@ -1451,7 +1451,7 @@ Log4j Container
 `dubbo.properties`
 `dubbo.container=spring,jetty,log4j`
 
-## 分布式服务框架远程服务通讯介绍 
+## 分布式服务框架远程服务通讯介绍
 [Hessian 原理分析](http://blog.sina.com.cn/s/blog_56fd58ab0100mrl6.html)
 [java 几种远程服务调用协议的比较](http://www.cnblogs.com/jifeng/archive/2011/07/20/2111183.html)
 在分布式服务框架中，一个最基础的问题就是远程服务是怎么通讯的，在Java领域中有很多可实现远程通讯 的技术，例如:RMI、MINA、ESB、Burlap、Hessian、SOAP、EJB和JMS等

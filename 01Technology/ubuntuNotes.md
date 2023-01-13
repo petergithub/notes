@@ -516,6 +516,48 @@ Vim中查看文件编码 `:set fileencoding`
 3. iconv 转换, iconv的命令格式如下: `iconv -f fromEncoding -t toEncoding inputfile -o outputfile`
   比如将一个GBK编码 的文件 转换成 UTF-8 编码 `iconv -f GBK -t UTF-8 file1 -o file2`
 
+### cp
+
+`cp -avx /home/* /mnt/newhome`
+
+功能: 复制文件或目录
+说明: cp指令用于复制文件或目录，如同时指定两个以上的文件或目录，且最后的目的地是一个已经存在的目录，则它会把前面指定的所有文件或目录复制到此目录中。若同时指定多个文件或目录，而最后的目的地并非一个已存在的目录，则会出现错误信息
+参数:
+-a 或 --archive 此参数的效果和同时指定"-dpR"参数相同
+-b 或 --backup 删除、覆盖目的文件先备份，备份的文件或目录亦建立为符号链接，并指向源文件或目录链接的源文件或目录。假如没有加上这个参数，在复制过程中若遇到符号链接，则会直接复制源文件或目录
+-f 或 --force 强行复制文件或目录， 不论目的文件或目录是否已经存在
+-i 或 --interactive 覆盖文件之前先询问用户
+-l 或 --link 对源文件建立硬链接，而非复制文件
+-p 或 --preserve 保留源文件或目录的属性，包括所有者、所属组、权限与时间
+-P 或 --parents 保留源文件或目录的路径，此路径可以是绝对路径或相对路径，且目的目录必须已经丰在
+-r 递归处理，将指定目录下的文件与子目录一并处理。若源文件或目录的形态，不属于目录或符号链接，则一律视为普通文件处理
+-R 或 --recursive 递归处理，将指定目录下的文件及子目录一并处理
+-s 或 --symbolic-link 对源文件建立符号链接，而非复制文件
+-S <备份字尾字符串> 或 --suffix=<备份字尾字符串> 用"-b"参数备份目的文件后，备份文件的字尾会被加上一个备份字符串。默认的备份字尾符串是符号"~"
+-u 或 --update 使用这项参数之后，只会在源文件的修改时间(Modification Time)较目的文件更新时，或是名称相互对应的目的文件并不存在，才复制文件
+-v 或 --verbose 显示执行过程
+-V <备份方式> 或 --version-control=<备份方式> 指定当备份文件时，备份文件名的命名方式，有以下3种:
+1.numbered或t, 将使用备份编号，会在字尾加上~1~字符串，其数字编号依次递增
+2.simple或never 将使用简单备份，默认的备份字尾字符串是~, 也可通过-S来指定
+3.existing或nil将使用当前方式，程序会先检查是否存在着备份编号，若有则采用备份编号，若无则采用简单备份
+-x 或 --one-file-system 复制的文件或目录存放的文件系统，必须与cp指令执行时所处的文件系统相同，否则不复制，亦不处理位于其他分区的文件
+--help 显示在线帮助
+--sparse=<使用时机> 设置保存希疏文件的时机
+--version 显示版本
+
+示例:
+
+* 复制文件，只有源文件较目的文件的修改时间新时，才复制文件 `cp -u -v file1 file2`
+* 采用交互方式将文件file1复制成文件file2 `cp -i file1 file2`
+* 将文件file1复制成file2，因为目的文件已经存在，所以指定使用强制复制的模式 `cp -f file1 file2`
+* 将目录dir1复制成目录dir2 `cp -R file1 file2`
+* 同时将文件file1、file2、file3与目录dir1复制到dir2 `cp -R file1 file2 file3 dir1 dir2`
+* 复制时保留文件属性 `cp -p a.txt tmp/`
+* 复制时保留文件的目录结构 `cp -P /var/tmp/a.txt ./temp/`
+* 复制时产生备份文件 `cp -b a.txt tmp/`
+* 复制时产生备份文件，尾标 ~1~格式 `cp -b -V t a.txt /tmp`
+* 指定备份文件尾标 `cp -b -S _bak a.txt /tmp`
+
 ### less
 
 `less -n -i -S`
@@ -1096,6 +1138,8 @@ It uses `/bin/sh`
 
 crontab filename 以filename做为crontab的任务列表文件并载入
 
+crontab task back up `* */1 * * * /usr/bin/crontab -l > /data/configurations/crontab.txt 2>&1`
+
 crontab特殊的符号说明
 
 1. "*"代表所有的取值范围内的数字
@@ -1319,7 +1363,7 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 * `-X, --request <command>`    Specifies a custom request method curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词
 * `-s, --silent`    Silent  or  quiet  mode. Don't show progress meter or error messages.  Makes Curl mute. It will still output the data  you  ask for
 * `--cookie "key1=value1;k2=v2"` Pass cookie
-* `-H, --header`    Sent with header -H "host:login.example.com"
+* `-H, --header`    Sent with header `-H "host:login.example.com" -H "Content-Type: application/json"`
 * `-u, --USER`    username:password
 * `-w, --write-out "@curl-format.txt"`    tells cURL to use our format file
 * `-m, --max-time <seconds>`    超时时间. Maximum time in seconds that you allow the whole operation to  take.
@@ -3017,9 +3061,13 @@ Note: Be careful with you modify, it may cause the system not to work properly.
 ```sh
 $sudo fdisk -l
  id username
-vi /etc/fstab
- /dev/sda3      /media/program    ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0    #defaults = rw, suid, dev, exec, auto, nouser, and async.
+$vi /etc/fstab
+/dev/sda3      /media/program    ntfs    defaults,nofail,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0    #defaults = rw, suid, dev, exec, auto, nouser, and async.
+
+# 追加 uuid 到 fstab
+echo `blkid /dev/vdb1 | awk '{print $2}' | sed 's/\"//g'` /data ext4 defaults,nofail 0 0 >> /etc/fstab
 ```
+
 
 auto= mounted at boot
 noauto= not mounted at boot

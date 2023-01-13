@@ -10,7 +10,9 @@ install arthas: `kubectl exec -it podName -- /bin/bash -c "wget https://arthas.a
 ### 获取信息 排查问题
 
 kubectl get events -A -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message |less
-kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb
+
+查看指定 pod 的 events
+kubectl get events --watch -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod, involvedObject.name=pod-test-78b7567ccc-b96kb
 
 kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod --sort-by=.metadata.creationTimestamp |less
 kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --sort-by=.metadata.creationTimestamp |less
@@ -135,11 +137,16 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 ### PVC
 
 `kubectl get pvc` volume claim
+
 `kubectl patch pvc test-pvc -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'` resize pvc
 
 ### Pod
 
 `k port-forward pod-name 8001:5000` 本地端口 8001 转发到 pod 的端口 5000
+
+`kubectl delete pods $(kubectl get pods | grep Evicted |awk '{print $1}')` delete Evicted pods in current namespace
+
+`kubectl get pods -A | grep Evicted | awk '{print "kubectl delete pods -n ",$1,$2}' | bash -x` delete Evicted pods in all namespaces
 
 #### [Assign Pods to Nodes](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/)
 
@@ -241,17 +248,14 @@ CREATING A TLS CERTIFICATE FOR THE INGRESS
 
 Copying Kubernetes Secrets Between Namespaces: `kubectl get secret gitlab-registry --namespace=revsys-com -o yaml | kubectl apply --namespace=devspectrum-dev -f -`
 
-`exec` form—For example, `ENTRYPOINT ["node", "app.js"]`: runs the node process directly (not inside a shell)
-`shell` form—For example, `ENTRYPOINT node app.js`: used the shell form
-
 ### System
 
 `kubectl get events` 查看相关事件
 
 ### [Managing Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 
-**request**: the scheduler uses this information to decide which node to place the Pod on. The kubelet also reserves at least the request amount of that system resource specifically for that container to use.  It is default to the limits if requests is not set explicitly.
-**limit**: the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set
+* **request**: the scheduler uses this information to decide which node to place the Pod on. The kubelet also reserves at least the request amount of that system resource specifically for that container to use.  It is default to the limits if requests is not set explicitly.
+* **limit**: the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set
 
 #### Exceeding the limits
 
@@ -309,6 +313,27 @@ withKubeConfig([credentialsId: 'k8s_config_prd'
                 }
 ```
 
+### Volume (Disk)
+
+`Pod The node had condition: [DiskPressure]` 这个异常信息会发生在 Pod 创建的时候，如果 Node 没有足够的空间创建新的 Pod，就会抛出这个异常
+
+`The node was low on resource: ephemeral-storage` 这个异常信息发生在 pod 运行过程中，如果 pod 写了大量的日志信息，导致磁盘被大量使用，导致无法继续运行，会抛出这个异常。
+
+设置 PVC 大小 `kubectl patch pvc pvc-name -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'`
+
+#### Unable to attach or mount volumes - timed out waiting for the condition
+
+[Kubernetes - Kubelet Unable to attach or mount volumes - timed out waiting for the condition - vEducate.co.uk](https://veducate.co.uk/kubelet-unable-attach-volumes/)
+
+The fix is to remove the stale VolumeAttachment. `kubectl delete volumeattachment [volumeattachment_name]`
+
+[容器服务K8S存储卷挂载常见问题-阿里云开发者社区](https://developer.aliyun.com/article/591884)
+
+磁盘挂载日志
+tail -f /var/log/alicloud/diskplugin.csi.alibabacloud.com.log | grep d-2zeheqwxc2jrasb0fonj
+tail -n 1000 /var/log/messages | grep kubelet |less
+kg VolumeAttachment | sort -k 3
+
 ### Network
 
 [从零开始入门 K8s | 理解 CNI 和 CNI 插件](https://developer.aliyun.com/article/748866)
@@ -332,6 +357,11 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 3. 在这个节点上创建 Pod 之后，Kubelet 就会根据 CNI 配置文件执行前两步所安装的 CNI 插件；
 4. 上步执行完之后，Pod 的网络就配置完成了。
 
+#### 阿里云ACK集群中的网络问题
+
+[阿里云ACK集群中的网络问题](https://itopic.org/ack-network-issue.html)
+[pod 无法访问集群 ingress slb 绑定的公网域名 | Blog](https://zijin-m.github.io/Blog/problems/k8s/externalTrafficPolicy-local.html)
+
 #### 阿里云Kubernetes托管版开启 hairpin 模式
 
 据客服回复目前(2020-11-20)没有简单的配置方式, 但发现下面的方式暂时有效果:
@@ -354,18 +384,38 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 }
 ```
 
+## Kubernetes internal
+
+### Components of the Control Plane
+
+* The etcd distributed persistent storage
+* The API server
+* The Scheduler
+* The Controller Manager
+
+These components store and manage the state of the cluster, but they aren’t what runs the application containers.
+
+### Components running on the worker nodes
+
+The task of running your containers is up to the components running on each worker node:
+
+* The Kubelet
+* The Kubernetes Service Proxy (kube-proxy)
+* The Container Runtime (Docker, rkt, or others)
+
 ## Useful image
 
-`kubectl run mysql-client --image=mysql:8.0.28 -it --rm --restart=Never -- mysql`
-`kubectl run redis-client --image=redis:6.0.9 -it --rm --restart=Never -- bash`
-`kubectl run dnsutils --image=tutum/dnsutils -it --rm`
-`kubectl run dnsutils --image=tutum/dnsutils -it --rm --restart=Never -- dig SRV kubia.default.svc.cluster.local`
-`kubectl run curl --image=tutum/curl -it --rm --restart=Never`
-`kubectl run netshoot --image=nicolaka/netshoot -it --rm`
-`kubectl run nginx --image=nginx -it --rm`
-`kubectl run busybox --image=busybox -it --rm`  busybox: BusyBox combines tiny versions of many common UNIX utilities
-`kubectl run alpine --image=alpine -it --rm`  alpine: A minimal Docker image based on Alpine Linux
-  `apk add curl` install curl
+`kubectl run -it --rm --restart=Never --image=mysql:8.0.28 mysql-client -- mysql`
+`kubectl run -it --rm --restart=Never --image=redis:6.0.9 redis-client -- bash`
+`kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils`
+`kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils -- dig SRV kubia.default.svc.cluster.local`
+`kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools`
+`kubectl run -it --rm --restart=Never --image=tutum/curl curl`
+`kubectl run -it --rm --image=nicolaka/netshoot netshoot`
+`kubectl run -it --rm --image=nginx nginx`
+`kubectl run -it --rm --image=busybox busybox`  busybox: BusyBox combines tiny versions of many common UNIX utilities
+`kubectl run -it --rm --image=alpine alpine`  alpine: A minimal Docker image based on Alpine Linux
+`apk add curl` install curl
 
 ## helm
 
@@ -406,13 +456,15 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 [SIGTERM : Linux Graceful Termination | Exit code 143, Signal 15](https://komodor.com/learn/sigterm-signal-15-exit-code-143-linux-graceful-termination/)
 
-Common exit codes associated with docker containers are:
+Common exit codes (`128+x`) associated with docker containers are:
 
 * Exit Code 0: Absence of an attached foreground process
 * Exit Code 1: Indicates failure due to application error
-* Exit Code 137: Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
-* Exit Code 139: Indicates failure as container received SIGSEGV
-* Exit Code 143: Indicates failure as container received SIGTERM
+* Exit Code 137: `128+9` Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
+* Exit Code 139: `128+11` Indicates failure as container received SIGSEGV
+* Exit Code 143: `128+15` Indicates failure as container received SIGTERM
+
+x: see `man signal`
 
 ### [Troubleshooting a failed certificate request | cert-manager](https://cert-manager.io/docs/faq/troubleshooting/)
 

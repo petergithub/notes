@@ -10,14 +10,14 @@
 
 ### [微服务架构深度解析与最佳实践](https://zhuanlan.zhihu.com/p/94976754)
 
-服务框架：我们可以选择用 Spring Cloud 或者 Apache Dubbo，包括新兴的 Spring Cloud Alibaba，还有华为贡献的 Apache ServiceComb，蚂蚁金服的 SOFAStack ，Oracle 的 Helidon，Redhat 的 Quarkus，基于 Scala 语言和 Akka 的 Lagom，基于 Grails 语言的 Micronaut，基于 Python 语言的 Nameko，基于 Golang 语言的 go-micro，支持多语言混编的响应式微服务框架 Vert.X，腾讯开源的 Tars，百度开源的 Apache BRPC（孵化中），微博的简化版 Dubbo 框架 Motan 等等。
-配置中心：Apollo，Nacos，disconf，Spring Cloud Config，或者 Etcd、ZK、Redis 自己封装
-服务注册发现：Eureka，Consul，或者 Etcd、ZK、Redis 自己封装
-服务网关：Zuul/Zuul2，Spring Cloud Gateway，nginx 系列的 Open Resty 和 Kong，基于 Golang 的 fagongzi Gateway 等
-容错限流：Hystrix，Sentinel，Resilience4j，或者直接用 Kong 自带的插件
-消息处理：Kafka、RabbitMQ、RocketMQ，以及 Pulsar，可以使用 Sping Messaging 或者 Spring Cloud Stream 来简化处理
-链路监控与日志：开源的链路技术有 CAT、Pinpoint、Skywalking、Zipkin、Jaeger 等，也可以考虑用商业的 APM（比如听云 APM、OneAPM、App Dynamic 等），日志可以用 ELK
-认证与授权：比如要支持 OAuth2、LDAP，传统的自定义 BRAC 等，可以选择 Spring Security 或者 Apache Shiro 等
+* 服务框架：我们可以选择用 Spring Cloud 或者 Apache Dubbo，包括新兴的 Spring Cloud Alibaba，还有华为贡献的 Apache ServiceComb，蚂蚁金服的 SOFAStack ，Oracle 的 Helidon，Redhat 的 Quarkus，基于 Scala 语言和 Akka 的 Lagom，基于 Grails 语言的 Micronaut，基于 Python 语言的 Nameko，基于 Golang 语言的 go-micro，支持多语言混编的响应式微服务框架 Vert.X，腾讯开源的 Tars，百度开源的 Apache BRPC（孵化中），微博的简化版 Dubbo 框架 Motan 等等。
+* 配置中心：Apollo，Nacos，disconf，Spring Cloud Config，或者 Etcd、ZK、Redis 自己封装
+* 服务注册发现：Eureka，Consul，或者 Etcd、ZK、Redis 自己封装
+* 服务网关：Zuul/Zuul2，Spring Cloud Gateway，nginx 系列的 Open Resty 和 Kong，基于 Golang 的 fagongzi Gateway 等
+* 容错限流：Hystrix，Sentinel，Resilience4j，或者直接用 Kong 自带的插件
+* 消息处理：Kafka、RabbitMQ、RocketMQ，以及 Pulsar，可以使用 Sping Messaging 或者 Spring Cloud Stream 来简化处理
+* 链路监控与日志：开源的链路技术有 CAT、Pinpoint、Skywalking、Zipkin、Jaeger 等，也可以考虑用商业的 APM（比如听云 APM、OneAPM、App Dynamic 等），日志可以用 ELK
+* 认证与授权：比如要支持 OAuth2、LDAP，传统的自定义 BRAC 等，可以选择 Spring Security 或者 Apache Shiro 等
 
 ### [一个可供中小团队参考的微服务架构技术栈](https://www.infoq.cn/article/china-microservice-technique)
 
@@ -40,7 +40,7 @@
 
 ## 规划
 
-### 代码未编工具先行；
+### 代码未编工具先行
 
     统一微服务工程结构；
     统一服务启动方式（jar war）；
