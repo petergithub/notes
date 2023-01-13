@@ -318,6 +318,7 @@ FROM prince
 2. 看看索引是不是对的，看看哪些SQL本身是有问题的
 
 [Identify and Kill Queries with MySQL Command-Line Tool](https://pantheon.io/docs/kill-mysql-queries/)
+[pt-kill — Percona Toolkit Documentation](https://docs.percona.com/percona-toolkit/pt-kill.html)
 [Mass killing of MySQL Connections](https://www.percona.com/blog/2009/05/21/mass-killing-of-mysql-connections)
 
 ```SQL
@@ -1097,6 +1098,15 @@ SQL 标准中规定的 RR 并不能消除幻读，但是 MySQL 的 RR 可以，�
 
 ### 锁机制
 
+```sql
+SHOW ENGINE INNODB STATUS\G;
+
+-- 5.6 查询锁
+SELECT*FROM information_schema.INNODB_LOCKS;
+-- mysql 8 查询锁
+select * FROM performance_schema.data_locks WHERE LOCK_TYPE="TABLE";
+```
+
 1. 共享锁：由读表操作加上的锁，加锁后其他用户只能获取该表或行的共享锁，不能获取排它锁，也就是说只能读不能写
 2. 排它锁：由写表操作加上的锁，加锁后其他用户不能获取该表或行的任何锁，典型是mysql事务中的
 
@@ -1125,6 +1135,8 @@ SQL 标准中规定的 RR 并不能消除幻读，但是 MySQL 的 RR 可以，�
 InnoDB的锁，与索引类型，事务的隔离级别相关
 
 #### 各种SQL到底加了什么锁
+
+[MySQL 8.0 15.7.3 Locks Set by Different SQL Statements in InnoDB](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html)
 
 ##### 普通select加什么锁
 
@@ -1181,7 +1193,7 @@ This is accomplished with locking. InnoDB utilizes indexes for locking records, 
 
 `SELECT ... FOR UPDATE` with INSERT
 
-However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for a record that doesn''t exist yet? If you are using the default isolation level of REPEATABLE READ, InnoDB will also utilize gap locks. As long as you know the id (or even range of ids) to lock, then InnoDB can lock the gap so no other record can be inserted in that gap until we''re done with it.
+However, to use SELECT ... FOR UPDATE with INSERT, how do you lock an index for a record that doesn't exist yet? If you are using the default isolation level of REPEATABLE READ, InnoDB will also utilize gap locks. As long as you know the id (or even range of ids) to lock, then InnoDB can lock the gap so no other record can be inserted in that gap until we're done with it.
 
 If your id column were an auto-increment column, then SELECT ... FOR UPDATE with INSERT INTO would be problematic because you wouldn''t know what the new id was until you inserted it. However, since you know the id that you wish to insert, SELECT ... FOR UPDATE with INSERT will work.
 
@@ -1286,11 +1298,11 @@ SELECT @@read_buffer_size, @@read_rnd_buffer_size, @@sort_buffer_size, @@join_bu
 ## I/O
 
 1. `innodb_flush_log_at_trx_commit` 2
-   1. 0 把日志缓冲写到日志文件，并且每秒钟刷新一次，但是事务提交时不做任何事。
-   2. 1 事务提交时，把事务日志从缓存区写到日志文件中，并且立刻写入到磁盘上。
-   3. 2 事务提交时，把事务日志从缓存区写到日志文件中，但不一定立刻写入到磁盘上。日志文件会每秒写入到磁盘，如果写入前系统崩溃，就会导致最后1秒的日志丢失。
+   1. 0 把日志缓冲写到日志文件，并且每秒钟刷新一次，但是事务提交时不做任何事。该模式速度最快，但不太安全，mysqld进程的崩溃会导致上一秒钟所有事务数据的丢失。
+   2. 1 事务提交时，把事务日志从缓存区写到日志文件中，并且立刻写入到磁盘上。该模式是最安全的，但也是最慢的一种方式。在mysqld服务崩溃或者服务器主机宕机的情况下，日志缓存区只有可能丢失最多一个语句或者一个事务。
+   3. 2 事务提交时，把事务日志从缓存区写到日志文件中，但不一定立刻写入到磁盘上。日志文件会每秒写入到磁盘，如果写入前系统崩溃，就会导致最后1秒的日志丢失。该模式速度较快，较取值为0情况下更安全，只有在操作系统崩溃或者系统断电的情况下，上一秒钟所有事务数据才可能丢失。
 2. `sync_binlog` 1000
-   1. 1 事务提交后，将二进制日志文件写入磁盘并立即刷新，相当于同步写入磁盘，不经过系统缓存。
+   1. 1 事务提交后，将二进制日志文件写入磁盘并立即刷新，相当于同步写入磁盘，不经过系统缓存。是最安全的值，但也是最慢的
    2. 1000 每写入1000次系统缓存就执行一次写入磁盘并刷新的操作，会有数据丢失的风险。
 
 ### O_DIRECT
@@ -1499,6 +1511,13 @@ To see indexes for all tables within a specific schema: `SELECT DISTINCT TABLE_N
 mysql query escape %前面加两个反斜杠，比如
 `select count(1) from tableName where column like '%关键字\\%前面的是一个百分号%'`
 
+### 索引下推（index condition pushdown ）
+
+联合索引 第一个条件 用了范围查询
+
+1. 没有ICP的情况下 range+using where
+2. ICP的情况下 range+using index condition
+
 ### Tracing the Optimizer
 
 ```sql
@@ -1684,7 +1703,7 @@ MySQL NDB Cluster (或 MySQL Cluster) 与MySQL Server（人们普遍认知的MyS
 
 几乎与MySQL Cluster完全无关，并且是从MySQL 5.7 开始作为一组插件实现的。其中之一是“组复制”插件，该插件使组中的MySQL服务器能够在它们之间复制数据。
 
-## Q
+## Question
 
 ### MYSQL=黑盒?
 
