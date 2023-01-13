@@ -10,6 +10,38 @@
 
 git merge --squash --no-ff
 
+### Git commit message convention
+
+[Git commit message convention that you can follow! - DEV Community 👩‍💻👨‍💻](https://dev.to/i5han3/git-commit-message-convention-that-you-can-follow-1709)
+
+A typical git commit message will look like
+
+`<type>(<scope>): <subject>`
+
+"type" must be one of the following mentioned below!
+
+* build: Build related changes (eg: npm related/ adding external dependencies)
+* chore: A code change that external user won't see (eg: change to .gitignore file or .prettierrc file)
+* ci: continuous integration related
+* feat: A new feature
+* fix: A bug fix
+* docs: Documentation related changes
+* refactor: A code that neither fix bug nor adds a feature. (eg: You can use this when there is semantic changes like renaming a variable/ function name)
+* revert: reverts a previous commit
+* perf: A code that improves performance
+* style: A code that is related to styling
+* test: Adding new test or making changes to existing test
+
+"scope" is optional
+
+Scope must be noun and it represents the section of the section of the codebase
+
+"subject"
+
+* use imperative, present tense (eg: use "add" instead of "added" or "adds")
+* don't use dot(.) at end
+* don't capitalize first letter
+
 ## Commands
 
 ### Most recent
@@ -402,3 +434,11 @@ git filter-branch -f --env-filter "
     GIT_COMMITTER_EMAIL='new@email'
   " HEAD
 ```
+
+### View git history of specific line
+
+[View git history of specific line - Stack Overflow](https://stackoverflow.com/questions/50469927/view-git-history-of-specific-line)
+
+`git log -L 15,+1:'path/to/your/file.txt'` Trace the evolution of the line [15, 15+1] in file.txt
+
+`-L <start>,<end>:<file>` Trace the evolution of the line range given by `<start>,<end>`
