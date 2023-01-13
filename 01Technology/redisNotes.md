@@ -76,7 +76,11 @@ EvictedKeys 因内存满而淘汰的key总数
 
 ## Performance
 
-### [Redis 变慢问题的 Checklist](https://time.geekbang.org/column/article/dbfab3b1b37b27e980756e0b2042186a/share?code=B4DpWbLTTWwh2J-qoenyDrjUMJmEMYzFjIA5fd%2FVh4c%3D&source=app_share&oss_token=33f0026d90c6e4c7)
+Redis单机qps（每秒的并发）可以达到110000次/s，写的速度是81000次/s。
+
+### Redis 变慢问题的 Checklist
+
+[Redis 变慢问题的 Checklist](https://time.geekbang.org/column/article/dbfab3b1b37b27e980756e0b2042186a/share?code=B4DpWbLTTWwh2J-qoenyDrjUMJmEMYzFjIA5fd%2FVh4c%3D&source=app_share&oss_token=33f0026d90c6e4c7)
 
 摘自 [Redis 核心技术与实战 - 蒋德钧](https://time.geekbang.org/column/intro/100056701)
 
@@ -239,7 +243,7 @@ SCAN return value is an array of two values
 `SCAN cursor [MATCH pattern] [COUNT count]`
 eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
 `redis-cli --scan | head -10`
-`redis-cli --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli DEL` 批量删除
+`redis-cli -h host -p 6379 -n 2 --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli -h host -p 6379 -n 2  DEL` 批量删除
 
 #### SCAN命令时，不会漏key，但可能会得到重复的key
 
