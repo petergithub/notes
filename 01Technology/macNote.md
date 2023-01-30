@@ -275,13 +275,15 @@ restart the service  `sudo pfctl -f /etc/pf.conf`
 edit policy file
 
 1. Export current policy: `pwpolicy getaccountpolicies | awk 'NR>1' > ~/Desktop/file.plist`
-2. Edit the policy file, change the quoted part to your Regex. `policyAttributePassword matches '^$|.{4,}+'`
+2. Edit the policy file, change the quoted part to your Regex (default: `^(?=.*[0-9])(?=.*[a-zA-Z]).+`). `policyAttributePassword matches '^$|.{4,}+'`
 3. Import policy file for account username: `pwpolicy setaccountpolicies -u username ~/Desktop/file.plist`
 4. chang password for account: `sudo passwd username`
 
 `^$|.{3,}+` for a 4 character length password.
 
-### [How to Write NTFS Drives on macOS Monterey](https://techsviewer.com/how-to-write-ntfs-drives-on-macos-monterey/)
+### How to Write NTFS Drives on macOS Monterey
+
+[How to Write NTFS Drives on macOS Monterey](https://techsviewer.com/how-to-write-ntfs-drives-on-macos-monterey/)
 
 Method 1: Using Terminal to Enable Writing to NTFS Drives
 
@@ -290,6 +292,10 @@ diskutil list
 # Replace the “disk2s1” section with the Indentifier of your NTFS drive.
 sudo mkdir /Volumes/disk2s1
 sudo mount -t ntfs -o rw,auto,nobrowse /dev/disk2s1 /Volumes/disk2s1
+
+sudo mkdir /Volumes/documentShelf && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s5 /Volumes/documentShelf
+sudo mkdir /Volumes/entertainmentBox && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s6 /Volumes/entertainmentBox
+sudo mkdir /Volumes/softwareToolkit && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s7 /Volumes/softwareToolkit
 ```
 
 ## Network

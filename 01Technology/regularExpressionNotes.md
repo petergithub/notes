@@ -122,15 +122,13 @@ Find:`（(\d+)）` Replace: `$1.`
 
 #### 需求 将所有的方法调用都套上print()
 
-Find: `(num.\w+())`
-Replace: `print($1)`
+Find: `(num.\w+())` Replace: `print($1)`
 
 #### 需求 将SQL语句中的多余字符替换掉
 
 原文：`SELECT platform, sales_medium.platform_anchor_id AS sales_medium_platform_anchor_id FROM sales_medium`
 需求：把 `sales_medium.platform_anchor_id AS sales_medium_platform_anchor_id` 替换成 `platform_anchor_id`
-Find: `sales_medium\.(.*?) AS.*?,`
-Replace: `$1,`
+Find: `sales_medium\.(.*?) AS.*?,` Replace: `$1,`
 
 ## filename
 
