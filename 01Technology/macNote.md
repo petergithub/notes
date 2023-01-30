@@ -194,6 +194,16 @@ Connect using a DSN: `mycli mysql://my_user@my_host.com:3306/my_database`
 `COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown)` 切换到上/下一个工作表 Sheet
 Cloud document storage location: /Users/pu/Library/Containers/com.kingsoft.wpsoffice.mac/Data/Library/Application Support/Kingsoft/WPS Cloud Files/userdata/qing/filecache
 
+### Calibre
+
+自定义翻译源，打开 Ebook viewer，双击查询，然后点击 `Add sources`，加入以下格式的链接
+
+```sh
+https://cn.bing.com/search?q=define:{word}
+https://www.google.com/search?q=define:{word}
+https://fanyi.baidu.com/#en/zh/{word}
+```
+
 ## Manage
 
 ### stop programs from opening on startup
