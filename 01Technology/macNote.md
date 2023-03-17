@@ -150,6 +150,14 @@ Alt+U or click the icon to copy URL without encoding from address bar
 3. 打开命令行（command palette）：command + shift + p。
 4. 在命令行中输入「screen」，这时自动补齐功能会显示出一些包含 「Screen」 关键字的命令。移动方向键到「Capture full size screenshot」并回车,chrome就会自动下载整个页面截屏文件。
 
+#### How to Enable DNS Over HTTPS (DoH)
+
+1. Select the three-dot menu in your browser > Settings.
+2. Select Privacy and security > Security.
+3. Scroll down and enable Use secure DNS.
+4. Select the With option, and from the drop-down menu choose Cloudflare (1.1. 1.1).
+5. [Browser Security Check | Cloudflare](https://www.cloudflare.com/ssl/encrypted-sni)
+
 ### firefox
 
 firefox profile location: `/users/$user/library/application support/firefox/profiles`
@@ -186,8 +194,8 @@ Connect using a DSN: `mycli mysql://my_user@my_host.com:3306/my_database`
 1. 以支持 Https 方式启动 `anyproxy --intercept`
 2. 启动浏览器 [链接](http://localhost:8002)
 3. 客户端设置代理 [链接](http://ip:8001)
- [代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)
- [AnyProxy](http://anyproxy.io/cn)
+ [安装使用文档 代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)
+ [AnyProxy 官网](http://anyproxy.io/cn)
 
 ### WPS
 
@@ -205,6 +213,9 @@ https://fanyi.baidu.com/#en/zh/{word}
 ```
 
 ## Manage
+
+[苹果 Mac 重置 SMC、NVRAM、PRAM 方法教程 - 解决 macOS 卡顿，风扇响或无法启动](https://www.iplaysoft.com/p/mac-reset-smc-nvram-pram)
+[How to Reset your Mac or MacBook's PRAM and SMC | Avast](https://www.avast.com/c-reset-mac-pram-smc)
 
 ### stop programs from opening on startup
 
@@ -303,9 +314,23 @@ diskutil list
 sudo mkdir /Volumes/disk2s1
 sudo mount -t ntfs -o rw,auto,nobrowse /dev/disk2s1 /Volumes/disk2s1
 
-sudo mkdir /Volumes/documentShelf && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s5 /Volumes/documentShelf
-sudo mkdir /Volumes/entertainmentBox && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s6 /Volumes/entertainmentBox
-sudo mkdir /Volumes/softwareToolkit && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s7 /Volumes/softwareToolkit
+sudo mkdir -p /Volumes/documentShelf && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s5 /Volumes/documentShelf
+sudo mkdir -p /Volumes/entertainmentBox && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s6 /Volumes/entertainmentBox
+sudo mkdir -p /Volumes/softwareToolkit && sudo mount -w -t ntfs -o rw,nobrowse /dev/disk3s7 /Volumes/softwareToolkit
+
+# macOS Ventura 13.2
+# [How to Write NTFS Drives on macOS Ventura](https://techsviewer.com/how-to-write-ntfs-drives-on-macos-ventura/)
+# 1. install MacFuse from [Home - macFUSE](https://osxfuse.github.io/)
+# 2. Install NTFS-3G from Homebrew
+# 2.1 brew tap gromgit/homebrew-fuse
+# 2.2 brew install ntfs-3g-mac
+# 3. # List volume in macOS: diskutil list
+# 3.1 Unmount USB NTFS Drive (your NTFS drive identifier: disk2s2): sudo diskutil unmount /dev/disk2s2
+# 3.2 Mount and Enable NTFS Write permission
+sudo umount /Volumes/documentShelf && sudo mkdir -p /Volumes/documentShelf && sudo mount_ntfs /dev/disk4s5 /Volumes/documentShelf
+sudo umount /Volumes/entertainmentBox && sudo mkdir -p /Volumes/entertainmentBox && sudo mount_ntfs /dev/disk4s6 /Volumes/documentShelf
+sudo umount /Volumes/softwareToolkit && sudo mkdir -p /Volumes/softwareToolkit && sudo mount_ntfs /dev/disk4s7 /Volumes/softwareToolkit
+
 ```
 
 ## Network
@@ -470,4 +495,5 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * VeraCrypt, TrueCrypt-7.2-Mac-OS-X
 * 垃圾清理：CleanMyMac X（248 元/年）——腾讯柠檬清理（免费）
 * 全能截图工具：CleanShot X（200 元）/ Xnip（50 元）——iShot（免费）
-* 解压缩：Bandizip（118 元）/ 解忧（45 元）——eZip（免费）
+* 解压缩：360rar
+* [Proxyman · Native, Modern Web Debugging Proxy 代理抓包工具](https://proxyman.io/)

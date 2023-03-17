@@ -1,5 +1,5 @@
 # install package
-# refer to [高效程序员的MacBook工作环境配置](http://www.codeceo.com/article/programmer-macbook-workplace.html)
+# refer to [高效程序员的MacBook工作环境配置](https://cloud.tencent.com/developer/article/1046070)
 # automator [给MAC应用设置系统热键(快捷键)启动](https://www.jianshu.com/p/b83f54888ff9)
 # TODO:
 
@@ -14,6 +14,14 @@
 #
 # to list all installed jdk /usr/libexec/java_home -V
 # man java_home
+# 
+# https://stackoverflow.com/questions/24342886/how-to-install-java-8-on-mac
+# /Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
+# 
+# $HOME/Library/Java/JavaVirtualMachines/openjdk-19.0.2-1/Contents/Home
+brew tap adoptopenjdk/openjdk
+brew install --cask adoptopenjdk8
+
 echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >> ~/.zsh.mac
 echo "export JAVA_HOME=$(/usr/libexec/java_home -v17)" >> ~/.zsh.mac
 
@@ -34,8 +42,8 @@ export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 # echo $SHELL
 # zsh check version
 # zsh --version
-brew install zsh zsh-completions
-chsh -s $(which zsh)
+# chsh -s $(which zsh)
+brew install zsh-completions
 # oh my zsh https://github.com/ohmyzsh/ohmyzsh
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 # or sh -c "$(curl -fsSL https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh)"
@@ -48,26 +56,82 @@ sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/i
 ## Disable 'Would you like to check for updates' prompt: add DISABLE_AUTO_UPDATE="true" on your .zshrc before the source $ZSH/oh-my-zsh.sh line
 # git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 # source ~/.zshrc
+brew install google-chrome
 
 # brew install maven
 # brew install python3
 
-# common software install begin
-# autojump jq
-# coreutils include gdate
-#
-# autojump
-# Add the following line to your ~/.bash_profile or ~/.zshrc file:
-#  [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
-#
 # Install and Set Up kubectl on macOS
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/#install-with-homebrew-on-macos
 # download a specific version: curl -LO "https://dl.k8s.io/release/v1.16.6/bin/darwin/amd64/kubectl"
 # Notice the server and client version: kubectl version
 # kubectl version --client
-brew install kubectl kube-ps1 stern
-brew install google-chrome
-#brew install node
+brew install kubectl kubectx kube-ps1 stern
+
+# common software install begin
+# autojump jq
+#
+# autojump
+# Add the following line to your ~/.bash_profile or ~/.zshrc file:
+#  [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+#
+# jless https://jless.io/user-guide.html
+# jless can read files directly, or read JSON data from standard input 
+brew install htop ncdu bat jless autojump jq
+brew install mycli
+
+# How to replace Mac OS X utilities with GNU core utilities?
+# https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities
+# https://liyang85.com/install-gnu-utilities-on-macos
+# 如果不启用--with-default-names，安装的工具会被添加g前缀，使用的时候就是gsed、gfind、gtar，查看帮助文件就是man gsed
+# replace mac default sed
+# --with-default-names was removed https://discourse.brew.sh/t/why-was-with-default-names-removed/4405/17
+# coreutils include gdate
+brew install grep coreutils findutils gawk gnu-tar gnu-sed
+brew install gnutls gnu-indent gnu-getopt
+
+# All commands have been installed with the prefix "g".
+# If you need to use these commands with their normal names, you
+# can add a "gnubin" directory to your PATH from your bashrc like:
+#   PATH="/opt/homebrew/opt/grep/libexec/gnubin:$PATH"
+sudo mkdir -p /usr/local/gnubin/
+for gnuutil in /opt/homebrew/opt/*/libexec/gnubin/*; do
+    sudo ln -sfn $gnuutil /usr/local/gnubin
+done
+echo "Add /usr/local/gnubin to /etc/paths"
+PATH="/usr/local/gnubin:$PATH"
+# TODO MANPATH
+# Additionally, you can access their man pages with normal names if you add
+# the "gnuman" directory to your MANPATH from your bashrc as well:
+# MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+BREW_OPT="$(brew --prefix)/opt"
+BREW_MAN="libexec/gnuman"
+# MANPATH="$BREW_OPT/grep/$BREW_MAN:${MANPATH-/usr/share/man}"
+MANPATH="$BREW_OPT/grep/$BREW_MAN:$BREW_OPT/coreutils/$BREW_MAN:$BREW_OPT/findutils/$BREW_MAN:$BREW_OPT/gawk/$BREW_MAN:$BREW_OPT/gnu-tar/$BREW_MAN:$BREW_OPT/gnu-sed/$BREW_MAN:$BREW_MAN:$BREW_OPT/gnu-indent/$BREW_MAN:${MANPATH-/usr/share/man}"
+
+### karabiner-elements ⌘ ⇧
+##keyboard mapping https://karabiner-elements.pqrs.org/docs/
+## refer https://v2ex.com/t/565667 短按左 Shift ⇧（英文快捷键) , 短按右 Shift ⇧（中文快捷键）
+## 配置文件放到~/.config/karabiner/assets/complex_modifications目录下
+## Complex modifications > rules > Add rule > 共四个 "短按 Shift", "Control 空格"
+## Complex modifications > parameters > to_if_alone_timeout_millisenconds 500, to_if_held_down_threshold_milliseconds 100
+#
+### Alfred
+# Troubleshooting File Indexing Issues https://www.alfredapp.com/help/troubleshooting/indexing/
+# how can I filter out unwanted search results in Alfred (ie node_modules folder, caches)
+# https://apple.stackexchange.com/questions/310443/how-can-i-filter-out-unwanted-search-results-in-alfred-ie-node-modules-folder
+# Go to Preferences -> Spotlight -> Privacy (TAB) Then add the folders you want to exclude to that list.
+# 
+# Sync Alfred preferences 
+# [Disabling Sync Folder - Alfred Help and Support](https://www.alfredapp.com/help/advanced/sync/disable-sync/)
+# ln -s $HOME/.config/Alfred.alfredpreferences $HOME/Library/"Application Support"/Alfred/Alfred.alfredpreferences
+#
+### Maccy: Lightweight clipboard manager for macOS
+brew install --cask alfred karabiner-elements maccy
+
+### VirtualBox
+## Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
+brew install calibre xmind virtualbox postman broot docker
 
 # develop software install
 # download from mysql official website mysql-5.7.23-macos10.13-x86_64.tar.gz
@@ -88,6 +152,10 @@ brew install google-chrome
 #ln -s /usr/local/Cellar/mysql@5.7/5.7.23/bin/mysql /usr/local/bin/mysql
 ## Or using the mysql command
 #mysql --version
+#
+## mysql client mycli
+brew install mycli
+#brew install node
 
 ## nginx
 #Docroot is: /usr/local/var/www
@@ -96,45 +164,6 @@ brew install google-chrome
 #nginx will load all files in /usr/local/etc/nginx/servers/.
 #To have launchd start nginx now and restart at login:  brew services start nginx
 #Or, if you don't want/need a background service you can just run: nginx
-
-
-# other software
-# jless https://jless.io/user-guide.html
-# jless can read files directly, or read JSON data from standard input 
-brew install mycli ncdu bat jless
-
-# How to replace Mac OS X utilities with GNU core utilities?
-# https://apple.stackexchange.com/questions/69223/how-to-replace-mac-os-x-utilities-with-gnu-core-utilities
-# https://liyang85.com/install-gnu-utilities-on-macos
-# 如果不启用--with-default-names，安装的工具会被添加g前缀，使用的时候就是gsed、gfind、gtar，查看帮助文件就是man gsed
-# replace mac default sed
-# --with-default-names was removed https://discourse.brew.sh/t/why-was-with-default-names-removed/4405/17
-brew install coreutils findutils gnu-tar gnu-sed gawk gnutls gnu-indent gnu-getopt grep
-# Then add PATH with a script
-# PATH="/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/findutils/libexec/gnubin:$PATH"
-mkdir -p /usr/local/gnubin/
-for gnuutil in /usr/local/opt/*/libexec/gnubin/*; do
-    ln -sfn $gnuutil /usr/local/gnubin/
-done
-echo "Add /usr/local/gnubin to /etc/paths"
-PATH="/usr/local/gnubin:$PATH"
-# TODO MANPATH
-
-### karabiner-elements ⌘ ⇧
-##keyboard mapping https://karabiner-elements.pqrs.org/docs/
-## refer https://v2ex.com/t/565667 短按左 Shift ⇧（英文快捷键) , 短按右 Shift ⇧（中文快捷键）
-## 配置文件放到~/.config/karabiner/assets/complex_modifications目录下
-## Complex modifications > rules > Add rule > 共四个 "短按 Shift", "Control 空格"
-## Complex modifications > parameters > to_if_alone_timeout_millisenconds 500, to_if_held_down_threshold_milliseconds 100
-### VirtualBox
-## Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
-### Alfred
-# Troubleshooting File Indexing Issues https://www.alfredapp.com/help/troubleshooting/indexing/
-# how can I filter out unwanted search results in Alfred (ie node_modules folder, caches)
-# https://apple.stackexchange.com/questions/310443/how-can-i-filter-out-unwanted-search-results-in-alfred-ie-node-modules-folder
-# Go to Preferences -> Spotlight -> Privacy (TAB) Then add the folders you want to exclude to that list.
-### Maccy: Lightweight clipboard manager for macOS
-brew install --cask xmind calibre virtualbox alfred karabiner-elements maccy postman broot
 
 # Visual Studio Code (vscode)
 ## Setting for IntelliSense https://code.visualstudio.com/docs/editor/intellisense
@@ -148,6 +177,10 @@ brew install --cask xmind calibre virtualbox alfred karabiner-elements maccy pos
 #
 # File->Open Recent->Reopen Closed Editor: `Ctrl+Shift+T`
 # add to PATH environment: `command palette -> shell command install`
+#
+
+# iTerm2
+# shortcut Alt+I Perference -> keys -> Hotkey -> Show/hide all windows with a system-wide hotkey
 #
 # Open iTerm external
 # User Setting: Command+Shift+P
@@ -189,7 +222,7 @@ chmod 0644 /etc/synthetic.conf
 # [Mos](https://mos.caldis.me/) set scroll direction independently for your mouse
 # [Fantastical Calendar](https://flexibits.com/fantastical)
 # [jd-GUI](http://jd.benow.ca) 
-#    export JAVA_HOME=$(/usr/libexec/java_home -v1.8.0_301) in /Applications/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh  
+#    export JAVA_HOME=$(/usr/libexec/java_home -v1.8) in /Applications/JD-GUI.app/Contents/MacOS/universalJavaApplicationStub.sh  
 # [SizeUp](http://www.irradiatedsoftware.com/sizeup/)
 # [Better And Better](http://www.better365.cn/col.jsp?id=114):状态栏,键盘鼠标手势设置
 # [Vanilla](https://matthewpalmer.net/vanilla/): Hide menu bar icons on your Mac, Command+drag; start with open -a /Applications/Vanilla.app in a script ~/.script/mac_startup.sh
@@ -202,15 +235,20 @@ chmod 0644 /etc/synthetic.conf
 # NewFileMenuFree
 # Maccy: Lightweight clipboard manager for macOS
 # [Broot](https://dystroy.org/broot/) Get an overview of a directory
+# [Microsoft Remote Desktop Beta - App Center](https://install.appcenter.ms/orgs/rdmacios-k2vy/apps/microsoft-remote-desktop-for-mac/distribution_groups/all-users-of-microsoft-remote-desktop-for-mac)
 
 ## Config
 ### Tap to click
 # Preference -> Trackpad -> Point & Click -> Tap to click
 
+### Turn the Mac startup sound on or off
+# Choose Apple menu  > System Settings > Click Sound in the sidebar > Turn “Play sound on startup” on or off.
+
 ### Enable dragging with three fingers
 # Preference -> Accessibility -> Mouse & Trackpad -> Trackpad Options -> Enable dragging
 
 ### Login Item with startup.sh
+# Make startup.sh open with console
 # Preference > Users & Gruops > Login Items > add '~/.script/mac_startup.sh'
 
 ## iTerm2 profile backup
@@ -221,6 +259,7 @@ chmod 0644 /etc/synthetic.conf
 #### refer to https://apple.stackexchange.com/questions/154292/iterm-going-one-word-backwards-and-forwards
 ## Open new tabs in iTerm in the current directory
 # Preference -> General -> Wroking Directory -> Reuse previous session's directory
+## Launching iTerm2 from macOS Finder https://gist.github.com/pdanford/158d74e2026f393e953ed43ff8168ec1
 
 ### Open file with default application
 # Command+I or right (or control) click a file of the type you want to change and:
@@ -251,6 +290,8 @@ chmod 0644 /etc/synthetic.conf
     # https://www.howtogeek.com/236055/how-to-write-to-ntfs-drives-on-a-mac/
 
 # Try NTFS Tool https://github.com/ntfstool/ntfstool
+
+# 格式化为exfat格式 windows cmd: format e: /fs:exfat /q
 
 1. Disable SIP(System Integrity Protection)
 1.1 Reboot Mac into Recovery Mode by rebooting and holding down Command+R
