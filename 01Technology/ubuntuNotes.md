@@ -404,14 +404,15 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `:wqa` (write, then quit all)
 `:qa!` (force to quit all)
 
+在两个文件之间来回跳转 `CTRL+w, w`
+跳转到下一个差异点 `]c`. 反向跳转是: `[c`
+
 `CTRL+w K`(把当前窗口移到最上边)
 `CTRL+w H`(把当前窗口移到最左边)
 `CTRL+w J`(把当前窗口移到最下边)
 `CTRL+w L`(把当前窗口移到最右边)
 `CTRL+w,r` 交换上/下、左/右两个分隔窗口的位置
 其中2和4两个操作会把窗口改成垂直分割方式.
-在两个文件之间来回跳转, 可以用下列命令序列`CTRL+w, w`
-可以使用快捷键在各个差异点之间快速移动. 跳转到下一个差异点: `]c`. 反向跳转是: `[c`
 `> -`, `> +` 调整窗口大小
 
 `dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
@@ -525,11 +526,14 @@ Vim中查看文件编码 `:set fileencoding`
 参数:
 -a 或 --archive 此参数的效果和同时指定"-dpR"参数相同
 -b 或 --backup 删除、覆盖目的文件先备份，备份的文件或目录亦建立为符号链接，并指向源文件或目录链接的源文件或目录。假如没有加上这个参数，在复制过程中若遇到符号链接，则会直接复制源文件或目录
+-d same as --no-dereference --preserve=links: never follow symbolic links in SOURCE
 -f 或 --force 强行复制文件或目录， 不论目的文件或目录是否已经存在
 -i 或 --interactive 覆盖文件之前先询问用户
 -l 或 --link 对源文件建立硬链接，而非复制文件
--p 或 --preserve 保留源文件或目录的属性，包括所有者、所属组、权限与时间
+-P, --no-dereference never follow symbolic links in SOURCE
 -P 或 --parents 保留源文件或目录的路径，此路径可以是绝对路径或相对路径，且目的目录必须已经丰在
+-p 或 --preserve=mode,ownership,timestamps 保留源文件或目录的属性，包括所有者、所属组、权限与时间
+--preserve[=ATTR_LIST] preserve the specified attributes (default: mode,ownership,timestamps), if possible additional attributes: context, links, xattr, all
 -r 递归处理，将指定目录下的文件与子目录一并处理。若源文件或目录的形态，不属于目录或符号链接，则一律视为普通文件处理
 -R 或 --recursive 递归处理，将指定目录下的文件及子目录一并处理
 -s 或 --symbolic-link 对源文件建立符号链接，而非复制文件
@@ -537,9 +541,9 @@ Vim中查看文件编码 `:set fileencoding`
 -u 或 --update 使用这项参数之后，只会在源文件的修改时间(Modification Time)较目的文件更新时，或是名称相互对应的目的文件并不存在，才复制文件
 -v 或 --verbose 显示执行过程
 -V <备份方式> 或 --version-control=<备份方式> 指定当备份文件时，备份文件名的命名方式，有以下3种:
-1.numbered或t, 将使用备份编号，会在字尾加上~1~字符串，其数字编号依次递增
-2.simple或never 将使用简单备份，默认的备份字尾字符串是~, 也可通过-S来指定
-3.existing或nil将使用当前方式，程序会先检查是否存在着备份编号，若有则采用备份编号，若无则采用简单备份
+    1.numbered或t, 将使用备份编号，会在字尾加上~1~字符串，其数字编号依次递增
+    2.simple或never 将使用简单备份，默认的备份字尾字符串是~, 也可通过-S来指定
+    3.existing或nil将使用当前方式，程序会先检查是否存在着备份编号，若有则采用备份编号，若无则采用简单备份
 -x 或 --one-file-system 复制的文件或目录存放的文件系统，必须与cp指令执行时所处的文件系统相同，否则不复制，亦不处理位于其他分区的文件
 --help 显示在线帮助
 --sparse=<使用时机> 设置保存希疏文件的时机
@@ -761,17 +765,8 @@ find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s
 #### Common usage 例子
 
 ``` bash
-# 按逗号分割字段输出成行, 来查看需要打印的行数
-ps -ef | head -n 2 | awk '{print ++i,$i}'
-#  或者 print each filed number
-ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'
 # print the process by "root", $1 match root
-ps -ef | awk '$1~/root/ {print $0}' | less
-# print in format
 ps -ef | awk '$1~/root/ && $2>2000 && $2<2060 {printf("%6s owns it, pid is: %5d\n"), $1, $2}' | head
-
-# 输出第三行以后的行
-awk -F ':' 'NR >3 {print $1}' demo.txt
 
 # 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter
 ls -1 | awk 'ORS=","' | head -c -1
@@ -794,40 +789,7 @@ ossutil ls oss://path/to/202109/02/ | sort -k 2 | awk '$2>"14:28:00" && $2<"14:3
 less confluence.ognl.attack.log | python -c "import sys, urllib as ul; [sys.stdout.write(ul.unquote_plus(l)) for l in sys.stdin]" | less
 ```
 
-`awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
-`awk '$5 ~ /ldb/ {print}' f.txt` #第五列匹配ldb
-`alias aprint='awk "{print \$1}"'`  the $ is preceded by a \ to prevent $1 from being expanded by the shell.
-`w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0
-`awk -v RS='\),\(' -F "'" '{print $2}'`: 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
-`awk -v RS='\\),\\(' -F "'" '{print $2}'` CentOS
-`echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
-Print every line that has at least one field: `awk 'NF > 0' data`
-
-过滤记录`awk '$3==0 && $6=="LISTEN" ' netstat.txt` 比较运算符: ==, !=, >, <, >=, <=
-保留表头 引入内建变量NR `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt`
-
-awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`
- with `'\''` you close the opening `'`, then print a literal `'` by escaping it and finally open the ' again.
-escape square brackets: Brackets `[` need double escape `\\`: `\\[`
-
-awk escape double quote: `"\""` [Print double quotes in unix Awk](http://www.unixcl.com/2012/07/print-double-quotes-in-unix-awk.html)
-
-```sh
-# escape double quote
-cat file.txt
-# 6289693505455 Plan_DAIL_30D_AA
-awk '{print $2,"\""$1"\""}' file.txt
-# Plan_DAIL_30D_AA "6289693505455"
-
-#Assigning the quotes sequence to a variable x
-$ awk -v x="\"" '{print $2,x$1x}' file.txt
-#Using octal code of double quotes
-$ awk '{print $2,"\042"$1"\042"}' file.txt
-#Using ASCII code of double quotes
-$ awk '{print $2,"\x22"$1"\x22"}'  file.txt
-```
-
-##### 日志解析
+#### awk 日志解析
 
 ```bash
 # tomcat localhost_access_log filter with http status code
@@ -849,7 +811,7 @@ grep -v 0$ access.2010-11-05.log | awk -F '\" ' '{print $4" " $1}' web.log | awk
 rm -f /www/logs/access.log.$(date -d '-1 month' +'%Y-%m')*
 ```
 
-##### awk 16进制转换
+#### awk 16进制转换
 
 ```bash
 echo "D0490012475E" | awk '{
@@ -875,33 +837,32 @@ awk还支持命令文件 `awk -f awk_file data_file`
 Initialization and Final Action
 
 ``` bash
-    Syntax:
-    BEGIN { Actions}
-    {ACTION} # Action for everyline in a file
-    END { Actions }
+Syntax:
+BEGIN { Actions}
+{ACTION} # Action for everyline in a file
+END { Actions }
 
-    # is for comments in Awk
+# is for comments in Awk
 ```
 
 example:
 
 ``` bash
-
-    $ awk 'BEGIN {print "Name\tDesignation\tDepartment\tSalary";}
-    > {print $2,"\t",$3,"\t",$4,"\t",$NF;}
-    > END{print "Report Generated\n--------------";
-    > }' employee.txt
-    Name    Designation    Department    Salary
-    Thomas      Manager      Sales              $5,000
-    Jason      Developer      Technology      $5,500
-    Sanjay      Sysadmin      Technology      $7,000
-    Nisha      Manager      Marketing      $9,500
-    Randy      DBA           Technology      $6,000
-    Report Generated
-    --------------
+$ awk 'BEGIN {print "Name\tDesignation\tDepartment\tSalary";}
+> {print $2,"\t",$3,"\t",$4,"\t",$NF;}
+> END{print "Report Generated\n--------------";
+> }' employee.txt
+Name    Designation    Department    Salary
+Thomas      Manager      Sales              $5,000
+Jason      Developer      Technology      $5,500
+Sanjay      Sysadmin      Technology      $7,000
+Nisha      Manager      Marketing      $9,500
+Randy      DBA           Technology      $6,000
+Report Generated
+--------------
 ```
 
-#### 变量
+#### awk 变量
 
 内建的字段变量
 $0 一字符串, 其内容为目前 awk 所读入的数据行.
@@ -913,14 +874,67 @@ $2 $0上第二个字段的数据
 `NF` (Number of Fields)     整数, 其值表$0上所存在的字段数目
 `NR` (Number of Records)    整数, 其值表awk已读入的数据行数目
 `FILENAME`                awk正在处理的数据文件文件名
-`FS` (field separator)    FS default as space and tab. `FS="\n"` take "\n" as separator, `-F \t` take tab as separator
+`FS` (Field Separator)    FS default as space and tab. `FS="\n"` take "\n" as separator, `-F \t` take tab as separator
 `RS` (Record Separator)    awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
-`awk -v RS=""` 按空白行切分文件成Records
+`ORS` gets appended after every line that gets output
+
 `awk -F \" '{print $1, $2}'` 以"为分隔符处理每一个Records
 `awk -F '[= ]'` 同时以=和空格作为分隔符
 `awk -F '[\\[\\]]'` 和 `awk -F "[\\\[\\\]]"` 转义 `[`和`]` 同时以这两个字符作为分隔符
-`ps -ef | head -n 2 | awk '{print ++i,$i}'` 按逗号分割字段输出成行, 来查看需要打印的行数 或者
-`ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'`    print each filed number
+`echo "a (b (c" | awk -F " \\\(" '{ print $1; print $2; print $3 }'`: To use ( (space+parenthesis) as field separator in awk, use " \\\("`
+
+```sh
+# NF
+# 按逗号分割字段输出成行, 来查看需要打印的行数 print each field number
+ps -ef | head -n 2 | awk '{for (i=1;i<=NF;i++) {printf("%2d: %s\n"), i, $i}}'
+# Print every line that has at least one field
+awk 'NF > 0' data
+
+# NR
+# 输出第三行以后的行
+awk -F ':' 'NR >3 {print $1}' demo.txt
+# 引入内建变量 `NR` 保留表头
+awk '$6=="TIME_WAIT" || NR==1 ' netstat.txt
+
+# RS
+#按空白行切分文件成Records
+awk -v RS=""
+# 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
+awk -v RS='\),\(' -F "'" '{print $2}'
+# CentOS 以`),(`为每行的记录分隔符, 以`'`切分记录, 用于SQL文件
+awk -v RS='\\),\\(' -F "'" '{print $2}'
+
+# ORS
+# 合并多行到一行 并去掉最后一个符号 join multiple lines of file names into one with custom delimiter
+ls -1 | awk 'ORS=","' | head -c -1
+```
+
+#### awk escape
+
+awk escape single quote: `watch -n 1 -d 'ls -l | awk '\''{print $9}'\'''` is same as `watch -n 1 -d 'ls -l | awk "{print \$9}"'`
+ with `'\''` you close the opening `'`, then print a literal `'` by escaping it and finally open the ' again.
+escape square brackets: Brackets `[` need double escape `\\`: `\\[`
+
+awk escape double quote: `"\""
+
+```sh
+# escape $, the $ is preceded by a \ to prevent $1 from being expanded by the shell.
+alias aprint='awk "{print \$1}"'
+
+# awk escape double quote: `"\""`
+# [Print double quotes in unix Awk](http://www.unixcl.com/2012/07/print-double-quotes-in-unix-awk.html)
+cat file.txt
+# 6289693505455 Plan_DAIL_30D_AA
+awk '{print $2,"\""$1"\""}' file.txt
+# Plan_DAIL_30D_AA "6289693505455"
+
+#Assigning the quotes sequence to a variable x
+$ awk -v x="\"" '{print $2,x$1x}' file.txt
+#Using octal code of double quotes
+$ awk '{print $2,"\042"$1"\042"}' file.txt
+#Using ASCII code of double quotes
+$ awk '{print $2,"\x22"$1"\x22"}'  file.txt
+```
 
 #### awk的工作流程
 
@@ -962,12 +976,17 @@ A为字符串, B为正则表达式.
 `A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
 `A !~B` 判断 字符串A 中是否 未包含 能匹配(match)B式样的子字符串.
 `.`    通配符, 代表任意个字符
-
 `||` or, `&&` and, `!` not
 
-例如 :
-`$0 ~ /program[0-9]+\.c/ { print $0 }`
-`$0 ~ /program[0-9]+\.c/` 是一个 Pattern, 用来判断`$0`(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
+例如
+
+* `$0 ~ /program[0-9]+\.c/ { print $0 }`
+* `$0 ~ /program[0-9]+\.c/` 用来判断`$0`(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
+* `awk '$5 ~ /ldb/ {print}' f.txt` #第五列包含 ldb
+* `w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0
+* `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
+* `awk '$3==0 && $6=="LISTEN" ' netstat.txt` 过滤记录
+* `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt` 保留表头 引入内建变量NR
 
 当Pattern 中被用来比对的字符串为`$0`时, 可省略`$0`, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E )
 
@@ -1029,8 +1048,6 @@ awk 中大部分指令与 C 语言中的用法一致
     Jones 2143 78 84 77,Gondrol 2321 56 58 45,RinRao 2122 38 37
     Edwin 2537 87 97 95,Dayan 2415 30 47,
 ```
-
-`ORS` gets appended after every line that gets output
 
 #### awk 的内建函数(Built-in Functions)
 
@@ -1505,6 +1522,24 @@ wget 'http://www.example.com:9000/json' \
 
 * `-v` 详细输出信息
 * `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
+
+### nc 传输文件
+
+-l 表示监听端口，等待接收数据
+-p 1234 表示要监听端口号1234
+
+```sh
+# 接收端等待接收文件
+nc -l -p 1234 > target.tgz
+# 发送端发传输文集
+nc TARGET_HOST 1234 < source.tgz
+
+# 批量传输多个文件
+# 发送端，我们需要先用 tar 将文件打包，然后通过管端传给 nc：
+tar cvf - SOURCE_DIRECTORY/ | nc TARGET_HOST 1234
+# 接收端，我们让 nc 收到数据后通过管道传给 tar 解包
+nc -l -p 1234 | tar xvf -
+```
 
 ### mail
 
@@ -2451,7 +2486,7 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
     网卡是否正常启用: `ifconfig eth0`
         第3行显示了对该网卡的配置, 包括IP, 子网掩码等, 这里可以检查是否出现错配, 如果这一行显示不正确, 那一定是网卡没有正确配置开启.
     本地网络是否连接:  用route 命令查看内核路由表 `route -n`得到网关, 之后就可以尝试ping 网关, 排查与网关之间的连接
-    DNS工作状况: `nslookup`, `dig` 如果这里nslookup命令无法解析目标域名, 则很有可能是DNS配置不当
+    DNS工作状况: `nslookup`, `dig +trace` 如果这里nslookup命令无法解析目标域名, 则很有可能是DNS配置不当
     能否路由到目标主机:
         1. based on ICMP: `ping IP`, `traceroute IP`
             ping得通, 说明路由工作正常, ping不通可能是因为网络不通或者某个网关限制了ICMP协议包
@@ -2833,7 +2868,7 @@ sudo ls -dl /tmp
 drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 ```
 
- tmp目录是所有用户共有的临时文件夹, 所有用户都拥有读写权限, 这就必然出现一个问题, A用户在/tmp里创建了文件a.file, 此时B用户看了不爽, 在/tmp里把它给删了（因为拥有读写权限）, 那肯定是不行的. 实际上在/tmp目录中, 只有文件的拥有者和root才能对其进行修改和删除, 其他用户则不行, 因为有特殊权限stick bit（粘贴位）权限, 正如drwxrwxrwt中的最后一个t
+tmp目录是所有用户共有的临时文件夹, 所有用户都拥有读写权限, 这就必然出现一个问题, A用户在/tmp里创建了文件a.file, 此时B用户看了不爽, 在/tmp里把它给删了（因为拥有读写权限）, 那肯定是不行的. 实际上在/tmp目录中, 只有文件的拥有者和root才能对其进行修改和删除, 其他用户则不行, 因为有特殊权限stick bit（粘贴位）权限, 正如drwxrwxrwt中的最后一个t
 
 ##### 特殊位作用
 
@@ -2843,9 +2878,10 @@ drwxrwxrwt 6 root root 4096 08-22 11:37 /tmp
 
 ##### 设置方式
 
-  SUID: 置于 u 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod u+s`
-  SGID: 置于 g 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod g+s`
-  STICKY: 粘滞位, 置于 o 的 x 位, 原位置有执行权限, 就置为 t , 否则为T  `#chmod o+t`
+* SUID: 置于 u 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod u+s`
+* SGID: 置于 g 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod g+s`
+* STICKY: 粘滞位, 置于 o 的 x 位, 原位置有执行权限, 就置为 t , 否则为T  `#chmod o+t`
+
 在一些文件设置了特殊权限后, 字母不是小写的s或者t, 而是大写的S和T, 那代表此文件的特殊权限没有生效, 是因为你尚未给它对应用户的x权限
 去除特殊位有:  `#chmou u-s`等
 将三个特殊位的用八进制数值表示, 放于 u/g/o 位之前. 其中 suid :4 sgid:2  sticky:1
