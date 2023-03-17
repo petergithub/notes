@@ -47,8 +47,6 @@ Scope must be noun and it represents the section of the section of the codebase
 ### Most recent
 
 `git checkout -b hotfix upstream/master` create a new branch from upstream
-`git log -m --name-only` List all modified files in git merge commit
-`git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git rev-list --all | xargs git grep <string>`
 `ssh -Tv git@gitlab.com` get `Welcome to GitLab, Anonymous!`
 
@@ -63,13 +61,15 @@ Final release version
 `git push origin --tags`    一次性推送很多标签
 `git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
 
-`git log -g branchName` show Git branch created time just for local fetch/create time
-`git log --name-only` show changed file name only
 `git show <commit-id>` show difference for a commit
 `git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
+`git log -g branchName` show Git branch created time just for local fetch/create time
+`git log -p [file]`    显示指定文件相关的每一次diff
+`git log -m --name-only` List all modified files in git merge commit
+`git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
+`git log --name-only` show changed file name only
 `git log --follow [file]`    显示某个文件的版本历史，包括文件改名
 `git whatchanged [file]`    显示某个文件的版本历史，包括文件改名
-`git log -p [file]`    显示指定文件相关的每一次diff
 `git blame [file]`    显示指定文件是什么人在什么时间修改过
 `git commit -v`
 
