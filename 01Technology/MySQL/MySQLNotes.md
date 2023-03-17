@@ -916,6 +916,12 @@ find the mysql data directory by `grep datadir /etc/my.cnf` or
 `sudo /etc/init.d/mysql start`  start mysql server on ubuntu
 `sudo /etc/init.d/mysql restart`  restart mysql server on ubuntu
 
+#### Mac
+
+install with `brew install mysql`
+To restart mysql after an upgrade: `brew services restart mysql`
+Or, if you don't want/need a background service you can just run: `/opt/homebrew/opt/mysql/bin/mysqld_safe --datadir=/opt/homebrew/var/mysql`
+
 #### Windows
 
 1. unzip
