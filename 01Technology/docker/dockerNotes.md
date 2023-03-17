@@ -253,6 +253,7 @@ sudo docker run hello-world
   "log-opts": {
     "max-size": "500m",
     "max-file": "10",
+    "compress": "true",
     "labels": "production_status",
     "env": "os,customer"
   }
