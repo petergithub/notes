@@ -40,7 +40,7 @@ Jakarta (/dʒəˈkɑːrtə/
 ### 常用参数
 
 * `java -XX:+PrintFlagsFinal -version` 查看JVM参数的默认值
-* `-Xss256k, -XX:ThreadStackSize=1024` default Linux/x86 (64-bit): 1 MB
+* `-Xss256k, -XX:ThreadStackSize=1024` default Linux/x86 (64-bit): 1 MB  `java -XX:+PrintFlagsFinal -version | grep ThreadStackSize`
 * `-XX:MaxMetaspaceSize=128m` 默认值很大，`CompressedClassSpaceSize` 默认也有1G
 
 [Configuring Stack Sizes in the JVM | Baeldung](https://www.baeldung.com/jvm-configure-stack-sizes)
