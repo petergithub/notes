@@ -384,6 +384,17 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 }
 ```
 
+```sh
+# scp 10-flannel.conf host1:/etc/cni/net.d/10-flannel.conf
+for host in host1 host2; do echo $host; scp 10-flannel.conf $host:/etc/cni/net.d/10-flannel.conf; done
+
+生成 pod 后修改方式
+for intf in /sys/devices/virtual/net/cni0/brif/*; do echo 1 > $intf/hairpin_mode; done
+
+# 验证
+for intf in /sys/devices/virtual/net/cni0/brif/*; do echo "$intf"; cat $intf/hairpin_mode; done
+```
+
 ## Kubernetes internal
 
 ### Components of the Control Plane
