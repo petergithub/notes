@@ -112,19 +112,18 @@ PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
 * [Smart Tomcat](https://plugins.jetbrains.com/plugin/9492-smart-tomcat)
 * [IdeaVimExtension](https://plugins.jetbrains.com/plugin/9615-ideavimextension): switch to English input method in normal mode and restore input method in insert mode.
 * GsonFormat: 把json格式的内容转成Object
-* RestfulToolkit: `Command+back slash`
 * [Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
-* [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\`
+* [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\` `Command+back slash`
 * Rainbow Brackets
 * Grep Console: highlight the editor - nice for analyzing logs
 * Maven Helper
 * Key Promoter
-* Spring Assistant
 * GenerateAllSetter
 * JRebel and XRebel: 热部署插件
 * .env files support: 把.env文件中的内容给放到项目运行的环境变量中去
 * SequenceDiagram: 梳理代码逻辑，绘制时序图
 * Tabnine: AI code assistant
+* Spring Assistant
 
 ### Vim
 
