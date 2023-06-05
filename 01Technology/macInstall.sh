@@ -59,7 +59,8 @@ sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/i
 brew install google-chrome
 
 # brew install maven
-# brew install python3
+# brew install python@3.11
+# export PATH="$(brew --prefix)/opt/python@3.11/libexec/bin:$PATH"
 
 # Install and Set Up kubectl on macOS
 # https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/#install-with-homebrew-on-macos
@@ -77,7 +78,7 @@ brew install kubectl kubectx kube-ps1 stern
 #
 # jless https://jless.io/user-guide.html
 # jless can read files directly, or read JSON data from standard input 
-brew install htop ncdu bat jless autojump jq
+brew install telnet htop ncdu bat jless autojump jq
 brew install mycli
 
 # How to replace Mac OS X utilities with GNU core utilities?
@@ -131,7 +132,7 @@ brew install --cask alfred karabiner-elements maccy
 
 ### VirtualBox
 ## Devices > Optical Drivers > Choose disk image > /Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso
-brew install calibre xmind virtualbox postman broot docker
+brew install calibre xmind virtualbox postman broot
 
 # develop software install
 # download from mysql official website mysql-5.7.23-macos10.13-x86_64.tar.gz
@@ -198,7 +199,7 @@ brew install mycli
 
 
 # docker
-brew install docker
+brew install --cask docker
 # docker tool for mac
 #brew install docker docker-compose docker-machine xhyve docker-machine-driver-xhyve
 
@@ -213,6 +214,8 @@ ln -sfn ~/.config/ossutil/.ossutilconfig ~/.ossutilconfig
 # https://derflounder.wordpress.com/2020/01/18/creating-root-level-directories-and-symbolic-links-on-macos-catalina/
 # https://apple.stackexchange.com/questions/388236/unable-to-create-folder-in-root-of-macintosh-hd
 # create the file /etc/synthetic.conf, which should be owned by root and group wheel with permissions 0644.
+# TO create a /data link to $HOME/Documents/data
+# OR call a shell with ~/.script/mac.create.folder.under.root.sh
 copy ~/.config/etc/synthetic.conf /etc/synthetic.conf
 chmod 0644 /etc/synthetic.conf
 
@@ -292,6 +295,7 @@ chmod 0644 /etc/synthetic.conf
 # Try NTFS Tool https://github.com/ntfstool/ntfstool
 
 # 格式化为exfat格式 windows cmd: format e: /fs:exfat /q
+# The best file formats supported on Mac and Windows are exFAT and FAT32
 
 1. Disable SIP(System Integrity Protection)
 1.1 Reboot Mac into Recovery Mode by rebooting and holding down Command+R

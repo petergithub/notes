@@ -143,6 +143,12 @@ Display: `Preference -> Profiles -> Colors -> Foreground: black, Background: whi
 
 Alt+U or click the icon to copy URL without encoding from address bar
 
+#### Extension
+
+[Bypass Paywalls web browser extension for Chrome and Firefox.](https://github.com/iamadamdev/bypass-paywalls-chrome)
+
+尝试油猴脚本
+
 #### 在Chrome 浏览器上滚动截屏
 
 1. 打开 Chrome 浏览器，进入需要截图的网站页面
@@ -212,6 +218,10 @@ https://www.google.com/search?q=define:{word}
 https://fanyi.baidu.com/#en/zh/{word}
 ```
 
+#### plugin
+
+Ebook Translator是由书伴开发的一个Calibre插件。该插件可以将不同格式、不同语言的电子书翻译成指定语言，并在原文段落之后形成对照排版，方便辅助阅读和理解原文
+
 ## Manage
 
 [苹果 Mac 重置 SMC、NVRAM、PRAM 方法教程 - 解决 macOS 卡顿，风扇响或无法启动](https://www.iplaysoft.com/p/mac-reset-smc-nvram-pram)
@@ -247,6 +257,29 @@ load from `/Library/LaunchAgents`
 disable it `launchctl unload -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
 turn it back on `launchctl load -w /Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist`
 
+### mac新建全局快捷键 Open Terminal
+
+[mac新建全局快捷键 - 简书](https://www.jianshu.com/p/afee9aeb41a8)
+
+1. 在Launchpad中打开mac自带软件自动操作
+2. 选取文稿类型为服务
+3. “服务”收到选定的选项中选择没有输入
+4. 在当前页左侧导航栏中找到运行AppleScript并双击，在命令框中输入图示1内容（这里以快捷打开mac Terminal为例）
+
+    ```AppleScript
+    on run {input, parameters}
+
+    (* Your script goes here *)
+    tell application "Terminal" reopen
+    activate
+
+    end tell
+    end run
+    ```
+
+5. command+s保存为 Open Terminal
+6. 打开设置-键盘-快捷键-服务-通用-找到“Open Terminal” 单机右侧添加快捷键，键入你想要设置的按键保存即可，图示2
+
 ### 停止系统更新提示
 
 ```sh
@@ -262,6 +295,11 @@ sudo softwareupdate --reset-ignored
 ```
 
 [How to stop getting a reminder to update to Catalina in macOS](https://www.macworld.com/article/233450/how-to-stop-getting-a-reminder-to-update-to-catalina-in-macos.html)
+
+### How to Prevent Mac Sleeping When Display is Off
+
+MacOS Ventura 13.0
+System Settings > Displays > Advanced > Toggle the switch for “Prevent automatic sleeping on power adapter when the display is off”
 
 ### macbook pro合盖之后耗电很快:休眠时关闭 WiFi
 
@@ -497,3 +535,5 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * 全能截图工具：CleanShot X（200 元）/ Xnip（50 元）——iShot（免费）
 * 解压缩：360rar
 * [Proxyman · Native, Modern Web Debugging Proxy 代理抓包工具](https://proxyman.io/)
+* [MacWhisper](https://app.gumroad.com/d/29e33b796f6ce9bb186f87cdf2fadb16) License key 0E077F0E-B40C4044-B5FAFD74-41DE25A7
+* [Downie：Mac OS平台最强大的嗅探下载工具，视频、音频、PDF手到擒来](https://xuebajiajiayou.com/714/)
