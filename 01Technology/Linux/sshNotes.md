@@ -278,6 +278,16 @@ pssh  is  a  program  for executing ssh in parallel on a number of hosts.
 client_file 待上传的文件, 可以有多个, 多个文件之间用空格隔开. 也可以用*.filetype上传某个类型的全部文件
 user 服务端登录用户名, host 服务器名（IP或域名）, filepath 上传到服务器的目标路径（这里注意此用户一定要有这个路径的读写权限）
 
+### scp 断点续传
+
+* `rsync --partial --progress --rsh="ssh -p 222" user@host:remote_file local_file` resume an scp transfer for different port than default 22
+* [linux - Is there a way to resume an interrupted scp of a file? - Super User](https://superuser.com/questions/421672/is-there-a-way-to-resume-an-interrupted-scp-of-a-file)
+
+  You can try the following approch: instead of `scp` use `dd` to skip over the downloaded part and append the remainder to the file.
+
+  sofar=`ls -l ./destfile | awk '{print $5}'`
+  ssh user@host "dd if=./srcfile bs=1024 skip=$sofar" >> ./destfile
+
 ### Windows putty plink pscp
 
 * pscp.exe -pw pwd filename username@host:directory/subdirectory

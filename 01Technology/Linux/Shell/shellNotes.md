@@ -240,20 +240,20 @@ fi
 ### 向脚本传递参数
 
 ``` bash
-    #! /bin/sh
-    # test.sh
-    echo "$# parameters"; # count of parameters
-    echo "$@"; # all parameters
-    echo "$0"; # shell script name, the zero
-    echo "$1"; # the first parameter
+#! /bin/sh
+# test.sh
+echo "$# parameters"; # count of parameters
+echo "$@"; # all parameters
+echo "$0"; # shell script name, the zero
+echo "$1"; # the first parameter
 
-input:    test.sh 11 22
+input: test.sh 11 22
 output:
 
-    2 parameters
-    11 22
-    test.sh
-    11
+2 parameters
+11 22
+test.sh
+11
 ```
 
 ### 封装函数
@@ -428,39 +428,39 @@ esac
 
 ``` bash
 
-    #! /bin/sh
-    #shell脚本控制jar的启动和停止
-    #启动方法
-    start(){
+#! /bin/sh
+#shell脚本控制jar的启动和停止
+#启动方法
+start(){
 
-            java -Xms128m -Xmx2048m -jar test1.jar 5 > log.log &
-            java -Xms128m -Xmx2048m -jar test2.jar 5 > log.log &
-            tail -f result.log
-    }
-    #停止方法
-    stop(){
-            ps -ef|grep test|awk '{print $2}'|while read pid
-            do
-               kill -9 $pid
-            done
-    }
+    java -Xms128m -Xmx2048m -jar test1.jar 5 > log.log &
+    java -Xms128m -Xmx2048m -jar test2.jar 5 > log.log &
+    tail -f result.log
+}
+#停止方法
+stop(){
+    ps -ef|grep test|awk '{print $2}'|while read pid
+    do
+        kill -9 $pid
+    done
+}
 
-    case "$1" in
-    start)
-      start
-      ;;
-    stop)
-      stop
-      ;;
-    restart)
-      stop
-      start
-      ;;
-    *)
-      printf 'Usage: %s {start|stop|restart}\n' "$prog"
-      exit 1
-      ;;
-    esac
+case "$1" in
+start)
+    start
+    ;;
+stop)
+    stop
+    ;;
+restart)
+    stop
+    start
+    ;;
+*)
+    printf 'Usage: %s {start|stop|restart}\n' "$prog"
+    exit 1
+    ;;
+esac
 ```
 
 ## example
@@ -490,16 +490,15 @@ esac
 ### 日期自增
 
 ``` bash
-
-    #! /bin/bash
-    # 日期自增
-    start=20170101
-    end=20170103
-    while [ $start -le $end ]
-    do
-      echo $start
-      start=`date -d "1 day $start" +%Y%m%d`
-    done
+#! /bin/bash
+# 日期自增
+start=20170101
+end=20170103
+while [ $start -le $end ]
+do
+    echo $start
+    start=`date -d "1 day $start" +%Y%m%d`
+done
 ```
 
 ### 时间比较
@@ -509,23 +508,22 @@ esac
 date 的+%s可以将日期转换成时间戳格式,看下面的例子:
 
 ``` bash
+#!/bin/bash
+# 时间比较
 
-    #!/bin/bash
-    # 时间比较
+date1="2008-4-09 12:00:00"
+date2="2008-4-10 15:00:00"
 
-    date1="2008-4-09 12:00:00"
-    date2="2008-4-10 15:00:00"
+t1=`date -d "$date1" +%s`
+t2=`date -d "$date2" +%s`
 
-    t1=`date -d "$date1" +%s`
-    t2=`date -d "$date2" +%s`
-
-    if [ $t1 -gt $t2 ]; then
-        echo "$date1 > $date2"
-    elif [ $t1 -eq $t2 ]; then
-        echo "$date1 == $date2"
-    else
-        echo "$date1 < $date2"
-    fi
+if [ $t1 -gt $t2 ]; then
+    echo "$date1 > $date2"
+elif [ $t1 -eq $t2 ]; then
+    echo "$date1 == $date2"
+else
+    echo "$date1 < $date2"
+fi
 ```
 
 ### 测量请求时间
