@@ -26,7 +26,7 @@ connect from a container to a service on the host: connect to the special DNS na
 * `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
 * `-i` 让容器的标准输入保持打开
 * `-p` [host:]port:dockerPort
-* `-d` 后台运行
+* `-d, --detach` 后台运行
 * `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
 * `--rm` 在容器终止运行后自动删除容器文件
 * `-v, --volume "/path/to/host/machine:/path/to/container`
@@ -50,16 +50,28 @@ connect from a container to a service on the host: connect to the special DNS na
 * `-n, --last int` Show n last created containers (includes all states) (default -1)
 * `-l, --latest` Show the latest created container (includes all states)
 
+#### Docker management
+
 `docker system df` 磁盘占用
 
 `docker stats`  a live look at your containers resource utilization
 
-- Memory is listed under the MEM USAGE / LIMIT column. This provides a snapshot of how much memory the container is utilizing and what it’s memory limit is.
-- CPU utilization is listed under the CPU % column.
-- Network traffic is represented under the NET I/O column. It displays the outgoing and incoming traffic consumption of a container.
-- Storage utilization is shown under the BLOCK I/O column. This show you the amount of reads and writes a container is peforming to disk.
+* Memory is listed under the MEM USAGE / LIMIT column. This provides a snapshot of how much memory the container is utilizing and what it’s memory limit is.
+* CPU utilization is listed under the CPU % column.
+* Network traffic is represented under the NET I/O column. It displays the outgoing and incoming traffic consumption of a container.
+* Storage utilization is shown under the BLOCK I/O column. This show you the amount of reads and writes a container is peforming to disk.
 
 `docker stats --no-stream` the first stats pull results
+
+#### Restart containers automatically
+
+[Start containers automatically | Docker Documentation](https://docs.docker.com/config/containers/start-containers-automatically/)
+
+[How do I make a Docker container start automatically on system boot? - Stack Overflow](https://stackoverflow.com/questions/30449313/how-do-i-make-a-docker-container-start-automatically-on-system-boot)
+
+The default restart policy is no. For the created containers use docker update to update restart policy.
+
+`docker update --restart unless-stopped <containerID>`
 
 ### image
 
@@ -124,12 +136,45 @@ http://hub-mirror.c.163.com
 https://mirror.ccs.tencentyun.com
 ```
 
-### Troubleshooting
+## Troubleshooting
 
-#### Troubleshooting Network
+### Troubleshooting Network
 
 [Troubleshooting Container Networking](https://success.docker.com/article/troubleshooting-container-networking)
 `docker run -it --rm --network container:issue-container-name nicolaka/netshoot`
+
+### 已知宿主机的 PID，如何找出对应的容器 global PID -> namespace PID 映射
+
+常见的场景就是使用 top/htop 定位到占用内存/CPU过高的进程，此时需要定位到它所在的容器
+
+```sh
+# 宿主机进程 22932
+# 通过 docker inspect 查找到对应容器
+$ docker ps -q | xargs docker inspect --format '{{.State.Pid}}, {{.ID}}' | grep 22932
+
+# 通过 cgroupfs 找到对应容器
+$ cat /etc/22932/cgroup
+```
+
+### 如何找出 docker 容器中的 pid 在宿主机对应的 pid 容器中 namespace PID -> global PID 映射
+
+```sh
+# 容器环境
+
+# 已知容器中该进程 PID 为 122
+# 在容器中找到对应 PID 的信息，在 /proc/$pid/sched 中包含宿主机的信息
+$ cat /proc/122/sched
+node (7477, #threads: 7)
+...
+# 宿主机环境
+
+# 7477 就是对应的 global PID，在宿主机中可以找到
+# -p 代表指定 PID
+# -f 代表打印更多信息
+$ ps -fp 7477
+UID        PID  PPID  C STIME TTY          TIME CMD
+root      7477  7161  0 Jul10 ?        00:00:38 node index.js
+```
 
 ## Disk clean
 
@@ -146,6 +191,23 @@ start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorf
 `docker run --name mongo -d mongo:4.2.7`
 
 Jenkins with blue ocean: `docker run -d -p 8081:8080 -p 50000:50000 -v /data/docker/jenkins/jenkins_home:/var/jenkins_home -v /usr/share/apache-maven:/usr/local/maven    -v /etc/localtime:/etc/localtime --name jenkins jenkinsci/blueocean:1.25.5`
+
+### gitlab
+
+```sh
+#!/bin/bash
+
+docker run --detach \
+    --hostname 127.0.0.1 \
+    --publish 8443:443 --publish 8080:80 --publish 22:22 \
+    --name gitlab \
+    --restart always \
+    -e TZ=Asia/Shanghai \
+    --volume /data/gitlab/config:/etc/gitlab \
+    --volume /data/gitlab/logs:/var/log/gitlab \
+    --volume /data/gitlab/data:/var/opt/gitlab \
+    gitlab/gitlab-ce:8.16.4-ce.0
+```
 
 ### CentOS
 
