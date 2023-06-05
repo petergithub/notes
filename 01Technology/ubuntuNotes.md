@@ -286,6 +286,18 @@ After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer po
 
 Move around inside of long line: `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
+#### Scrolling relative to cursor (scroll-cursor)
+
+`:help scroll-cursor` or `:help z`
+
+`zEnter` or `zt` puts current line to top of screen
+`z.` or `zz` puts current line to center of screen, (warning: ZZ is save and exit, so watch out for caps lock)
+`z-` or `zb` puts current line to bottom of screen
+
+(`zEnter`, `z.`, and `z-` puts the cursor in the first non blank column. `zt`, `zz`, and `zb` leaves the cursor in the current column)
+
+`zt / zz / zb` - fixed cursor and move screen to top/center(german:'zentrum')/ bottom <---> `H / M / L` - fixed screen and move cursor to High / Middle / Low position
+
 ##### 快速回跳
 
 ``  :  当前文件上次跳转操作的位置
@@ -329,6 +341,12 @@ You need to select to the next matching parenthesis.
 ```
 
 #### mark and registers
+
+```sh
+mg  # This book marks the current position as g (this can be any letter)
+'g  # going to the bookmarked line
+`g  # return to g
+```
 
 You can move to the line containing a mark using the ' (single quote) command. Thus 'a moves to the beginning of the line containing the 'a' mark.
 You can move to the precise location of any mark using the \`(backquote) command. Thus \`z will move directly to the exact location of the 'z' mark.
@@ -760,6 +778,20 @@ find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s
 
 命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
+#### rename
+
+[linux - Shell/Bash shortcut for bulk renaming of files in a folder - Stack Overflow](https://stackoverflow.com/questions/8416990/shell-bash-shortcut-for-bulk-renaming-of-files-in-a-folder)
+[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion-1)
+
+```bash
+for i in *.txt; do mv "$i" "${i/Pattern/Replacement}"; done
+
+# install perl script rename
+rename 's/test-this/REPLACESTRING/g' *
+# dry run with -n
+rename -n 's/test-this/REPLACESTRING/g' *
+```
+
 ### awk
 
 #### Common usage 例子
@@ -968,9 +1000,10 @@ awk 中提供下列 关系运算符(Relation Operator)
 `==` 等于
 `!=` 不等于
 `%` 求余
-match `~`  :包含
+`~` match 包含
 `!~` not match
 上列关系运算符除`~`(match)与`!~`(not match)外与 C 语言中之含意一致.
+
 (match)`~` 与`!~`(match) 如下 :
 A为字符串, B为正则表达式.
 `A ~B` 判断 字符串A 中是否 包含 能匹配(match)B式样的子字符串.
@@ -1113,17 +1146,19 @@ kill -9 $PID
 ### date
 
 `date --help`
-`date -R` for `--rfc-2822` format which displays correct offset
-Valid timezones are defined in `/usr/share/zoneinfo/`
 
-Get Unix time stamp     `date +%s` 1477998994
-Convert Unix timestamp to Date `date -d @1467540501`
-Convert Date to Unix timestamp `date -d 'Sun Jul  3 18:08:21 CST 2016' +%s`
+`date +%s`  Get Unix time stamp `1477998994`
+`date -d @1685455706` Convert Unix timestamp to Date `Tue May 30 22:08:26 CST 2023`
+`date -d 'Tue May 30 22:08:26 CST 2023' +%s` Convert Date to Unix timestamp `1685455706`
+`date -d '2023-05-30 22:08:26' +%s` Convert Date to Unix timestamp `1685455706`
+
 `date -d '1 hours ago' "+%Y%m%d_%H"` 20161031_19
 `date -d '1 days ago' "+%F"` 2016-11-01
 `date -d now "+%Y%m%d %H:%M:%S"`
 `date +%Y%m%d%H%M%S.%N` 20161101191653.792204176
 
+`date -R` for `--rfc-2822` format which displays correct offset
+Valid timezones are defined in `/usr/share/zoneinfo/`
 `man timezone`
 >The offset is positive if the local timezone is west of the Prime Meridian and negative if it is east
 
@@ -1239,9 +1274,9 @@ sbin is not in the path when run via cron. Specify the full path to service. Thi
 
 ``` bash
 
-    /path/to/nginx/access.log
-    /path/to/other/*.log
-    {
+/path/to/nginx/access.log
+/path/to/other/*.log
+{
     daily
     # rotate 7: 一次将存储7个归档日志。对于第8个归档，时间最久的归档将被删除。
     rotate 7
@@ -1261,7 +1296,7 @@ sbin is not in the path when run via cron. Specify the full path to service. Thi
     postrotate
         [ -e /usr/local/nginx/logs/nginx.pid ] && kill -USR1 `cat /usr/local/nginx/logs/nginx.pid`
     endscript
-    }
+}
 ```
 
 [Nginx Log Rotation](https://www.nginx.com/resources/wiki/start/topics/examples/logrotation/)
@@ -1369,7 +1404,7 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 
 显示http header, 显示http response的头信息, 连同网页代码一起 `curl -i www.sina.com`, `-I`参数则是只显示http response的头信息.
 
-#### option
+#### curl option
 
 * `-o, --output /path/to/file`    Write output to filex` instead of stdout
 * `-i, --include`    (HTTP)  Include  the  HTTP-header in the output
@@ -1388,6 +1423,11 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 * `-G, --get`  make all data specified with -d, --data, --data-binary or --data-urlencode to be used in an HTTP GET request instead of the POST request that otherwise would be used. The data will be appended to the URL with a '?' separator.
 * `--data-urlencode <data>` (HTTP) This posts data, similar to the other -d, --data options with the exception that this performs URL-encoding.
 * `-x` use proxy `curl -x http://127.0.0.1:1087 -Lv https://www.google.com`
+* `-C/--continue-at <offset>` Continue/Resume a previous file transfer at the given offset. Use `-C -` to tell curl to automatically find out where/how to resume the transfer.
+* Change user agent
+  * `curl -A "user-agent-name-here" url`
+  * `curl --user-agent "user-agent-name-here" url`
+  * `curl -H "User-Agent: user-Agent-Name-Here"`
 
 #### Sample
 
@@ -1402,13 +1442,13 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 * 上传文件数组 `curl -F "key=value" -F "files[]=@file1.tar.gz -F "files[]=@file1.tar.gz" http://localhost/upload`
 * `curl -G`
 
-    ```bash
-    curl -G \
-        --data-urlencode "p1=value 1" \
-        --data-urlencode "p2=value 2" \
-        http://example.com
-        # http://example.com?p1=value%201&p2=value%202
-    ```
+```bash
+curl -G \
+    --data-urlencode "p1=value 1" \
+    --data-urlencode "p2=value 2" \
+    http://example.com
+    # http://example.com?p1=value%201&p2=value%202
+```
 
 ##### 分段下载
 
@@ -1425,6 +1465,14 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 ##### POST application/json
 
 `curl -d '{"key1":"value1", "key2":"value2"}' -H "Content-Type: application/json" -X POST http://localhost:3000/data`
+
+##### POST body with variable
+
+```sh
+# $var1 使用 "'" 来转义
+export var1="20220916161114CA35C0"
+curl -X POST http://localhost:3000/data --header 'Content-Type:application/json' -d '{"name":"'"$var1"'"}'
+```
 
 ##### Print 10 times
 
@@ -1488,8 +1536,6 @@ And here is what you get back:
             time_total:  0.164
 ```
 
-#### options
-
 ### wget
 
 ``` bash
@@ -1501,6 +1547,10 @@ wget 'http://www.example.com:9000/json' \
     -O --header='Content-Type:application/json' \
     --post-data='{"some data to post..."}'
 ```
+
+#### wget options
+
+* `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.  For instance:
 
 ### rsync
 
@@ -1517,11 +1567,14 @@ wget 'http://www.example.com:9000/json' \
 
 * `-z` 传输时压缩;
 * `-P` 等于 `--partial --progress`
-* `--partial` 保留那些因故没有完全传输的文件, 以是加快随后的再次传输
+* `--partial` 保留那些因故没有完全传输的文件
 * `--progress` 进度
+
+* `--partial-dir=.rsync-partial`
 
 * `-v` 详细输出信息
 * `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
+* `-e, --rsh=COMMAND` choose an alternative remote shell program to use
 
 ### nc 传输文件
 
@@ -1646,7 +1699,7 @@ tmux a[ttach] -t session
 ? 列出所有快捷键; 按q返回
 d 脱离当前会话,可暂时返回Shell界面, 输入tmux a[ttach]能够重新进入之前会话
 s 选择并切换会话; 在同时开启了多个会话时使用
-$ Rename the current session
+\$ Rename the current session
 
 #### window operation
 
@@ -2215,6 +2268,29 @@ perf 命令（performance 的缩写）讲起，它是 Linux 系统原生提供�
 `dmesg | grep oom-killer shows the OutOfMemory-killer at work`
 `cat /proc/meminfo`
 `ps aux | sort -nk +4 | tail` 列出头十个最耗内存的进程
+进程内存 `ps -O rss` 指定 rss 可以查看进程的内存
+实时查看进程内存 `pidstat -sr`
+
+#### 实时查看进程内存
+
+pidstat -sr
+
+```sh
+# 查看 23097 PID 的内存信息，每隔一秒打印一次
+# -r: 查看进程的内存信息
+# -s: 查看进程的 stack 信息
+# -p: 指定 PID
+# 1: 每间隔 1s 打印一次
+# 5: 共打印 5 组
+$ pidstat -sr -p 23097 1 5
+Linux 3.10.0-693.2.2.el7.x86_64 (shanyue)       07/18/19        _x86_64_        (2 CPU)
+
+18:56:07      UID       PID  minflt/s  majflt/s     VSZ    RSS   %MEM StkSize  StkRef  Command
+18:56:08        0     23097      0.00      0.00  366424  95996   2.47    136      80  node
+
+18:56:08      UID       PID  minflt/s  majflt/s     VSZ    RSS   %MEM StkSize  StkRef  Command
+18:56:09        0     23097      0.00      0.00  366424  95996   2.47    136      80  node
+```
 
 #### Momory troubleshooting
 
@@ -3013,6 +3089,9 @@ aptitude name for failed resolving dependency
 
 #### apt command
 
+repos/mirros location: /etc/apt/
+3rd party repos/mirros location: /etc/apt/sources.list.d
+
 apt-get 下载后, 软件所在路径是 /var/cache/apt/archives
 
 apt-cache policy maven    #check the version of package from apt-get
@@ -3032,6 +3111,10 @@ apt-get source vsftpd    #To download and unpack source code of a package to a s
 apt-get --compile source goaccess    #download, unpack and compile the source code at the same time
 apt-get download nethogs    #Download a Package Without Installing
 apt-get changelog vsftpd    #downloads a package change-log and shows the package version that is installed
+
+apt clean
+apt autoclean
+apt autoremove
 
 #### dpkg command
 
