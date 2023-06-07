@@ -31,6 +31,8 @@ Meaning of CPU:
 The expression 0.1 is equivalent to the expression 100m, which can be read as "one hundred millicpu". Some people say "one hundred millicores", and this is understood to mean the same thing. A request with a decimal point, like 0.1, is converted to 100m by the API, and precision finer than 1m is not allowed. For this reason, the form 100m might be preferred.
 `0.1 = 100m`
 
+get all pods along with cpu and memory requirements in kubernetes `kubectl get po -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,memory-request:spec.containers[*].resources.requests.memory,memory-limit:spec.containers[*].resources.limits.memory" --sort-by=".spec.containers[*].resources.limits.memory`
+
 ### Common
 
 `k logs -f --tail=10 pod-name`
@@ -259,7 +261,7 @@ Copying Kubernetes Secrets Between Namespaces: `kubectl get secret gitlab-regist
 
 #### Exceeding the limits
 
-CPU: when a CPU limit is set for a container, the process isn’t given more CPU time than the config- ured limit.
+CPU: when a CPU limit is set for a container, the process isn’t given more CPU time than the configured limit.
 Memory: When a process tries to allocate memory over its limit, the process is killed (it’s said the container is OOMKilled, where OOM stands for Out Of Memory)
 
 #### pod QoS classes

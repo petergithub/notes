@@ -159,6 +159,35 @@ https://pac.itzmx.com/abc.pac
 
 https://veracrypt.codeplex.com
 
+### clamAV 杀毒软件
+
+[ClamAV from Ubuntu](https://help.ubuntu.com/community/ClamAV)
+
+#### usage
+
+`freshclam` 更新病毒库
+`clamdscan /path/to/file` 扫描病毒
+`clamdscan--remove /path/to/file` 删掉病毒文件
+
+#### installation and startup
+
+1. vi /etc/yum.repos.d/dag.repo
+
+```sh
+#Dag RPM Repository Start
+[dag]
+name=Dag RPM Repository for RHEL4
+baseurl=http://ftp.riken.jp/Linux/dag/redhat/el4/en/$basearch/dag/
+enabled=1
+gpgcheck=1
+#Dag RPM Repository End
+```
+
+2. `yum -y install clamd`
+3. `service clamd start`
+4. `service clamd status`
+
+
 ## Classify by Project Development Phase
 
 ### 01 Project Management
@@ -218,7 +247,7 @@ UAT: User Acceptance Test
 
 ##### 通过MMM构建MySQL高可用集群系统
 
-#####  MySQL读写分离解决方案
+##### MySQL读写分离解决方案
 
 通过amoeba 实现MySQL读写分离
 通过keepalived构建高可用的amoeba服务
@@ -247,25 +276,15 @@ pm2 stop bin/www
 pm2 list
 pm2 delete id
 
-### 07 Support
-
-Django的出现让运维非常快速方便地开发部署自动化工具
-
 #### Monitor
 
-##### Zabbix
-
-Zabbix is an open source monitoring software
-
-##### Munin Monitoring
-
-[Munin Monitoring](https://munin-monitoring.org/)
-
-Munin is a networked resource monitoring tool that can help analyze resource trends and "what just happened to kill our performance?" problems.
-
-##### Ganglia
-
-##### 基于 nagios 的分布式监控平台 centreon
+* [UptimeRobot: Free Website Monitoring Service](https://uptimerobot.com/)
+* [louislam/uptime-kuma: A fancy self-hosted monitoring tool](https://github.com/louislam/uptime-kuma)
+* [Home | 哪吒监控](https://nezha.wiki/)
+* Zabbix is an open source monitoring software
+* [Munin Monitoring](https://munin-monitoring.org/)
+* Ganglia
+* 基于 nagios 的分布式监控平台 centreon
 
 ##### Java HeartBeat
 
@@ -279,33 +298,18 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 是一款用来监控Java应用或服务器的监控统计工具，以图表形式展示监控数据
 [Home](https://github.com/javamelody/javamelody/wiki)
 
-##### clamAV 杀毒软件
+##### 给你的 iPhone 发自定义推送
 
-[ClamAV from Ubuntu](https://help.ubuntu.com/community/ClamAV)
+[分享个自用的小工具~ 给你的 iPhone 发自定义推送 - V2EX](https://www.v2ex.com/t/467407)
+[Bark服务端部署文档 | Fin](https://day.app/2018/06/bark-server-document/)
 
-###### usage
+AppStore 连接
+https://itunes.apple.com/cn/app/bark-customed-notifications/id1403753865
 
-`freshclam` 更新病毒库
-`clamdscan /path/to/file` 扫描病毒
-`clamdscan--remove /path/to/file` 删掉病毒文件
-
-###### installation and startup
-
-1. vi /etc/yum.repos.d/dag.repo
-
-```sh
-#Dag RPM Repository Start
-[dag]
-name=Dag RPM Repository for RHEL4
-baseurl=http://ftp.riken.jp/Linux/dag/redhat/el4/en/$basearch/dag/
-enabled=1
-gpgcheck=1
-#Dag RPM Repository End
-```
-
-2. `yum -y install clamd`
-3. `service clamd start`
-4. `service clamd status`
+App 源码
+https://github.com/Finb/Bark
+后端源码
+https://github.com/Finb/go-tools/blob/master/Bark.go
 
 #### 运维工具组合的进化
 
@@ -324,3 +328,5 @@ Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
 ##### 应用监控 APM
 
 ##### 国内开源 open-falcon
+
+### 07 Support

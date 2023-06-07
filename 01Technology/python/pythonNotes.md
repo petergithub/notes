@@ -91,7 +91,7 @@ Install a project in editable mode (i.e. setuptools “develop mode”) from a l
 `conda --version` Conda displays the number of the version
 `conda update conda` update
 `conda create --name environmentName` Create a new environment
-`conda create --name environmentName python=3.6` Create a new environment with package
+`conda create python=3.10 --name environmentName` Create a new environment with package
 `conda activate environmentName` To use, or "activate" the new environment
 `conda info --envs` list of all your environments
 `conda activate` Change your current environment back to the default (base)
