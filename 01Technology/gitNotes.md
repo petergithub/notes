@@ -117,7 +117,7 @@ HEAD指向最后一次commit的信息
 `git log --stat -2` 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
 `git log --oneline`
 
-`git commit --amend -m "Comment"`
+`git commit --amend -m "New Comment"` 使用 New Commit 覆盖原来的 message
 `git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
 `git rebase -i HEAD~3` 重写历史
 `git rebase --onto master commitId` 在非master分支上执行,在master上重复commitId之后的提交,开区间
@@ -168,11 +168,34 @@ Do the merge, and then pull the stash:
 `git diff global origin/global`: fetch后对比文件
 `gitk`: view commite graph
 
-### Advanced Command
-
 `git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
 `git rebase --onto master <commitId>` 在非master分支上执行,在master上重复commitId之后的提交,开区间
 `git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
+
+
+[Git - Revision Selection Example history for range selection](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#double_dot)
+
+`^` to identify which parent
+`d921970^1` means the first parent of a merge commit
+`d921970^2` means “the second parent of d921970
+
+`HEAD~` and `HEAD^` are equivalent to refer the first parent
+`HEAD~2` means “the first parent of the first parent,” or “the grandparent” — it traverses the first parents the number of times you specify.
+`HEAD~3` or `HEAD~~~` the first parent of the first parent of the first parent
+`HEAD~3^2` get the second parent of the `HEAD~3`
+
+Double Dot
+`git log origin/master..HEAD`  to see what you’re about to push to a remote
+`git log origin/master..` — Git substitutes HEAD if one side is missing.
+
+Multiple Points
+`^` character or `--not` before any reference
+
+`git log refA..refB` == `git log ^refA refB` == `git log refB --not refA`
+`git log refA refB ^refC` == `git log refA refB --not refC`
+
+Triple Dot
+`git log master...experiment` which specifies all the commits that are reachable by either of two references but not by both of them
 
 ## Skills
 
@@ -191,7 +214,7 @@ Do the merge, and then pull the stash:
 2. 当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
 3. 当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
 4. 已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
-5. 恢复 `git reset --hard` 删除的文件 通过`git reflog`找到commitID,然后`git reset --hard commitID`
+5. 恢复 `git reset --hard` 删除的文件 通过`git reflog` or `git log -g` 找到commitID,然后`git reset --hard commitID`
 
 ### stage part of a new file, but not the whole file
 
@@ -263,6 +286,31 @@ To initialize, fetch and checkout any nested submodules `git submodule update --
 you can set it in either your .gitmodules file (so everyone else also tracks it), or just in your local .git/config file. Let’s set it in the .gitmodules file: `git config -f .gitmodules submodule.DbConnector.branch stable`  track that repository’s “stable” branch,
 
 see log of commits `git log -p --submodule`, config it as default
+
+## Git subtree
+
+You must be sure that super and sub-project code is not mixed in new commits.
+提交代码时，一次混合提交的情况测试
+
+/Library/Developer/CommandLineTools/usr/libexec/git-core/git-subtree
+[git/git-subtree.txt at master · git/git · GitHub](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt)
+
+### 介绍
+
+用一句话来描述 Git Subtree 的优势就是：
+
+> 经由 Git Subtree 来维护的子项目代码，对于父项目来说是透明的，所有的开发人员看到的就是一个普通的目录，原来怎么做现在依旧那么做，只需要维护这个 Subtree 的人在合适的时候去做同步代码的操作。
+
+最简单理解两者的方式，subtrees在父仓库是拉取下来的一份子仓库拷贝，而submodule则是一个指针，指向一个子仓库commit。
+
+我们可以过激地比较：
+submodules 推送简单，但拉取困难，因为它们是指向子仓库的指针
+subtrees 推送困难，但拉取简单，因为他们是子仓库的拷贝
+
+### 什么时候需要Subtree
+
+1、当多个项目共用同一模块代码，而且这块代码跟着项目在快速更新的时候
+2、把一部分代码迁移出去独立为一个新的 git 仓库，但又希望能够保留这部分代码的历史提交记录
 
 ## Git configuration
 
@@ -414,6 +462,8 @@ git push origin master
 
 ### How to complete a git clone for a big project on an unstable connection?
 
+[How to complete a git clone for a big project on an unstable connection? - Stack Overflow](https://stackoverflow.com/questions/3954852/how-to-complete-a-git-clone-for-a-big-project-on-an-unstable-connection)
+
 ```bash
 # The key here is --depth 1 and --unshallow.
 # This also works for fetching an existing repo on slow connection: git fetch --depth 1 then git fetch --unshallow
@@ -422,6 +472,8 @@ git push origin master
 git clone http://github.com/large-repository --depth 1
 cd large-repository
 git fetch --unshallow
+
+# for m in $(seq 1 50);do git fetch --depth=$[m*100];done
 ```
 
 ### reset author for ALL commits
