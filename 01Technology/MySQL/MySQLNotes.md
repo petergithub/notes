@@ -188,6 +188,7 @@ select id, year, country, product, profit,
 
 ### JOIN
 
+[SQL 连接(JOIN) | 菜鸟教程](https://www.runoob.com/sql/sql-join.html)
 [A Visual Explanation of SQL Joins](https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
 INNER JOIN: match in both Table A and Table B.
 FULL OUTER JOIN: all records in Table A and Table B
@@ -209,7 +210,9 @@ LEFT JOIN C ON A.id = C.id)
 WHERE B.id Is Not Null
 
 -- 关联查询价格最高的文章
-select s1.article, s1.dealer, s1.price FROM shop s1 left join shop s2 ON s1.price > s2.price and s1.article = s2.article  where s2.price is null;
+-- [MySQL :: MySQL 8.0 Reference Manual :: 3.6.4 The Rows Holding the Group-wise Maximum of a Certain Column](https://dev.mysql.com/doc/refman/8.0/en/example-maximum-column-group-row.html)
+-- The LEFT JOIN works on the basis that when s1.price is at its maximum value, there is no s2.price with a greater value and thus the corresponding s2.article value is NULL.
+select s1.article, s1.dealer, s1.price FROM shop s1 left join shop s2 ON s1.price < s2.price and s1.article = s2.article  where s2.price is null;
 
 ```
 
@@ -777,6 +780,10 @@ SELECT
 FROM information_schema.TABLES
 ORDER BY (data_length + index_length) DESC;
 ```
+
+[使用“optimize table”命令释放MySQL实例的表空间](https://help.aliyun.com/document_detail/457082.html)
+
+使用 delete 语句删除数据时，delete语句只是将记录的位置或数据页标记为了“可复用”，但是磁盘文件的大小不会改变，即表空间不会直接回收。此时您可以通过 `optimize table` 语句释放表空间。
 
 #### find the selectivity of several prefix lengths in one query
 
