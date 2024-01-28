@@ -77,6 +77,8 @@ C-1 is control-1
 If you are not sure which key codes represent which keys on your keyboard you might want to run xev and then press the desired keys to get their codes.
 less /usr/share/X11/xkb/symbols/us
 
+`CDPATH` : 设置 cd 命令的基目录 `export CDPATH=".:/home/guru:/usr"` 经常使用CD命令进入某一个特定目录下的子目录，你可以将CDPATH设置为该目录，当使用cd进入其下的子目录时，则不需要键入该目录名
+
 ### bash
 
 `man readline` to get the introduction to the combination of keys or documentation from [Readline Interaction](http://www.gnu.org/software/bash/manual/bash.html#Readline-Interaction)
@@ -134,6 +136,20 @@ Add comments for multi-lines
 * CTRL+c: 终止命令
 * CTRL+z: 挂起命令
 
+#### history cmd
+
+history with date and time
+
+1. macOS `history -t"%F %T"`
+2. zsh `history -i`
+3. bash `echo 'export HISTTIMEFORMAT="%d/%m/%y %T "' >> ~/.bash_profile && source ~/.bash_profile`
+
+`man zshbuiltins` to see more format:
+
+* -f     prints full time-date stamps in the US `MM/DD/YY hh:mm' format
+* -i     prints full time-date stamps in ISO8601 `yyyy-mm-dd hh:mm' format
+* -t fmt prints time and date stamps in the given format; fmt is formatted with the strftime function with the zsh extensions  described  for  the  %D{string} prompt format in the section EXPANSION OF PROMPT SEQUENCES in zshmisc(1).  The resulting formatted string must be no more than 256 characters or will not be printed
+
 Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node/Event-Designators.html#Event-Designators)
 
 * `!!` or `!-1` : 执行上一条命令 Run the last command-name
@@ -166,24 +182,23 @@ echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
 
 友情提示
 
-   1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
-   2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
-    输入`du -sh dir`, 按回车执行命令
-    `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行`du -sh dir`这条命令  like `watch -n 1 -d du -sh dir`
-    其实上面这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
-   3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
-   4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
-         CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-    The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'`         To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
+1. 以上介绍的大多数 Bash 快捷键仅当在 emacs 编辑模式时有效, 若你将 Bash 配置为 vi 编辑模式, 那将遵循 vi 的按键绑定. Bash 默认为 emacs 编辑模式. 如果你的 Bash 不在 emacs 编辑模式, 可通过`set -o emacs`设置.
+2. 用`CTRL+p`取出历史命令列表中某一个命令后, 按`CTRL+o`可以在这条命令到历史命令列表后面的命令之间循环执行命令, 比如历史命令列表中有50条命令, 后面三项分别是命令A, 命令B, 命令C, 用`CTRL+p`取出命令A后, 再按CTRL+o就可以不停的在命令A, 命令B, 命令C中循环执行这三个命令. `CTRL+o`有一个非常好用的地方, 比如用cp命令在拷贝一个大目录的时候, 你肯定很想知道当前的拷贝进度, 那么你现在该怎样做呢? 估计很多人会想到不停的输入`du -sh dir`去执行, 但用`CTRL+o`可以非常完美的解决这个问题, 方法就是:
+   1. 输入`du -sh dir`, 按回车执行命令
+   2. `CTRL+p, CTRL+o`, 然后就可以不停的按CTRL+o了, 会不停的执行`du -sh dir`这条命令  like `watch -n 1 -d du -sh dir`
+   3. 这个问题也可以用watch命令解决: `watch -n 10 -d du -sh /app/data/nas/`
+3. 使用 CTRL+r 而不是上下光标键来查找历史命令  CTRL+g: 从历史搜索模式退出
+4. `CTRL+s,CTRL+q,CTRL+c,CTRL+z` 是由终端设备处理的, 可用`stty`命令设置.
+    CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+    The sequence C-s is taken from the terminal driver, as you can see from `stty -a | grep '\^S'` To free up the sequence for use by readline, set the stop terminal sequence to some other sequence, as for example `stty stop ^J`
     or remove it altogether with `stty stop undef`.
     or totally disable XON/XOFF (resume/pause) flow control characters by `stty -ixon`
     After that `C-s` would work in the given terminal.
     Set it in ~/.bashrc to make it work in every terminal.
-        refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)
-   5. 在已经敲完的命令后按`CTRL+x CTRL+e`, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  `echo "export EDITOR=vim" >> ~/.bashrc`
-
-`ALT+.`把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
-undo     CTRL+/
+    refer to [search bash history](http://stackoverflow.com/questions/791765/unable-to-forward-search-bash-history-similarly-as-with-ctrl-r) and [search bash history reverse](http://askubuntu.com/questions/60071/how-to-forward-search-history-with-the-reverse-i-search-command-ctrlr)
+5. 在已经敲完的命令后按`CTRL+x CTRL+e`, 会打开一个你指定的编辑器（比如vim, 通过环境变量$EDITOR 指定）  `echo "export EDITOR=vim" >> ~/.bashrc`
+6. `ALT+.`把上一条命令的最后一个参数输入到当前命令行. 非常非常之方便, 强烈推荐. 如果继续按ALT+., 会把上上条命令的最后一个参数拿过来. 同样, 如果你想把上一条命令第一个参数拿过来咋办呢? 用ALT+0 ALT+., 就是先输入ALT+0, 再输入ALT+.. 如果是上上条命令的第一个参数呢? 当然是ALT+0 ALT+. ALT+.了.
+7. undo     CTRL+/
 
 #### bash profile
 
@@ -587,7 +602,8 @@ Vim中查看文件编码 `:set fileencoding`
 * `-i, --ignore-case` Causes searches to ignore case;
 * `-n` Suppresses line  numbers
 * `-S` Causes lines longer than the screen width to be chopped rather than folded
-
+* `-e, --quit-at-eof` Causes less to automatically exit the second time it reaches end-of-file. 查看多个小文件时使用
+*
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
 less `&pattern` is like `grep` in `less`
@@ -723,6 +739,8 @@ key3=<font color="#6fa5e9">value3</font>
 delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
 `rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
 
+`ls | grep -v notDelete.log | xargs rm -r`
+
 #### 文件个数 count files in directory recursively
 
 `find . -type f | wc -l`
@@ -819,6 +837,41 @@ ossutil ls oss://path/to/202109/02/ | sort -k 2 | awk '$2>"14:28:00" && $2<"14:3
 
 # url decode with unquote_plus,  url encode with quote_plus
 less confluence.ognl.attack.log | python -c "import sys, urllib as ul; [sys.stdout.write(ul.unquote_plus(l)) for l in sys.stdin]" | less
+
+# 文本
+2011-10-25 8:41:20
+2011-10-25 8:41:38
+2011-10-25 18:10:09
+2011-10-26 8:29:05
+# 取出每天的第一条记录，即去重
+awk '!a[$1]++' file
+# 解析
+# 1. ”!” 即非。
+# 2. a[$0]，以$0为数据下标，建立数组a，a[$0]++，即给数组a赋值，a[$0]+=1
+# 3. 组合起来，awk 执行!a[$0]++的流程
+# 3.1 '!a[$0]++' 当$0的内容首次出现时，a[$0]将为空（相当于0），
+# 此时将先求!a[$0]的值（也是整个式子的值，即为非空 true ,将影响后续动作，执行默认的print)
+# 3.2 对a[$0]进行+1，a[$0] 加1后为1，当下次出现时a[$0]即不为空，表达式结果为非真 false，即不打印
+# 可以使用下面的语句查看执行流程
+echo -e "5\n5\n5"|awk '{print ">"a[$0]+0}!a[$0]++{print $0}'
+
+
+#统计相同的日期的个数
+awk '{a[$1]++}END{for(i in a)print i,a[i]}' file
+
+# 同时筛选 8 点的数据($2==8)的限制条件, | 表示同时使用两个分隔符
+awk -F ' |:' '!a[$1]++&&($2==8)' file
+
+#取每天的最后一条记录
+awk '!a[$1]++ && i {print i} {i=$0} END {print i}' file
+awk 'NR>1{if($1!=x)print y}{x=$1;y=$0}END{print $0}' file
+# 取最后一条只需取首次出现的上面那条即可,通过{i=$0}将$0赋给i,!a[$1]++限制首次出现,
+# 首行i为空,会打印一个空行,加个&&i来保证不打印那个空行,最后必须要有END{print i},
+# 最后一行要单独打印
+# {i=$0}保存上一行的记录是常规用法。
+# if($1!=x)print y}{x=$1;y=$0} 保存$1 $0
+#加个($2==18)的条件
+awk -F ' |:' '!a[$1]++&&i{print i}{if($2==18)i=$0}END{print i}' file
 ```
 
 #### awk 日志解析
@@ -906,7 +959,7 @@ $2 $0上第二个字段的数据
 `NF` (Number of Fields)     整数, 其值表$0上所存在的字段数目
 `NR` (Number of Records)    整数, 其值表awk已读入的数据行数目
 `FILENAME`                awk正在处理的数据文件文件名
-`FS` (Field Separator)    FS default as space and tab. `FS="\n"` take "\n" as separator, `-F \t` take tab as separator
+`FS` (Field Separator)    FS default as space and tab. `FS="\n"` take "\n" as separator, `-F \t` take tab as separator，可以使用 `|` 来同时使用多个分隔符
 `RS` (Record Separator)    awk根据 RS 把输入分成多个Records,一次读入一个Record进行处理,预设值是 "\n". RS = "" 表示以 空白行 来分隔相邻的Records.
 `ORS` gets appended after every line that gets output
 
@@ -1217,11 +1270,15 @@ MAILTO=username@example.org
 5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
 ```
 
-log path: `/var/log/messages` or `/var/log/cron*`
+log path: `/var/log/messages` or `/var/log/cron*`, `/var/mail/$USER` on Mac
+
+环境变量
 
 1. 脚本中涉及文件路径时全部写绝对路径
-2. 脚本执行要用到java或其他环境变量时，通过source命令引入环境变量  `source $HOME/.bash_profile`
+2. 在第一行设置 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/data/software/jdk1.8.0_202/bin
+   1. 设置前先获取默认值 `* * * * * env > /data/logs/crontab/env.cron.txt 2>&1`
 3. 在crontab 脚本行 加入`source /etc/profile;`
+4. 脚本执行要用到java或其他环境变量时，通过source命令引入环境变量  `source $HOME/.bash_profile`
 
 `10 1 * * 6,0 /usr/local/etc/rc.d/lighttpd restart` 表示每周六、周日的1 : 10重启lighttpd
 `* */1 * * * /usr/local/etc/rc.d/lighttpd restart` 每一小时重启lighttpd
@@ -1266,6 +1323,8 @@ sbin is not in the path when run via cron. Specify the full path to service. Thi
 
 ### logrotate
 
+`man logrotate`
+
 在/etc/logrotate.d/ 文件夹下, 新建nginx文件 内容如下
 `logrotate -d /etc/logrotate.d/nginx` 测试, 不会真的切割文件
 `logrotate -vf /etc/logrotate.d/nginx` 手动切割文件
@@ -1289,6 +1348,8 @@ sbin is not in the path when run via cron. Specify the full path to service. Thi
     # nocompress 如果你不希望对日志文件进行压缩，设置这个参数即可
     # delaycompress: 总是与compress选项一起用，delaycompress选项指示logrotate不要将最近的归档压缩，压缩将在下一次轮循周期进行。这在你或任何软件仍然需要读取最新归档时很有用
     delaycompress
+    # copytruncate Truncate the original log file in place after creating a copy, instead of moving the old log file and optionally creating a new one.
+    copytruncate
     # notifempty 如果日志文件为空，轮循不会进行
     notifempty
     # sharedscripts 表示postrotate脚本在压缩了日志之后只执行一次
@@ -1334,6 +1395,8 @@ Extract multiple .tar.gz files with a single tar call
 The `-i` option ignores the EOF at the end of the tar archives, from the man page:
 `-i, --ignore-zeros` ignore blocks of zeros in archive (normally mean EOF)
 
+`tar --exclude /path/to/logs --exclude path/to/temp -zcv target.tgz source` 排除文件夹或者文件
+
 #### jar
 
 * list files without extracting `jar tvf <filename>.jar`
@@ -1349,13 +1412,13 @@ java命令引入jar时可以-cp参数, 但-cp不能用通配符(JDK 5中多个ja
 
 ### sort, uniq and cut
 
-`sort` `-t`设定间隔符 `-k`指定列数
+`sort` `-t` 设定间隔符 `-k` 指定列数
 `sort [-fbMnrtuk] [file or stdin]`
 
-* `-n`  : 使用『纯数字』进行排序(默认是以文字型态来排序的);
-* `-r`  : 反向排序;
-* `-t`  : 分隔符, 默认是用 [tab] 键来分隔;
-* `-k`  : 以那个区间 (field) 来进行排序的意思
+* `-n`: 使用『纯数字』进行排序(默认是以文字型态来排序的);
+* `-r`: 反向排序;
+* `-t`: 分隔符, 默认是用 [tab] 键来分隔;
+* `-k`: 排序区间 (field), 可以多个，表示多字段排序
 
 示例:
 
@@ -1468,10 +1531,13 @@ curl -G \
 
 ##### POST body with variable
 
+[json - Using curl POST with variables defined in bash script functions - Stack Overflow](https://stackoverflow.com/questions/17029902/using-curl-post-with-variables-defined-in-bash-script-functions)
+
 ```sh
-# $var1 使用 "'" 来转义
+# 字符串$name 使用 "'" 来转义
+# 数字 $age 使用 ' 来转义
 export var1="20220916161114CA35C0"
-curl -X POST http://localhost:3000/data --header 'Content-Type:application/json' -d '{"name":"'"$var1"'"}'
+curl -X POST http://localhost:3000/data --header 'Content-Type:application/json' -d '{"name":"'"$name"'", "age": '$age'}'
 ```
 
 ##### Print 10 times
@@ -1576,6 +1642,15 @@ wget 'http://www.example.com:9000/json' \
 * `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
 * `-e, --rsh=COMMAND` choose an alternative remote shell program to use
 
+Note: The trailing slash (/) on the source directory modifies the behavior of the rsync command.
+
+* If you do not use a trailing slash, the source directory is copied to the destination directory, and then the contents of the directory.
+* When you do use the trailing slash, rsync only copies the content of the source without creating an additional directory level.
+
+### [Unison file synchronizer](https://github.com/bcpierce00/unison)
+
+Unison works across platforms, allowing you to synchronize a Windows laptop with a Unix server, for example.
+
 ### nc 传输文件
 
 -l 表示监听端口，等待接收数据
@@ -1629,7 +1704,7 @@ find out which command shell executes and to print binary(command) file location
 
 ### Move Running Process to Background
 
-#### ALREADY RUNNING PROCESS INTO BACKGROUND
+#### already running process into background
 
 1. CTRL+z
 2. `jobs`
@@ -1642,7 +1717,9 @@ Show the status of all background and suspended jobs: jobs
 Bring a job back into the foreground: `fg %jobnumber`
 Bring a job back into the background: `bg %jobnumber`
 
-#### ALREADY RUNNING PROCESS INTO NOHUP
+`stty tostop` disable ability of background jobs to output to controlling terminal
+
+#### already running process into nohup
 
 1. Run some SOMECOMMAND
 2. ctrl+z to stop (pause) the program and get back to the shell
@@ -1660,9 +1737,32 @@ send 100 requests with a concurrency of 50 requests to an URL
 send requests during 30 seconds with a concurrency of 50 requests to an URL
 `ab -t 30 -c 50 URL http://www.example.com/`
 
+### od
+
+od - dump files in octal and other formats
+
+`od -A x -t x1z -v fileName` Display hexdump format output
+
+`-A, --address-radix=RADIX` output format for file offsets; RADIX is one of [doxn], for Decimal, Octal, Hex or None
+`-t, --format=TYPE` select output format or formats
+`-v, --output-duplicates` do not use * to mark line suppression
+`-w[BYTES], --width[=BYTES]` output BYTES bytes per output line; 32 is implied when BYTES is not specified
+
+`TYPE` is made up of one or more of these specifications:
+
+`a`      named character, ignoring high-order bit
+`c`      printable character or backslash escape
+`o[SIZE]` octal, SIZE bytes per integer
+`x[SIZE]` hexadecimal, SIZE bytes per integer
+
+`SIZE` is a number.
+Adding a `z` suffix to any type displays printable characters at the end of each output line.
+
 ### Other
 
 `history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head` 列出最常用的10条命令
+使用 HISTTIMEFORMAT 在历史中显示 TIMESTAMP `export HISTTIMEFORMAT='%F %T '`
+
 查看最后一个日志文件 `ls -tr /data/log | tail -1`
 cat << EOF > test.txt
 ABC
@@ -1827,6 +1927,7 @@ Common usage:
 * 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log`
 * 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据
     `tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'`
+* The following command prints only TCP segments with a source port between 7001 and 7005. `tcpdump 'tcp and tcp[0:2] > 7000 and tcp[0:2] <= 7005'`
 * 抓取所有经过eth1，目标MAC地址是00:01:02:03:04:05的ICMP数据 `tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'`
 * 抓取所有经过eth1，目的网络是192.168，但目的主机不是192.168.1.200的TCP数据 `tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'`
 
@@ -1876,14 +1977,13 @@ Common usage:
 
 `lsof` command (short for "list open files")  this will show you a list of all the open files and their associated process.
 
-``` bash
-
-    $ lsof
-    COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
-    init       1       root  cwd       DIR        8,1      4096          2 /
-    init       1       root  txt       REG        8,1    124704     917562 /sbin/init
-    init       1       root    0u      CHR        1,3       0t0       4369 /dev/null
-    init       1       root    3r     FIFO        0,8       0t0       6323 pipe
+```sh
+$ lsof
+COMMAND  PID       USER   FD      TYPE     DEVICE  SIZE/OFF       NODE NAME
+init       1       root  cwd       DIR        8,1      4096          2 /
+init       1       root  txt       REG        8,1    124704     917562 /sbin/init
+init       1       root    0u      CHR        1,3       0t0       4369 /dev/null
+init       1       root    3r     FIFO        0,8       0t0       6323 pipe
 ```
 
 FD – Represents the file descriptor. Some of the values of FDs are,
@@ -1935,7 +2035,7 @@ Samples:
 
 ### strace 跟踪进程中的系统调用
 
-strace常用来跟踪进程执行时的系统调用和所接收的信号。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。
+strace 常用来跟踪进程执行时的系统调用和所接收的信号。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。 Mac OS 是 dtruss
 
 * `strace command` 执行名称为command的命令或程序并跟踪系统调用
 * `strace -p procid` 跟踪ID为的procid的进程系统调用情况
@@ -1955,24 +2055,18 @@ The command to print a prompt to the screen and to store the resulting input int
 `python -m SimpleHTTPServer 8000`  HTTP服务在8000号端口上侦听 Python 2
 `python -m http.server 7777` （使用端口 7777 和 Python 3）
 
+### maxmind mmdbinspect
+
+[maxmind/mmdbinspect: look up records for one or more IPs/networks in one or more .mmdb databases](https://github.com/maxmind/mmdbinspect)
+
+`mmdbinspect -db GeoLite2-City.mmdb 1.1.1.1`
+
 ## Softwares
 
 ### Software List
 
 screenshot: shutter,deepin-scrot
 ubuntu上 接收 outlook exchange 郵件？ thunderbird + exquilla 插件
-
-### Desktop location
-
-$HOME/.local/share/applications
-/usr/local/share/applications
-/usr/share/applications
-
-[update tooltips color](http://askubuntu.com/questions/70599/how-to-change-tooltip-background-color-in-unity)
-grep -r tooltip_[fb]g_color /usr/share/themes/Ambiance: find all files to update
-update as below:
-tooltip_bg_color #f5f5b5;
-tooltip_fg_color #000000;
 
 ### Tomcat
 
@@ -2036,12 +2130,24 @@ ALT+Delete, and then press the up or down arrow key.
 3. sed
 4. awk
 
-`split -b bigFile.txt 100M` split file into small files
 `head -n 10 | tail -n 5` print 5 up to 10 line
 
 `sed -n '2p' < file.txt` print the 2nd line
 `sed -n '10,33p' < file.txt` print 10 up to 33 line
 `sed -n '1p;3p' < file.txt` print 1st and 3rd line
+
+#### split
+
+`split [-<行数>][-b][-c][-l] file.txt`
+
+* -b, --bytes=size 对file进行切分 每个小文件大小为size 可以指定单位b，k，m
+* -l, --lines=number 对file进行切分 每个文件都有number行
+* -d 添加数字后缀
+* -a 2 表示用2位数来顺序命名 后缀长度
+* smaillFile_ 分割后文件的前缀
+
+`split -b 100M bigFile.txt smaillFile_` split file into small files
+`split -l 10000 bigFile.txt -d -a 2 smaillFile_`
 
 ### Missing clock menu bar fix
 
@@ -2256,6 +2362,23 @@ perf 命令（performance 的缩写）讲起，它是 Linux 系统原生提供�
 [The USE Method](http://www.brendangregg.com/usemethod.html )
 [如何读懂火焰图](http://www.ruanyifeng.com/blog/2017/09/flame-graph.html )
 [Flame Graphs](http://www.brendangregg.com/flamegraphs.html )
+
+#### CPU核数怎么计算
+
+```sh
+# 物理cpu数: 主板上实际插入的cpu数量，可以数不重复的 physical id 有几个（physical id）
+cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l
+
+# cpu核数: 单块CPU上面能处理数据的芯片组的数量，如双核、四核等 （cpu cores）
+cat /proc/cpuinfo | grep "cpu cores" | wc -l
+
+# 逻辑cpu数: 简单来说，它可使处理器中的1颗内核，如2颗内核那样在操作系统中发挥作用。
+cat /proc/cpuinfo | grep "processor" | wc -l
+```
+
+操作系统可以使用逻辑CPU来模拟出真实CPU的效果。 在之前没有多核处理器的时候，一个CPU只有一个核，而现在有了多核技术，其效果就好像把多个CPU集中在一个CPU上。
+
+当计算机没有开启超线程时，逻辑CPU的个数就是计算机的核数。 而当超线程开启后，逻辑CPU的个数是核数的两倍。
 
 ### Memory
 
@@ -2493,6 +2616,17 @@ dd做的只是文件拷贝工作
     Timing buffered disk reads: 234 MB in  3.00 seconds =  77.98 MB/sec
 ```
 
+#### 查看硬盘信息
+
+`lsblk` 查看接入到系统中的块设备，默认输出分区、大小、挂载点等信息
+`lsscsi` 打印SCSI硬盘信息
+`lshw -class disk` 打印硬件的详细信息，打印硬盘信息需要root权限
+
+#### File recovery
+
+[File recovery - ArchWiki](https://wiki.archlinux.org/title/file_recovery)
+[Linux debugfs Hack: Undelete Files - nixCraft](https://www.cyberciti.biz/tips/linux-ext3-ext4-deleted-files-recovery-howto.html)
+
 ### Network
 
 #### [Linux Network Checklist](http://www.brendangregg.com/blog/2016-05-04/srecon2016-perf-checklists-for-sres.html)
@@ -2697,6 +2831,52 @@ UDP Clients & Servers
 
 1. 使用web 页面 `http://localhost:3002` 访问
 2. `/etc/init.d/ntop restart`
+
+##### [10款抓包工具 不止Wireshark和Tcpdump -腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2231025?areaId=106001)
+
+1. Wireshark
+2. Tcpdump
+3. Fiddler
+4. Solarwinds 带宽分析器 处理各种规模网络的故障、可用性和性能监控，监控显示网络设备的响应时间、可用性和性能，并通过开箱即用的仪表板、警报和报告检测、诊断和解决性能问题。
+5. Free Network Analyzer 是一款出色的免费网络监控软件，可以分析计算机的有线或无线连接，可以捕获、过滤和显示所有流量数据并解码网络数据包原始数据
+6. NAST英文全称：Network Analyzer Sniffer Tool，是一个基于 ncurses 的工具，适用于无 GUI 的 UNIX 服务器，可以在正常模式或混杂模式下嗅探网络接口上的数据包并记录它。
+7. Kismet 不仅仅是个网络嗅探器，还可以分析隐藏网络或未广播 SSID 的流量，适用于无线流量和无线设备的抓包，可用于 *NIX、Windows Under Cygwin 和 OSX 环境。
+8. EtherApe 具有许多与 WireShark 相同的功能，也是开源免费的，具有链路层、IP 和 TCP 模式，以图形方式显示网络活动。主机和链接的大小随流量而变化，图形化界面更加好看，但是它仅适用于 Linux、Unix 和 MacOS，不适用于Windows系统。
+9. NetworkMiner 可以抓取实时流量，也可以分析以前捕获的以pcap 格式保存的流量的内容，适用于 Windows，由总部位于瑞典的小公司 Netresec 开发和支持，有免费版和收费版
+10. WinDump 是 tcpdump 的 Windows 版本，可用于根据各种复杂规则监视、诊断和保存到磁盘网络流量，可以通过命令行、PowerShell 或远程 shell 运行。
+
+#### 网络拓扑的发现
+
+1. `netstat -ni` -i 提供网络接口的信息。我们还指定-n 标志以输出数值地址，而不是试图把它们反向解析成名字。
+2. `netstat -nr` –r 展示路由表，也是另一种确定接口的方法。我们通常指定-n 标志以输出数值地址。它还给出默认路由器的IP地址。
+3. `ifconfig eth0` 有了各个网络接口的名字，执行ifconfig 就可获得每个接口的详细信息。
+4. `ping -b 206.168.112.127` 找出本地网络中众多主机的IP地址的方法之一是，针对从上一步找到的本地接口的广播地址执行ping 命令。
+
+```sh
+root@CentOS:~ # netstat -ni
+Kernel Interface table
+Iface       MTU Met    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+em2        1500   0 34011461      0      0      0 23760915      0      0      0 BMRU
+lo        16436   0 40477415      0      0      0 40477415      0      0      0 LRU
+
+root@CentOS:~ # netstat -ar
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+172.17.0.0      *               255.255.254.0   U         0 0          0 em2
+link-local      *               255.255.0.0     U         0 0          0 em2
+default         localhost       0.0.0.0         UG        0 0          0 em2
+
+root@mac netstat -nr
+Routing tables
+
+Internet:
+Destination        Gateway            Flags           Netif Expire
+default            172.17.0.1         UGScg             en0
+127.0.0.1          127.0.0.1          UH                lo0
+172.17.0.1         a0:63:91:f0:fb:db  UHLWIir           en0   1184
+172.17.0.15        6a:bb:64:50:8d:de  UHLWI             en0    395
+172.17.1.255       ff:ff:ff:ff:ff:ff  UHLWbI            en0      !
+```
 
 ### 操作系统 `uname -a`
 
@@ -3071,6 +3251,87 @@ configure sudo to never ask for your password. add the following line: `username
 `id -nG <username>`    Find out user group identity
 `less /etc/group` or `groups`    Get all groups in system
 
+### update hostname
+
+`hostname newname`
+`vi /etc/hostname`
+`vi /etc/hosts`
+
+### update hosts
+
+redirect it to ustc:lug.ustc.edu.cn
+var url = request.url.replace('googleapis.com', 'lug.ustc.edu.cn');
+refer to [ReplaceGoogleCDN](https://github.com/justjavac/ReplaceGoogleCDN)
+vi /etc/hosts
+202.141.162.123 www.ajax.googleapis.com
+202.141.162.123 ajax.googleapis.com
+
+### 设置 DNS
+
+sudo vi /etc/resolvconf/resolv.conf.d/head
+sudo resolvconf -u
+cat /etc/resolv.conf
+
+nameserver 192.168.1.1
+
+### ca-certificates update
+
+1. `sudo mkdir /usr/share/ca-certificates/extra`
+2. `sudo cp /path/to/ca.cert /usr/share/ca-certificates/extra/com.ca.crt`
+3. `sudo dpkg-reconfigure ca-certificates` or `sudo update-ca-certificates`
+4. if no cert installed, then `sudo vi /etc/ca-certificates.conf`, add `extra/com.ca.crt`
+then `sudo update-ca-certificates`
+
+## Ubuntu Installation
+
+check your Ubuntu version using any of the following methods:
+
+1. Use the `lsb_release -a` command.
+2. Use the `/etc/lsb-release` or `/etc/os-release` command.
+3. Check the `/etc/issue` file.
+4. Use the `hostnamectl` command.
+
+### Main directories
+
+[LinuxFilesystemTreeOverview](https://help.ubuntu.com/community/LinuxFilesystemTreeOverview)
+The standard Ubuntu directory structure mostly follows the Filesystem Hierarchy Standard, which can be referred to for more detailed information.
+Here, only the most important directories in the system will be presented.
+/bin is a place for most commonly used terminal commands, like ls, mount, rm, etc.
+/boot contains files needed to start up the system, including the Linux kernel, a RAM disk image and bootloader configuration files.
+/dev contains all device files, which are not regular files but instead refer to various hardware devices on the system, including hard drives.
+/dev/shm 这个目录是在内存里 采用tmpfs文件系统 默认值是内存的一半
+/etc contains system-global configuration files, which affect the system''s behavior for all users.
+/home home sweet home, this is the place for users'' home directories.
+/lib contains very important dynamic libraries and kernel modules
+/usr contains the majority of user utilities and applications, and partly replicates the root directory structure, containing for instance, among others, /usr/bin/ and /usr/lib.
+/var is dedicated variable data that potentially changes rapidly; a notable directory it contains is /var/log where system log files are kept.
+通常情况下, linux会这样放软件的组件:
+程序的文档->/usr/share/doc; /usr/local/share/doc
+程序->/usr/share; /usr/local/share
+程序的启动项->/usr/share/apps; /usr/local/share
+程序的语言包->/usr/share/locale; /usr/local/share/locale
+可执行文件->/usr/bin; /usr/local/bin
+而有的软件为了和系统组件分隔开, 选择栖息于 /opt, 但目录结构往往是一样的, 把/usr或/usr/local 替换为了/opt/"软件名"
+~/share all softwares
+~/opt softwares
+
+### [Source code](https://peteris.rocks/blog/htop/#source-code)
+
+``` bash
+$ which uptime
+/usr/bin/uptime
+$ dpkg -S /usr/bin/uptime
+procps: /usr/bin/uptime
+```
+
+Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.
+You can then go to packages.ubuntu.com and search for the package there.
+Here is the page for [procps](http://packages.ubuntu.com/source/xenial/procps)
+If you scroll to the bottom of the page, you'll see links to the source code repositories:
+
+* Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
+* Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
+
 ### Software manage
 
 dpkg -i AdbeRdr*.deb  #install
@@ -3131,37 +3392,6 @@ dpkg -L packageName    #Check the location of Packages installed
 dpkg --unpack packageName    #Unpack the Package but do not Configure
 dpkg --configure packageName    #Reconfigure a Unpacked Package
 
-### update hostname
-
-`hostname newname`
-`vi /etc/hostname`
-`vi /etc/hosts`
-
-### update hosts
-
-redirect it to ustc:lug.ustc.edu.cn
-var url = request.url.replace('googleapis.com', 'lug.ustc.edu.cn');
-refer to [ReplaceGoogleCDN](https://github.com/justjavac/ReplaceGoogleCDN)
-vi /etc/hosts
-202.141.162.123 www.ajax.googleapis.com
-202.141.162.123 ajax.googleapis.com
-
-### 设置 DNS
-
-sudo vi /etc/resolvconf/resolv.conf.d/head
-sudo resolvconf -u
-cat /etc/resolv.conf
-
-nameserver 192.168.1.1
-
-### ca-certificates update
-
-1. `sudo mkdir /usr/share/ca-certificates/extra`
-2. `sudo cp /path/to/ca.cert /usr/share/ca-certificates/extra/com.ca.crt`
-3. `sudo dpkg-reconfigure ca-certificates` or `sudo update-ca-certificates`
-4. if no cert installed, then `sudo vi /etc/ca-certificates.conf`, add `extra/com.ca.crt`
-then `sudo update-ca-certificates`
-
 ### mount disk
 
 用mount挂载你的windows分区, 事先以root权限用fdisk -l查看. 你就知道该挂载哪个了
@@ -3178,10 +3408,10 @@ Note: Be careful with you modify, it may cause the system not to work properly.
 先用FDISK命令查看一下磁盘的UUID
 
 ```sh
-$sudo fdisk -l
- id username
-$vi /etc/fstab
-/dev/sda3      /media/program    ntfs    defaults,nofail,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0    #defaults = rw, suid, dev, exec, auto, nouser, and async.
+sudo fdisk -l
+id username
+vi /etc/fstab
+# /dev/sda3      /media/program    ntfs    defaults,nofail,utf8,uid=1000,gid=1000,dmask=022,fmask=133     0       0    #defaults = rw, suid, dev, exec, auto, nouser, and async.
 
 # 追加 uuid 到 fstab
 echo `blkid /dev/vdb1 | awk '{print $2}' | sed 's/\"//g'` /data ext4 defaults,nofail 0 0 >> /etc/fstab
@@ -3212,47 +3442,6 @@ fmask: file umask
 #### NTFS permission The mode is determined by the partition's mount options
 
 bash script.sh    #You can always explicitly invoke the script interpreter
-
-### Main directories
-
-[LinuxFilesystemTreeOverview](https://help.ubuntu.com/community/LinuxFilesystemTreeOverview)
-The standard Ubuntu directory structure mostly follows the Filesystem Hierarchy Standard, which can be referred to for more detailed information.
-Here, only the most important directories in the system will be presented.
-/bin is a place for most commonly used terminal commands, like ls, mount, rm, etc.
-/boot contains files needed to start up the system, including the Linux kernel, a RAM disk image and bootloader configuration files.
-/dev contains all device files, which are not regular files but instead refer to various hardware devices on the system, including hard drives.
-/dev/shm 这个目录是在内存里 采用tmpfs文件系统 默认值是内存的一半
-/etc contains system-global configuration files, which affect the system''s behavior for all users.
-/home home sweet home, this is the place for users'' home directories.
-/lib contains very important dynamic libraries and kernel modules
-/usr contains the majority of user utilities and applications, and partly replicates the root directory structure, containing for instance, among others, /usr/bin/ and /usr/lib.
-/var is dedicated variable data that potentially changes rapidly; a notable directory it contains is /var/log where system log files are kept.
-通常情况下, linux会这样放软件的组件:
-程序的文档->/usr/share/doc; /usr/local/share/doc
-程序->/usr/share; /usr/local/share
-程序的启动项->/usr/share/apps; /usr/local/share
-程序的语言包->/usr/share/locale; /usr/local/share/locale
-可执行文件->/usr/bin; /usr/local/bin
-而有的软件为了和系统组件分隔开, 选择栖息于 /opt, 但目录结构往往是一样的, 把/usr或/usr/local 替换为了/opt/"软件名"
-~/share all softwares
-~/opt softwares
-
-### [Source code](https://peteris.rocks/blog/htop/#source-code)
-
-``` bash
-$ which uptime
-/usr/bin/uptime
-$ dpkg -S /usr/bin/uptime
-procps: /usr/bin/uptime
-```
-
-Here we find out that uptime is actually located at `/usr/bin/uptime` and that on Ubuntu it is part of the `procps` package.
-You can then go to packages.ubuntu.com and search for the package there.
-Here is the page for [procps](http://packages.ubuntu.com/source/xenial/procps)
-If you scroll to the bottom of the page, you'll see links to the source code repositories:
-
-* Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
-* Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
 
 ## 入侵排查思路
 
