@@ -141,6 +141,10 @@ vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 * [实战 SSH 端口转发](https://www.ibm.com/developerworks/cn/linux/l-cn-sshforward )
 * [SSH隧道：端口转发功能详解](https://www.cnblogs.com/f-ck-need-u/p/10482832.html)
 
+* 正向代理（-L）：相当于 iptable 的 port forwarding
+* 反向代理（-R）：相当于 frp 或者 ngrok
+* socks5 代理（-D）：相当于 ss/ssr
+
 ### 动态转发
 
 * `ssh -D <local port> <SSH Server>`    动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能
