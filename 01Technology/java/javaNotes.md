@@ -2,6 +2,8 @@
 
 ## Recent
 
+轻量级锁是 JVM 自己管理线程，重量级锁是交给操作系统管理线程
+
 [Backend Developer Roadmap: Learn to become a modern backend developer](https://roadmap.sh/backend)
 
 non-volatile memory (NVM)：非易失性存储器（NVM）是一种计算机存储器，即使电源关闭也具有保存已保存数据的能力。 与易失性存储器不同，NVM不需要定期刷新其存储器数据
@@ -54,6 +56,10 @@ JDK 中新特性，Java 不同版本的比较可以参考，看看增加了哪�
 * [OpenJDK Java增强提案（JEP）](https://openjdk.java.net/jeps/0) 形式进行的变更
 * Oracle [发布说明](https://www.oracle.com/java/technologies/javase/16-relnote-issues.html) 可以查阅每个 Java 版本的详细信息
 
+## Java 21
+
+[What's new in Java 21](https://www.hackingnote.com/en/java/java-21/index.html)
+
 ## Java 17
 
 [JDK 17 Documentation](https://docs.oracle.com/en/java/javase/17/)
@@ -63,6 +69,8 @@ JDK 中新特性，Java 不同版本的比较可以参考，看看增加了哪�
 [What's new in Java 17](https://www.hackingnote.com/en/java/java-17/index.html)
 [Java Version Almanac - Java 17 - foojay](https://foojay.io/almanac/java-17/)
 [JDK 17 Books](https://docs.oracle.com/en/java/javase/17/books.html)
+
+JEP-374: Disable and Deprecate Biased Locking
 
 ### Flight Recorder
 
@@ -75,6 +83,11 @@ JDK 中新特性，Java 不同版本的比较可以参考，看看增加了哪�
 
 method reference :: syntax (meaning “use this method as a value”
 `File[] hiddenFiles = new File(".").listFiles(File::isHidden);`
+
+LocalDate, LocalTime, LocalDateTime 是方便用户使用，Instant 精确到纳秒，方便电脑识别
+Duration 精确到秒或者纳秒: You can create a duration between two LocalTimes, two LocalDateTimes, or two Instants
+Period 精确到天 You can find out the difference between two LocalDates
+DateTimeFormatter
 
 ## Java lock
 
@@ -118,15 +131,17 @@ method reference :: syntax (meaning “use this method as a value”
 
 在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分:
 
-* 对象头(Header)：在32位和64位的虚拟机(未开启压缩指针)中分别为 32 bit（4 字节）和 64 bit（8 字节）
+* 对象头(Header)
 * 实例数据(Instance Data)
 * 对齐填充(Padding)：以8字节对齐
 
 对象头中一般包含两个部分:
 
-* 标记字 Mark Word，占用一个机器字，也就是8字节。
-* 类型指针，占用一个机器字，也就是8个字节。如果堆内存小于32GB，JVM默认会开启指针压缩，则只占用4个字节。
+* 标记字 Mark Word，占用一个机器字，64位虚拟机是8字节。
+* 类型指针 占用一个机器字，也就是8个字节。如果堆内存小于32GB，JVM默认会开启指针压缩，则只占用4个字节。
 * 如果是数组，对象头中还会多出一个部分: 数组长度，int值，占用4字节。
+
+可以查看的 工具: JOL=Java Object Layout
 
 举例来说，下面的 `MyOrder` 类的每个对象会占用40个字节。
 
@@ -162,6 +177,11 @@ public class MyOrder{
 | Java 7 client | serial collector     |
 
 ### GC 选型
+
+吞吐量 = 业务代码时间 /（业务代码时间 + 垃圾收集时间）
+
+交互式应用：保证停顿时间 300ms 情况下尽可能 增加吞吐
+常规应用：需要在保证最大吞吐量的情况下 尽可能减小停顿时间
 
 选择正确的 GC 算法，唯一可行的方式就是去尝试，并找出不合理的地方，一般性的指导原则：
 
@@ -804,6 +824,10 @@ Java中实际上有四种强度不同的引用，从强到弱它们分别是，�
 ## JVM 致命错误日志（hs_err_pid.log）解读
 
 [JVM 致命错误日志（hs_err_pid.log）解读](https://www.raychase.net/1459) Posted on 06/27/2013 by 四火
+
+[Exploring the Java ‘hs_err_pid’ File - DZone](https://dzone.com/articles/exploring-the-java-hs-err-pid-file)
+
+[fastThread Analyze ‘hs_err_pid’ File tool](https://fastthread.io/ft-dashboard.jsp)
 
 致命错误出现的时候，JVM 生成了 `hs_err_pid<pid>.log` 这样的文件，其中往往包含了虚拟机崩溃原因的重要信息。
 
