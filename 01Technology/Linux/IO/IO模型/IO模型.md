@@ -2,7 +2,7 @@
 
 ## 概念 同步异步 synchronous/asynchronous 阻塞非阻塞 blocking/non-blocking
 
-参考 Unix Networking Programming Col 1, Chapter 6.
+直接阅读 Unix Networking Programming Vol 1, Chapter 6 会更容易理解
 
 ### Asynchronous, Non-Blocking, Event-Base architectures
 
@@ -34,7 +34,9 @@ So **they don't always mean the same thing**. To distil the socket example, we c
 
 ## Java IO读写原理
 
-[10 分钟看懂 NIO 底层原理](https://www.cnblogs.com/crazymakercircle/p/10225159.html)
+主要参考 [10 分钟看懂 NIO 底层原理](https://www.cnblogs.com/crazymakercircle/p/10225159.html)，但文章在多路复用部分使用 Reactor 并错误解释为异步非阻塞。
+
+[你管这破玩意叫 IO 多路复用？- 无聊的闪客](https://mp.weixin.qq.com/s/YdIdoZ_yusVWza1PU7lWaw)
 
 用户程序进行IO的读写，基本上会用到 `read & write` 两大系统调用。可能不同操作系统，名称不完全一样，但是功能是一样的。
 
@@ -57,7 +59,7 @@ So **they don't always mean the same thing**. To distil the socket example, we c
 ![Java 服务端处理网络请求的典型过程](image/Java服务端处理网络请求的典型过程.png)
 
 1. 客户端请求
-    Linux通过网卡，读取客户断的请求数据，将数据读取到内核缓冲区。
+    Linux通过网卡，读取客户端的请求数据，将数据读取到内核缓冲区。
 2. 获取请求数据
     服务器从内核缓冲区读取数据到Java进程缓冲区。
 
@@ -72,7 +74,9 @@ So **they don't always mean the same thing**. To distil the socket example, we c
 
 ## 四种主要的IO模型
 
-Unix Networking Programming Col 1, Chapter 6.
+Unix Networking Programming Vol 1, Chapter 6.
+
+把数据 IO 分为两个阶段：数据准备 和 数据读取（从内核向进程复制数据），阻塞是在数据准备阶段等待，同步是指用户自己读数据
 
 常见的IO模型有四种：
 
@@ -93,7 +97,10 @@ Unix Networking Programming Col 1, Chapter 6.
     强调一下，这里所说的NIO（同步非阻塞IO）模型，并非Java的NIO（New IO）库。
 
 3. IO多路复用（IO Multiplexing）
-    即经典的Reactor设计模式，有时也称为异步阻塞IO，Java中的Selector和Linux中的epoll都是这种模型。
+    阻塞 和 非阻塞 是指数据就绪前，用户线程的状态。两者都是 同步IO，即数据就绪后，由用户线程负责数据拷贝到用户空间，此时是同步拷贝的。因此是 阻塞同步IO 和 非阻塞同步IO。
+
+    IO多路复用是在 非阻塞IO 的基础上，原因每次只询问单个数据状态，多路复用 则是询问多个数据状态，即多个数据复用在同一个线程上处理。数据在内核缓冲区就绪后，用户线程依旧是同步IO拷贝的。
+    Java中的Selector和Linux中的epoll都是这种模型。
 
 4. 异步IO（Asynchronous IO）
     异步IO，指的是用户空间与内核空间的调用方式反过来。用户空间线程是变成被动接受的，内核空间是主动调用者。
@@ -157,7 +164,9 @@ Unix Networking Programming Col 1, Chapter 6.
 
 ## IO多路复用模型(I/O multiplexing）
 
-即经典的 Reactor 设计模式，有时也称为异步阻塞IO，Java中的 Selector 和 Linux 中的 epoll 都是这种模型
+阻塞 和 非阻塞 是指数据就绪前，用户线程的状态。两者都是 同步IO，即数据就绪后，由用户线程负责数据拷贝到用户空间，此时是同步拷贝的。因此是 阻塞同步IO 和 非阻塞同步IO。
+
+IO多路复用是在 非阻塞IO 的基础上，原因每次只询问单个数据状态，多路复用 则是询问多个数据状态，即多个数据复用在同一个线程上处理。数据在内核缓冲区就绪后，用户线程依旧是同步IO拷贝的。
 
 如何避免同步非阻塞NIO模型中轮询等待的问题呢？这就是IO多路复用模型。
 

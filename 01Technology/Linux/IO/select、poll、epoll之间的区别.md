@@ -1,12 +1,19 @@
 # select、poll、epoll之间的区别
 
 [epoll和select的区别](https://blog.csdn.net/jiange_zh/article/details/50811553)
+[你管这破玩意叫 IO 多路复用？- 无聊的闪客](https://mp.weixin.qq.com/s/YdIdoZ_yusVWza1PU7lWaw)
+
+Advanced Programming in the UNIX® Environment 3rd Edition, Chapter 14 Advanced I/O, 14.4 I/O Multiplexing
 
 select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一种机制，可以监视多个描述符，一旦某个描述符就绪（一般是读就绪或者写就绪），能够通知程序进行相应的读写操作。
 
 但select，poll，epoll本质上都是同步I/O，因为他们都需要在读写事件就绪后自己负责进行读写，也就是说这个读写过程是阻塞的，而异步I/O则无需自己负责进行读写，异步I/O的实现会负责把数据从内核拷贝到用户空间。
 
 ## select原理 时间复杂度O(n)
+
+int select(int maxfdp1, fd_set *restrict readfds,
+    fd_set *restrict writefds, fd_set *restrict exceptfds, struct timeval *restrict tvptr);
+        Returns: count of ready descriptors, 0 on timeout, −1 on error
 
 调用select时，会发生以下事情：
 
@@ -20,6 +27,9 @@ select，poll，epoll都是IO多路复用的机制。I/O多路复用就通过一
 [epoll和select的区别](https://blog.csdn.net/jiange_zh/article/details/50811553)
 
 ## poll实现 时间复杂度O(n)
+
+int poll(struct pollfd fdarray[], nfds_t nfds, int timeout);
+    Returns: count of ready descriptors, 0 on timeout, −1 on error
 
 poll的实现和select非常相似，只是描述fd集合的方式不同，poll使用pollfd结构而不是select的fd_set结构，其他的都差不多。
 
