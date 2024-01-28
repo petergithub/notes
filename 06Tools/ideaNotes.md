@@ -123,6 +123,7 @@ PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
 * .env files support: 把.env文件中的内容给放到项目运行的环境变量中去
 * SequenceDiagram: 梳理代码逻辑，绘制时序图
 * Tabnine: AI code assistant
+* Codeium: Tab 键接受; 使用 ⌥ + ] 和 ⌥ + 来切换备选建议
 * Spring Assistant
 
 ### Vim

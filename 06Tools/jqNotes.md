@@ -6,19 +6,27 @@
 
 ```bash
 # example
-> echo '"Hello, world"' |jq .
-"Hello, world"
+echo '"Hello, world"' |jq .
+# "Hello, world"
 
-> echo '{"foo": 42, "bar": "less interesting data"}' | jq .
-42
+echo '{"foo": 42, "bar": "less interesting data"}' | jq .
+# {
+#   "foo": 42,
+#   "bar": "less interesting data"
+# }
 
-> echo '{"code":200,"data": {"list":[{"updated":1},{"updated":3},{"updated":5},{"updated":7}]}}' | jq '.data.list | .[].updated' | head -n 2
-1
-3
+echo '{"code":200,"data": {"list":[{"updated":1},{"updated":3},{"updated":5},{"updated":7}]}}' | jq '.data.list | .[].updated' | head -n 2
+# 1
+# 3
 
-> echo '{"code":200,"data": {"list":[{"updated":1},{"updated":3},{"updated":5},{"updated":7}]}}' | jq .data.list | jq '.[].updated' | head -n 2
-1
-3
+echo '{"code":200,"data": {"list":[{"updated":1},{"updated":3},{"updated":5},{"updated":7}]}}' | jq .data.list | jq '.[].updated' | head -n 2
+# 1
+# 3
+
+# Formatting Custom Output
+# comma-separated data on a single line.
+echo '{"foo": 42, "bar": "less interesting data"}' | jq '"Foo: \(.foo), Bar: \(.bar)"'
+# "Foo: 42, Bar: less interesting data"
 
 ```
 
