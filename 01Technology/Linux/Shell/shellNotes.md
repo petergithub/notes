@@ -21,6 +21,31 @@ echo "`date` (print as a date result: Mar  9 17:20:49 CST 2022) end sleep 2 sec;
 * `$*` 该变量包含了所有输入的命令行参数值
 * `$0` is a magic variable for the full path of the executed script. If your script is invoked as "`sh script-name`", then `$0` will be exactly "script-name". [self-deleting shell script - Stack Overflow](https://stackoverflow.com/questions/8981164/self-deleting-shell-script/1086907#1086907)
 
+## alias
+
+看看别人是怎么用好 alias 的
+
+https://www.cyberciti.biz/tips/bash-aliases-mac-centos-linux-unix.html
+
+https://www.digitalocean.com/community/questions/what-are-your-favorite-bash-aliases
+
+https://www.linuxtrainingacademy.com/23-handy-bash-shell-aliases-for-unix-linux-and-mac-os-x/
+
+https://brettterpstra.com/2013/03/31/a-few-more-of-my-favorite-shell-aliases/
+
+```sh
+### Get os name via uname ###
+_myos="$(uname)"
+
+### add alias as per os using $_myos ###
+case $_myos in
+   Linux) alias foo='/path/to/linux/bin/foo';;
+   FreeBSD|OpenBSD) alias foo='/path/to/bsd/bin/foo' ;;
+   SunOS) alias foo='/path/to/sunos/bin/foo' ;;
+   *) ;;
+esac
+```
+
 ## Shell 变量
 
 定义变量时，变量名不加美元符号（$，PHP语言中变量需要），注意，变量名和等号之间不能有空格. 如： `var_name="a variable"`
@@ -155,7 +180,7 @@ EOF
 
 #### Common Bash comparisons
 
-```text
+```sh
 Operator    Meaning    Example
 -z    Zero-length string    [ -z "$myvar" ]
 -z string string为空
@@ -223,8 +248,11 @@ fi
 这个命令写在脚本文件里才有作用, 他返回这个脚本文件放置的目录, 并可以根据这个目录来定位所要运行程序的相对位置（绝对位置除外）.
 在/home/admin/test/下新建test.sh内容如下:
 
-   cd `dirname $0`
-   echo `pwd`
+```sh
+cd `dirname $0`
+echo `pwd`
+echo $PWD
+```
 
 然后返回到/home/admin/执行 `sh test/test.sh` 运行结果: `/home/admin/test`
 这样就可以知道一些和脚本一起部署的文件的位置了, 只要知道相对位置就可以根据这个目录来定位, 而可以不用关心绝对位置. 这样脚本的可移植性就提高了, 扔到任何一台服务器, （如果是部署脚本）都可以执行.
@@ -240,7 +268,7 @@ fi
 ### 向脚本传递参数
 
 ``` bash
-#! /bin/sh
+#! /bin/sh -xe
 # test.sh
 echo "$# parameters"; # count of parameters
 echo "$@"; # all parameters
@@ -261,6 +289,8 @@ test.sh
 尽量封装函数使用
 
 ```sh
+#!/bin/bash -xe
+
 log() { # classic logger
     local prefix=$(date "+%Y-%m-%d %H:%M:%S")
     echo "${prefix} $@" >&2
@@ -321,32 +351,31 @@ done
 ```
 
 ``` bash
+for x in one two three four
+do
+    echo number $x
+done
 
-    for x in one two three four
-    do
-        echo number $x
-    done
+output:
+number one
+number two
+number three
+number four
 
-    output:
-    number one
-    number two
-    number three
-    number four
+for myfile in /etc/r*
+do
+    if [ -d "$myfile" ]
+    then
+        echo "$myfile (dir)"
+    else
+        echo "$myfile"
+    fi
+done
 
-    for myfile in /etc/r*
-    do
-        if [ -d "$myfile" ]
-        then
-          echo "$myfile (dir)"
-        else
-          echo "$myfile"
-        fi
-    done
-
-    for((i=0;i<3;i++))
-    do
-        echo $i
-    done
+for((i=0;i<3;i++))
+do
+    echo $i
+done
 ```
 
 ### while
@@ -480,11 +509,59 @@ esac
 `expr 8 % 2` or `echo $((8%2))`
 
 ```shell
+for x in `seq 1 10`
+do
+    echo $x "   "  $((${x} + 10)) " " $(($x * 10))
+done
+```
 
-    for x in ` seq 1 10 `
-    do
-        echo $x "   "  $((${x} + 10)) " " $(($x * 10))
-    done
+### 处理命令行参数
+
+```sh
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -s  )   shift
+    SERVER=$1 ;;
+        -d  )   shift
+    DATE=$1 ;;
+  --paramter|p ) shift
+    PARAMETER=$1;;
+        -h|help  )   usage # function call
+                exit ;;
+        * )     usage # All other parameters
+                exit 1
+    esac
+    shift
+done
+```
+
+### 命令行菜单
+
+```sh
+#!/bin/bash
+# Bash Menu Script Example
+
+PS3='Please enter your choice: '
+options=("Option 1" "Option 2" "Option 3" "Quit")
+select opt in "${options[@]}"
+do
+    case $opt in
+        "Option 1")
+            echo "you chose choice 1"
+            ;;
+        "Option 2")
+            echo "you chose choice 2"
+            ;;
+        "Option 3")
+            echo "you chose choice $REPLY which is $opt"
+            ;;
+        "Quit")
+            break
+            ;;
+        *) echo "invalid option $REPLY";;
+    esac
+done
 ```
 
 ### 日期自增
