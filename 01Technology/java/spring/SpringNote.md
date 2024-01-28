@@ -29,30 +29,45 @@
 
 ## Spring 基础
 
+### Bean 创建流程
+
+1. 实例化 AbstractBeanFactory##getBean > doGetBean > AbstractAutowireCapableBeanFactory#createBean > doCreateBean > createBeanInstance
+2. 初始化 自定义属性 设置Bean的属性 populateBean
+3. 初始化 容器对象属性 Aware相关接口实现  BeanFactoryAware, ApplicationContextAware
+4. BeanPostProcessor 接口 postProcessBeforeInitialization 方法，AOP 创建代理
+5. init-method属性并自动调用其配置的初始化方法
+6. BeanPostProcessor 接口 postProcessAfterInitialization 方法
+
 ### spring循环依赖
 
 [Spring源码最难问题《当Spring AOP遇上循环依赖》](https://blog.csdn.net/chaitoudaren/article/details/105060882)
 
-1.spring利用了3级缓存解决循环依赖
-2.在一个bean实例化的过程中，通过提前暴露自己的bean工厂存放在三级缓存中
-3.并在有循环依赖发生时，通过**三级缓存中存放的bean工厂**生产bean，并放置到二级缓存中，并返回引用的方式，来解决循环依赖的问题
+1. spring利用了3级缓存解决循环依赖
+2. 在一个bean实例化的过程中，通过提前暴露自己的bean工厂存放在三级缓存中
+3. 并在有循环依赖发生时，通过**三级缓存中存放的bean工厂**生产bean，并放置到二级缓存中，并返回引用的方式，来解决循环依赖的问题
 
 为什么是三级缓存，而不是二级缓存？
 
 简单来说，循环依赖的对象存在AOP代理的时候，代理时机会提前(正常是在初始化之后进行代理)，
 为了避免循环依赖依赖到的是代理之后的对象，所以提前代理的对象存放在二级缓存，提前暴露的对象放在三级缓存
 
+三级缓存：
+
+1. singletonObject：一级缓存 成品对象，这里的 bean经历过实例化->属性填充->初始化以及各类的后置处理。
+2. earlySingletonObjects：二级缓存 半成品对象，bean只能确保已经进行了实例化，但是属性填充跟初始化还没完成，仅能作为指针提前曝光，被其他bean所引用。
+3. singletonFactories：三级缓存 lambda 表达式 ，在bean实例化完之后，属性填充以及初始化之前，bean转换成beanFactory并加入到三级缓存。
+
 ### aop的原理
 
 1. spring的aop利用了jdk或者cglib的动态代理
-2.在代理目标类实现了接口的情况下，则会使用jdk动态代理，否则使用cglib基于目标类生成子类对象的方式生成动态代理对象（spring boot2中默认使用的cglib，aop自动配置类中指定的，为了防止impl类方式的注入不会生成代理对象）
-3.通过在生成spring bean的最后一步时候，通过aop的processor，生成jdk或者cglib的动态代理，会持有被代理对象，及相关的advisor
+2. 在代理目标类实现了接口的情况下，则会使用jdk动态代理，否则使用cglib基于目标类生成子类对象的方式生成动态代理对象（spring boot2中默认使用的cglib，aop自动配置类中指定的，为了防止impl类方式的注入不会生成代理对象）
+3. 通过在生成spring bean的最后一步时候，通过aop的processor，生成jdk或者cglib的动态代理，会持有被代理对象，及相关的advisor
 执行方法过程：
- 1.在执行代理方法的时候，会先获取所有的通知列表，并且在执行时会构建一个MethodInvocation，并传入通知列表。
- 2.MethodInvocation的执行方法（proceed()）会利用此通知列表来构建一个责任链，维护一个增长的下标，每次在执行时获取一个通知方法（MethodInteceptor）
- 3.在每次执行methodInteceptor，会传入MethodInvocation进去，在执行proceed的前后可以执行增强的方法
- 4.另外在proceed的入口处会有下标超出通知列表的判断，如果达到最后一个会执行被代理的目标方法，并返回结果，以此来作为责任链的终点。
- 5.另外在执行MethodInteceptor的后置的一些方法是在finally中执行的，这样在保证return之前能够执行最终方法。
+   1. 在执行代理方法的时候，会先获取所有的通知列表，并且在执行时会构建一个MethodInvocation，并传入通知列表。
+   2. MethodInvocation的执行方法（proceed()）会利用此通知列表来构建一个责任链，维护一个增长的下标，每次在执行时获取一个通知方法（MethodInteceptor）
+   3. 在每次执行methodInteceptor，会传入MethodInvocation进去，在执行proceed的前后可以执行增强的方法
+   4. 另外在proceed的入口处会有下标超出通知列表的判断，如果达到最后一个会执行被代理的目标方法，并返回结果，以此来作为责任链的终点。
+   5. 另外在执行MethodInteceptor的后置的一些方法是在finally中执行的，这样在保证return之前能够执行最终方法。
 
 ### spring mvc容器初始化与执行流程
 
