@@ -8,12 +8,12 @@ Relational DB -> Databases -> Tables -> Rows -> Columns
 Elasticsearch -> Indices   -> Types  -> Documents -> Fields
 
 请尽可能多的使用过滤式查询。
-start elasticsearch:  
-`cd elasticsearch-<version>`  
-`./bin/elasticsearch` or  
-`./bin/elasticsearch -d` run it in the background as a daemon  
+start elasticsearch:
+`cd elasticsearch-<version>`
+`./bin/elasticsearch` or
+`./bin/elasticsearch -d` run it in the background as a daemon
 
-[全文搜索引擎 Elasticsearch 入门教程 - 阮一峰](http://www.ruanyifeng.com/blog/2017/08/elasticsearch.html)  
+[全文搜索引擎 Elasticsearch 入门教程 - 阮一峰](http://www.ruanyifeng.com/blog/2017/08/elasticsearch.html)
 查看当前节点的所有 Index `curl -X GET 'http://localhost:9200/_cat/indices?v'`
 get alias `curl -X GET 'http://localhost:9200/p_channel_v1/_alias/?pretty=true'`
 列出每个 Index 所包含的 Type `curl 'localhost:9200/_mapping?pretty=true'`
@@ -28,7 +28,7 @@ Count by type: `curl "10.0.0.29:9200/p_channel_v1/_search?search_type=count&pret
 `GET /_analyze?analyzer=standard
 Text to analyze`
 
-``` json
+```json
 curl -X GET "localhost:9200/_search?explain" -H 'Content-Type: application/json' -d'
 {
    "query"   : { "match" : { "tweet" : "honeymoon" }}
@@ -41,7 +41,7 @@ curl -X GET "localhost:9200/_search?explain" -H 'Content-Type: application/json'
 
 [head 插件](https://github.com/mobz/elasticsearch-head):
 
-```shell
+```sh
 git clone git://github.com/mobz/elasticsearch-head.git
 cd elasticsearch-head
 npm install
@@ -106,7 +106,7 @@ GET /_search
 [更复杂的搜索](https://www.elastic.co/guide/cn/elasticsearch/guide/cn/_more_complicated_searches.html)
 `range` 过滤器 ， 它能找到年龄大于 30 的文档，其中 gt 表示_大于(`_great than`)
 
-``` shell
+```sh
 GET /megacorp/employee/_search
 {
     "query" : {
@@ -130,7 +130,7 @@ GET /megacorp/employee/_search
 
 ##### Bool Filter
 
-``` shell
+```sh
 {
    "bool" : {
       "must" :     [],
@@ -167,7 +167,7 @@ GET /my_store/products/_search
 
 ##### Nesting Boolean Queries
 
-``` shell
+```sh
 SELECT document
 FROM   products
 WHERE  productID      = "KDKE-B-9947-#kL5"
@@ -200,7 +200,7 @@ GET /my_store/products/_search
 
 ##### Finding Multiple Exact Values
 
-``` shell
+```sh
 {
         "terms" : {
         "price" : [20, 30]
@@ -215,7 +215,7 @@ GET /my_store/products/_search
 * `gte`: >= greater than or equal to
 * `lte`: <= less than or equal to
 
-``` shell
+```sh
 SELECT document
 FROM   products
 WHERE  price BETWEEN 20 AND 40
@@ -239,7 +239,7 @@ GET /my_store/products/_search
 
 Ranges on Dates:
 
-``` shell
+```sh
 "range" : {
     "timestamp" : {
         "gt" : "2014-01-01 00:00:00",
@@ -253,7 +253,7 @@ Ranges on Dates:
 `exists`: is
 `missing`: is not
 
-``` shell
+```sh
 SELECT tags
 FROM   posts
 WHERE  tags IS NOT NULL
@@ -288,7 +288,7 @@ GET /my_index/posts/_search
 
 #### [Multifield Search](https://www.elastic.co/guide/en/elasticsearch/guide/current/multi-query-strings.html)
 
-``` shell
+```sh
 GET /_search
 {
   "query": {
@@ -315,8 +315,8 @@ Elasticsearch 有一个功能叫聚合（aggregations）, 与 SQL 中的 GROUP B
 Metrics
 `sum`, `avg`, `min`, `mean`, `max`
 
-``` shell
-SQL: group by interests  
+```sh
+SQL: group by interests
 GET /megacorp/employee/_search
 {
   "aggs": {
@@ -357,9 +357,9 @@ GET /cars/transactions/_search?search_type=count
 `term` 查询会查找我们指定的精确值
 最为常用的 `term` 查询， 可以用它处理数字（numbers）、布尔值（Booleans）、日期（dates）以及文本（text）
 
-`curl -XPOST 'http://example.com/p_channel_v2/device_roi_statistics/_search?pretty'  -d '{"query":{"bool":{"must":{"term":{"app_key":"UnmYb2"}},"should":[{"term":{"android_id":"5dbeb56a02d3033c"}},{"term":{"android_id":"195a35544d1fd132"}}],"minimum_should_match":"1"}},"aggregations":{"revenue_1a":{"sum":{"field":"revenue_1"}}}}'`
+`curl -X POST 'http://example.com/p_channel_v2/device_roi_statistics/_search?pretty'  -d '{"query":{"bool":{"must":{"term":{"app_key":"UnmYb2"}},"should":[{"term":{"android_id":"5dbeb56a02d3033c"}},{"term":{"android_id":"195a35544d1fd132"}}],"minimum_should_match":"1"}},"aggregations":{"revenue_1a":{"sum":{"field":"revenue_1"}}}}'`
 
-``` shell
+```sh
 {
   "query": {
     "bool": {
@@ -392,5 +392,6 @@ GET /cars/transactions/_search?search_type=count
   }
 }
 
-``` shell
+```
+
 `constant_score` 查询以非评分模式来执行
