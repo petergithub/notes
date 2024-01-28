@@ -151,6 +151,8 @@ https://pac.itzmx.com/abc.pac
 
 ## Editor
 
+* Meta 学术文档OCR神器 [Nougat](https://facebookresearch.github.io/nougat/)
+
 ## Data Security
 
 ### Encrypt
@@ -187,6 +189,9 @@ gpgcheck=1
 3. `service clamd start`
 4. `service clamd status`
 
+## Cloud
+
+[Cloud Native Landscape](https://landscape.cncf.io/guide)
 
 ## Classify by Project Development Phase
 
@@ -235,6 +240,9 @@ UAT: User Acceptance Test
 
 ### 06 Deploy
 
+[kaniko: Build Container Images In Kubernetes](https://github.com/GoogleContainerTools/kaniko)
+[Use kaniko to build Docker images | GitLab](https://docs.gitlab.com/ee/ci/docker/using_kaniko.html)
+
 #### Data security 数据安全工具DRBD
 
 #### 高性能集群软件 Keepalived
@@ -242,6 +250,8 @@ UAT: User Acceptance Test
 #### 高并发负载均衡软件 HAProxy
 
 #### 构建高性能的 MySQL 集群系统
+
+#### [Bytebase 数据库 Schema 变更管理工具](https://www.oschina.net/p/bytebase)
 
 ##### 通过KeepAlived搭建 MySQL双主模式的高可用集群系统
 
@@ -286,6 +296,8 @@ pm2 delete id
 * Ganglia
 * 基于 nagios 的分布式监控平台 centreon
 
+多维度告警 Prometheus + alertmgr
+
 ##### Java HeartBeat
 
 https://www.oschina.net/news/62034/java-heartbeat-0-4
@@ -326,6 +338,8 @@ Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
 提供日志收集，分析，和实时搜索，与可视化监控
 
 ##### 应用监控 APM
+
+[Elastic APM - Free and open application performance monitoring](https://www.elastic.co/guide/en/apm/guide/current/apm-overview.html)
 
 ##### 国内开源 open-falcon
 
