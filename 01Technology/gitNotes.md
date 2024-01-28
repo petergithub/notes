@@ -50,10 +50,6 @@ Scope must be noun and it represents the section of the section of the codebase
 `git rev-list --all | xargs git grep <string>`
 `ssh -Tv git@gitlab.com` get `Welcome to GitLab, Anonymous!`
 
-`HEAD^` 上一个版本
-`HEAD^^` `HEAD~2` 倒数第2个版本
-`HEAD~3` 倒数第3个版本
-
 Final release version
 `git merge --no-ff <branchName>`    使得合并操作总是产生一次新的提交
 `git merge --squash <branchName>`    把branchName上所有提交合并为一次提交到当前分支上再commit
@@ -172,10 +168,9 @@ Do the merge, and then pull the stash:
 `git rebase --onto master <commitId>` 在非master分支上执行,在master上重复commitId之后的提交,开区间
 `git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
 
-
 [Git - Revision Selection Example history for range selection](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#double_dot)
 
-`^` to identify which parent
+`^` to identify which parent，当前版本的上一个版本，即倒数第二个
 `d921970^1` means the first parent of a merge commit
 `d921970^2` means “the second parent of d921970
 
@@ -187,6 +182,8 @@ Do the merge, and then pull the stash:
 Double Dot
 `git log origin/master..HEAD`  to see what you’re about to push to a remote
 `git log origin/master..` — Git substitutes HEAD if one side is missing.
+
+`r1..r2` commit (r1, r2] exclude r1. See `man gitrevisions`
 
 Multiple Points
 `^` character or `--not` before any reference
@@ -289,11 +286,9 @@ see log of commits `git log -p --submodule`, config it as default
 
 ## Git subtree
 
-You must be sure that super and sub-project code is not mixed in new commits.
-提交代码时，一次混合提交的情况测试
-
 /Library/Developer/CommandLineTools/usr/libexec/git-core/git-subtree
 [git/git-subtree.txt at master · git/git · GitHub](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt)
+[Mastering Git subtrees. They’re the ultimate way to both share… | by Christophe Porteneuve | Medium](https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec)
 
 ### 介绍
 
@@ -311,6 +306,110 @@ subtrees 推送困难，但拉取简单，因为他们是子仓库的拷贝
 
 1、当多个项目共用同一模块代码，而且这块代码跟着项目在快速更新的时候
 2、把一部分代码迁移出去独立为一个新的 git 仓库，但又希望能够保留这部分代码的历史提交记录
+
+### 命令
+
+[git subtree使用说明_一行Java的博客-CSDN博客](https://blog.csdn.net/lupengfei1009/article/details/103099820)
+
+```sh
+-d # show debug messages
+
+# 引入子仓库
+git remote add -f <仓库别名> <仓库地址>
+
+git subtree add   --prefix=<prefix> <commit>
+git subtree add   --prefix=<prefix> <repository> <ref>
+git subtree pull  --prefix=<prefix> <repository> <ref>
+git subtree push  --prefix=<prefix> <repository> <ref>
+git subtree merge --prefix=<prefix> <commit>
+
+# 对已有的项目目录进行拆分
+git subtree split --prefix=<prefix> [OPTIONS] [<commit>]
+# 重新split出一个新起点（这样，每次提交subtree的时候就不会从头遍历一遍了）
+git subtree split --rejoin --prefix=<prefix> --branch <ref>
+```
+
+#### 添加一个已有的 subtree 项目示例
+
+```sh
+# git remote add -f <仓库别名> <仓库地址>
+git remote add -f child git@github.com/subtree-child.git
+
+# git subtree add   --prefix=<prefix> <repository> <ref>
+git subtree add --prefix=child child master
+
+# 推送到远程
+git subtree push --prefix=child child feature/child
+# 拉取远程代码
+git subtree pull --prefix=child child master
+```
+
+#### 对已有的项目目录进行拆分
+
+开发中发现某一部分可以抽离出来作为公共的子模块，操作流程如下
+
+```sh
+# 1. 将 subtree-parent项目的 src/plugins 目录剥离成一个新的分支 subtree-plugins-branch
+# git subtree split --prefix=<prefix> [OPTIONS] [<commit>]
+git subtree split --prefix=src/plugins -b subtree-plugins-branch
+
+# 2. 在主项目 subtree-parent 的同级目录创建一个用于保存这个分支的文件夹
+# 创建文件夹
+mkdir ../subtree-plugins
+# 切到对应的文件夹
+cd ../subtree-plugins/
+# 初始化成一个git仓库
+git init
+
+# 3. 将剥离出来的分支并到当前目录来
+# ../subtree-parent 为主仓库的路径
+# subtree-plugins-branch 为第一步剥离出来的分支名称
+git pull ../subtree-parent subtree-plugins-branch
+
+# 4. 将新的仓库关联到远端仓库
+git remote add origin https://github.com/subtree-plugins.git
+
+# 5. 推送到远端代码
+git push -u origin +master
+```
+
+### Mastering Git subtrees
+
+```sh
+# [Mastering Git subtrees. They’re the ultimate way to both share… | by Christophe Porteneuve | Medium](https://medium.com/@porteneuve/mastering-git-subtrees-943d29a798ec)
+
+# Adding a subtree
+# add plugin repo
+git subtree add --prefix=vendor/plugins/demo plugin master
+# equals by manually:
+git read-tree --prefix=vendor/plugins/demo -u plugin/master
+
+# Getting an update from the subtree’s remote
+# pull plugin repo
+git subtree pull --prefix=vendor/plugins/demo plugin master
+# equals by manually:
+git merge -X subtree=vendor/plugins/demo plugin/master
+
+# git subtree error "fatal: refusing to merge unrelated histories"
+git merge -s subtree -X subtree=src/plugins plugins/master --allow-unrelated-histories
+
+# Updating a subtree in-place in the container
+# update plugin repo
+git subtree push --prefix vendor/plugins/demo plugin master
+# equals by manually:
+git cherry-pick -x --strategy=subtree master^
+git checkout -b backport-plugin plugin/master
+git push plugin HEAD:master
+
+# --strategy=subtree (-s means something else in cherry-pick) to make sure files outside of the subtree (elsewhere in container code) will get quietly ignored
+
+# Turning a directory into a subtree
+git subtree split --prefix lib/plugins/myown -b split-plugin
+# equals by manually:
+git checkout -b split-plugin
+git filter-branch --subdirectory-filter lib/plugins/myown
+```
+
 
 ## Git configuration
 
