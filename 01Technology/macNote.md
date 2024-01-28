@@ -199,9 +199,38 @@ Connect using a DSN: `mycli mysql://my_user@my_host.com:3306/my_database`
 
 1. 以支持 Https 方式启动 `anyproxy --intercept`
 2. 启动浏览器 [链接](http://localhost:8002)
-3. 客户端设置代理 [链接](http://ip:8001)
+3. 客户端设置代理 [链接](ip:8001)
  [安装使用文档 代理服务器 AnyProxy](https://www.jianshu.com/p/2074f7572694)
- [AnyProxy 官网](http://anyproxy.io/cn)
+ [alibaba/anyproxy: A fully configurable http/https proxy in NodeJS](https://github.com/alibaba/anyproxy)
+
+移动端安装证书
+浏览器打开地址 http://localhost:8002/fetchCrtFile 进行证书下载
+扫描二维码地址 http://localhost:8002/qr_root 进行证书下载
+手机打开链接下载 http://ip:8002/downloadCrt
+
+下载后，先添加配置描述文件，然后信任证书
+
+设置》通用》 VPN 与设备管理》添加配置描述文件
+设置》通用》关于本机》证书信任设置 选择信任
+
+安装流程
+
+```sh
+brew install node
+node --version
+# 安装稳定正式版
+npm install -g anyproxy
+```
+
+启动
+
+```sh
+# 启动 AnyProxy
+anyproxy
+
+# 以支持 Https 方式启动
+anyproxy --intercept
+```
 
 ### WPS
 
@@ -532,8 +561,10 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Open Source SQL Editor and Database Manager | Beekeeper Studio](https://www.beekeeperstudio.io/) sqllite
 * VeraCrypt, TrueCrypt-7.2-Mac-OS-X
 * 垃圾清理：CleanMyMac X（248 元/年）——腾讯柠檬清理（免费）
-* 全能截图工具：CleanShot X（200 元）/ Xnip（50 元）——iShot（免费）
+* 全能截图工具：CleanShot X（200 元）/ Xnip（50 元）iShot（免费）
 * 解压缩：360rar
 * [Proxyman · Native, Modern Web Debugging Proxy 代理抓包工具](https://proxyman.io/)
 * [MacWhisper](https://app.gumroad.com/d/29e33b796f6ce9bb186f87cdf2fadb16) License key 0E077F0E-B40C4044-B5FAFD74-41DE25A7
 * [Downie：Mac OS平台最强大的嗅探下载工具，视频、音频、PDF手到擒来](https://xuebajiajiayou.com/714/)
+* [testdisk: data recovery utilities](https://www.cgsecurity.org/testdisk_doc/#) `brew install testdisk`
+* [Easydict: 翻译，支持离线 OCR 识别](https://github.com/tisfeng/Easydict) 类似 Bob
