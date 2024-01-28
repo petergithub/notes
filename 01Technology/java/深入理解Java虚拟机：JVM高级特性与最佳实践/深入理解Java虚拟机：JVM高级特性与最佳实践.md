@@ -4,7 +4,9 @@
 
 ## 问题
 
-1. 内核态和用户态切换的成本是多少，衡量方式
+1. 内核态和用户态切换的成本是多少，衡量方式。
+   1. 进程运行过程中切换出去，需要保存下当前的 CPU 缓存，从内存加载新数据引起的性能消耗。
+   2. 计算机组成原理会讲到细节
 2. 轻量级锁获取过程 bytecodeInterpreter.cpp#1816 。第二个线程获取锁时 升级为重量级锁的过程确认 对象存储的线程对象地址是否会被替换？
 3. 元空间的存储 JDK 源码查看
 4. 同一个类内多个属性 synchronize，几个锁？
@@ -63,7 +65,7 @@ Dalvik VM并不是一个Java虚拟机，它没有遵循Java虚拟机规范，不
 Classes and metadata stored in the Metaspace
 [Metaspace](https://wiki.openjdk.java.net/display/HotSpot/Metaspace)
 
-元空间的JVM参数有两个：-XX:MetaspaceSize=N和 -XX:MaxMetaspaceSize=N，对于64位JVM来说，元空间的默认初始大小是20.75MB，默认的元空间的最大值是无限。MaxMetaspaceSize用于设置metaspace区域的最大值，MetaspaceSize表示metaspace首次使用不够而触发FGC的阈值，只对触发起作用，
+元空间的JVM参数有两个：`-XX:MetaspaceSize=N`和 `-XX:MaxMetaspaceSize=N`，对于64位JVM来说，元空间的默认初始大小是20.75MB，默认的元空间的最大值是无限。MaxMetaspaceSize用于设置metaspace区域的最大值，MetaspaceSize表示metaspace首次使用不够而触发FGC的阈值，只对触发起作用，
 
 [JVM源码分析之Metaspace解密-你假笨](https://developer.aliyun.com/article/73601)
 
@@ -142,10 +144,13 @@ Garbage collector is responsible for
 
 在JDK 1.2版之后，Java对引用的概念进行了扩充，将引用分为强引用（Strongly Reference）、软引用（Soft Reference）、弱引用（Weak Reference）和虚引用（Phantom Reference）4种，这4种引用强度依次逐渐减弱。
 
-* 强引用是最传统的“引用”的定义，是指在程序代码之中普遍存在的引用赋值软引用是用来描述一些还有用，但非必须的对象。
-* 软引用 SoftReference 关联着的对象，在系统将要发生内存溢出异常前，会把这些对象列进回收范围之中进行第二次回收，如果这次回收还没有足够的内存，才会抛出内存溢出异常
-* 弱引用 WeakReference 也是用来描述那些非必须对象，强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。
-* 虚引用 PhantomReference 也称为“幽灵引用”或者“幻影引用”，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的只是为了能在这个对象被收集器回收时收到一个系统通知。
+* **强引用**是最传统的“引用”的定义，是指在程序代码之中普遍存在的引用赋值软引用是用来描述一些还有用，但非必须的对象。
+* **软引用 SoftReference** 关联着的对象，在系统将要发生内存溢出异常前，会把这些对象列进回收范围之中进行第二次回收，如果这次回收还没有足够的内存，才会抛出内存溢出异常
+  * 使用案例：缓存
+* **弱引用 WeakReference** 也是用来描述那些非必须对象，强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生为止。当垃圾收集器开始工作，无论当前内存是否足够，都会回收掉只被弱引用关联的对象。
+  * 使用案例：ThreadLocal 中的 key 使用了弱引用，Spring 的 Transactional 注解使用 ThreadLocal 实现，保证使用的数据库链接是同一个。
+* **虚引用 PhantomReference** 也称为“幽灵引用”或者“幻影引用”，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用来取得一个对象实例。为一个对象设置虚引用关联的唯一目的只是为了能在这个对象被收集器回收时收到一个系统通知。
+  * 使用案例：垃圾回收线程，清理堆外内存 DirectByteBuffer
 
 #### 3.2.5 回收方法区
 
