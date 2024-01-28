@@ -43,8 +43,37 @@ Java Heap * HeapFractionForMemstore / (MemstoreSize / 2 )
 8. 默认get 到最新版本数据，如果需要获取多个版本的数据，需要使用 `scan 'test_tbl',{FILTER => "PrefixFilter ('rowkey')",RAW => true, VERSIONS => 10}`
 9. Disable a table: `disable 'test_tbl'`, `enable 'test_tbl'`If you want to delete a table or change its settings, as well as in some other situations, you need to disable the table first
 10. limit: `hbase> scan 'test_tbl', {'LIMIT' => 5}` Command like SQL LIMIT in HBase
-11. `count 'tablename', CACHE => 1000` 配置正确的 CACHE 时速度非常快, 上述计数一次取 1000 行。如果行很大，请将 CACHE 设置得较低。默认是每次读取一行。
-12. Drop the table: `drop 'test_tbl'`
+11. Drop the table: `drop 'test_tbl'`
+12. 如何统计HBase的表行数 `count 'test_tbl'`
+    1. `count 'tablename', CACHE => 1000` 配置正确的 CACHE 时速度非常快, 上述计数一次取 1000 行。如果行很大，请将 CACHE 设置得较低。默认是每次读取一行。
+
+```sh
+# 导出 hbase 数据到文本文件
+echo "scan 'registration',{COLUMNS=>'registration:status'}" | hbase shell | grep "^ " > registration.txt
+
+```
+
+### Delete命令
+
+Delete命令并不立即删除内容。实际上，它只是给记录打上删除的标记。就是说，针对那个内容的一条新“墓碑”（tombstone）记录写入进来，作为删除的标记。墓碑记录用来标志删除的内容不能在Get和Scan命令中返回结果。因为HFile文件是不能改变的，直到执行一次大合并（major compaction），这些墓碑记录才会被处理，被删除记录占用的空间才会释放。
+
+合并分为两种：大合并（major compaction）和小合并（minorco mpaction）
+可以从Shell中手工触发整个表（或者特定region）的大合并。这个动作相当耗费资源，不要经常使用
+
+分别使用 compact 和 major_compact 命令在Shell里触发合并，包括小合并（minor compaction）和大合并（major compaction）：
+help 'major_compact'
+
+Compact all regions in a table:
+hbase> major_compact 't1'
+hbase> major_compact 'ns1:t1'
+Compact an entire region:
+hbase> major_compact 'r1'
+
+### Scan
+
+[HBase Java Client Description (4.0.0-alpha-1)](https://hbase.apache.org/apidocs/org/apache/hadoop/hbase/client/package-summary.html)
+
+`scan 't1', {COLUMNS => ['c1', 'c2'], LIMIT => 10, STARTROW => 'xyz'}`
 
 ### Add Node
 
