@@ -176,6 +176,8 @@ openssl rsa -noout -modulus -in  private.key|openssl md5
 
 ### openssl Options
 
+`openssl version -d | awk '{print $2}'` to get the local system stores its preconfig-ured CA certificates
+
 openssl req certificate request generating utility
 -nodes if a private key is created it will not be encrypted
 -newkey creates a new certificate request and a new private key
