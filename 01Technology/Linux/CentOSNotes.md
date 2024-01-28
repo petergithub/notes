@@ -15,6 +15,17 @@ Enable: `setenforce enforcing`
 
 `sed -i 's/SELinux=enforcing/SELinux=disabled/' /etc/sysconfig/selinux` then reboot system and then check the status with `sestatus`
 
+## 关机
+
+centos关机命令：
+
+1. `halt` 立马关机
+2. `shutdown -h 10` 10分钟后自动关机
+3. `poweroff` 立刻关机,并且电源也会断掉
+4. `shutdown -h now` 立刻关机(root用户使用)
+
+如果是通过shutdown命令设置关机的话，可以用`shutdown -c`命令取消重启
+
 ## 自动启动
 
 ### CentOS 7 配置系统服务来设置自启动
@@ -79,12 +90,12 @@ RHEL/CentOS: `iptables-save > /etc/sysconfig/iptables`
 
 CentOS 7默认使用的是firewall作为防火墙，使用iptables必须重新设置一下
 
-1、关闭防火墙 firewalld
+1. 关闭防火墙 firewalld
 `systemctl stop firewalld` #停止firewall
 `systemctl disable firewalld` #禁止firewall开机启动
 `systemctl mask firewalld` `mask`是注销服务的意思。 注销服务意味着：. 该服务在系统重启的时候不会启动. 该服务无法进行做systemctl start/stop操作
 
-2、设置 iptables service `yum -y install iptables-services`
+2. 设置 iptables service `yum -y install iptables-services`
 如果要修改防火墙配置，如增加防火墙端口3306 `vi /etc/sysconfig/iptables`
 增加规则 `-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT`
 
