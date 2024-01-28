@@ -7,6 +7,8 @@
 [4.9 Environment Variables](https://dev.mysql.com/doc/refman/8.0/en/environment-variables.html)
 [MYSQL, OOM KILLER, AND EVERYTHING RELATED](https://www.psce.com/en/blog/2012/05/31/mysql-oom-killer-and-everything-related/)
 
+[Binary Search Tree Visualization](https://www.cs.usfca.edu/~galles/visualization/BST.html)
+
 `SHOW ENGINE INNODB STATUS`
 
 [How to shrink/purge ibdata1 file in MySQL?](https://stackoverflow.com/questions/3456159/how-to-shrink-purge-ibdata1-file-in-mysql)
@@ -89,6 +91,7 @@ duplicate table structure and data: `CREATE TABLE partnership_0803 AS SELECT * F
 
 `INSERT INTO table (id, name, age) VALUES(1, "A", 19) ON DUPLICATE KEY UPDATE name="A", age=19`
 `INSERT INTO tbl_temp2 (fld_id) SELECT tbl_temp1.fld_order_id FROM tbl_temp1 WHERE tbl_temp1.fld_order_id > 100;`
+`INSERT INTO tbl_temp2 SELECT * FROM tbl_temp1;`
 
 ### Update
 
@@ -96,14 +99,14 @@ duplicate table structure and data: `CREATE TABLE partnership_0803 AS SELECT * F
 append a string to an existing field: `UPDATE categories SET code = CONCAT(code, '_standard') WHERE id = 1;`
 
 ``` SQL
+-- update multiple fields
+UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
+
 -- Update MySQL table with another table's data
 UPDATE tableB
 INNER JOIN tableA ON tableA.name = tableB.name
 SET tableB.value = IF(tableA.value > 0, tableA.value, tableB.value)
 WHERE tableA.name = 'Joe'
-
--- update multiple fields
-UPDATE tbl SET refund_transactions = 0, trade_transactions = 83
 ```
 
 ### Alter
@@ -208,12 +211,25 @@ SELECT XXX
 FROM ((A LEFT JOIN B ON A.id = B.id)
 LEFT JOIN C ON A.id = C.id)
 WHERE B.id Is Not Null
+```
 
--- 关联查询价格最高的文章
--- [MySQL :: MySQL 8.0 Reference Manual :: 3.6.4 The Rows Holding the Group-wise Maximum of a Certain Column](https://dev.mysql.com/doc/refman/8.0/en/example-maximum-column-group-row.html)
+#### 关联查询价格最高的文章
+
+[MySQL :: MySQL 8.0 Reference Manual :: 3.6.4 The Rows Holding the Group-wise Maximum of a Certain Column](https://dev.mysql.com/doc/refman/8.0/en/example-maximum-column-group-row.html)
+
+```sql
+CREATE TABLE shop (
+    article INT UNSIGNED  DEFAULT '0000' NOT NULL,
+    dealer  CHAR(20)      DEFAULT ''     NOT NULL,
+    price   DECIMAL(16,2) DEFAULT '0.00' NOT NULL,
+    PRIMARY KEY(article, dealer));
+
+INSERT INTO shop VALUES
+    (1,'A',3.45),(1,'B',3.99),(2,'A',10.99),(3,'B',1.45),
+    (3,'C',1.69),(3,'D',1.25),(4,'D',19.95);
+
 -- The LEFT JOIN works on the basis that when s1.price is at its maximum value, there is no s2.price with a greater value and thus the corresponding s2.article value is NULL.
-select s1.article, s1.dealer, s1.price FROM shop s1 left join shop s2 ON s1.price < s2.price and s1.article = s2.article  where s2.price is null;
-
+select s1.article, s1.dealer, s1.price FROM shop s1 left join shop s2 ON s1.article = s2.article and s1.price < s2.price where s2.price is null;
 ```
 
 ### exists 语句
@@ -379,7 +395,7 @@ TINYINT | 1 | -128 | 0 | 127 | 255
 SMALLINT | 2 | -32768 | 0 | 32767 | 65535
 MEDIUMINT | 3 | -8388608 | 0 | 8388607 | 16777215
 INT | 4 | -2147483648 | 0 | 2147483647 | 4294967295
-BIGINT | 8 | -263 | 0 | 263-1 | 264-1
+BIGINT | 8 | -2^63 | 0 | 2^63-1 | 2^64-1
 
 ### String Type Storage Requirements
 
@@ -644,7 +660,8 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 导出整个数据库(--hex-blob 为有blob数据做的,防止乱码和导入失败用)
 备份文件中的"--"字符开头的行为注释语句；以/*!"开头、以"*/"结尾的语句为可执行的mysql注释，这些语句可以被mysql执行
 
-`mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz`
+`mysqldump -u USERNAME -p dbName | gzip > sql.gz`  生成一个 gz 文件
+`mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz` 生成两个文件 sql 和 gz
 `mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`
 
 * `--no-data, -d` 没有数据
@@ -785,6 +802,116 @@ ORDER BY (data_length + index_length) DESC;
 
 使用 delete 语句删除数据时，delete语句只是将记录的位置或数据页标记为了“可复用”，但是磁盘文件的大小不会改变，即表空间不会直接回收。此时您可以通过 `optimize table` 语句释放表空间。
 
+#### Calculate table size, row size and max row size for a table
+
+[mysql - Calculate row size and max row size for a table - Database Administrators Stack Exchange](https://dba.stackexchange.com/questions/114471/calculate-row-size-and-max-row-size-for-a-table)
+
+```sql
+SELECT col_sizes.TABLE_SCHEMA, col_sizes.TABLE_NAME, SUM(col_sizes.col_size) AS EST_MAX_ROW_SIZE
+FROM (
+    SELECT
+        cols.TABLE_SCHEMA,
+        cols.TABLE_NAME,
+        cols.COLUMN_NAME,
+        CASE cols.DATA_TYPE
+            WHEN 'tinyint' THEN 1
+            WHEN 'smallint' THEN 2
+            WHEN 'mediumint' THEN 3
+            WHEN 'int' THEN 4
+            WHEN 'bigint' THEN 8
+            WHEN 'float' THEN IF(cols.NUMERIC_PRECISION > 24, 8, 4)
+            WHEN 'double' THEN 8
+            WHEN 'decimal' THEN ((cols.NUMERIC_PRECISION - cols.NUMERIC_SCALE) DIV 9)*4  + (cols.NUMERIC_SCALE DIV 9)*4 + CEIL(MOD(cols.NUMERIC_PRECISION - cols.NUMERIC_SCALE,9)/2) + CEIL(MOD(cols.NUMERIC_SCALE,9)/2)
+            WHEN 'bit' THEN (cols.NUMERIC_PRECISION + 7) DIV 8
+            WHEN 'year' THEN 1
+            WHEN 'date' THEN 3
+            WHEN 'time' THEN 3 + CEIL(cols.DATETIME_PRECISION /2)
+            WHEN 'datetime' THEN 5 + CEIL(cols.DATETIME_PRECISION /2)
+            WHEN 'timestamp' THEN 4 + CEIL(cols.DATETIME_PRECISION /2)
+            WHEN 'char' THEN cols.CHARACTER_OCTET_LENGTH
+            WHEN 'binary' THEN cols.CHARACTER_OCTET_LENGTH
+            WHEN 'varchar' THEN IF(cols.CHARACTER_OCTET_LENGTH > 255, 2, 1) + cols.CHARACTER_OCTET_LENGTH
+            WHEN 'varbinary' THEN IF(cols.CHARACTER_OCTET_LENGTH > 255, 2, 1) + cols.CHARACTER_OCTET_LENGTH
+            WHEN 'tinyblob' THEN 9
+            WHEN 'tinytext' THEN 9
+            WHEN 'blob' THEN 10
+            WHEN 'text' THEN 10
+            WHEN 'mediumblob' THEN 11
+            WHEN 'mediumtext' THEN 11
+            WHEN 'longblob' THEN 12
+            WHEN 'longtext' THEN 12
+            WHEN 'enum' THEN 2
+            WHEN 'set' THEN 8
+            ELSE 0
+        END AS col_size
+    FROM INFORMATION_SCHEMA.COLUMNS cols
+) AS col_sizes
+GROUP BY col_sizes.TABLE_SCHEMA, col_sizes.TABLE_NAME
+```
+
+[measuring the table data size and index size](https://dba.stackexchange.com/a/46098/73508)
+
+As for measuring the table, for a given table mydb.mytable, you can run this query
+
+```sql
+SELECT
+    CONCAT(FORMAT(DAT/POWER(1024,pw1),2),' ',SUBSTR(units,pw1*2+1,2)) DATSIZE,
+    CONCAT(FORMAT(NDX/POWER(1024,pw2),2),' ',SUBSTR(units,pw2*2+1,2)) NDXSIZE,
+    CONCAT(FORMAT(TBL/POWER(1024,pw3),2),' ',SUBSTR(units,pw3*2+1,2)) TBLSIZE
+FROM
+(
+    SELECT DAT,NDX,TBL,IF(px>4,4,px) pw1,IF(py>4,4,py) pw2,IF(pz>4,4,pz) pw3
+    FROM
+    (
+        SELECT data_length DAT,index_length NDX,data_length+index_length TBL,
+        FLOOR(LOG(IF(data_length=0,1,data_length))/LOG(1024)) px,
+        FLOOR(LOG(IF(index_length=0,1,index_length))/LOG(1024)) py,
+        FLOOR(LOG(data_length+index_length)/LOG(1024)) pz
+        FROM information_schema.tables
+        WHERE table_schema='picooc_bigdata'
+        AND table_name='v2_sport_data_2'
+    ) AA
+) A,(SELECT 'B KBMBGBTB' units) B;
+```
+
+To measure all tables grouped by Database and Storage Engine
+
+```sql
+SELECT
+    IF(ISNULL(DB)+ISNULL(ENGINE)=2,'Database Total',
+    CONCAT(DB,' ',IFNULL(ENGINE,'Total'))) "Reported Statistic",
+    LPAD(CONCAT(FORMAT(DAT/POWER(1024,pw1),2),' ',
+    SUBSTR(units,pw1*2+1,2)),17,' ') "Data Size",
+    LPAD(CONCAT(FORMAT(NDX/POWER(1024,pw2),2),' ',
+    SUBSTR(units,pw2*2+1,2)),17,' ') "Index Size",
+    LPAD(CONCAT(FORMAT(TBL/POWER(1024,pw3),2),' ',
+    SUBSTR(units,pw3*2+1,2)),17,' ') "Total Size"
+FROM
+(
+    SELECT DB,ENGINE,DAT,NDX,TBL,
+    IF(px>4,4,px) pw1,IF(py>4,4,py) pw2,IF(pz>4,4,pz) pw3
+    FROM
+    (SELECT *,
+        FLOOR(LOG(IF(DAT=0,1,DAT))/LOG(1024)) px,
+        FLOOR(LOG(IF(NDX=0,1,NDX))/LOG(1024)) py,
+        FLOOR(LOG(IF(TBL=0,1,TBL))/LOG(1024)) pz
+    FROM
+    (SELECT
+        DB,ENGINE,
+        SUM(data_length) DAT,
+        SUM(index_length) NDX,
+        SUM(data_length+index_length) TBL
+    FROM
+    (
+       SELECT table_schema DB,ENGINE,data_length,index_length FROM
+       information_schema.tables WHERE table_schema NOT IN
+       ('information_schema','performance_schema','mysql')
+       AND ENGINE IS NOT NULL
+    ) AAA GROUP BY DB,ENGINE WITH ROLLUP
+) AAA) AA) A,(SELECT ' BKBMBGBTB' units) B;
+```
+
+
 #### find the selectivity of several prefix lengths in one query
 
 ``` sql
@@ -849,12 +976,8 @@ WHERE URL_ID NOT IN
 -- Another case:
 CREATE TABLE mytb (url_id int, url_addr varchar(100));
 
-INSERT INTO mytb VALUES (1, 'www.google.com');
-INSERT INTO mytb VALUES (2, 'www.microsoft.com');
-INSERT INTO mytb VALUES (3, 'www.apple.com');
-INSERT INTO mytb VALUES (4, 'www.google.com');
-INSERT INTO mytb VALUES (5, 'www.cnn.com');
-INSERT INTO mytb VALUES (6, 'www.apple.com');
+INSERT INTO mytb VALUES (1, 'www.google.com'), (2, 'www.microsoft.com'),(3, 'www.apple.com'),
+  (4, 'www.google.com'), (5, 'www.cnn.com'), (6, 'www.apple.com');
 
 -- Then we can use the multiple-table DELETE syntax as follows:
 
