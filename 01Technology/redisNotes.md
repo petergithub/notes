@@ -341,4 +341,31 @@ Redis 客户端可以订阅任意数量的频道。
 * `SUBSCRIBE channel [channel ...]` 订阅给定的一个或多个频道的信息。
 * `UNSUBSCRIBE [channel [channel ...]]` 指退订给定的频道。
 * `PUBSUB subcommand [argument [argument ...]]` 查看订阅与发布系统状态。
-  * `PUBSUB CHANNELS [pattern]` 列出当前的活跃频道。
+* `PUBSUB CHANNELS [pattern]` 列出当前的活跃频道。
+
+## Redis 6.0
+
+### multi-threaded I/O
+
+[Redis configuration file example | Redis](https://redis.io/docs/management/config-file/)
+
+redis 6.x IO threads 读请求默认关闭多线程，参考 Redis 配置文件注释
+原因：读时 IO 操作小，请求头很小，如果返回数据大，多线程提高效率
+
+```sh
+# Setting io-threads to 1 will just use the main thread as usual. When I/0 threads are enabled, we only use threads for writes, that is to thread the write(2) syscall and transfer the client buffers to the socket. However it is also possible to enable threading of reads and protocol parsing using the following configuration directive, by setting it to yes:
+io-threads-do-reads no
+```
+
+[In what types of workloads does multi-threaded I/O in Redis 6 make a difference? - Stack Overflow](https://stackoverflow.com/questions/62618284/in-what-types-of-workloads-does-multi-threaded-i-o-in-redis-6-make-a-difference)
+
+Before Redis 6, Redis processes a request with 4 steps in serial (in a single thread):
+
+1. reading the request from socket
+2. parsing it
+3. process it
+4. writing the response to socket
+
+Before it finishes these 4 steps, Redis cannot process other requests, even if there're some requests ready for reading (step 1). And normally writing the response to socket (step 4) is slow, so if we can do the write operation in another IO thread (configuration: `io-threads`), Redis can process more requests, and be faster.
+
+Also you can set Redis to run step 1 and 2 in another IO thread (configuration: `io-threads-do-reads`), however, the Redis team claims that normally it doesn't help much (_Usually threading reads doesn't help much. -- quoted from [redis.conf](https://raw.githubusercontent.com/redis/redis/6.0/redis.conf).
