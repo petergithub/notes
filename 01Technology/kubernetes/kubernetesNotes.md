@@ -169,12 +169,13 @@ nodeSelector:
 
 ### Deployment
 
-`k rollout history deployment  deployment-name` deployment 历史记录
+`kubectl rollout history deployment deployment-name` deployment 历史记录
 `kubectl set image deployment kubia nodejs=luksa/kubia:v3` Changes the container image defined in a Pod
 `kubectl rollout status deployment kubia` the progress of the rollout
 `kubectl rollout history deployment kubia` displaying a deployment’s rollout history
 `kubectl rollout undo deployment kubia` undoing a rollout
 `kubectl rollout undo deployment kubia --to-revision=1`
+`kubectl rollout history deployment/<Deployment-name>  --revision=<revision-number>  -o yaml`
 
 deployment strategies:
 
