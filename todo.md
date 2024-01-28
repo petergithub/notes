@@ -1,4 +1,5 @@
 # TODO list
+
 [TOC]
 
 ## Misc.
@@ -10,13 +11,14 @@
 ### Java
 
 #### Btrace
-[Btrace入门到熟练小工完全指南](http://calvin1978.blogcn.com/articles/btrace1.html)  
-[BTrace User's Guide](https://kenai.com/projects/btrace/pages/UserGuide)  
-[btrace github](https://github.com/btraceio/btrace)  
-Btrace是由：Attach API + BTrace脚本解析引擎 + ASM + JDK6 Instumentation组成  
 
+[Btrace入门到熟练小工完全指南](http://calvin1978.blogcn.com/articles/btrace1.html)
+[BTrace User's Guide](https://kenai.com/projects/btrace/pages/UserGuide)
+[btrace github](https://github.com/btraceio/btrace)
+Btrace是由：Attach API + BTrace脚本解析引擎 + ASM + JDK6 Instumentation组成
 
 ## Reading list
+
 Beyond Feelings,
 动物农庄,
 爱弥儿 论教育,
