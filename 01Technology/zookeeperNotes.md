@@ -1,16 +1,36 @@
 [TOC]
 
 # ZooKeeper
+
+ZooKeeper 是一个开源的分布式协调服务。它是一个为分布式应用提供一致性 服务的软件，分布式应用程序可以基于 Zookeeper 实现诸如数据发布/订阅、 负载均衡、命名服
+务、分布式协调/通知、集群管理、Master 选举、分布式锁和 分布式队列等功能。
+
+客户端的读请求可以被集群中的任意一台机器处理，如果读请求在节点上注册了 监听器，这个监听器也是由所连接的 zookeeper 机器来处理。对于写请求，这 些请求会同时发 给其他 zookeeper 机器并且达成一致后，请求才会返回成功。
+因此，随着 zookeeper 的集群机器增多，读请求的吞吐会提高但是写请求的吞 吐会下降。
+
+有序性是 zookeeper 中非常重要的一个特性，所有的更新都是全局有序的，每 个更新都有一个唯一的时间戳，这个时间戳称为 zxid(Zookeeper Transaction Id)。而读请求
+只会相对于更新有序，也就是读请求的返回结果中 会带有这个zookeeper 最新的 zxid。
+
+四种类型的数据节点 Znode
+
+1. PERSISTENT-持久节点 除非手动删除，否则节点一直存在于 Zookeeper 上
+2. EPHEMERAL-临时节点 临时节点的生命周期与客户端会话绑定，一旦客户端会话失效(客户端与 zookeeper 连接断开不一定会话失效)，那么这个客户端创建的所有临时节点 都会被移除。
+3. PERSISTENT_SEQUENTIAL-持久顺序节点 基本特性同持久节点，只是增加了顺序属性，节点名后边会追加一个由父节点维 护的自增整型数字。
+4. EPHEMERAL_SEQUENTIAL-临时顺序节点 基本特性同临时节点，增加了顺序属性，节点名后边会追加一个由父节点维护的 自增整型数字。
+
 ## Introduction
+
 ### Basic command
+
 1. 启动ZK服务: zkServer.sh start ../conf/zoo.cfg
-2. 查看ZK服务状态:	 zkServer.sh status
+2. 查看ZK服务状态: zkServer.sh status
 3. 停止ZK服务: zkServer.sh stop
-4. 重启ZK服务: zkServer.sh restart 
+4. 重启ZK服务: zkServer.sh restart
 
 ./zkCli.sh -server localhost:2181 连接到 ZooKeeper 服务
 
-### 命令行工具的一些简单操作如下：
+### 命令行工具的一些简单操作如下
+
 1. 显示根目录下、文件： ls / 使用 ls 命令来查看当前 ZooKeeper 中所包含的内容
 2. 显示根目录下、文件： ls2 / 查看当前节点数据并能看到更新次数等数据
 3. 创建文件，并设置初始内容： create /zk "test" 创建一个新的 znode节点“ zk ”以及与它关联的字符串
@@ -21,7 +41,9 @@
 8. 帮助命令： help
 
 ### ZooKeeper 常用四字命令
-  ZooKeeper 支持某些特定的四字命令字母与其的交互。它们大多是查询命令，用来获取 ZooKeeper 服务的当前状态及相关信息。用户在客户端可以通过 telnet 或 nc 向 ZooKeeper 提交相应的命令
+
+ZooKeeper 支持某些特定的四字命令字母与其的交互。它们大多是查询命令，用来获取 ZooKeeper 服务的当前状态及相关信息。用户在客户端可以通过 telnet 或 nc 向 ZooKeeper 提交相应的命令
+
 1. 可以通过命令：echo stat|nc 127.0.0.1 2181 来查看哪个节点被选择作为follower或者leader
 2. 使用echo ruok|nc 127.0.0.1 2181 测试是否启动了该Server，若回复imok表示已经启动。
 3. echo dump| nc 127.0.0.1 2181 ,列出未经处理的会话和临时节点。
@@ -31,27 +53,29 @@
 7. echo envi |nc 127.0.0.1 2181 ,输出关于服务环境的详细信息（区别于 conf 命令）。
 8. echo reqs | nc 127.0.0.1 2181 ,列出未经处理的请求。
 9. echo wchs | nc 127.0.0.1 2181 ,列出服务器 watch 的详细信息。
-10.echo wchc | nc 127.0.0.1 2181 ,通过session列出服务器 watch 的详细信息，它的输出是一个与 watch 相关的会话的列表。
+10. echo wchc | nc 127.0.0.1 2181 ,通过session列出服务器 watch 的详细信息，它的输出是一个与 watch 相关的会话的列表。
 11. echo wchp | nc 127.0.0.1 2181 ,通过路径列出服务器 watch 的详细信息。它输出一个与 session 相关的路径。
 
 ### Data Model
+
 zk内部是按照类似文件系统层级方式进行数据存储的
-                        +---+             
-                        | / |             
-                        +++-+             
-                         ||               
-                         ||               
-          +-------+------++----+-------+  
-          | /app1 |            | /app2 |  
-          +-+--+--+            +---+---+  
-            |  |                   |      
-            |  |                   |      
-            |  |                   |      
+                        +---+
+                        | / |
+                        +++-+
+                         ||
+                         ||
+          +-------+------++----+-------+
+          | /app1 |            | /app2 |
+          +-+--+--+            +---+---+
+            |  |                   |
+            |  |                   |
+            |  |                   |
 +----------++ ++---------+    +----+-----+
 | /app1/p1 |  | /app1/p2 |    | /app2/p1 |
 +----------+  +----------+    +----------+
 
 ### API
+
 zk的API时很简单，就跟通常的文件系统操作差不多 如下：
 create
 delete
@@ -61,10 +85,12 @@ get data
 get chilren
 sync
 
-
 ## Zookeeper伪集群环境搭建
+
 [ZooKeeper系列之一:Zookeeper伪集群环境搭建](http://www.wangyuxiong.com/archives/51712)
+
 ### 集群服务器数量和目录结构
+
 伪集群模式的二种目录结构，都以 2n+1 = 3 搭建，这也就是说允许最多n台服务器的失效
  目录结构
 conf
@@ -84,7 +110,8 @@ zookeeper/
     └── logs
 
 ### configuration files
-```
+
+```sh
 #zoo0.cfg
 tickTime=2000
 initLimit=10
@@ -120,9 +147,10 @@ clientPort=2182
 server.0=127.0.0.1:2887:7770
 server.1=127.0.0.1:2888:7771
 server.2=127.0.0.1:2889:7772
-
 ```
-配置文件的说明：
+
+配置文件的说明
+
 - tickTime ：基本事件单元，以毫秒为单位。这个时间是作为 Zookeeper 服务器之间或客户端与服务器之间维持心跳的时间间隔，也就是每个 tickTime 时间就会发送一个心跳。
 - dataDir ：存储内存中数据库快照的位置，顾名思义就是 Zookeeper 保存数据的目录，默认情况下，Zookeeper 将写数据的日志文件也保存在这个目录里。
 - clientPort ：这个端口就是客户端连接 Zookeeper 服务器的端口，Zookeeper 会监听这个端口，接受客户端的访问请求。
@@ -130,19 +158,20 @@ server.2=127.0.0.1:2889:7772
 - syncLimit：这个配置项标识 Leader 与 Follower 之间发送消息，请求和应答时间长度，最长不能超过多少个 tickTime 的时间长度，总的时间长度就是 2*2000=4 秒
 - server.A = B:C:D : A表示这个是第几号服务器,B 是这个服务器的 ip 地址；C 表示的是这个服务器与集群中的 Leader 服务器交换信息的端口；D 表示的是万一集群中的 Leader 服务器挂了，需要一个端口来重新进行选举，选出一个新的 Leader
 
+### 创建myid文件
 
-###创建myid文件：
 在集群模式下，需要通过myid来确定是哪一个server，上面配置的zoo.cfg中有一个值dataDir，在其指定的路径下新建一个文件myid
 该文件中只需要写入相应的A值，如在server.0，该值就应该是0
 
 ### startCluster
-cat startCluster.sh 
+
+cat startCluster.sh
 zkServer.sh start ../conf/zoo0.cfg
 zkServer.sh start ../conf/zoo1.cfg
 zkServer.sh start ../conf/zoo2.cfg
 
-
 ## ZooKeeper 典型应用场景一览
+
 ### 数据发布与订阅（配置中心）
 发布与订阅模型，即所谓的配置中心，顾名思义就是发布者将数据发布到ZK节点上，供订阅者动态获取数据，实现配置信息的集中式管理和动态更新。例如全局的配置信息，服务式服务框架的服务地址列表等就非常适合使用。
 
@@ -211,11 +240,14 @@ ZooKeeper中特有watcher注册与异步通知机制，能够很好的实现分�
 - 在Hbase中，也是使用ZooKeeper来实现动态HMaster的选举。在Hbase实现中，会在ZK上存储一些ROOT表的地址和HMaster的地址，HRegionServer也会把自己以临时节点（Ephemeral）的方式注册到Zookeeper中，使得HMaster可以随时感知到各个HRegionServer的存活状态，同时，一旦HMaster出现问题，会重新选举出一个HMaster来运行，从而避免了HMaster的单点问题
 
 ### 分布式锁
+
 分布式锁，这个主要得益于ZooKeeper为我们保证了数据的强一致性。锁服务可以分为两类，一个是**保持独占**，另一个是**控制时序**。
+
 - 所谓保持独占，就是所有试图来获取这个锁的客户端，最终只有一个可以成功获得这把锁。通常的做法是把zk上的一个znode看作是一把锁，通过create znode的方式来实现。所有客户端都去创建 /distribute_lock 节点，最终成功创建的那个客户端也即拥有了这把锁。
 - 控制时序，就是所有视图来获取这个锁的客户端，最终都是会被安排执行，只是有个全局时序了。做法和上面基本类似，只是这里 /distribute_lock 已经预先存在，客户端在它下面创建临时有序节点（这个可以通过节点的属性控制：CreateMode.EPHEMERAL_SEQUENTIAL来指定）。Zk的父节点（/distribute_lock）维持一份sequence,保证子节点创建的时序性，从而也形成了每个客户端的全局时序。
 
 ### 分布式队列
+
 队列方面，简单地讲有两种，一种是常规的先进先出队列，另一种是要等到队列成员聚齐之后的才统一按序执行。对于第一种先进先出队列，和分布式锁服务中的控制时序场景基本原理一致，这里不再赘述。
 
 第二种队列其实是在FIFO队列的基础上作了一个增强。通常可以在 /queue 这个znode下预先建立一个/queue/num 节点，并且赋值为n（或者直接给/queue赋值n），表示队列大小，之后每次有队列成员加入后，就判断下是否已经到达队列大小，决定是否可以开始执行了。这种用法的典型场景是，分布式环境中，一个大任务Task A，需要在很多子任务完成（或条件就绪）情况下才能进行。这个时候，凡是其中一个子任务完成（就绪），那么就去 /taskList 下建立自己的临时时序节点（CreateMode.EPHEMERAL_SEQUENTIAL），当 /taskList 发现自己下面的子节点满足指定个数，就可以进行下一步按序进行处理了。
