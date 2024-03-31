@@ -20,6 +20,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   * [文心一言 百度](https://yiyan.baidu.com/)
   * [通义千问 阿里](https://qianwen.aliyun.com/)
   * [Poe](https://poe.com/sage)
+  * [Kimi.ai - 帮你看更大的世界](https://kimi.moonshot.cn/)
   * [讯飞星火大模型 文案 图片 PPT 代码](https://xinghuo.xfyun.cn/desk)
   * [商汤商量语言大模型 注册需要企业邀请码](https://chat.sensetime.com/wb/register)
   * 腾讯混元助手 微信小程序
@@ -113,6 +114,27 @@ GPT (Generative Pre-trained Transformer)
 [AI 全栈学员部分作品集 - 飞书云文档](https://agiclass.feishu.cn/docx/M5xydPVjWovB9exHBjDc7IMYnub)
 
 [知乎《AI 大模型全栈工程师》课程大纲（第 05 期） - 飞书云文档](https://agiclass.feishu.cn/docx/KjFSdqxTZoDDfcxzikHcjjx0nDg)
+
+[AI大模型颠覆程序员的价值 - 程序员的AI大模型进阶之旅0122期](https://www.zhihu.com/xen/market/training/training-video/1730906752995045376/1730906966715797506?education_channel_code=ZHZN-d62bb90dfad9e02) 讲解了自训练 微调等方法
+[大模型应用开发技术体系串讲 - 程序员的AI大模型进阶之旅0125期](https://www.zhihu.com/xen/market/training/training-video/1731335160308744192/1731335415037206528?education_channel_code=ZHZN-cd8085beea05e6d) 孙志刚老师回答问题
+[使⽤ Assistants API快速搭建领域专属AI - 程序员的AI大模型进阶之旅0122期](https://www.zhihu.com/xen/market/training/training-video/1730906752995045376/1730907032264232960?education_channel_code=ZHZN-d62bb90dfad9e02)
+
+大模型领域岗位推荐
+ · 大模型训练师
+ · 大模型算法工程师
+ · 提示词工程师
+ · 大模型全栈开发工程师
+ · 大模型方向产品经理
+ · 大模型方向项目经理
+
+继续本岗位 · 大大提升效率，横向卷同行，纵向卷上下游
+成为超级个体 独立开发者，做自己的小老板
+成为大模型训练师 做公司的技术核心
+独立创业 凭大模型垂直落地能力解决独有场
+
+使用 Assistants API 快速搭建领域专属AI助手
+官方Web界面可体验/调试 https://platform.openapi/playground
+Demo框架 及具体实现 Streamlit 简介— A faster way to build and share data apps
 
 ### pengzhile/pandora
 
@@ -228,6 +250,8 @@ Prompt: I want you to act as a travel guide. I will write you my location and yo
 [Assistants overview - OpenAI API](https://platform.openai.com/docs/assistants/overview)
 
 ## 机器学习教程
+
+[Getting Started With MachineLearning (all in one)](https://pan.baidu.com/s/1tNXYQNadAsDGfPvuuj7_Tw)
 
 [microsoft/ML-For-Beginners: 12 weeks, 26 lessons, 52 quizzes, classic Machine Learning for all](https://github.com/microsoft/ML-For-Beginners)
 
