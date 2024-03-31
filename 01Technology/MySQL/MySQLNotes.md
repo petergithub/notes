@@ -1635,18 +1635,27 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 
 #### EXPLAIN列的解释
 
-table：显示这一行的数据是关于哪张表的
-type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
-possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
-key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
-key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
-ref：显示索引的哪一列被使用了，如果可能的话，是一个常数
-rows：MYSQL认为必须检查的用来返回请求数据的行数
-Extra：关于MYSQL如何解析查询的额外信息
+* id 列 编号是 select 的序列号，有几个 select 就有几个id，并且id的顺序是按 select 出现的顺序增长的。 id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。
+* select_type 表示对应行是简单还是复杂的查询,simple、primary（复杂查询中最外层的 select）、subquery（包含在 select 中的子查询，不在 from 子句中)、derived（包含在 from 子句中的子查询，结果存放在临时表）
+* table：显示这一行的数据是关于哪张表的，当 from 子句中有子查询时，table列是 derivenN 格式，表示当前查询依赖 id=N 的查询
+* type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
+* possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
+* key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
+* key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
+* ref：显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有:const(常量)，字段名(例: film.id)
+* rows：mysql估计要读取并检测的行数，注意这个不是结果集里的行数。
+* Extra：关于MYSQL如何解析查询的额外信息
 
 #### Type
 
 性能从最好到最差：system、const、eq_ref、ref、range、index和ALL
+
+* const, system：mysql能对查询的某部分进行优化并将其转化成一个常量，用于 primary key 或 unique key 的所有列与常数比较
+* eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录
+* ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较， 可能会找到多个符合条件的行。
+* range：范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行
+* index：扫描全索引就能拿到结果，一般是扫描某个二级索引
+* ALL：即全表扫描，扫描你的聚簇索引的所有叶子节点
 
 #### 需要强调rows是核心指标
 
@@ -1662,6 +1671,9 @@ Extra：关于MYSQL如何解析查询的额外信息
 
 该列包含MySQL解决查询的详细信息
 
+* Using index:使用覆盖索引，如果select后面查询的字段都可以从索引树中获取，这种情况一般可以说是用到了覆盖索引
+* Using where:使用 where 语句来处理结果，并且查询的列未被索引覆盖
+* Using index condition:查询的列不完全被索引覆盖，where条件中是一个前导列的范围;
 * Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现
 * Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中
 
