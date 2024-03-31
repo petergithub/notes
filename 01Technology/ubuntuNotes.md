@@ -3165,12 +3165,32 @@ CPU Modes:
 
 ### Network Command
 
-`nmap -A -T4 IP` scan all open ports from the IP
-`nmap -Pn IP`
-
 `ip addr` = `ip a`
 `ip addr show eth0`
 `sudo dhclient -4`
+
+#### nmap
+
+`nmap -A -T4 IP` scan all open ports from the IP
+`nmap -p PORT -Pn IP`
+`nmap -A -T4 scanme.nmap.org playground`
+
+寻找网络中所有在线主机 `nmap -sP 192.168.0.0/24`
+
+状态可能是 open(开放的)，filtered(被过滤的)， closed(关闭的)，或者unfiltered(未被过滤的)。
+
+* open(开放的)意味着目标机器上的应用程序正在该端口接收 TCP 连接或者 UDP 报文。
+* closed(关闭的) 端口没有应用程序在它上面监听，但是他们随时可能开放。
+* filtered(被过滤的) 意味着防火墙，过滤器或者其它网络障碍阻止了该端口被访问，Nmap无法得知 它是 open(开放的) 还是 closed(关闭的)。
+* unfiltered(未被过滤的) 当端口对Nmap的探测做出响应，但是Nmap无法确定它们是关闭还是开放
+* open|filtered 和 closed|filtered时，如果Nmap报告状态组合时，那说明Nmap无法确定该端口处于两个状态中的哪一个状态。
+
+`-Pn` Treat all hosts as online -- skip host discovery
+`-p1-6553,8080` 扫描1到6553,和8080 端口
+`-A`， 用来进行操作系统及其版本的探测
+`-T<0-5>`: Set timing template (higher is faster)
+`-v`: Increase verbosity level (use -vv or more for greater effect)
+`-d`: Increase debugging level (use -dd or more for greater effect)
 
 #### Restart network
 
