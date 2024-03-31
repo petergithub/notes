@@ -2,7 +2,7 @@
 
 ## Recent
 
-
+StampedLock 在提供类似读写锁的同时，还支持优化读模式。优化读基于假设，大多数情况下读操作并不会和写操作冲突，其逻辑是先试着读，然后通过validate方法确认是否进入了写模式，如果没有进入，就成功避免了开销；如果进入，则尝试获取读锁。
 CopyOnWriteArrayList 原来的一系列类 对应的新类型整理
 
 [Joins](https://docs.oracle.com/javase/tutorial/essential/concurrency/join.html)
@@ -188,6 +188,8 @@ Java Doc: `java.util.concurrent.ThreadPoolExecutor.execute(Runnable)`
 3. 最后线程池判断整个线程池是否已满？没满，则创建一个新的工作线程来执行这个新提交的任务，满了，则交给饱和策略来处理这个任务
 
 #### 合理的配置线程池
+
+[Java并发：线程池如何设置线程数_线程池中的线程数量-CSDN博客](https://blog.csdn.net/chuixue24/article/details/122828355)
 
 要想合理的配置线程池，就必须首先分析任务特性，可以从以下几个角度来进行分析：
     任务的性质：CPU密集型任务，IO密集型任务和混合型任务。
