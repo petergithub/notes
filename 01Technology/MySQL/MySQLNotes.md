@@ -375,6 +375,47 @@ mysql -u root -h 127.0.0.1 -e "show processlist\G;"| egrep "Host\:" | awk -F: '{
 mysql -u root -h 127.0.0.1 --skip-column-names -e "show processlist;"|awk '{print $3}'|awk -F":" '{print $1}'|sort|uniq –c
 ```
 
+### SQL 的语法并不按照语法顺序执行
+
+SQL 语句有一个让大部分人都感到困惑的特性，就是：SQL 语句的执行顺序跟其语句的语法顺序并不一致。SQL 语句的语法顺序是：
+
+SELECT[DISTINCT]
+FROM
+WHERE
+GROUP BY
+HAVING
+UNION
+ORDER BY
+为了方便理解，上面并没有把所有的 SQL 语法结构都列出来，但是已经足以说明 SQL 语句的语法顺序和其执行顺序完全不一样，就以上述语句为例，其执行顺序为：
+
+FROM
+WHERE
+GROUP BY
+HAVING
+SELECT
+DISTINCT
+UNION
+ORDER BY
+关于 SQL 语句的执行顺序，有三个值得我们注意的地方：
+
+1、 FROM 才是 SQL 语句执行的第一步，并非 SELECT 。数据库在执行 SQL 语句的第一步是将数据从硬盘加载到数据缓冲区中，以便对这些数据进行操作。（译者注：原文为“The first thing that happens is loading data from the disk into memory, in order to operate on such data.”，但是并非如此，以 Oracle 等常用数据库为例，数据是从硬盘中抽取到数据缓冲区中进行操作。）
+
+2、 SELECT 是在大部分语句执行了之后才执行的，严格的说是在 FROM 和 GROUP BY 之后执行的。理解这一点是非常重要的，这就是你不能在 WHERE 中使用在 SELECT 中设定别名的字段作为判断条件的原因。
+
+SELECT A.x + A.y AS z
+FROM A
+WHERE z = 10 -- z 在此处不可用，因为SELECT是最后执行的语句！
+如果你想重用别名z，你有两个选择。要么就重新写一遍 z 所代表的表达式：
+
+SELECT A.x + A.y AS z
+FROM A
+WHERE (A.x + A.y) = 10
+…或者求助于衍生表、通用数据表达式或者视图，以避免别名重用。请看下文中的例子。
+
+3、 无论在语法上还是在执行顺序上， UNION 总是排在在 ORDER BY 之前。很多人认为每个 UNION 段都能使用 ORDER BY 排序，但是根据 SQL 语言标准和各个数据库 SQL 的执行差异来看，这并不是真的。尽管某些数据库允许 SQL 语句对子查询（subqueries）或者派生表（derived tables）进行排序，但是这并不说明这个排序在 UNION 操作过后仍保持排序后的顺序。
+
+注意：并非所有的数据库对 SQL 语句使用相同的解析方式。如 MySQL、PostgreSQL和 SQLite 中就不会按照上面第二点中所说的方式执行。
+
 ## DataType
 
 [Data Type Storage Requirements](https://dev.mysql.com/doc/refman/8.0/en/storage-requirements.html#data-types-storage-reqs-strings)
