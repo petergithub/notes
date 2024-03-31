@@ -362,9 +362,9 @@ restart the service  `sudo pfctl -f /etc/pf.conf`
 
 edit policy file
 
-1. Export current policy: `pwpolicy getaccountpolicies | awk 'NR>1' > ~/Desktop/file.plist`
+1. Export current policy: `pwpolicy getaccountpolicies | awk 'NR>1' > ~/Downloads/accountpolicies`
 2. Edit the policy file, change the quoted part to your Regex (default: `^(?=.*[0-9])(?=.*[a-zA-Z]).+`). `policyAttributePassword matches '^$|.{4,}+'`
-3. Import policy file for account username: `pwpolicy setaccountpolicies -u username ~/Desktop/file.plist`
+3. Import policy file for account username: `pwpolicy setaccountpolicies -u username ~/Downloads/accountpolicies`
 4. chang password for account: `sudo passwd username`
 
 `^$|.{3,}+` for a 4 character length password.
@@ -534,6 +534,9 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 ## Apps
 
+* [精品MAC应用分享](https://xclient.info/)
+* [Cmacked - Cracked Mac Apps & Games](https://cmacked.com/page/2/)
+* [XMac.App](https://xmac.app/)
 * [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
 * NTFS 读写工具：Paragon NTFS / Tuxera NTFS（100+ 元）—— NTFS Tool（免费）
 * [ToDesk 安全流畅的远程控制软件](https://www.todesk.com/download.html)
@@ -568,3 +571,6 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Downie：Mac OS平台最强大的嗅探下载工具，视频、音频、PDF手到擒来](https://xuebajiajiayou.com/714/)
 * [testdisk: data recovery utilities](https://www.cgsecurity.org/testdisk_doc/#) `brew install testdisk`
 * [Easydict: 翻译，支持离线 OCR 识别](https://github.com/tisfeng/Easydict) 类似 Bob
+* [Mp3tag 1.8.16 音频元数据编辑 - 精品MAC应用分享](https://xclient.info/s/mp3tag.html)
+* [Aiko — Sindre Sorhus 语音转文字](https://sindresorhus.com/aiko)
+* [Switch - Convert Audio Formats: Switch Audio File Converter Software](https://www.nch.com.au/switch/index.html)
