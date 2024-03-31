@@ -2,19 +2,26 @@
 
 ## 概念 同步异步 synchronous/asynchronous 阻塞非阻塞 blocking/non-blocking
 
-直接阅读 Unix Networking Programming Vol 1, Chapter 6 会更容易理解
+直接阅读 Unix Network Programming Vol 1, Chapter 6 I/O Multiplexing: The select and poll Functions 会更容易理解。
 
-### Asynchronous, Non-Blocking, Event-Base architectures
+阻塞 和 非阻塞 是指数据就绪前，用户线程的状态。两者都是 同步IO，即数据就绪后，由用户线程负责数据拷贝到用户空间，此时是同步拷贝的。因此是 阻塞同步IO 和 非阻塞同步IO。
 
-[What's the difference between: Asynchronous, Non-Blocking, Event-Base architectures? - Stack Overflow](https://stackoverflow.com/questions/7931537/whats-the-difference-between-asynchronous-non-blocking-event-base-architectu/9489547#9489547)
+POSIX defines these two terms as follows:
 
-**Asynchronous** Asynchronous literally means not synchronous. Email is asynchronous. You send a mail, you don't expect to get a response NOW. But it is not non-blocking. Essentially what it means is an architecture where "components" send messages to each other without expecting a response immediately. HTTP requests are synchronous. Send a request and get a response.
+* A synchronous I/O operation causes the requesting process to be blocked until that I/O operation completes.
+* An asynchronous I/O operation does not cause the requesting process to be blocked.
 
-**Non-Blocking** This term is mostly used with IO. What this means is that when you make a system call, it will return immediately with whatever result it has without putting your thread to sleep (with high probability). For example non-blocking read/write calls return with whatever they can do and expect caller to execute the call again. try_lock for example is non-blocking call. It will lock only if lock can be acquired. Usual semantics for systems calls is blocking. read will wait until it has some data and put calling thread to sleep.
+Using these definitions, the first four I/O models—blocking, nonblocking, I/O multiplexing, and signal-driven I/O — are all synchronous because the actual I/O operation (recvfrom) blocks the process. Only the asynchronous I/O model matches the asynchronous I/O definition.
 
-**Event-base** This term comes from libevent. non-blocking read/write calls in themselves are useless because they don't tell you "when" should you call them back (retry). select/epoll/IOCompletionPort etc are different mechanisms for finding out from OS "when" these calls are expected to return "interesting" data. libevent and other such libraries provide wrappers over these event monitoring facilities provided by various OSes and give a consistent API to work with which runs across operating systems. Non-blocking IO goes hand in hand with Event-base.
+### [Synchronous and Asynchronous I/O - Win32 apps | Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/fileio/synchronous-and-asynchronous-i-o)
 
-I think these terms overlap. For example HTTP protocol is synchronous but HTTP implementation using non-blocking IO can be asynchronous. Again a non-blocking API call like read/write/try_lock is synchronous (it immediately gives a response) but "data handling" is asynchronous.
+There are two types of input/output (I/O) synchronization: synchronous I/O and asynchronous I/O. Asynchronous I/O is also referred to as overlapped I/O.
+
+In synchronous file I/O, a thread starts an I/O operation and immediately enters a wait state until the I/O request has completed. A thread performing asynchronous file I/O sends an I/O request to the kernel by calling an appropriate function. If the request is accepted by the kernel, the calling thread continues processing another job until the kernel signals to the thread that the I/O operation is complete. It then interrupts its current job and processes the data from the I/O operation as necessary.
+
+![two.synchronization.types](image/two.synchronization.types.png)
+
+In situations where an I/O request is expected to take a large amount of time, such as a refresh or backup of a large database or a slow communications link, asynchronous I/O is generally a good way to optimize processing efficiency. However, for relatively fast I/O operations, the overhead of processing kernel I/O requests and kernel signals may make asynchronous I/O less beneficial, particularly if many fast I/O operations need to be made. In this case, synchronous I/O would be better. The mechanisms and implementation details of how to accomplish these tasks vary depending on the type of device handle that is used and the particular needs of the application. In other words, there are usually multiple ways to solve the problem.
 
 ### asynchronous and non-blocking calls? also between blocking and synchronous
 
@@ -74,38 +81,26 @@ So **they don't always mean the same thing**. To distil the socket example, we c
 
 ## 四种主要的IO模型
 
-Unix Networking Programming Vol 1, Chapter 6.
+Unix Network Programming Vol 1, Chapter 6.
 
-把数据 IO 分为两个阶段：数据准备 和 数据读取（从内核向进程复制数据），阻塞是在数据准备阶段等待，同步是指用户自己读数据
+把数据 IO 分为两步：数据准备 和 数据读取（从内核向进程复制数据），阻塞是在数据准备阶段等待，同步是指用户自己读数据。
+
+对于一个套接字上的输入操作，第一步通常涉及等待数据从网络中到达。当所等待分组到达时，它被复制到内核中的某个缓冲区。第二步就是把数据从内核缓冲区复制到应用进程缓冲区。
 
 常见的IO模型有四种：
 
 1. 同步阻塞IO（Blocking IO）
-
-    首先，解释一下这里的**阻塞与非阻塞（blocking/non-blocking）**：
-
-    * 阻塞IO，指的是需要内核IO操作彻底完成后，才返回到用户空间，执行用户的操作。阻塞指的是用户空间程序的执行状态，用户空间程序需等到IO操作彻底完成。传统的IO模型都是同步阻塞IO。在java中，默认创建的socket都是阻塞的。
-
-    其次，解释一下**同步与异步（synchronous/asynchronous）**：
-    * 同步IO，是一种用户空间与内核空间的调用发起方式。同步IO是指用户空间线程是主动发起IO请求的一方，内核空间是被动接受方。异步IO则反过来，是指内核kernel是主动发起IO请求的一方，用户线程是被动接受方。
-
 2. 同步非阻塞IO（Non-blocking IO）
     非阻塞IO，指的是用户程序不需要等待内核IO操作完成后，内核立即返回给用户一个状态值，用户空间无需等到内核的IO操作彻底完成，可以立即返回用户空间，执行用户的操作，处于非阻塞的状态。
     简单的说：阻塞是指用户空间（调用线程）一直在等待，而且别的事情什么都不做；非阻塞是指用户空间（调用线程）拿到状态就返回，IO操作可以干就干，不可以干，就去干别的事情。
     非阻塞IO要求socket被设置为NONBLOCK。
 
-    强调一下，这里所说的NIO（同步非阻塞IO）模型，并非Java的NIO（New IO）库。
-
 3. IO多路复用（IO Multiplexing）
-    阻塞 和 非阻塞 是指数据就绪前，用户线程的状态。两者都是 同步IO，即数据就绪后，由用户线程负责数据拷贝到用户空间，此时是同步拷贝的。因此是 阻塞同步IO 和 非阻塞同步IO。
-
     IO多路复用是在 非阻塞IO 的基础上，原因每次只询问单个数据状态，多路复用 则是询问多个数据状态，即多个数据复用在同一个线程上处理。数据在内核缓冲区就绪后，用户线程依旧是同步IO拷贝的。
-    Java中的Selector和Linux中的epoll都是这种模型。
+    Java中的Selector和Linux中的epoll都是这种模型。Java的NIO是IO多路复用（ IO multiplexing ），不是同步非阻塞IO。
 
 4. 异步IO（Asynchronous IO）
-    异步IO，指的是用户空间与内核空间的调用方式反过来。用户空间线程是变成被动接受的，内核空间是主动调用者。
-
-    这一点，有点类似于Java中比较典型的模式是回调模式，用户空间线程向内核空间注册各种IO事件的回调函数，由内核去主动调用。
+    类似于Java中比较典型的模式是回调模式，用户空间线程向内核空间注册各种IO事件的回调函数，由内核去主动调用。
 
 ## 同步阻塞IO（Blocking IO）
 
@@ -129,16 +124,16 @@ Unix Networking Programming Vol 1, Chapter 6.
 
 一般情况下，会为每个连接配套一条独立的线程，或者说一条线程维护一个连接成功的IO流的读写。在并发量小的情况下，这个没有什么问题。但是，当在高并发的场景下，需要大量的线程来维护大量的网络连接，内存、线程切换开销会非常巨大。因此，基本上，BIO模型在高并发场景下是不可用的。
 
-## 同步非阻塞NIO（None Blocking IO）
+## 同步非阻塞NIO（NonBlocking IO）
 
 在linux系统下，可以通过设置socket使其变为non-blocking。NIO 模型中应用程序在一旦开始IO系统调用，会出现以下两种情况：
 
 1. 在内核缓冲区没有数据的情况下，系统调用会立即返回，返回一个调用失败的信息。
 2. 在内核缓冲区有数据的情况下，是阻塞的，直到数据从内核缓冲复制到用户进程缓冲。复制完成后，系统调用返回成功，应用进程开始处理用户空间的缓存数据。
 
-![Figure 6.2. Nonblocking I/O model](image/figure.6.2.NoneBlockingIO.model.png)
+![Figure 6.2. Nonblocking I/O model](image/figure.6.2.NonBlockingIO.model.png)
 
-![NoneBlockingIO](image/NoneBlockingIO.png)
+![NonBlockingIO](image/NonBlockingIO.png)
 
 举个栗子。发起一个non-blocking socket的read读操作系统调用，流程是这个样子：
 
@@ -159,8 +154,6 @@ Unix Networking Programming Vol 1, Chapter 6.
 需要不断的重复发起IO系统调用，这种不断的轮询，将会不断地询问内核，这将占用大量的 CPU 时间，系统资源利用率较低。
 
 总之，NIO模型在高并发场景下，也是不可用的。一般 Web 服务器不使用这种 IO 模型。一般很少直接使用这种模型，而是在其他IO模型中使用非阻塞IO这一特性。java的实际开发中，也不会涉及这种IO模型。
-
-再次说明，Java NIO（New IO） 不是IO模型中的NIO模型，而是另外的一种模型，叫做IO多路复用模型（ IO multiplexing ）。
 
 ## IO多路复用模型(I/O multiplexing）
 
@@ -201,7 +194,7 @@ IO多路复用模型，建立在操作系统kernel内核能够提供的多路分
 
 用select/epoll的优势在于，它可以同时处理成千上万个连接（connection）。与一条线程维护一个连接相比，I/O多路复用技术的最大优势是：系统不必创建线程，也不必维护这些线程，从而大大减小了系统的开销。
 
-Java的NIO（new IO）技术，使用的就是IO多路复用模型。在linux系统上，使用的是epoll系统调用。
+在linux系统上，使用的是epoll系统调用。
 
 ### 多路复用IO的缺点
 
@@ -243,4 +236,4 @@ kernel的数据准备是将数据从网络物理设备（网卡）读取到内�
 
 ### 小结一下
 
-四种IO模型，理论上越往后，阻塞越少，效率也是最优。在这四种 I/O 模型中，前三种属于同步 I/O，因为其中真正的 I/O 操作将阻塞线程。只有最后一种，才是真正的异步 I/O 模型，可惜目前Linux 操作系统尚欠完善。
+四种IO模型，理论上越往后，阻塞越少，效率也是最优。在这四种 I/O 模型中，前三种属于同步 I/O，因为其中真正的 I/O 操作将阻塞线程。只有最后一种，才是真正的异步 I/O 模型。
