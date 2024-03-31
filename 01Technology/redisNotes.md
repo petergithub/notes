@@ -100,15 +100,19 @@ Redis单机qps（每秒的并发）可以达到110000次/s，写的速度是8100
 
 ### Redis常用的删除策略有以下三种
 
+[Key eviction | Redis](https://redis.io/docs/reference/eviction/#eviction-policies)
+
 * 被动删除（惰性删除）：当读/写一个已经过期的Key时，会触发惰性删除策略，直接删除掉这个Key;
 * 主动删除（定期删除）：Redis会定期巡检，来清理过期Key；
 * 当内存达到maxmemory配置时候，会触发Key的删除操作；
 
-Redis 提供 6 种数据淘汰策略：
+Redis 提供 8 种数据淘汰策略：
     volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用 的数据淘汰
+    volatile-lfu(since 4.0): Removes least frequently used keys with the expire field set to true.
     volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数 据淘汰
     volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据 淘汰
     allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
+    allkeys-lfu(since 4.0): Keeps frequently used keys; removes least frequently used (LFU) keys
     allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
     no-enviction（驱逐）：禁止驱逐数据
 
