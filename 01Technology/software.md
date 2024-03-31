@@ -243,6 +243,18 @@ UAT: User Acceptance Test
 [kaniko: Build Container Images In Kubernetes](https://github.com/GoogleContainerTools/kaniko)
 [Use kaniko to build Docker images | GitLab](https://docs.gitlab.com/ee/ci/docker/using_kaniko.html)
 
+应用生命周期管理
+
+* 完整的 CI 流水线，代码编译，测试，安全扫描，镜像打包。
+  * Jenkins, Prow, Tekton;
+  * Maven, Sonar, jacoco;
+  * Kaniko, Helm, Docker;
+* 多阶段的测试流程。
+* 完整的 CD 流程，多集群部署，多阶段部署。
+* ArgoCD, Harbor, Kubernetes.
+* 从train mode 变成特续选代模式，在bug 修复之后快速上线。
+* 基于不同的CI软件，DevOps提供可配置的CI/CD 流水线。
+
 #### Data security 数据安全工具DRBD
 
 #### 高性能集群软件 Keepalived
