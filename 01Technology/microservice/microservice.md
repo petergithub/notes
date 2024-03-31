@@ -6,6 +6,22 @@
 [一个小团队的微服务架构改造之路](https://mp.weixin.qq.com/s/VjBiUmQNQPpSHeSVjK1C2A)
 [部署微服务的时候，Spring Cloud 和 Kubernetes 哪个更好？](http://dockone.io/article/2896)
 
+## 概念
+
+微服务与SOA的区别 发展阶段不一样 解决的问题不一样
+SOA: 解决服务可复用性 ，信息孤岛
+微服务: 解耦 拓展
+
+## 选型原则
+
+[微服务架构下该如何技术选型？ xcbey0nd 架构头条](https://mp.weixin.qq.com/s/f8dsUxdbTZ0Yt5In1BvRJg)
+
+* 有需求，再引入
+* 选择最熟悉，使用最多的技术
+* 强大社区支撑的技术
+* 从业务、项目规模出发
+* 先验证后使用
+
 ## 常见的微服务技术框架
 
 ### [微服务架构深度解析与最佳实践](https://zhuanlan.zhihu.com/p/94976754)
