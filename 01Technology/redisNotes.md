@@ -373,3 +373,23 @@ Before Redis 6, Redis processes a request with 4 steps in serial (in a single th
 Before it finishes these 4 steps, Redis cannot process other requests, even if there're some requests ready for reading (step 1). And normally writing the response to socket (step 4) is slow, so if we can do the write operation in another IO thread (configuration: `io-threads`), Redis can process more requests, and be faster.
 
 Also you can set Redis to run step 1 and 2 in another IO thread (configuration: `io-threads-do-reads`), however, the Redis team claims that normally it doesn't help much (_Usually threading reads doesn't help much. -- quoted from [redis.conf](https://raw.githubusercontent.com/redis/redis/6.0/redis.conf).
+
+## Redis Cluster 为什么使用哈希槽而不用一致性哈希
+
+[Redis为什么使用哈希槽而不用一致性哈希-51CTO.COM](https://www.51cto.com/article/777058.html)
+
+一致性哈希算法很好地解决了分布式系统在扩容或者缩容时，发生过多的数据迁移的问题。
+
+算法是对 2^32 进行取模运算的结果值虚拟成一个圆环，环上的刻度对应一个 0~2^32 - 1 之间的数值。通过虚拟节点的方式很好的处理了数据不平衡问题。
+
+原因：
+
+* 当发生扩容时候，Redis可配置映射表的方式让哈希槽更灵活，可更方便组织映射到新增server上面的slot数，比一致性hash的算法更灵活方便。
+* 在数据迁移时，一致性hash 需要重新计算key在新增节点的数据，然后迁移这部分数据，哈希槽则直接将一个slot对应的数据全部迁移，实现更简单
+* 可以灵活的分配槽位，比如性能更好的节点分配更多槽位，性能相对较差的节点可以分配较少的槽位
+
+为什么Redis Cluster哈希槽数量是16384？
+
+* Redis节点间通信时，心跳包会携带节点的所有槽信息，它能以幂等方式来更新配置。如果采用 16384(16k=2^14)个插槽，占空间 2KB (16384/8);如果采用 65536 个插槽，占空间 8KB (65536/8)。
+* Redis Cluster 不太可能扩展到超过 1000 个主节点，太多可能导致网络拥堵。
+* 16384 个插槽范围比较合适，当集群扩展到1000个节点时，也能确保每个master节点有足够的插槽
