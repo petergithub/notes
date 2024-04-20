@@ -8,8 +8,8 @@
 
 ## 概念
 
-微服务与SOA的区别 发展阶段不一样 解决的问题不一样
-SOA: 解决服务可复用性 ，信息孤岛
+微服务与SOA的区别 发展阶段不一样 解决的问题不一样，拆分粒度不一样
+SOA: 解决服务可复用性，信息孤岛，垂直拆分，仍然是单体
 微服务: 解耦 拓展
 
 ## 选型原则
@@ -39,29 +39,35 @@ SOA: 解决服务可复用性 ，信息孤岛
 
 核心支撑组件
 
-    服务网关 Zuul
-    服务注册发现 Eureka+Ribbon
-    服务配置中心 Apollo
-    认证授权中心 Spring Security OAuth2
-    服务框架 Spring MVC/Boot
+* 服务网关 Zuul/gateway
+* 服务注册发现 Eureka+Ribbon
+* 服务配置中心 Apollo
+* 认证授权中心 Spring Security OAuth2
+* 服务框架 Spring MVC/Boot
 
 监控反馈组件
 
-    数据总线 Kafka
-    日志监控 ELK
-    调用链监控 CAT
-    Metrics 监控 KairosDB
-    健康检查和告警 ZMon
-    限流熔断和流聚合 Hystrix/Turbine
+* 数据总线 Kafka
+* 日志监控 ELK
+* 调用链监控 CAT
+* Metrics 监控 KairosDB
+* 健康检查和告警 ZMon
+* 限流熔断和流聚合 Hystrix/Turbine
+
+### Seata 是什么?
+
+[Seata 是什么？ | Apache Seata](https://seata.apache.org/zh-cn/docs/overview/what-is-seata/)
+
+Seata 是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。
 
 ## 规划
 
 ### 代码未编工具先行
 
-    统一微服务工程结构；
-    统一服务启动方式（jar war）；
-    统一缓存调用方式（架构封装统一提供 jar 包和底层存储无关）；
-    统一 MQ 调用方式（架构封装统一提供 jar，和具体 MQ 类型无关) ；
-    统一日志格式；
-    统一多服务依赖调用方式 (串行调用方式、并行调用方式）；
-    统一熔断、降级处理流程；
+* 统一微服务工程结构；
+* 统一服务启动方式（jar war）；
+* 统一缓存调用方式（架构封装统一提供 jar 包和底层存储无关）；
+* 统一 MQ 调用方式（架构封装统一提供 jar，和具体 MQ 类型无关) ；
+* 统一日志格式；
+* 统一多服务依赖调用方式 (串行调用方式、并行调用方式）；
+* 统一熔断、降级处理流程；
