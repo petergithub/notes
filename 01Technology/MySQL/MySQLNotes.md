@@ -1777,6 +1777,16 @@ Loose index scan的原理是只使用组合索引的前缀部分，而不是索�
 每个指针对应第二层的行记录数：再来说说一个page能存储多少条行记录，常规的互联网项目单条行记录大小约为1k，那么一个page能存储的行记录数为16k/1k=16
 所以一个2层高的b+树能存储的行记录数大约为`1170*16=18720`，3层为`1170*1170*16`约等于2190w
 
+## 存储引擎 innodb 特点
+
+[MySQL 8.0 Reference Manual :: 17 The InnoDB Storage Engine](https://dev.mysql.com/doc/refman/8.0/en/innodb-storage-engine.html)
+
+1. Buffer Pool
+2. Change Buffer
+3. Double Write
+4. Adaptive Hash Index
+5. 异步 IO
+
 ## Replication
 
 [17.1.1.8 Setting Up Replication with Existing Data](https://dev.mysql.com/doc/refman/5.6/en/replication-howto-existingdata.html)
@@ -1866,6 +1876,111 @@ mysqlbinlog --read-from-remote-server -h localhost -uroot -p --base64-output=dec
 2. undo log操作：保证未提交事务影响的数据页回滚。
 3. 写缓冲(change buffer)合并。[写缓冲(change buffer)](https://mp.weixin.qq.com/s/PF21mUtpM8-pcEhDN4dOIw)
 4. purge操作。InnoDB的一种垃圾收集机制，使用单独的后台线程周期性处理索引中标记删除的数据。
+
+### 数据库主从同步延迟
+
+[RDS MySQL只读实例同步延迟原因与处理](https://help.aliyun.com/document_detail/41767.html)
+[记一次MySQL主从同步延迟优化](https://cloud.tencent.com/developer/news/228794)
+[How to identify and cure MySQL replication slave lag](https://www.percona.com/blog/2014/05/02/how-to-identify-and-cure-mysql-replication-slave-lag/)
+[What to Look for if Your MySQL Replication is Lagging](https://severalnines.com/database-blog/what-look-if-your-mysql-replication-lagging)
+[美团面试被问到主从延迟的解决办法 - 掘金](https://juejin.cn/post/7038459484838199326)
+
+当只读实例出现延迟的时候，排查方向如下：
+
+1. 检查只读实例是否存在无主键表的删除或者更新操作，可以通过在只读实例执行show engine innodb status\G命令查看，或者执行show open tables后查看输出结果的in_use列里值为1的表。
+2. 控制台查看SQL慢日志，是否有alter，repair，create等DDL操作。
+3. 检查只读实例的Binlog增长量，确定是否存在大事务。
+4. 主库与从库配置不一致：检查只读实例的IOPS，确认只读实例是否存在资源瓶颈。
+5. 在控制台查看监控，检查只读实例的MySQL_COMDML，确认主实例是否TPS过高。
+6. 只读实例执行 show slave status \G 命令，确定是否存在元数据锁。
+
+在控制台监控里面核对下 MySQL_COMDML 是否较大，如是，您是否可以通过拆分的方式进行操作的
+延迟是需要有现场的时候进行判断操作的，如复现可通过 show slave status \G命令（执行多次），可以看到 Seconds_Behind_Master 不断变化，而 Exec_Master_Log_Pos 却保持不变，这样可以判断只读实例的SQL线程在执行一个大的事务或者DDL操作
+
+```sql
+nopager ;select now();pager grep -E "Retrieved_Gtid_Set|Executed_Gtid_Set|Relay_Master_Log_File|Master_Log_File|Exec_Master_Log_Pos|Seconds_Behind_Master|Slave_SQL_Running_State|Slave_IO_State"; show slave status \G
+show open tables where in_use>0;
+        Slave_IO_State: Waiting for master to send event
+          Master_Host: 10.111.2.230
+          Master_User: replicator
+          Master_Port: 3002
+        Connect_Retry: 60
+      Master_Log_File: mysql-bin.008385
+  Read_Master_Log_Pos: 151587119
+        Relay_Log_File: slave-relay.008161
+        Relay_Log_Pos: 278809576
+Relay_Master_Log_File: mysql-bin.008384
+      Slave_IO_Running: Yes
+    Slave_SQL_Running: Yes
+```
+
+#### 未提交的事务
+
+[MySQL找出未提交事务的信息 - 云+社区 - 腾讯云](https://cloud.tencent.com/developer/article/1607249)
+
+```sql
+select * from information_schema.innodb_trx\G;
+
+select * from information_schema.processlist where COMMAND != 'Sleep';
+
+-- 查询这个超过10秒未提交事务的详细信息
+SELECT t.trx_mysql_thread_id ,t.trx_state ,t.trx_tables_in_use ,t.trx_tables_locked ,t.trx_query ,t.trx_rows_locked ,
+    t.trx_rows_modified ,t.trx_lock_structs ,t.trx_started ,t.trx_isolation_level ,p.time ,p.user ,p.host ,p.db ,p.command
+FROM   information_schema.innodb_trx t INNER JOIN information_schema.processlist p
+ON t.trx_mysql_thread_id = p.id
+WHERE  t.trx_state = 'RUNNING' AND p.time > 10 AND p.command = 'Sleep'\G
+
+-- performance_schema.events_statements_current中的未提交事务
+-- 通过查看performance_schema.events_statements_current表可看到每一个session正在执行的sql，哪怕它依旧执行完成了，只是没有提交：
+select * from performance_schema.events_statements_current where sql_text not like 'select * from performance_schema.events_statements_current%'\G
+```
+
+#### 问题发生在master上
+
+去看 processlist ，看slow sql，看操作系统负载，看系统参数配置；
+
+#### 问题发生在slave上
+
+1. SQL thread 慢，表现是
+   1. Seconds_Behind_Master 越来越大
+   2. Slave_SQL_Running_State: Reading event from the relay log
+2. IO thread慢，表现是
+   1. Seconds_Behind_Master 为0
+   2. Slave_SQL_Running_State: 显示正常值
+   3. Slave_IO_State:显示忙碌状态
+
+#### Waiting for dependent transaction to commit
+
+[MySQL Slave SQL Running State - “Waiting for dependent transaction to commit” meaning](https://dba.stackexchange.com/questions/269539/mysql-slave-sql-running-state-waiting-for-dependent-transaction-to-commit-me)
+[记一次Mysql主从复制延迟，Waiting for dependent transaction to commit](http://www.voycn.com/article/jiyicimysqlzhucongfuzhiyanchiwaiting-dependent-transaction-commit)
+
+`select @@slave_parallel_type, @@slave_parallel_workers, @@slave_preserve_commit_order;`
+开启多线程复制的情况：`slave_parallel_type=LOGICAL_CLOCK, slave_parallel_workers>0`
+
+开启多线程回放后，回放控制线程会根据既定的规则，进行并发回放。因此，后续事务如果不可以跟正在回放的事务并发的话，就必须要进行等待。
+如果开启了[`slave_preserve_commit_order`](https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html#sysvar_slave_preserve_commit_order)，进行并发回放的多个事务之间，也要按照和主库上提交的顺序一样，进行提交。
+
+`Waiting for dependent transaction to commit` 是当前事务无法和正在回放的事务并发回放，出现的等待。
+
+`Waiting for preceding transaction to commit` 是当前并发回放的事务在进入commit时的flush队列前，必须等到先前事务已经进入flush队列而引起的等待。
+
+`Waiting for slave workers to process their queues` 由于没有空闲的工作线程，协调线程会等待。这种情况说明理论上的并行度是理想的，但是可能是参数 slave_parallel_workers 设置不够。当然设置工作线程的个数应该和服务器的配置和负载相结合考虑。[MySQL里Wating for Slave workers to free pending events到底在等什么 - 云+社区 - 腾讯云](https://cloud.tencent.com/developer/article/1739742)
+
+#### 分区过多导致延迟
+
+排除掉常见因素后（无主键更新，从库配置低，从库压力大），通过 `perf top -p $(pidof mysqld)` 发现 bitmap_get_next_set 和 build_template_field 函数调用非常高。
+这两个函数跟启用表分区有关系。
+
+```sql
+-- 检查下表分区数量
+SELECT TABLE_NAME, COUNT(*) AS CNT
+    FROM information_schema.PARTITIONS WHERE PARTITION_NAME IS NOT NULL
+    GROUP BY TABLE_NAME ORDER BY CNT DESC LIMIT 50;
+-- 合并分区
+
+-- 合并分区后需要执行
+ANALYZE TABLE ;
+```
 
 ## 构建高性能的 MySQL 集群系统
 
