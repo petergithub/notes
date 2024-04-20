@@ -129,15 +129,17 @@ DateTimeFormatter
 
 ### 分析对象的内存占用
 
+[synchronized 枫叶云笔记](https://cloud.fynote.com/share/d/3225#锁升级过程_53)
+
 在HotSpot虚拟机里，对象在堆内存中的存储布局可以划分为三个部分:
 
-* 对象头(Header)
+* 对象头(Header)：Mark word，类型指针和数组长度
 * 实例数据(Instance Data)
 * 对齐填充(Padding)：以8字节对齐
 
 对象头中一般包含两个部分:
 
-* 标记字 Mark Word，占用一个机器字，64位虚拟机是8字节。
+* 标记字 Mark Word，占用一个机器字，64位虚拟机是8字节。包括 锁信息，GC，hashcode
 * 类型指针 占用一个机器字，也就是8个字节。如果堆内存小于32GB，JVM默认会开启指针压缩，则只占用4个字节。
 * 如果是数组，对象头中还会多出一个部分: 数组长度，int值，占用4字节。
 
@@ -148,7 +150,7 @@ DateTimeFormatter
 ```java
 public class MyOrder{
    private long orderId;
-   private long userId;
+   private String userId = "a-long-user-id";
    private byte state;
    private long createMillis;
 }
@@ -157,10 +159,11 @@ public class MyOrder{
 计算方式为:
 
 * 对象头占用12字节：Mark Word 8字节，指针压缩后占用4个字节
-* 每个long类型的字段占用8字节，3个long字段占用24字节。
+* 每个long类型的字段占用8字节，2个long字段占用16字节。
+* String 类型保存的引用，默认开启指针压缩，占用4 个字节
 * byte 字段占用1个字节。
 
-以上合计 37字节，加上以8字节对齐，则实际占用40个字节。
+以上合计 33字节，按8字节对齐，加上7 字节对齐填充，则实际占用40个字节。
 
 ## GC
 
