@@ -298,12 +298,6 @@ Three possible effects exist:
 2. 将镜像推送到Registry `docker push`
 3. 启动 pod `kubectl run pod-name -n namespace --image=registry.cn-beijing.aliyuncs.com/namespace/image-name:image-version -it --rm --restart=Never -- bash`
 
-### Managing pods’ computational resources
-
-* BestEffort (the lowest priority)
-* Burstable
-* Guaranteed (the highest)
-
 #### Jenkins
 
 [Kubernetes CLI](https://plugins.jenkins.io/kubernetes-cli/) 部署多个集群
@@ -531,3 +525,7 @@ reference:
 
 1. 在负载均衡设置端口映射, 监听虚拟服务器组的端口设置为 NodePort 30022
 2. 安全组放开 nodePort 30022
+
+## 使用 kubecost 分析 Kubernetes 成本
+
+kubecost 是目前较优秀的开源 Kubernetes 成本分析工具。kubecost 目前支持 阿里云、AWS 等云厂商对接，它能够提供集群中命名空间、应用等各类资源成本分配，用户还可以基于这些信息在 Kubecost 中设置预算和警报，帮助运维和财务管理人员进一步实现成本管理。
