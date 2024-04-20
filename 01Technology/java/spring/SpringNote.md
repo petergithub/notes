@@ -27,6 +27,11 @@
 4. AutoConfigurationImportSelector返回的自动配置的类都是使用@ConditionalXX进行并指定Condition进行条件匹配，符合条件的则会自动创建
 5. 我们也可以实现自己的Condition，并在spring.factories中配置自己创建的自动配置类，并使用@Condition指定相关的创建条件，那么在符合条件时便会进行创建。
 
+#### 0208Spring Boot技术难点源码深入剖析.mp4
+
+Springboot 根据配置的 pom.xml 来判断使用 Tomcat，jetty，Undertow。通过使用 ASM 工具来扫描 class 文件实现，比如环境中是否存在 Undertow.class。
+`@ConditionalOnClass({ Servlet.class, Undertow.class, SslClientAuthMode.class })`
+
 ## Spring 基础
 
 ### Bean 创建流程
