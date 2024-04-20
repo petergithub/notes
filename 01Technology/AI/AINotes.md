@@ -49,6 +49,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 * 编码助手
   * [Codeium · Free AI Code Completion & Chat](https://codeium.com/faq)
   * [通义灵码_智能编码助手 阿里云](https://tongyi.aliyun.com/lingma/download)
+  * 百度 Comate 2.0代码助手 [Baidu Comate · Coding mate](https://comate.baidu.com/)
 * 把真人变成虚拟人的是Meta human，想更简单变虚拟人的是Ready player me；
 * PPT: chatgpt生成的markdown语法内容导入[MindShow](https://www.mindshow.fun/#/home)
 * 第三方社群，civitai
@@ -57,6 +58,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 * Scribe AI chrome 插件：自动生成可视化操作指南, 创建逐步指南的场景，包括操作说明、标准操作规程、培训手册等。
 
 [AI 工具列表 飞书文档](https://zl49so8lbq.feishu.cn/wiki/wikcn6YTN3CrZTS8RhrEca8c8Eg)
+[极客时间 AIGC 知识库](https://gp477l8icq.feishu.cn/wiki/JUXnwzSuviL5E9kh6jUc8FRinHe)
 [ModelScope魔搭社区 旨在打造下一代开源的模型即服务共享平台，为泛AI开发者提供灵活、易用、低成本的一站式模型服务产品，让模型应用更简单。](https://community.modelscope.cn/)
 
 [xtekky/gpt4free: decentralising the Ai Industry, just some language model api's...](https://github.com/xtekky/gpt4free)
@@ -267,3 +269,7 @@ Prompt: I want you to act as a travel guide. I will write you my location and yo
 ### 简介
 
 线性回归主要用来解决连续值预测的问题，逻辑回归用来解决分类的问题，输出的属于某个类别的概率，工业界经常会用逻辑回归来做排序
+
+## LLM 介绍
+
+[Getting Started With Large Language Models - DZone Refcardz](https://dzone.com/refcardz/getting-started-with-large-language-models)
