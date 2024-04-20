@@ -9,20 +9,20 @@ MongoDB limits the data size of individual BSON objects/documents. At the time o
 
 ### Start Server & Connection
 
-`mongod` To start MongoDB using all defaults  
-`mongod --dbpath /path/to/mongodb/data/ --auth` To start MongoDB  
+`mongod` To start MongoDB using all defaults
+`mongod --dbpath /path/to/mongodb/data/ --auth` To start MongoDB
 
 [mongo bin](https://docs.mongodb.com/manual/reference/program/mongo/#bin.mongo)
 [Write Scripts for the mongo Shell](https://docs.mongodb.com/manual/tutorial/write-scripts-for-the-mongo-shell/)
 
 `mongo <host>:<port>/<dbName>`  Connect to mongo
-`--quiet` Suppress MongoDB shell version  
+`--quiet` Suppress MongoDB shell version
 `--eval` execute command
 `--nodb` start mongo client without using a database
 
 `mongo mongodb://user:pwd@localhost:27017/DATABASE_NAME?authSource=admin`
 `mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --authenticationDatabase=admin`
-`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet script.js`  
+`mongo -u <user> -p <password>  127.0.0.1:27017/DATABASE_NAME --quiet script.js`
 
 ```bash
 # mongo shell script
@@ -38,18 +38,18 @@ keti -n storage-service mongo-7d7c64f477-658fh -- mongo "mongodb://user:pwd@loca
 
 ### Basic Commands
 
-runCommand syntax: `db.runCommand()`  
+runCommand syntax: `db.runCommand()`
 dropping a collection(drop database) `db.DATABASE_NAME.drop()` or `db.runCommand({"drop" : "DATABASE_NAME"})`
-`> help`  
-`load("/path/to/script.js")`  
+`> help`
+`load("/path/to/script.js")`
 Getting timestamp from mongodb id `ObjectId("507c7f79bcf86cd7994f6c0e").getTimestamp()`
 
 #### format
 
-To format the printed result, you can add the .pretty() to the operation: `db.myCollection.find().pretty()`  
+To format the printed result, you can add the .pretty() to the operation: `db.myCollection.find().pretty()`
 
 ``` js
-// print a result collection  
+// print a result collection
 
 function printResult (r) {
   print(tojson(r))
@@ -73,9 +73,9 @@ print ("end " + tojson(date1.toLocaleString()))
 #### db
 
 查看数据库 `show dbs` == `db.getMongo().getDBs()`
-查看当前正在使用的数据库 `db`  
+查看当前正在使用的数据库 `db`
 切换数据库 `use DATABASE_NAME` == `db.getSisterDB("DATABASE_NAME")`
-删除数据库 删除数据库首先使用`use`命令切换到要删除的数据库，然后使用`db.dropDatabase()`  
+删除数据库 删除数据库首先使用`use`命令切换到要删除的数据库，然后使用`db.dropDatabase()`
 `db.stats()`
 
 `db.copyDatabase(fromdb, todb, fromhost, username, password, mechanism)` Copies a database either from one mongod instance to the current mongod instance or within the current mongod. [db.copyDatabase()](https://docs.mongodb.com/manual/reference/method/db.copyDatabase/)
@@ -85,12 +85,12 @@ print ("end " + tojson(date1.toLocaleString()))
 
 `show collections` == `show tables` == `db.getCollectionNames()`
 查看单个集合，可以使用 `db.getCollection("COLLECTION_NAME")`
-`db.collectionName.findOne()`  
-`db.getCollection('COLLECTION_NAME').count()`  
+`db.collectionName.findOne()`
+`db.getCollection('COLLECTION_NAME').count()`
 `db.collection_name.distinct(field,query,options)`
 创建集合 `db.createCollection(COLLECTION_NAME, options)`
 重命名 `db.COLLECTION_NAME.renameCollection("NEW_NAME")`
-集合的删除 `db.COLLECTION_NAME.drop()`  
+集合的删除 `db.COLLECTION_NAME.drop()`
 duplicate collection in the same database
     fastest: `mongodump -d db -c source_collection`, `mongorestore -d db -c targetcollection --dir=dump/<db>/<target_collection.bson>`
     fast: `db.source_collection.aggregate([{ $match: {} }, { $out: "target_collection" }])`
@@ -121,7 +121,7 @@ delete_collection_list.forEach( function (collection) {
   })
 
 # drop all collection in the database
-db.getCollectionNames().forEach(c=>db[c].drop())  
+db.getCollectionNames().forEach(c=>db[c].drop())
 ```
 
 #### query
@@ -130,19 +130,19 @@ db.getCollectionNames().forEach(c=>db[c].drop())
 projection `db.getCollection('users').find({"id" : "5a153558e8ac2b5c7a8052da"}, {"id":0,"custom_weight":1})` `1: display; 0: hide`
 
 Return documents where the tags field matches the specified array exactly, including the order: `db.inventory.find( { tags: [ "red", "blank" ] } )`
-To specify fields to return: `db.COLLECTION_NAME.findOne({key1:value1}, {key2:0, key3:1})` 0, exclude key2; 1, display key3  
-limit()指定查询结果数量  `db.COLLECTION_NAME.find().limit(NUMBER)`  
-skip()指定查询偏移量 `db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)`  
-sort()实现查询结果排序 `db.COLLECTION_NAME.find().sort({KEY:1})` 排序方式为可选值为：1和-1，1表示使用升序排列，-1表示降序排序  
+To specify fields to return: `db.COLLECTION_NAME.findOne({key1:value1}, {key2:0, key3:1})` 0, exclude key2; 1, display key3
+limit()指定查询结果数量  `db.COLLECTION_NAME.find().limit(NUMBER)`
+skip()指定查询偏移量 `db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)`
+sort()实现查询结果排序 `db.COLLECTION_NAME.find().sort({KEY:1})` 排序方式为可选值为：1和-1，1表示使用升序排列，-1表示降序排序
 
 db.collection.remove({query})
 
 ### Query Criteria 查询条件
 
-`"$lt","$lte","$gt","$gte", "$ne"`分别对应`<,<=,>,>=,<>`  
-查询birthday日期是`1990-1-1`之前的人 `db.users.find({"birthday":{"$lt":new Date("1990/01/01")}})`  
+`"$lt","$lte","$gt","$gte", "$ne"`分别对应`<,<=,>,>=,<>`
+查询birthday日期是`1990-1-1`之前的人 `db.users.find({"birthday":{"$lt":new Date("1990/01/01")}})`
 查询`age >=18  <=30`: `db.users.find({"age":{"$gte":18,"$lte":30}})`
-`db.users.find({"name":{"$ne":"refactor1"}})`  
+`db.users.find({"name":{"$ne":"refactor1"}})`
 `db.collections.findOne({"gateWayPayInfo.gateWayPayorderInfo.outOrderId" : "20150809173033000000000000005503"});`
 `db.inventory.find( { qty: { $ne: 20 } } )`
 `db.notes.find({"title": {'$regex': "夏天来啦", "$options": 'i'})`
@@ -158,7 +158,7 @@ search with `special_||vertial_bar`:
 #### 使用"$in","$nin","$or", "$not", $and 查询
 
 - 使用`"$in"`, `"$nin"`
- 查询出pageViews为10000,20000的数据: `db.users.find({pageViews:{"$in":[10000,20000]}})`  
+ 查询出pageViews为10000,20000的数据: `db.users.find({pageViews:{"$in":[10000,20000]}})`
 
 - 使用`"$or"`
 查询出pageViews是10000,20000或url是`http://www.cnblogs.com/refactor`的文档:
@@ -176,7 +176,7 @@ db.users.find(
 ```
 
 - 使用`"$not"` "$not"可以用在任何条件之上
-查询出`id`取模后值不为1和5的文档: `db.users.find({"id":{"$not":{"mod":[1,5]}}})`  
+查询出`id`取模后值不为1和5的文档: `db.users.find({"id":{"$not":{"mod":[1,5]}}})`
 `db.inventory.find( { price: { $not: { $eq: null } } } )`
 
 #### 条件句的规则
@@ -205,7 +205,7 @@ The $inc operator increments a field by a specified value and has the following 
 { "_id" : ObjectId("4ba0f148d22aa494fd523623"), "y" : 2 }
 ```
 
-If we only want to find keys whose value is null  
+If we only want to find keys whose value is null
 `db.c.find({"z" : {"$in" : [null], "$exists" : false}})` or `db.inventory.find( { price: { $eq: null } } )`
 find documents whose value is not null
 `db.c.find({"z" : {"$in" : [null], "$exists" : true}})` or `db.inventory.find( { price: { $not: { $eq: null } } } )`
@@ -217,11 +217,11 @@ find documents whose value is not null
 `select * from student where  name regexp 'joe'` 对应 `db.student.find( {name:/joe/})`
 
 MongoDB uses the Perl Compatible Regular Expression (PCRE) library to match regular
-expressions  
-use a regular expression to do case insensitive matching, Joe or joe  
+expressions
+use a regular expression to do case insensitive matching, Joe or joe
 `> db.users.find({"name" : /joe/i})`
 
-If we want to match not only various capitalizations of joe, but also joey  
+If we want to match not only various capitalizations of joe, but also joey
 `> db.users.find({"name" : /joey?/i})`
 
 `db.test.find({$or: [{platform_user_id: {'$regex': "123031", "$options": 'i'}}, {nickname: {'$regex': "123031", "$options": 'i'}}]})`
@@ -237,9 +237,9 @@ If we want to match not only various capitalizations of joe, but also joey
 
 #### Querying Arrays
 
-Arrays are always 0-indexed  
-`> db.food.insert({"fruit" : ["apple", "banana", "peach"]})`  
-query `db.food.find({"fruit" : "banana"})`  
+Arrays are always 0-indexed
+`> db.food.insert({"fruit" : ["apple", "banana", "peach"]})`
+query `db.food.find({"fruit" : "banana"})`
 
 ##### $all 如果需要多个元素来匹配数组,就要用"$all"
 
@@ -268,19 +268,19 @@ db.users.find({"emails":"295240648@126.com"})
 
 ##### $size
 
-query for arrays of a given size: `db.food.find({"fruit" : {"$size" : 3}})`  
+query for arrays of a given size: `db.food.find({"fruit" : {"$size" : 3}})`
 
 ##### $slice operator
 
 return the first 10 comments: `db.blog.posts.findOne(criteria, {"comments" : {"$slice" : 10}})`
-Alternatively, if we wanted the last 10 comments, we could use -10: `db.blog.posts.findOne(criteria, {"comments" : {"$slice" : -10}})`  
+Alternatively, if we wanted the last 10 comments, we could use -10: `db.blog.posts.findOne(criteria, {"comments" : {"$slice" : -10}})`
 return pages in the middle of the results by taking an offset and the number of elements to return:
-`db.blog.posts.findOne(criteria, {"comments" : {"$slice" : [23, 10]}})`  
+`db.blog.posts.findOne(criteria, {"comments" : {"$slice" : [23, 10]}})`
 
 ##### $elemMatch
 
-use "$elemMatch" to force MongoDB to compare both clauses with a single array element:  
-`db.test.find({"x" : {"$elemMatch" : {"$gt" : 10, "$lt" : 20}})`  
+use "$elemMatch" to force MongoDB to compare both clauses with a single array element:
+`db.test.find({"x" : {"$elemMatch" : {"$gt" : 10, "$lt" : 20}})`
 
 ###### [$elemMatch projection](https://docs.mongodb.com/manual/reference/operator/projection/elemMatch/)
 
@@ -302,7 +302,7 @@ have a document that looks like this:
 }
 ```
 
-Query: `db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})`  
+Query: `db.people.find({"name.first" : "Joe", "name.last" : "Schmoe"})`
 
 ##### Query an Array of Embedded Documents
 
@@ -358,8 +358,8 @@ db.coll.aggregate([
     ])
 
 // distinct by multiple fileds and count
-db.myCollection.aggregate( 
-   {$group : {_id : "$myIndexedNonUniqueField"} }, 
+db.myCollection.aggregate(
+   {$group : {_id : "$myIndexedNonUniqueField"} },
    {$group: {_id:1, count: {$sum : 1 }}})
    .result[0].count;
 
@@ -395,7 +395,7 @@ db.coll.find().sort( {"a":1} ).skip(count / 2 - 1).limit(1);
 count = db.coll.count();
 db.coll.find().sort( {"a":1} ).skip(count / 2 - 1).limit(2);
 
-// # join 操作  
+// # join 操作
 // https://docs.mongodb.com/manual/reference/operator/aggregation/lookup/
 SELECT *, <output array field>
 FROM collection
@@ -470,15 +470,15 @@ db.notes.aggregate([
 
 ### Index
 
-Find all indexes: `db.system.indexes.find()`  
-Setup index(Key 值为要创建的索引字段，1为指定按升序创建索引，如果你想按降序来创建索引指定为-1即可): `db.COLLECTION_NAME.createIndex({KEY:1}, {name:INDEX_NAME})`  
-createIndex() 方法中你也可以设置使用多个字段创建索引（关系型数据库中称作复合索引）: `db.COLLECTION_NAME.createIndex({"title":1,"description":-1})`  
-创建索引时加background:true 的选项，让创建工作在后台执行 `db.COLLECTION_NAME.createIndex({open: 1, close: 1}, {background: true})`  
-重建索引 `db.COLLECTION_NAME.reIndex()`  
+Find all indexes: `db.system.indexes.find()`
+Setup index(Key 值为要创建的索引字段，1为指定按升序创建索引，如果你想按降序来创建索引指定为-1即可): `db.COLLECTION_NAME.createIndex({KEY:1}, {name:INDEX_NAME})`
+createIndex() 方法中你也可以设置使用多个字段创建索引（关系型数据库中称作复合索引）: `db.COLLECTION_NAME.createIndex({"title":1,"description":-1})`
+创建索引时加background:true 的选项，让创建工作在后台执行 `db.COLLECTION_NAME.createIndex({open: 1, close: 1}, {background: true})`
+重建索引 `db.COLLECTION_NAME.reIndex()`
 创建唯一索引 `db.COLLECTION_NAME.createIndex( { "user_id": 1 }, { unique: true } )`
 
-查看集合中的索引: `db.COLLECTION_NAME.getIndexes()`  
-查看集合中的索引大小`db.COLLECTION_NAME.totalIndexSize()`  
+查看集合中的索引: `db.COLLECTION_NAME.getIndexes()`
+查看集合中的索引大小`db.COLLECTION_NAME.totalIndexSize()`
 
 To list all indexes on all collections in a database, you can use the following operation in the mongo shell:
 
@@ -490,7 +490,7 @@ db.getCollectionNames().forEach(function(collection) {
 });
 ```
 
-删除集合中的某一个索引: `db.COLLECTION_NAME.dropIndex("INDEX-NAME")` or `db.COLLECTION_NAME.dropIndex({x: 1, y: -1})`  
+删除集合中的某一个索引: `db.COLLECTION_NAME.dropIndex("INDEX-NAME")` or `db.COLLECTION_NAME.dropIndex({x: 1, y: -1})`
 删除所有索引 `db.COLLECTION_NAME.dropIndexes();`
 
 ### Update
@@ -699,8 +699,8 @@ db.createUser(
 
 ##### Connect and authenticate as myTester
 
-`mongo --port 27017 -u "myTester" -p "xyz123" --authenticationDatabase "test"`  
-`db.auth("myTester","xyz123")`  
+`mongo --port 27017 -u "myTester" -p "xyz123" --authenticationDatabase "test"`
+`db.auth("myTester","xyz123")`
 
 ## Profile 优化
 
@@ -708,15 +708,15 @@ db.createUser(
 
 ### Command
 
-`mongotop -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`  
-`mongostat -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`  
-[mongottop](https://docs.mongodb.com/manual/reference/program/mongotop/ )  
-[mongostat](https://docs.mongodb.com/manual/reference/program/mongostat/#fields )  
+`mongotop -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`
+`mongostat -u <user> -p <password> -h 127.0.0.1:27017 --authenticationDatabase admin`
+[mongottop](https://docs.mongodb.com/manual/reference/program/mongotop/ )
+[mongostat](https://docs.mongodb.com/manual/reference/program/mongostat/#fields )
 
 `db.currentOp()` Seeing the Current Operations 寻找有问题的操作
-`db.runCommand( { serverStatus: 1 } )`  
-`db.COLLECTION_NAME.stats()`  
-`db.killOp(<opid>)` get opid from `db.currentOp()`  
+`db.runCommand( { serverStatus: 1 } )`
+`db.COLLECTION_NAME.stats()`
+`db.killOp(<opid>)` get opid from `db.currentOp()`
 `db.runCommand( { serverStatus: 1, workingSet: 1 } )` collect the statistics about your server and analyze your server stats.
 In output of the serverStatus command you should pay attention to:
     mem contains info about the current memory usage (virtual and phyisical i.e. resident)
@@ -727,16 +727,16 @@ In output of the serverStatus command you should pay attention to:
 
 `db.getProfilingStatus()` 查看当前的分析级别和慢查询阈值
 `db.setProfilingLevel(1, 1000)`  设置分析级别为 1, 并且记录 1000 毫秒以上的慢查询
-`db.setProfilingLevel(2)` Level 2 means “profile everything.”  
+`db.setProfilingLevel(2)` Level 2 means “profile everything.”
 `db.system.profile.find( {millis: {$gt: 5}})`  获取5ms以上的慢查询记录
-`db.system.profile.find().pretty()`  
+`db.system.profile.find().pretty()`
 `db.system.profile.find({millis: {$gt: 500}, ts: {$gt: ISODate("2020-09-25T15:14:29.352+08:00")}, {op:1,ns:1,command:1,millis:1,planSummary:1,ts:1}).sort({millis:-1})`
 
-#### [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )  
+#### [currentOp](https://docs.mongodb.com/manual/reference/command/currentOp )
 
 `db.currentOp()` Seeing the Current Operations 寻找有问题的操作
 重点关注以下几个字段:
-    `opid` 操作的唯一标识符。如果有需要，可以通过db.killOp(opid)直接终止该操作。 
+    `opid` 操作的唯一标识符。如果有需要，可以通过db.killOp(opid)直接终止该操作。
     `secs_running` 表示该操作已经执行的时间，单位为秒。如果该字段返回的值特别大，需要查看请求是否合理。
     `ns` 该操作目标集合。
     `op` 表示操作的类型。通常是查询、插入、更新、删除中的一种。
@@ -754,8 +754,8 @@ In output of the serverStatus command you should pay attention to:
 `db.collection.find().explain()`
 `db.collection.explain().aggregate([])`
 [Return Information on Aggregation Pipeline Operation](https://docs.mongodb.com/manual/reference/method/db.collection.aggregate/#example-aggregate-method-explain-option)
-方法的参数如下：  
-    verbose：{String}，可选参数。指定冗长模式的解释输出，方式指定后会影响explain()的行为及输出信息。  
+方法的参数如下：
+    verbose：{String}，可选参数。指定冗长模式的解释输出，方式指定后会影响explain()的行为及输出信息。
     可选值有："queryPlanner"、"executionStats"、"allPlansExecution"，默认为"queryPlanner"
 [执行计划函数explain](https://itbilu.com/database/mongo/V1WFKy-Cl.html )
 
@@ -800,11 +800,11 @@ In output of the serverStatus command you should pay attention to:
 ```
 
 `"cursor" : "BtreeCursor appkey_1_event_1_cdate_1"` BtreeCursor means that an index was used
-`"n" : 6632` This is the number of documents returned by the query  
-`"nscannedObjects" : 6632` This is a count of the number of times MongoDB had to follow an index pointer to the actual document on disk. If the query contains criteria that is not part of the index or requests fields back that aren’t contained in the index, MongoDB must look up the document each index entry points to.  
-`"nscanned" : 6632` The number of index entries looked at if an index was used. If this was a table scan, it is the number of documents examined.  
+`"n" : 6632` This is the number of documents returned by the query
+`"nscannedObjects" : 6632` This is a count of the number of times MongoDB had to follow an index pointer to the actual document on disk. If the query contains criteria that is not part of the index or requests fields back that aren’t contained in the index, MongoDB must look up the document each index entry points to.
+`"nscanned" : 6632` The number of index entries looked at if an index was used. If this was a table scan, it is the number of documents examined.
 
-Refer to P100, Using explain() and hint(), MongoDB权威指南第2版 MongoDB The Definitive Guide  
+Refer to P100, Using explain() and hint(), MongoDB权威指南第2版 MongoDB The Definitive Guide
 
 ### [Troubleshooting MongoDB 100% CPU load and slow queries](https://medium.com/@igorkhomenko/troubleshooting-mongodb-100-cpu-load-and-slow-queries-da622c6e1339)
 
@@ -853,3 +853,43 @@ db.setProfilingLevel(1, 100);
 小结
 
 这些方法虽然能够起一定的作用，但最主要的目的还是为架构上的提升争取点时间罢了。
+
+### MongoDB 也使用B+Tree
+
+[MongoDB uses B+ by WiredTiger default storage engine. - Stack Overflow](https://stackoverflow.com/a/65733242/1086907)
+
+MongoDB uses B+ by WiredTiger default storage engine.
+
+1、https://docs.mongodb.com/manual/core/wiredtiger/
+
+Starting in MongoDB 3.2, the WiredTiger storage engine is the default storage engine.
+
+2、http://source.wiredtiger.com/3.2.1/tune_page_size_and_comp.html
+
+WiredTiger maintains a table's data in memory using a data structure called a B-Tree ( B+ Tree to be specific), referring to the nodes of a B-Tree as pages. Internal pages carry only keys. The leaf pages store both keys and values.
+
+[Does index use btree or b+tree?](https://groups.google.com/g/wiredtiger-users/c/1YHbNXPw-1A?pli=1)
+Ars Roseregen to wiredtiger-users
+Oct 7, 2023, 5:16:06 PM
+
+For a long time I thought he was using btree until I saw this document[link](https://source.wiredtiger.com/10.0.0/tune_page_size_and_comp.html)which says WiredTiger maintains a table’s data in memory using a data structure called a B-Tree (B+ Tree to be specific). But I found the source code of the btree[link](https://github.com/wiredtiger/wiredtiger/blob/mongodb-7.1/src/include/btree.h#L98)which doesn’t look like a b+tree(because I can’t find the next or pre pointer for leaf node). And this document says it is B-tree[link](https://source.wiredtiger.com/11.1.0/arch-btree.html). This make me confused. Can someone give me some pointers?
+
+Keith Smith to wiredtiger-users@googlegroups.com
+Oct 9, 2023, 9:27:28 PM
+
+Hi Ars, thanks for the question!
+
+Within the WiredTiger team, we tend to refer to our tables "B-Trees". I think this is mostly for simplicity, and not because it is the precisely correct term. But that does lead to some inconsistency (as you've found) in the documentation and comments.
+
+The exact answer, however, is a bit complicated. WiredTiger includes a number of optimizations and design choices that don't adhere to the classic definitions of a B-Tree or a B+ Tree. I expect that if you look in detail at any other widely used database you will find similar variations.
+
+There is not, to my knowledge, a precise definition of a B+ tree. Two features that are commonly cited are:
+All keys reside in the leaves.
+The leaves are linked for easy sequential access.
+WiredTiger B-Trees do store all keys and values in the leaf pages. (An exception are overflow pages where we store large keys and values that might be inefficient to store in the leaf page. This is one of those optimizations I mentioned.) So in that regard they behave like B+ trees.
+
+WiredTiger does *not* (as you've found) provide links directly from one leaf page to the next. This is because WiredTiger always writes an updated page to a new location in the file. So linking leaf pages in this manner would be impractical. When we update a leaf page, we write it to a new file location. That means we would need to update the pointer in the leaf pages pointing to it, and therefore we would write those pages to new locations, until we rewrite every leaf page.
+
+WiredTiger moves from one leaf page to the next by going back through the parent page. This is pretty efficient because the WiredTiger cache will never evict an internal B-Tree page if any of its child pages are in the cache. Therefore any time we need to move from one leaf to the next, the parent is guaranteed to be in the cache.
+
+FWIW, Douglas Comer's [classic paper on B-Trees](https://web.archive.org/web/20170809145513id_/http://sites.fas.harvard.edu/~cs165/papers/comer.pdf) from 1979 says that in B+ trees "leaf nodes are *usually* linked together" (p. 129, emphasis mine). So it has never been a strict requirement that B+ trees have these links.
