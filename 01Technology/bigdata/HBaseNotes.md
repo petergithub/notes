@@ -43,7 +43,7 @@ Java Heap * HeapFractionForMemstore / (MemstoreSize / 2 )
 8. 默认get 到最新版本数据，如果需要获取多个版本的数据，需要使用 `scan 'test_tbl',{FILTER => "PrefixFilter ('rowkey')",RAW => true, VERSIONS => 10}`
 9. Disable a table: `disable 'test_tbl'`, `enable 'test_tbl'`If you want to delete a table or change its settings, as well as in some other situations, you need to disable the table first
 10. limit: `hbase> scan 'test_tbl', {'LIMIT' => 5}` Command like SQL LIMIT in HBase
-11. Drop the table: `drop 'test_tbl'`
+ Drop the table: `drop 'test_tbl'`
 12. 如何统计HBase的表行数 `count 'test_tbl'`
     1. `count 'tablename', CACHE => 1000` 配置正确的 CACHE 时速度非常快, 上述计数一次取 1000 行。如果行很大，请将 CACHE 设置得较低。默认是每次读取一行。
 
@@ -177,6 +177,19 @@ Caused by: java.lang.ClassNotFoundException: com.hadoop.compression.lzo.LzoCodec
         ... 11 more
 ```
 
+## 存储数据结构 LSM
+
+LSM树（Log-Structured Merge Tree）输入数据首先被存储在日志文件，这些文件内的数据完全有序。当有日志文件被修改时，对应的更新会被先保存在内存中来加速查询。
+
+当系统经历过许多次数据修改，且内存空间被逐渐被占满后，LSM树会把有序的“键-记录”对写到磁盘中，同时创建一个新的数据存储文件。此时，因为最近的修改都被持久化了，内存中保存的最近更新就可以被丢弃了。
+
 ## 参数调优
 
 [生产环境中的HBase核心参数到底该怎么优化？这篇文章可以一看 - 墨天轮](https://www.modb.pro/db/81894)
+
+1. 垃圾回收优化
+2. 本地memstore分配缓冲区
+3. 压缩
+4. 优化拆分和合并
+5. 负载均衡
+6. 合并region
