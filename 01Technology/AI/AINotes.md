@@ -19,6 +19,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   * Slack Claude
   * [文心一言 百度](https://yiyan.baidu.com/)
   * [通义千问 阿里](https://qianwen.aliyun.com/)
+  * [Google AI Studio](https://aistudio.google.com/app/prompts/new_chat)
   * [Poe](https://poe.com/sage)
   * [Kimi.ai - 帮你看更大的世界](https://kimi.moonshot.cn/)
   * [讯飞星火大模型 文案 图片 PPT 代码](https://xinghuo.xfyun.cn/desk)
@@ -39,6 +40,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   * [Aiko — Sindre Sorhus 语音转文字](https://sindresorhus.com/aiko)
   * [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper) [MacWhisper](https://app.gumroad.com/d/29e33b796f6ce9bb186f87cdf2fadb16)
   * Buzz transcribes and translates audio offline on your personal computer. [Buzz](https://github.com/chidiwilliams/buzz)
+  * [AudioPen](https://audiopen.ai/demo)
 * 文本转音视频
   * 音频生成用 voice.ai 或 Eleven Labs，连字幕都可以用自己通过AI“训练”的个性专属字体。
 * 视频处理
@@ -46,6 +48,8 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   * 视频制作用 Descript 或 Runway
   * 一个频视中的人物替换成虚拟人或CG的是Wonder；
   * 给频视配音创建音乐就用Soundraw；
+  * [Open-Sora 视频生成](https://github.com/hpcaitech/Open-Sora?tab=readme-ov-file)
+  * [Open Sora demo - a Hugging Face Space by hpcai-tech](https://huggingface.co/spaces/hpcai-tech/open-sora)
 * 编码助手
   * [Codeium · Free AI Code Completion & Chat](https://codeium.com/faq)
   * [通义灵码_智能编码助手 阿里云](https://tongyi.aliyun.com/lingma/download)
@@ -138,6 +142,44 @@ GPT (Generative Pre-trained Transformer)
 官方Web界面可体验/调试 https://platform.openapi/playground
 Demo框架 及具体实现 Streamlit 简介— A faster way to build and share data apps
 
+[ChatTTS-ui: 一个简单的本地网页界面，直接使用ChatTTS将文字合成为语音，同时支持对外提供API接口。](https://github.com/jianchang512/ChatTTS-ui)
+
+### 本地知识库搭建
+
+[chatchat-space/Langchain-Chatchat: Langchain-Chatchat（原Langchain-ChatGLM）基于 Langchain 与 ChatGLM 等语言模型的本地知识库问答 | Langchain-Chatchat (formerly langchain-ChatGLM), local knowledge based LLM (like ChatGLM) QA app with langchain](https://github.com/chatchat-space/Langchain-Chatchat)
+[Langchain-ChatGLM：基于本地知识库问答_langchain chatglm-CSDN博客](https://blog.csdn.net/dzysunshine/article/details/131003488)
+
+LangChain 是一个用于开发由语言模型驱动的应用程序的框架，主要拥有 3个能力：
+
+1. 可以调用LLM模型
+2. 可以将 LLM 模型与外部数据源进行连接
+3. 允许与 LLM 模型进行交互
+
+知识库问答实现步骤
+基于Langchain思想实现基于本地知识库的问答应用。实现过程如下：
+1、加载文件
+2、读取文本
+3、文本分割
+4、文本向量化
+5、问句向量化
+6、在文本向量中匹配出与问句向量最相似的top k个
+7、匹配出的文本作为上下文和问题一起添加到prompt中
+8、提交给LLM生成回答。
+
+### Dify
+
+[Dify github](https://github.com/langgenius/dify)
+[Studio - Dify](https://cloud.dify.ai/apps)
+
+Dify is an open-source LLM app development platform. Dify's intuitive interface combines AI workflow, RAG pipeline, agent capabilities, model management, observability features and more, letting you quickly go from prototype to production.
+
+案例：
+
+* 训练出专属于“你”的问答机器人
+* 官网 AI 智能客服
+* 接入微信
+* 接入钉钉
+
 ### pengzhile/pandora
 
 [pengzhile/pandora: 潘多拉，一个让你呼吸顺畅的ChatGPT。Pandora, a ChatGPT that helps you breathe smoothly.](https://github.com/pengzhile/pandora)
@@ -215,6 +257,17 @@ Prompt: I want you to act as a travel guide. I will write you my location and yo
 [墨本关键词助手](https://www.mbprompt.com/#/)
 [MidJourney Prompt Tool](https://prompt.noonshot.com/)
 
+### Stable Diffusion
+
+[Stable Diffusion Models: a beginner's guide - Stable Diffusion Art](https://stable-diffusion-art.com/models/)
+[ControlNet: A Complete Guide - Stable Diffusion Art](https://stable-diffusion-art.com/controlnet/)
+[常用的ControlNet以及如何在Stable Diffusion WebUI中使用 - 知乎](https://zhuanlan.zhihu.com/p/620074109)
+
+[Install Stable Diffusion on Mac](https://uxplanet.org/install-stable-diffusion-ui-on-mac-beginners-guide-351e40a9e8e2)
+[webui Online Services · AUTOMATIC1111/stable-diffusion-webui Wiki](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)
+[Stability-AI/generative-models: Generative Models by Stability AI](https://github.com/Stability-AI/generative-models)
+[Mikubill/sd-webui-controlnet: WebUI extension for ControlNet](https://github.com/Mikubill/sd-webui-controlnet)
+
 ### MidJourney 案例
 
 [【Midjourney教程】设计麻瓜也能10分钟上架一套表情包](https://mp.weixin.qq.com/s/FagQ3HdAnx-HLfJK4NRMBQ)
@@ -273,3 +326,7 @@ Prompt: I want you to act as a travel guide. I will write you my location and yo
 ## LLM 介绍
 
 [Getting Started With Large Language Models - DZone Refcardz](https://dzone.com/refcardz/getting-started-with-large-language-models)
+
+文心大模型ERNIE是百度发布的产业级知识增强大模型，涵盖了NLP大模型和跨模态大模型。
+
+https://github.com/PaddlePaddle/ERNIE
