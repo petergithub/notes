@@ -244,11 +244,11 @@ chmod 0644 /etc/synthetic.conf
 ### Tap to click
 # Preference -> Trackpad -> Point & Click -> Tap to click
 
+### Enable dragging with three fingers
+# Preference > Accessibility > Pointer Control > Trackpad Options > Turn on “Use trackpad for dragging” > dragging style “three finger drag” 
+
 ### Turn the Mac startup sound on or off
 # Choose Apple menu  > System Settings > Click Sound in the sidebar > Turn “Play sound on startup” on or off.
-
-### Enable dragging with three fingers
-# Preference -> Accessibility -> Mouse & Trackpad -> Trackpad Options -> Enable dragging
 
 ### Login Item with startup.sh
 # Make startup.sh open with console
