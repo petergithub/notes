@@ -257,6 +257,14 @@ expands non-matching globs to zero arguments, rather than to themselves.
 MANDATORY_MANPATH           /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
 MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/bin        /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio12.6/man
 
+#### When pasting in terminal, `00~` is pasted at the start and `01~` at the end
+
+[macos - When pasting in Terminal.app, `00~` is pasted at the start and `01~` at the end - Ask Different](https://apple.stackexchange.com/questions/446859/when-pasting-in-terminal-app-00-is-pasted-at-the-start-and-01-at-the-end)
+
+Short answer: Run the command printf '\e[?2004l'. This sends an escape sequence to the terminal that tells it to stop sending bracketed paste sequences.
+
+or `reset`
+
 ### vi
 
 [What is your most productive shortcut with Vim?](https://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim/1220118#1220118)
@@ -2001,6 +2009,10 @@ TYPE – Specifies the type of the file. Some of the values of TYPEs are,
 * FIFO – First In First Out
 * CHR – Character special file
 
+DEVICE
+
+http://www.kernel.org/pub/linux/docs/lanana/device-list/devices-2.6.txt
+
 Parameters:
 
 * `+D` will recurse
@@ -2067,6 +2079,17 @@ The command to print a prompt to the screen and to store the resulting input int
 
 screenshot: shutter,deepin-scrot
 ubuntu上 接收 outlook exchange 郵件？ thunderbird + exquilla 插件
+
+### ffmpeg
+
+```sh
+# [ffmpeg-script: 基于ffmpeg的一键脚本命令](https://github.com/xxxily/ffmpeg-script)
+# 将音视频文件进行快速的合并操作
+ffmpeg -i out.mp4 -i out.aac -vcodec copy -acodec copy new.mp4
+
+# 将flv文件快速转换成mp4文件
+ffmpeg -i input.flv -vcodec copy -acodec copy output.mp4
+```
 
 ### Tomcat
 
@@ -3411,6 +3434,16 @@ dpkg -s packageName    #Check a Package is installed or not
 dpkg -L packageName    #Check the location of Packages installed
 dpkg --unpack packageName    #Unpack the Package but do not Configure
 dpkg --configure packageName    #Reconfigure a Unpacked Package
+
+#### install and manage RPMs
+
+convert single RPM files into DEBs with Alien:
+
+```sh
+sudo apt-get install alien
+sudo alien my_package.rpm
+sudo dpkg -i my_package.deb
+```
 
 ### mount disk
 
