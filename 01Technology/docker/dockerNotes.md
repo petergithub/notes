@@ -301,6 +301,37 @@ sudo systemctl start docker
 sudo docker run hello-world
 ```
 
+### 配置镜像仓库
+
+[Docker被封禁的离线镜像临时方案 tar 包上传- 掘金](https://juejin.cn/post/7381478389469839397)
+[DockerHub国内镜像源列表（2024年6月18日 亲测可用） - 软件分享 - LINUX DO](https://linux.do/t/topic/114516)
+[国内的 Docker Hub 镜像加速器，由国内教育机构与各大云服务商提供的镜像加速服务 | Dockerized 实践 https://github.com/y0ngb1n/dockerized · GitHub](https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6)
+
+
+为了加速镜像拉取，使用以下命令设置registry mirror
+
+```sh
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json <<EOF
+{
+    "registry-mirrors": [
+        "https://hub.uuuadc.top",
+        "https://docker.anyhub.us.kg",
+        "https://dockerhub.jobcher.com",
+        "https://dockerhub.icu",
+        "https://docker.ckyl.me",
+        "https://docker.awsl9527.cn"
+    ]
+}
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+使用DockerHub Proxy，以下以 hub.uuuadc.top 为例：可以根据列表自行替换
+docker pull hub.uuuadc.top/library/mysql:5.7
+说明：library是一个特殊的命名空间，它代表的是官方镜像。如果是某个用户的镜像就把library替换为镜像的用户名
+
 ### Configure logging drivers
 
 全局配置控制 docker 运行时产生的日志文件大小
