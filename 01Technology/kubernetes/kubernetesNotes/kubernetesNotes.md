@@ -1,5 +1,7 @@
 # kubernetesNotes
 
+Container Network Interface (CNI)
+
 ## Recent
 
 batch delete `kdelp $(kgp -l | grep Evicted | awk '{print $1}')`
@@ -20,6 +22,10 @@ kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSe
 kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
 
 ## Concept
+
+OCI: Open Container Initiative
+CRI: Container Runtime Interface
+runc 是一个兼容oci的容器运行时。它实现OCI规范并运行容器进程。
 
 ### [Requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
 
@@ -249,7 +255,20 @@ CREATING A TLS CERTIFICATE FOR THE INGRESS
 `kubectl create secret tls tls-secret --cert=tls.cert --key=tls.key`
 `kubectl create secret generic fortune-https --from-file=https.key --from-file=https.cert --from-file=foo`
 
-Copying Kubernetes Secrets Between Namespaces: `kubectl get secret gitlab-registry --namespace=revsys-com -o yaml | kubectl apply --namespace=devspectrum-dev -f -`
+```sh
+# Copying Kubernetes Secrets Between Namespaces:
+kubectl get secret <secret-name> --namespace=<source-namespace>  -o yaml \
+  | sed 's/namespace: <from-namespace>/namespace: <to-namespace>/' \
+  | kubectl create -f -
+
+# Update k8s ConfigMap or Secret without deleting the existing one
+kubectl create configmap foo --from-file foo.properties -o yaml --dry-run=client | kubectl apply -f -
+
+# 创建 configMap 的同时增加 label
+kubectl label configmap my-config app=grafana env=test
+kubectl create configmap --from-file=... --overrides='{"metadata":{"label":"app": "awesomeapp"}}'
+kubectl create cm foo -o yaml --dry-run|kubectl label -f- --dry-run -o yaml --local f=b
+```
 
 ### System
 
@@ -333,13 +352,15 @@ kg VolumeAttachment | sort -k 3
 
 ### Network
 
-[从零开始入门 K8s | 理解 CNI 和 CNI 插件](https://developer.aliyun.com/article/748866)
-[kubernetes网络模型之“小而美”flannel](https://zhuanlan.zhihu.com/p/79270447)
+[Mastering Kubernetes Pod-to-Pod Communication: A Comprehensive Guide | by Extio Technology | Medium](https://medium.com/@extio/mastering-kubernetes-pod-to-pod-communication-a-comprehensive-guide-46832b30556b)
 
 Kubernetes 对集群网络有以下要求：
 所有的 Pod 之间可以在不使用 NAT 网络地址转换的情况下相互通信；所有的 Node 之间可以在不使用 NAT 网络地址转换的情况下相互通信；每个 Pod 看到的自己的 IP 和其他 Pod 看到的一致。
 
 #### Kubernetes CNI
+
+[从零开始入门 K8s | 理解 CNI 和 CNI 插件](https://developer.aliyun.com/article/748866)
+[kubernetes网络模型之“小而美”flannel](https://zhuanlan.zhihu.com/p/79270447)
 
 CNI，它的全称是 Container Network Interface，即容器网络的 API 接口。
 
@@ -353,6 +374,68 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 2. 安装 CNI 配置文件中所对应的二进制插件；
 3. 在这个节点上创建 Pod 之后，Kubelet 就会根据 CNI 配置文件执行前两步所安装的 CNI 插件；
 4. 上步执行完之后，Pod 的网络就配置完成了。
+
+#### Kubernetes集群Pod和Service之间通信的实现原理
+
+[K8s network之五：Kubernetes集群Pod和Service之间通信的实现原理 | Mr.Muzi](https://marcuseddie.github.io/2021/K8s-Network-Architecture-section-five.html)
+
+##### 同一个 Node 节点内的 Pod 不能通过 Service 互访
+
+修改集群kube proxy 配置 masqueradeAll true
+[Kubernetes 同一个 Node 节点内的 Pod 不能通过 Service 互访 - 哈希](https://www.haxi.cc/archives/Kubernetes-同一个-Node-节点内的-Pod-不能通过-Service-互访.html)
+[Kubernetes 同一个 Node 节点内的 Pod 不能通过 Service 互访 - 面壁者的逻辑 - 博客园](https://www.cnblogs.com/longgor/p/13588191.html)
+
+[Debug Services | Kubernetes](https://kubernetes.io/docs/tasks/debug/debug-application/debug-service)
+
+[Virtual IPs and Service Proxies | Kubernetes](https://kubernetes.io/docs/reference/networking/virtual-ips/)
+[IP Masquerade Agent User Guide | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/ip-masq-agent/)
+
+[kubernetes - Pods running on the same node can't access to each other through service - Stack Overflow](https://stackoverflow.com/questions/64073696/pods-running-on-the-same-node-cant-access-to-each-other-through-service/78910247#78910247)
+
+原因：kube-proxy通过在每个节点上创建相同的ipvs规则（关闭rap），当pod访问集群内svc（vip）时，请求会被当前节点vip接受，此时，ipvs会进行DNAT操作，而在回报时，两个pod处于同一个veth-part的一面，此时流量并不会走网关，所以回报的时候源ip和目的ip都是两个pod的ip，但是在请求发送时，目的ip为vip，此时会丢弃掉请求。
+
+using flannel as CNI on Kubernetes v1.30.1 and it turned out that flannel needs masquerade to be set true while kube-proxy default value has masqueradeAll: false. Changing it to true and restarting kube-proxy pods solved the problem
+
+the steps:
+
+```sh
+# set masqueradeAll: true
+kubectl -n kube-system edit cm kube-proxy
+# to restart all kube proxy pods
+kubectl -n kube-system delete pod -l k8s-app=kube-proxy
+```
+
+#### Flannel
+
+[从 Flannel 学习 Kubernetes overlay 网络](https://atbug.com/cross-node-traffic-on-flannel-vxlan-network/)
+
+```sh
+# IP 命令
+
+# ip neighbour show | awk '$3=="flannel.1"{print $0}'
+10.244.2.0 dev flannel.1 lladdr 5e:5f:7e:bd:65:ea PERMANENT
+10.244.0.0 dev flannel.1 lladdr 76:7d:9c:b5:29:9d PERMANENT
+
+# bridge fdb show flannel.1 |awk '$3=="flannel.1"{print $0}'
+26:22:89:97:04:e8 dev flannel.1 dst 192.168.102.103 self permanent    # 转发至k8s-node2节点
+76:7d:9c:b5:29:9d dev flannel.1 dst 192.168.102.101 self permanent    # 转发至k8s-master节点
+```
+
+#### kubectl netshoot
+
+[nicolaka/netshoot: a Docker + Kubernetes network trouble-shooting swiss-army container](https://github.com/nicolaka/netshoot)
+
+```sh
+kubectl netshoot debug podName --image-name nicolaka/netshoot --image-tag v0.13
+# spin up a throwaway pod for troubleshooting
+kubectl netshoot run tmp-shell --image-name nicolaka/netshoot --image-tag v0.13
+
+# debug using an ephemeral container in an existing pod
+kubectl netshoot debug my-existing-pod
+
+# create a debug session on a node
+kubectl netshoot debug node/my-node
+```
 
 #### 阿里云ACK集群中的网络问题
 
@@ -427,23 +510,121 @@ The task of running your containers is up to the components running on each work
 
 ## helm
 
-`helm repo add ali-incubator https://aliacs-app-catalog.oss-cn-hangzhou.aliyuncs.com/charts-incubator/`
-`helm repo add ali-stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts`
+[Helm | Installing Helm](https://helm.sh/docs/intro/install/)
+
+[Harbor docs | Managing Helm Charts](https://goharbor.io/docs/2.7.0/working-with-projects/working-with-images/managing-helm-charts/)
+
+```sh
+/usr/local/bin/helm
+
+helm repo add ali-incubator https://aliacs-app-catalog.oss-cn-hangzhou.aliyuncs.com/charts-incubator
+helm repo add ali-stable https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
+#添加阿里云的 chart 仓库
+helm repo add aliyun https://kubernetes.oss-cn-hangzhou.aliyuncs.com/charts
+# 添加私有habor 仓库
+helm repo add --username=admin --password=xxxxxxxx my_harbor https://xxxxx:8443/chartrepo/library
+
+#查看配置的 chart 仓库有哪些
+helm repo list
+#删除 chart 仓库地址
+helm repo remove aliyun
+#从指定 chart 仓库地址搜索 chart
+helm search repo aliyun
 helm search repo gitlab-ce
+# 查看 chart 信息
+helm show chart aliyun/memcached
+
 helm fetch ali-stable/gitlab-ce
+
+# Install charts
+helm install myrelease oci://<registry url>/<project>/<chart name> --version <version>
+
 helm uninstall gitlab
 
-## Setup
+helm registry login <registry url>
+```
+
+下载 chart 包到本地
+
+```sh
+# 下载 chart 包到本地
+[root@master1 ~]# helm pull aliyun/memcached
+[root@master1 ~]# tar zxvf memcached-2.0.1.tgz
+[root@master1 ~]# cd memcached
+[root@master1 memcached]# ls
+Chart.yaml README.md templates values.yaml
+# Chart.yaml： chart 的基本信息，包括版本名字之类
+# templates：存放 k8s 的部署资源模板，通过渲染变量得到部署文件
+# values.yaml：存放全局变量，templates 下的文件可以调用
+
+[root@xianchaomaster1 memcached]# cd templates/
+[root@xianchaomaster1 templates]# ls
+_helpers.tpl NOTES.txt pdb.yaml statefulset.yaml svc.yaml
+# _helpers.tpl 存放能够复用的模板
+# NOTES.txt 为用户提供一个关于 chart 部署后使用说明的文件
+```
+
+helm package
+
+```sh
+# 执行helm package -d <chart所在目录> <chart名称>,会生成一个压缩包，名字为<chart名称>-<chart文件内的version>.tgz
+# 下面的命令在目录appchart-uat-cd会生成appchart-uat-cd-1.0.0.tgz
+helm package -d appchart-uat-cd appchart-uat-cd
+```
+
+上传 chart 包到仓库
+
+```sh
+helm push mychart-1.0.0.tgz my-repo
+
+# 更新存储库: 上传新的 Helm Chart 后，你需要更新 Helm 存储库的索引文件。
+# 由于 Harbor 主要用于容器镜像管理，而不是传统的 Helm Chart 仓库，因此在更新 Helm Chart 时需要手动重新上传并更新索引文件。
+helm repo update
+
+```
+
+## Setup Cluster
+
+```sh
+# 默认master节点是不参与pod的调配的，如果需要请执行以下命令
+
+#查看污点
+[root@master1 ~]# kubectl describe node k8s-master | grep Taints
+Taints: node-role.kubernetes.io/master:NoSchedule
+#去除污点，允许 master 部署 pod ,这里报错不用管
+[root@master1 ~]# kubectl taint nodes --all node-role.kubernetes.io/master-
+node/master1 untainted
+error: taint "node-role.kubernetes.io/master" not found
+#再次查看，无显示，说明污点去除成功
+[root@master1 ~]# kubectl describe node master1 | grep Taints
+Taints:    <none>
+```
+
+### Kubernetes Gateway API
+
+Gateway API v1.0: GA Release October 31, 2023
+
+[Kubernetes Gateway API 正式发布并引入 ingress2gateway 项目用于简化 Gateway API 升级 | 云原生社区（中国）](https://cloudnative.to/blog/gateway-api-ingress2gateway/)
+
+![Gateway API](image/Gateway-API.png)
+
+[Gateway API | Kubernetes](https://kubernetes.io/docs/concepts/services-networking/gateway/)
+[Getting started - Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/guides/)
+
+### Setup cli
 
 [Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
 [kube-ps1](https://github.com/jonmosco/kube-ps1)
 `brew install kube-ps1 stern`
 kube-shell `pip install kube-shell --user -U`
 `brew install kubectx`
-切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
 [Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
 
 终极工具k9s
+
+切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
+git clone https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
 
 ## Best Practice
 
@@ -529,3 +710,96 @@ reference:
 ## 使用 kubecost 分析 Kubernetes 成本
 
 kubecost 是目前较优秀的开源 Kubernetes 成本分析工具。kubecost 目前支持 阿里云、AWS 等云厂商对接，它能够提供集群中命名空间、应用等各类资源成本分配，用户还可以基于这些信息在 Kubecost 中设置预算和警报，帮助运维和财务管理人员进一步实现成本管理。
+
+## Docker vs. Containerd
+
+[一文带你了解Docker与Containerd的区别-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2327654)
+
+[Docker, containerd, CRI-O and runc之间的区别？ - Zhai_David - 博客园](https://www.cnblogs.com/chuanzhang053/p/16784668.html)
+
+[容器服务 如何选择 Containerd 和 Docker-常见问题-文档中心-腾讯云](https://cloud.tencent.com/document/product/457/35747)
+[如何选择Docker、Containerd及安全沙箱运行时_容器服务 Kubernetes 版 ACK(ACK)-阿里云帮助中心](https://help.aliyun.com/zh/ack/ack-managed-and-ack-dedicated/user-guide/comparison-of-docker-containerd-and-sandboxed-container)
+
+
+Containerd：调用链更短，组件更少，更稳定，占用节点资源更少。建议选择 Containerd。
+
+作为 K8S 容器运行时，部署结构对比
+
+Docker: kubelet --> docker shim （在 kubelet 进程中） --> dockerd --> containerd
+Containerd: kubelet --> cri plugin（在 containerd 进程中） --> containerd
+
+Containerd 和 Docker 组件常用命令是什么？
+
+Containerd 不支持 docker API 和 docker CLI，但是可以通过 cri-tool 命令实现类似的功能。
+
+ctr 是 containerd 的一个客户端工具。 crictl 是 CRI 兼容的容器运行时命令行接口，可以使用它来检查和调试 k8s 节点上的容器运行时和应用程序。 ctr -v 输出的是 containerd 的版本，crictl -v 输出的是当前 k8s 的版本，从结果显而易见你可以认为 crictl 是用于 k8s 的。
+
+|           | docker                  | ctr（containerd）              | crictl（kubernetes）       |
+|-----------|-------------------------|------------------------------|--------------------------|
+| 创建新容器     | docker create           | ctr container create         | crictl create            |
+| 启动/关闭容器   | docker start/stop       | ctr task start/kill          | crictl start/stop        |
+| 运行新容器     | docker run              | ctr run                      | 无（最小单元为 pod）             |
+| 查看运行的容器   | docker ps               | ctr task ls/ctr container ls | crictl ps                |
+| 删除容器      | docker rm               | ctr container rm             | crictl rm                |
+| 查看容器日志    | docker logs             | 无                            | crictl logs              |
+| 查看容器数据    | docker inspect          | ctr container info           | crictl inspect           |
+| 查看容器资源    | docker stats            | 无                            | crictl stats             |
+| 容器内部执行命令  | docker exec             | 无                            | crictl exec              |
+| attach    | docker attach           | 无                            | crictl attach            |
+| 修改镜像标签    | docker tag              | ctr image tag                | 无                        |
+| 导入镜像      | docker load             | ctr image import             | 无                        |
+| 导出镜像      | docker save             | ctr image export             | 无                        |
+| 查看镜像      | docker images           | ctr image ls                 | crictl images            |
+| 删除镜像      | docker rmi              | ctr image rm                 | crictl rmi               |
+| 拉取镜像      | docker pull             | ctr image pull               | crictl pull              |
+| 推送镜像      | docker push             | ctr image push               | 无                        |
+| 查看镜像详情    | docker inspect IMAGE-ID | ?                            | crictl inspect IMAGE-ID  |
+| 显示 POD 列表 | 无                       | 无                            | crictl pods              |
+
+## containerd
+
+### 设置 containerd 拉取 http 私有仓库
+
+[How to pull docker image from a insecure private registry with latest Kubernetes - Stack Overflow](https://stackoverflow.com/questions/72419513/how-to-pull-docker-image-from-a-insecure-private-registry-with-latest-kubernetes)
+
+```sh
+# vi /etc/containerd/config.toml
+      [plugins."io.containerd.grpc.v1.cri".registry.configs]
+
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081"] # edited line
+
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081".auth] # edited line
+            username = "USERNAME"
+            password = "PASSWORD"
+
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081".tls] # edited line
+            ca_file = "" # edited line
+            cert_file = "" # edited line
+            insecure_skip_verify = true # edited line
+            key_file = "" # edited line
+
+      [plugins."io.containerd.grpc.v1.cri".registry.headers]
+
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."172.28.48.107:8081"] # edited line
+          endpoint = ["http://172.28.48.107:8081"] # edited line
+```
+
+### 客户端工具 nerdctl
+
+https://github.com/containerd/nerdctl/releases
+
+精简 (nerdctl--linux-amd64.tar.gz): 只包含 nerdctl
+完整 (nerdctl-full--linux-amd64.tar.gz): 包含 containerd, runc, and CNI 等依赖
+
+nerdctl 的目标并不是单纯地复制 docker 的功能，它还实现了很多 docker 不具备的功能，例如延迟拉取镜像（lazy-pulling）、镜像加密（imgcrypt）等。具体看 nerdctl。
+
+通过 nerdctl 登录 harbor
+
+```sh
+echo Harbor12345 | nerdctl login --username "admin" --password-stdin  myharbor-minio.com:443
+nerdctl login --username "admin" --password Harbor12345 myharbor-minio.com:443
+# 登出
+nerdctl logout
+```
