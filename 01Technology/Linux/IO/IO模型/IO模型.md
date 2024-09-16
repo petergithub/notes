@@ -8,8 +8,8 @@
 
 POSIX defines these two terms as follows:
 
-* A synchronous I/O operation causes the requesting process to be blocked until that I/O operation completes.
-* An asynchronous I/O operation does not cause the requesting process to be blocked.
+* A synchronous **I/O operation** causes the requesting process to be blocked until that I/O operation completes.
+* An asynchronous **I/O operation** does not cause the requesting process to be blocked.
 
 Using these definitions, the first four I/O models—blocking, nonblocking, I/O multiplexing, and signal-driven I/O — are all synchronous because the actual I/O operation (recvfrom) blocks the process. Only the asynchronous I/O model matches the asynchronous I/O definition.
 
