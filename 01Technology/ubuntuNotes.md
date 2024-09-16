@@ -663,6 +663,15 @@ pgrep -l apache2
 
 [Linux Sed命令详解](https://qianngchn.github.io/wiki/4.html)
 
+```sh
+# 注释行
+# If BBB is at the beginning of the line:
+sed -i 's/^BBB/#&/' file
+
+# If BBB is in the middle of the line:
+sed-i  's/^[^#]*BBB/#&/' file
+```
+
 多个模式 `sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'`
 删除行 `sed -i '/DELETE_LINE/d'`
 
@@ -1391,7 +1400,14 @@ Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f |
 
 #### tar
 
+* `-r` specifies that you want to append files to the archive,
+* `-v` enables verbose output for tracking progress
+* `-f` specifies the name of the tar archive
+* `--delete` option is used to delete a file from an archive
+
 `tar -tf filename.tar.gz`    List files inside the tar.gz file
+`tar -rvf existingTar.tar new1.txt new2.txt` Adding Files to a Tar Archive
+`tar --delete -f tecmint.tar ravi1.txt ravi3.txt` Deleting Files from a Tar Archive
 `vim filename.tar.gz` List files and open file inside it with `Enter`
 `tar -jxvf firefox-37.0.2.tar.bz2 -C /opt/` -C 选项提取文件到指定目录
 `-exclude path/to/exclude` exclude files
@@ -1661,8 +1677,12 @@ Unison works across platforms, allowing you to synchronize a Windows laptop with
 
 ### nc 传输文件
 
--l 表示监听端口，等待接收数据
--p 1234 表示要监听端口号1234
+* -l 表示监听端口，等待接收数据
+* -p 1234 表示要监听端口号1234
+* -u udp
+* `-v` verbose
+* `-w timeout`
+* `-z` Only scan for listening daemons, without sending any data to them.  Cannot be used together with -l.
 
 ```sh
 # 接收端等待接收文件
@@ -1675,6 +1695,19 @@ nc TARGET_HOST 1234 < source.tgz
 tar cvf - SOURCE_DIRECTORY/ | nc TARGET_HOST 1234
 # 接收端，我们让 nc 收到数据后通过管道传给 tar 解包
 nc -l -p 1234 | tar xvf -
+```
+
+使用 nc 测试两个节点及 pod 之间的四层连通性
+
+```sh
+# host1
+nc -l 9999
+# host2
+nc -vz <host1> 9999
+# udp -u
+nc -uv host2 8472
+Connection to host2 8472 port [udp/otv] succeeded!
+
 ```
 
 ### mail
@@ -1772,10 +1805,22 @@ Adding a `z` suffix to any type displays printable characters at the end of each
 使用 HISTTIMEFORMAT 在历史中显示 TIMESTAMP `export HISTTIMEFORMAT='%F %T '`
 
 查看最后一个日志文件 `ls -tr /data/log | tail -1`
+
+```sh
 cat << EOF > test.txt
 ABC
 DEF
 EOF
+```
+
+```SH
+# sudo tee -a 追加文件, 没有-a 覆盖文件
+sudo tee -a /etc/rc.local <<EOF
+mount -t vboxsf -o uid=$UID,gid=$(id -g) D_DRIVE /d
+mount -t vboxsf -o uid=$UID,gid=$(id -g) E_DRIVE /e
+EOF
+```
+
 `watch -d -n 1 'df; ls -FlAt /path'` 实时某个目录下查看最新改动过的文件
 `watch -n 3 ls` 以3秒钟执行一个ls命令
 `cd -` 切换回上一个目录
@@ -1816,6 +1861,8 @@ w 以菜单方式显示及选择窗口
 n(到达下一个窗口) p(到达上一个窗口)
 & 关掉当前窗口, 也可以输入 exit
 , Rename the current window
+
+##### disable automatic rename
 
 If the window name keeps renaming, create file `.tmux.conf` with content below
 `set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"` or `DISABLE_AUTO_TITLE=true` in .zshrc for zsh
@@ -1888,98 +1935,6 @@ CTRL+a k    杀掉当前窗口
 CTRL+a [    进入拷贝/回滚模式
 -c file    使用配置文件file, 而不使用默认的$HOME/.screenrc
 screen -wipe命令清除死掉的会话
-
-### tcpdump
-
-[《神探tcpdump第一招》-linux命令五分钟系列之三十五](http://roclinux.cn/?p=2474)
-[Linux tcpdump命令详解](https://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html)
-
-tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包
-一般计算机网卡都工作在非混杂模式下，此时网卡只接受来自网络端口的目的地址指向自己的数据。当网卡工作在混杂模式下时，网卡将来自接口的所有数据都捕获并交给相应的驱动程序。网卡的混杂模式一般在网络管理员分析网络数据作为网络故障诊断手段时用到，同时这个模式也被网络黑客利用来作为网络数据窃听的入口。在Linux操作系统中设置网卡混杂模式时需要管理员权限。在Windows操作系统和Linux操作系统中都有使用混杂模式的抓包工具，比如著名的开源软件Wireshark
-
-`tcpdump -i eth0 -nn -X 'port 53' -c 1`
-`tcpdump -i eth1 -s 0 -w /var/tmp/1.cap port 3306` 对 3306 端口进行抓包
-
-#### tcpdump 常用选项
-
-* `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡
-* `-c` 是Count的含义，设置tcpdump抓几个包
-* `-nn` 当tcpdump遇到协议号或端口号时，不要将这些号码转换成对应的协议名称或端口名称。比如，众所周知21端口是FTP端口，我们希望显示21，而非tcpdump自作聪明的将它显示成FTP
-* `-X` 把协议头和包内容都原原本本的显示出来（tcpdump会以16进制和ASCII的形式显示），这在进行协议分析时是绝对的利器. 对具体的数据包解释见[链接](http://roclinux.cn/?p=2820)
-* `-XX` tcpdump会从以太网部分就开始显示网络包内容，而不是仅从网络层协议开始显示
-* `-e` 增加以太网帧头部信息输出
-* `-s` 设置包大小限制值，如果你要追求高性能，建议把这个值调低，这样可以有效避免在大流量情况下的丢包现象
-* `-v` 输出更详细的信息: 加了-v选项之后，在原有输出的基础之上，你还会看到tos值、ttl值、ID值、总长度、校验值等。
-
-至于上述值的含义，需要你专门去研究下IP头、TCP头的具体协议定义
-
-* `-t` 输出时不打印时间戳
-* `-l` 使得输出变为行缓冲. Linux/UNIX的标准I/O提供了全缓冲、行缓冲和无缓冲三种缓冲方式。标准错误是不带缓冲的，终端设备常为行缓冲，而其他情况默认都是全缓冲的
-* `-q` 就是quiet output, 尽量少的打印一些信息
-* `-N` 不打印出host 的域名部分. 设置此选项后 tcpdump 将会打印'nic' 而不是 'nic.ddn.mil'
-* `-S` 打印TCP 数据包的顺序号时, 使用绝对的顺序号, 而不是相对的顺序号.(nt: 相对顺序号可理解为, 相对第一个TCP 包顺序号的差距,比如, 接受方收到第一个数据包的绝对顺序号为232323, 对于后来接收到的第2个,第3个数据包, tcpdump会打印其序列号为1, 2分别表示与第一个数据包的差距为1 和 2. 而如果此时-S 选项被设置, 对于后来接收到的第2个, 第3个数据包会打印出其绝对顺序号:232324, 232325)
-
-* `-w` 将流量保存到文件中, 把raw packets（原始网络包）直接存储到文件中
-* `-r` 读取raw packets文件进行了“流量回放”，网络包被“抓”的速度都按照历史进行了回放, 可以使用`-e`、`-l`和过滤表达式来对输出信息进行控制
-* `-C 10` 限制每个转储文件的上限, 达到上限后将文件分卷(以MB为单位)
-* `-W 5` 不仅限制每个卷的上限, 而且限制卷的总数
-
-* `-A` tcpdump只会显示ASCII形式的数据包内容，不会再以十六进制形式显示
-* `tcpdump -D` 列出所有可以选择的抓包对象
-* `-F` 指定过滤表达式所在的文件 `tcpdump -i eth0 -c 1 -t -F filter.txt`
-
-Common usage:
-
-* `ssh target "sudo tcpdump -s 0 -U -n -i eth0 not port 22 -w -" | wireshark -k -i -` 在远端调用tcpdump抓包，通过管道传回本地，然后让wireshark抓包
-* `tcpdump -l > dump.log & tail -f dump.log`
-* 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log`
-* 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据
-    `tcpdump -i eth1 '((tcp) and (port 80) and ((dst host 192.168.1.254) or (dst host 192.168.1.200)))'`
-* The following command prints only TCP segments with a source port between 7001 and 7005. `tcpdump 'tcp and tcp[0:2] > 7000 and tcp[0:2] <= 7005'`
-* 抓取所有经过eth1，目标MAC地址是00:01:02:03:04:05的ICMP数据 `tcpdump -i eth1 '((icmp) and ((ether dst host 00:01:02:03:04:05)))'`
-* 抓取所有经过eth1，目的网络是192.168，但目的主机不是192.168.1.200的TCP数据 `tcpdump -i eth1 '((tcp) and ((dst net 192.168) and (not dst host 192.168.1.200)))'`
-
-* 抓取HTTP包 `tcpdump -i eth0 -lXvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT"
-* 抓HTTP GET数据 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x47455420'`, GET的十六进制是47455420
-* 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为”MAIL”的包，”MAIL”的十六进制为 0x4d41494c
-* 抓SSH返回 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x5353482D'` SSH-的十六进制是0x5353482D
-* 抓包并保存,重放
-    `tcpdump -i eth0 -lXvvenns 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.log.bin &`
-    `tcpdump -r tcpdump.log.bin`
-    `tcpdump -i eno16780032 -lXvvennNs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.log.bin`
-
-#### 过滤表达式
-
-`man pcap-filter` packet filter syntax
-表达式是大体可以分成三种过滤条件
-
-* 类型: 主要包括host，net，port
-* 方向: 主要包括src，dst，dst or src，dst and src
-* 协议: 主要包括fddi，ip，arp，rarp，tcp，udp等类型
-除了这三种类型的关键字之外，其他重要的关键字如下：gateway， broadcast，less， greater
-还有三种逻辑运算，取非运算 `not` or `!`， 与运算是`and` or `&&`, 或运算是`or` or `||`
-
-1. `host`：指定主机名或IP地址，例如`host roclinux.cn`或`host 202.112.18.34`
-2. `net` ：指定网络段，例如`arp net 128.3`或`dst net 128.3`
-3. `portrange`：指定端口区域，例如`src or dst portrange 6000-6008`
-4. `protocol [ expr : size]`
-    `protocol`指定协议名称，比如ip、tcp and udp、ether, fddi, arp, rarp, decnet, lat, sca, moprc, mopdl.
-    `expr`用来指定数据报偏移量，表示从某个协议的数据报的第多少位开始提取内容，默认的起始位置是0；
-    `size`表示从偏移量的位置开始提取多少个字节，可以设置为1、2、4, 默认提取1个字节
-    例题：`ip[0] & 0xf != 5`
-    IP协议的第0-4位，表示IP版本号，可以是IPv4（值为0100）或者IPv6（0110）；第5-8位表示首部长度，单位是“4字节”，如果首部长度为默认的20字节的话，此值应为5，即”0101″。ip[0]则是取这两个域的合体。0xf中的0x表示十六进制，f是十六进制数，转换成8位的二进制数是“0000 1111”。而5是一个十进制数，它转换成8位二进制数为”0000 0101″。
-    这个语句中!=的左侧部分就是提取IP包首部长度域，如果首部长度不等于5，就满足过滤条件。言下之意也就是说，要求IP包的首部中含有可选字段
-
-* `host IP`  `port 53` 监视指定主机和端口的数据包 `tcpdump host 210.27.48.1 and \ (port 53 or  port 21 \)`
-* `tcpdump -i eth0 'udp'` 抓取udp包, 这里还可以把udp改为ether、ip、ip6、arp、tcp、rarp等
-* `tcpdump -i eth0 'dst 8.8.8.8'` 设置src（source）和dst（destination）指定机器IP, 如果没有设置的话，默认是src or dst
-* `tcpdump -i eth0 'dst port 53 or dst port 80'` 查目标机器端口是53或80的网络包
-* `tcpdump 'port ftp or ftp-data'` 获取使用ftp端口和ftp数据端口的网络包, /etc/services存储着所有知名服务和传输层端口的对应关系
-* `tcpdump 'tcp[tcpflags] & tcp-syn != 0 and not dst host qiyi.com'` 获取roclinux.cn和baidu.com之间建立TCP三次握手中第一个网络包，即带有SYN标记位的网络包，另外，目的主机不能是qiyi.com
-* 要提取TCP协议的SYN、ACK、FIN标识字段，语法是`tcp[tcpflags] & tcp-syn`, `tcp[tcpflags] & tcp-ack`, `tcp[tcpflags] & tcp-fin`
-* 查看哪些ICMP包中“目标不可达、主机不可达”的包的表达式`icmp[0:2]==0x0301`
-* 提取TCP协议里的SYN-ACK数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 `tcp[13]==18`
-* 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`
 
 ### lsof
 
@@ -2298,7 +2253,6 @@ date -d "1970-01-01 UTC `echo "$(date +%s)-$(cat /proc/uptime|cut -f 1 -d' ')+12
 7. `perf stat -a` -- sleep 10 ⟶  IPC, LLC hit ratio
 8. `htop` can do 1-4
 
-`lscpu` display information on CPU architecture
 `cat /proc/cpuinfo` view the amount of cores
 `pidstat -l 2 10`
 `w` - Find Out Who Is Logged on And What They Are Doing
@@ -2339,16 +2293,52 @@ waiting time。指CPU花费在等待I/O操作上的总时间，与blocked相似
 steal time。指当前CPU被强制（involuntary wait ）等待另外虚拟的CPU处理完毕时花费的时间，此时 hypervisor 在为另一个虚拟处理器服务
 Softirq time 、Hardirq time。分别对应系统在处理软硬中断时候所花费的CPU时间
 
+#### 查看 CPU 信息
+
+```sh
+# uname -m will display the machine hardware name, which will indicate the processor architecture.
+uname -m
+# `lscpu` display information on CPU architecture
+lscpu | grep Architecture
+# prints values such as x86_64, i686, arm, or aarch64.
+# x86_64 is amd64 (also known as x86-64 or Intel 64).
+# i386 i686 is 386
+# arm is arm
+
+/*CPU查看CPU型号*/
+cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c
+
+/*查看物理CPU个数*/
+cat /proc/cpuinfo | grep "physical id" | sort -u | wc -l
+
+/*查看逻辑CPU个数*/
+cat /proc/cpuinfo | grep "processor" | wc -l
+
+/*查看CPU内核数*/
+cat /proc/cpuinfo | grep "cpu cores" | uniq
+
+/*查看单个物理CPU封装的逻辑CPU数量*/
+cat /proc/cpuinfo | grep "siblings" | uniq
+
+/*计算是否开启超线程
+##逻辑CPU > 物理CPU x CPU核数 #开启超线程
+##逻辑CPU = 物理CPU x CPU核数 #没有开启超线程或不支持超线程*/
+
+/*查看是否超线程,如果cpu cores数量和siblings数量一致，则没有启用超线程，否则超线程被启用。*/
+cat /proc/cpuinfo | grep -e "cpu cores"  -e "siblings" | sort | uniq
+```
+
 #### top uptime
 
 `top`命令包含了几个命令的检查的内容: 比如系统负载情况（`uptime`）、系统内存使用情况（`free`）、系统CPU使用情况（`vmstat`）等. 因此通过这个命令, 可以相对全面的查看系统负载的来源. 同时, `top`命令支持排序, 可以按照不同的列排序, 方便查找出诸如内存占用最多的进程、CPU占用率最高的进程等.
+`top -u postgres`  查看某个用户内存使用情况,如:postgres
 
 1. `uptime`
 `23:51:26 up 21:31,  1 user,  load average: 30.02, 26.43, 19.02`
 命令的输出分别表示1分钟、5分钟、15分钟的平均负载情况. 通过这三个数据, 可以了解服务器负载是在趋于紧张还是区域缓解. 如果1分钟平均负载很高, 而15分钟平均负载很低, 说明服务器正在命令高负载情况, 需要进一步排查CPU资源都消耗在了哪里. 反之, 如果15分钟平均负载很高, 1分钟平均负载较低, 则有可能是CPU资源紧张时刻已经过去.
 判断一个系统负载是否偏高需要计算单核CPU的平均负载, 等于这里uptime命令显示的系统平均负载 / CPU核数, 一般以0.7为比较合适的值. 偏高说明有比较多的进程在等待使用CPU资源
 
-2. `top`
+1. `top`
 top命令中, 按 `f` 键, 进入选择排序列的界面, 按 `k` 键, 并输入想要终止的PID, 就可以直接杀死指定进程
 `RES`是常驻内存, 是进程切实使用的物理内存量
 第3行: 当前的CPU运行情况:
@@ -2742,6 +2732,39 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
     查看路由过程中哪些节点是瓶颈
     查看带宽的使用情况
 
+##### ip route 配置静态路由
+
+```sh
+ip route add [network/prefix] via [gateway] dev [interface]
+# 其中，network/prefix 指目标网络和掩码位数，即网络前缀长度，via 指路由数据包的下一跳网关的IP地址，dev interface 指数据包从哪个网络接口出去。如果只想查看路由表，则不需要在命令中添加 add 参数，而是直接输入 ip route
+
+# 设置系统默认路由
+ip route add default via 192.168.1.254
+
+# 设置192.168.4.0网段的网关为192.168.0.254,数据走eth0接口
+ip route add 192.168.4.0/24 via 192.168.0.254 dev eth0
+
+# 设置默认网关为192.168.0.254
+ip route add default via 192.168.0.254 dev eth0
+
+# 删除路由规则
+ip route del 192.168.4.0/24
+
+# 检查网络连通性
+ip route get 8.8.8.8
+# 限制网络流量转发
+ip route add prohibit 10.0.0.2
+```
+
+网桥 network bridge
+
+```sh
+# 删掉网桥
+sudo ip link set dev docker0 down
+sudo brctl delbr docker0
+sudo brctl show
+```
+
 ##### 服务器中TIME_WAIT状态连接数较多
 
 ```sh
@@ -2854,6 +2877,14 @@ UDP Clients & Servers
 
 1. 使用web 页面 `http://localhost:3002` 访问
 2. `/etc/init.d/ntop restart`
+
+##### bandwhich 查看带宽及不同 IP 地址产生的流量
+
+查看当前什么程序在占用带宽，以及不同 IP 地址产生的流量。
+
+displaying current network utilization by process, connection and remote IP/hostname
+
+[imsnif/bandwhich: Terminal bandwidth utilization tool](https://github.com/imsnif/bandwhich)
 
 ##### [10款抓包工具 不止Wireshark和Tcpdump -腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2231025?areaId=106001)
 
