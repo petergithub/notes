@@ -44,7 +44,7 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 * `ssh-copy-id user@host`    将公钥添加到 host 以实现无密码登录
 * `ssh-copy-id -i ~/.ssh/id_rsa.pub username@host`
 * `cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"`    从一台没有SSH-COPY-ID命令的主机将你的SSH公钥复制到服务器
-* `ssh user@host 'mkdir -p .ssh && cat >> .ssh/authorized_keys < ~/.ssh/id_rsa.pub'`
+* `ssh user@host 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys < ~/.ssh/id_rsa.pub'`
 
 ## ssh 远程操作
 
@@ -202,7 +202,7 @@ Classic SSH Jumphost configuration
 
 A configuration like this will allow you to proxy through HOST A.
 
-```config
+```sh
 # $ cat .ssh/config
 Host host-a
     Hostname 10.0.0.5
@@ -259,18 +259,37 @@ trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 * `yes | pv | ssh $host "cat > /dev/null"`    实时SSH网络吞吐量测试 通过SSH连接到主机, 显示实时的传输速度, 将所有传输数据指向/dev/null, 需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
 * `yes | pv | cat > /dev/null`
 
-## pssh
+## pssh pscp.pssh prsync 批量操作
 
-pssh  is  a  program  for executing ssh in parallel on a number of hosts.
+[How to use parallel ssh (PSSH) for executing commands in parallel on a number of Linux/Unix/BSD servers - nixCraft](https://www.cyberciti.biz/cloud-computing/how-to-use-pssh-parallel-ssh-program-on-linux-unix/)
+
+pssh is a program for executing ssh in parallel on a number of hosts.
 
 * `pssh -ih /path/to/host.txt date` Pass list of hosts using a file
 * `pssh -iH "host1 host2" date` Pass list of hosts manually
 * `pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
 
-### pssh options
+* `pscp -H "worker01 worker02" /etc/containerd/config.toml  /etc/containerd/`
+* `prsync -h ~/.pssh_hosts_files *.html /var/www/html/` use the prsync command for efficient copy
+* `pnuke -h .pssh_hosts_files process_name` kill processes in parallel
+* `pslurp -h my-hosts.txt -L /tmp/output/ /etc/hosts hosts` Using parallel-slurp for downloading files in parallel. This command would copy the file /etc/hosts from each host listed in the my-hosts.txt file to the directory /tmp/output/. The files would be renamed to `hosts` on the machine stated in the my-hosts.txt file.
+
+```sh
+# pssh_hosts_files 文件格式
+cat ~/.pssh_hosts_files
+vivek@dellm6700
+root@192.168.2.30
+root@192.168.2.45
+root@192.168.2.46
+```
+
+options
 
 * Using `-o` or `--outdir` you can save standard output to files
 * Using `-e` or `--errdir` you can save standard error to files
+* -i, --inline Display standard output and standard error as each host completes.
+* `-h host_file, --hosts host_file` Read hosts from the given host_file.
+* `-H, --host "[user@]host[:port] [ [user@]host[:port ] ... ]"` Add the given host strings to the list of hosts.
 
 ## scp
 
