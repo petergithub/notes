@@ -125,6 +125,7 @@ PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
 * Tabnine: AI code assistant
 * Codeium: Tab 键接受; 使用 ⌥ + ] 和 ⌥ + 来切换备选建议
 * Spring Assistant
+* [SonarLint](https://docs.sonarsource.com/sonarlint/intellij/getting-started/installation/)
 
 ### Vim
 

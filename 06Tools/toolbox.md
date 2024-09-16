@@ -50,6 +50,12 @@ mkcert is a simple tool for making locally-trusted development certificates. htt
 
 1. ARC: chrome extension to run APKs
 
+#### chrome解决http自动跳转https问题
+
+地址栏输入： chrome://net-internals/#hsts.
+找到底部 Delete domain security policies一栏，输入想处理的域名，点击delete。
+搞定了，再次访问http域名不再自动跳转https了。
+
 ### Visual Studio Code
 
 `Cmd + Shift + P` Show and run command
@@ -90,11 +96,11 @@ HTML or Markdown syntax
 [Confuluence Anchors] (https://confluence.atlassian.com/conf55/confluence-user-s-guide/creating-content/using-the-editor/working-with-anchors#WorkingwithAnchors-Creatingananchor)
 
 1. Create anchor: Ctrl+Shift+A (Click + -> Other macro -> Anchor)
-  or input { -> select "open macro browser" -> Anchor  
+  or input { -> select "open macro browser" -> Anchor
 2. Creating link to an anchor (view HTML source to get anchor id):
-  user guide:   https://confluence.atlassian.com/conf55/confluence-user-s-guide/creating-content/using-the-editor/working-with-anchors#WorkingwithAnchors-Creatingalinktoananchor  
-  or page name is in English: http://confluence.lab.tclclouds.com/display/TCLOUD/gateway.pay#gateway.pay-returnValues  
-  or page name is not in English: http://confluence.lab.tclclouds.com/pages/viewpage.action?pageId=7595848#id-账户中心常用相关整理-staticPageDeploy  
+  user guide:   https://confluence.atlassian.com/conf55/confluence-user-s-guide/creating-content/using-the-editor/working-with-anchors#WorkingwithAnchors-Creatingalinktoananchor
+  or page name is in English: http://confluence.lab.tclclouds.com/display/TCLOUD/gateway.pay#gateway.pay-returnValues
+  or page name is not in English: http://confluence.lab.tclclouds.com/pages/viewpage.action?pageId=7595848#id-账户中心常用相关整理-staticPageDeploy
 
 ### Misc
 
@@ -107,11 +113,11 @@ HTML or Markdown syntax
 
 ### Memo
 
-gmtp connect to android  
+gmtp connect to android
 ncdu NCurses Disk Usage: ncdu (NCurses Disk Usage) is a curses-based version of the well-known 'du'
 Transmission: Transmission is a cross-platform BitTorrent client https://transmissionbt.com/about/
-linux 多线程下载工具 multiget  
-linux 下读书软件 fbreader  
+linux 多线程下载工具 multiget
+linux 下读书软件 fbreader
 phpBB-3.1.10 forum
 Gimp: alternatives to Photoshop
 Autokey
@@ -130,7 +136,7 @@ webtorrent-desktop
 DVD Decrypter [link](http://www.dvddecrypter.org.uk/ http://arch.pconline.com.cn//pcedu/soft/gj/media/0511/724509_1.html)
 
 Sandboxie sandbox for windows
-ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/  
+ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 
 ### Extend
 
