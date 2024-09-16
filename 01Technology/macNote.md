@@ -534,7 +534,7 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 
 ## Apps
 
-* [精品MAC应用分享](https://xclient.info/)
+* [mac-awesomeTools](https://github.com/SuJunming/mac-awesomeTools/blob/master/README.md)
 * [Cmacked - Cracked Mac Apps & Games](https://cmacked.com/page/2/)
 * [XMac.App](https://xmac.app/)
 * [IINA /ˈiːnə/ The modern media player for macOS.](https://iina.io/)
@@ -574,3 +574,5 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Mp3tag 1.8.16 音频元数据编辑 - 精品MAC应用分享](https://xclient.info/s/mp3tag.html)
 * [Aiko — Sindre Sorhus 语音转文字](https://sindresorhus.com/aiko)
 * [Switch - Convert Audio Formats: Switch Audio File Converter Software](https://www.nch.com.au/switch/index.html)
+* [Krita 触摸板手绘](https://krita.org/en/post-download/)
+* [Draw 触摸板手绘](https://krita.org/en/post-download/)
