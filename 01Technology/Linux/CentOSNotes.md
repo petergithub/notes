@@ -109,6 +109,187 @@ CentOS 7默认使用的是firewall作为防火墙，使用iptables必须重新�
 
 Other command `systemctl disable iptables`
 
+#### iptables 简介
+
+[iptables简介及命令用法](https://liu2lin600.github.io/2016/07/23/iptables简介及命令用法)
+
+Linux上的防火墙套件为iptables/netfilter，iptables是用户空间上配置与修改过滤规则的命令，生成的规则直接送往linux内核空间netfilter中，netfilter是Linux核心中的一个通用架构，用于接收并生效规则，起到防火墙作用
+
+[iptables 和 netfilter 的关系](https://liu2lin600.github.io/2016/07/23/iptables简介及命令用法/iptables.png)
+
+在netfilter上定义了5个钩子函数(hook function)，分别作用于5个链上：
+
+1. 路由前，目标地址转换 == > PREROUTING
+2. 到达本机内部的报文必经之路 == > INPUT
+3. 由本机转发的报文必经之路 == > FORWARD
+4. 由本机发出的报文的必经之路 == > OUTPUT
+5. 路由后，源地址转换 == > POSTROUTING
+
+netfilter提供了一系列的表(tables),每个表由若干个链(chains)组成，而每条链可以由一条或若干条规则(rules)组成，关系如下：
+
+[iptables 的表 tables 和链 chains 的关系](https://liu2lin600.github.io/2016/07/23/iptables简介及命令用法/iptables1.png/)
+
+4表
+
+1. raw：用于配置数据包，raw 中的数据包不会被系统跟踪
+2. mangle：用于对特定数据包的修改
+3. nat：用于网络地址转换，如SNAT、DNAT、MASQUERADE、REDIRECT
+4. filter：过滤，定义是否允许通过防火墙
+
+5链
+
+1. INPUT链：当接收到防火墙本机地址的数据包（入站）时，应用此链中的规则
+2. OUTPUT链：当防火墙本机向外发送数据包（出站）时，应用此链中的规则
+3. FORWARD链：当接收到需要通过防火墙发送给其他地址的数据包（转发）时，应用此链中的规则
+4. PREROUTING链：在对数据包作路由选择之前，应用此链中的规则
+5. POSTROUTING链：在对数据包作路由选择之后，应用此链中的规则
+
+规则(处理机制)
+
+1. ACCEPT：允许数据包通过
+2. DROP：直接丢弃数据包，不给任何回应信息
+3. REJECT：拒绝数据包通过，同时会给数据发送端一个响应的信息
+4. SNAT：源地址转换，解决内网用户用同一个公网地址上网的问题，仅作用于nat表上POSTROUTING，INPUT上。在进入路由层面的route之前，重新改写源地址，目标地址不变，并在本机建立NAT表项，当数据返回时，根据NAT表将目的地址数据改写为数据发送出去时候的源地址，并发送给主机
+5. MASQUERADE：是SNAT的一种特殊形式，适用于像adsl这种临时会变的ip上
+6. DNAT:目标地址转换，让互联网上主机访问本地内网上的某服务器上的服务，仅作用于nat表上PREROUTING和OUTPUT。和SNAT相反，IP包经过route之后、出本地的网络栈之前，重新修改目标地址，源地址不变，在本机建立NAT表项，当数据返回时，根据NAT表将源地址修改为数据发送过来时的目标地址，并发给远程主机，可以隐藏后端服务器的真实地址
+7. REDIRECT：是DNAT的一种特殊形式，将网络包转发到本地host上（不管IP头部指定的目标地址是啥），方便在本机做端口转发
+8. LOG：仅记录日志信息，然后将数据包传递给下一条规则
+9. RETURN：一般用于自定义链上，自定义链被内置链引用时，当没有规则被匹配时，返回内置链的下一条规则
+
+数据流向
+
+与本机内部进程通信：
+
+进入：–> PREROUTING –> INPUT
+出去：–> OUTPUT –> POSTROUTING
+
+由本机转发：
+
+请求：–>PREROUTING–>FORWARD–>POSTROUTING
+响应：–>PREROUTING–>FORWARD–>POSTROUTING
+
+[iptables 数据流向及相应的表链关系图](https://liu2lin600.github.io/2016/07/23/iptables简介及命令用法/iptables2.jpg)
+
+##### iptables命令用法
+
+iptables [-t table] COMMAND chain [num] [-m match [match-options]] [-j target [target-options]]
+
+查看
+
+iptables -L -n
+
+常用选项
+
+链管理
+
+-F：flush, 清空规则链，无法还原
+-N：new, 新建一条自定义链，被内建链上规则调用才能生效
+-X：delete, 删除引用计数为0的自定义空链
+-P：policy，设置默认策略，对filter表来讲，默认规则为ACCEPT或DROP
+-E：重命名引用计数为0的自定义链
+-Z：zero，计数器归零
+
+规则管理
+
+-A：Append，在尾后追加
+-I：Insert，在指定位插入规则，省略位置则为链首
+-D：Delete，删除指定规则
+-R：Replace，将指定规则替换为新规则
+
+显示
+
+-L：list，列出表中的链上的规则；
+-n：numeric，以数值格式显示；
+-v：verbose，显示详细格式信息，更详细-vv, -vvv
+-x：exactly，计数器的精确结果；
+--line-numbers：显示链中的规则编号
+
+```sh
+iptables -vnL               # 默认显示filter表规则，可指定表显示
+iptables -F -t filter       # 清空filter表中规则，不指定则清空所有表中的规则
+iptables -P INPUT DROP      # 设置INPUT链默认处理机制为DROP
+iptables -D INPUT 2         # 删除INPUT链上第2条规则
+iptables -N test_chain      # 添加自定义链test_chain，其只能被内置链接所引用
+iptables -X test_chain      # 删除引用计数为0的自定义空链
+iptables -I INPUT 2 xxxx    # 添加规则到INPUT上第2条
+iptables -A OUTPUT xxxx     # 在OUTPUT链尾添加
+```
+
+保存和重载规则
+
+使用iptables命令生成的规则在重启后将失效，所以可将规则保存至文件，重启时从文件中读取
+
+```sh
+iptables-save > /PATH/TO/SOME_RULE_FILE       # 将编写的规则保存到指定文件中
+iptables-restore < /PATH/FROM/SOME_RULE_FILE  # 从指定文件中恢复规则
+
+# centos6上也可使用如下命令
+service iptables save       # 自动保存规则至/etc/sysconfig/iptables文件中
+server iptables restore     # 从/etc/sysconfig/iptables文件中重载规则
+```
+
+规则优化:
+
+1. 可安全放行所有入站及出站，且状态为ESTABLISHED的连接
+2. 服务于同一类功能的规则，匹配条件严格的放前面，宽松放后面
+3. 服务于不同类功能的规则，匹配报文可能性较大扩前面，较小放后面
+4. 设置默认策略：
+   1. (a) 最后一条规则设定
+   2. (b) 默认策略设定
+
+iptables-save 输出的解释
+
+* -s 指明”匹配条件”中的”源地址”，即如果报文的源地址属于-s对应的地址，那么报文则满足匹配条件，-s为source之意，表示源地址。
+* -j 指明当”匹配条件”被满足时，所对应的动作，上例中指定的动作为DROP，在上例中，当报文的源地址为192.168.1.146时，报文则被DROP（丢弃）。
+* -m 模块关键字 调用显示匹配
+* -p 协议
+* -d 目标地址
+
+[iptables详解示例](https://www.cnblogs.com/sunsky303/p/12327863.html)
+
+```sh
+[root@worker01 docker]# iptables-save | grep backend
+-A KUBE-SEP-FJGLA3RP7W3WND5T -s 10.244.3.54/32 -m comment --comment "test/backend:backend" -j KUBE-MARK-MASQ
+-A KUBE-SEP-FJGLA3RP7W3WND5T -p tcp -m comment --comment "test/backend:backend" -m tcp -j DNAT --to-destination 10.244.3.54:28080
+-A KUBE-SERVICES -d 10.99.56.175/32 -p tcp -m comment --comment "test/backend:backend cluster IP" -m tcp --dport 80 -j KUBE-SVC-F7FBEKZZKTJ6WYRO
+-A KUBE-SVC-F7FBEKZZKTJ6WYRO ! -s 10.244.0.0/16 -d 10.99.56.175/32 -p tcp -m comment --comment "test/backend:backend cluster IP" -m tcp --dport 80 -j KUBE-MARK-MASQ
+-A KUBE-SVC-F7FBEKZZKTJ6WYRO -m comment --comment "test/backend:backend -> 10.244.3.54:28080" -j KUBE-SEP-FJGLA3RP7W3WND5T
+
+
+# iptables-save -t nat -c
+# 说明：-t 表示要dump的表(不指定的话dump所有表的配置)。-c 表示输出中显示每条规则当前报文计数。
+
+# Generated by iptables-save v1.4.21 on Tue Jan 15 15:42:32 2019
+--这是注释
+*nat
+-- 这表示下面这些是nat表中的配置
+:PREROUTING ACCEPT [5129516:445315174]
+-- :PREROUTING ACCEPT，表示nat表中的PREROUTING 链默认报文策略是接受（匹配不到规则继续） ，
+
+-- [5129516:445315174] 即[packet, bytes]，表示当前有5129516个包(445315174字节)经过nat表的PREROUTING 链
+:INPUT ACCEPT [942957:151143842]
+:OUTPUT ACCEPT [23898:3536261]
+:POSTROUTING ACCEPT [23898:3536261]
+-- 解释同上
+:DOCKER - [0:0]
+-- 解释同上（此条是自定义链）
+---------- 下面开始按条输出所有规则----------
+[4075:366986] -A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
+-- [4075:366986]即[packet, bytes]，表示经过此规则的包数，字节数。 后面部分则是用iptables命令配置此规则的命令（详解选项可参考iptables帮助）。
+[0:0] -A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
+[0:0] -A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+[2:188] -A POSTROUTING -s 192.168.122.0/24 -d 224.0.0.0/24 -j RETURN
+[0:0] -A POSTROUTING -s 192.168.122.0/24 -d 255.255.255.255/32 -j RETURN
+[0:0] -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p tcp -j MASQUERADE --to-ports 1024-65535
+[0:0] -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -p udp -j MASQUERADE --to-ports 1024-65535
+[0:0] -A POSTROUTING -s 192.168.122.0/24 ! -d 192.168.122.0/24 -j MASQUERADE
+[0:0] -A DOCKER -i docker0 -j RETURN
+--以上规则同第一条规则的解释
+COMMIT
+-- 应用上述配置
+# Completed on Tue Jan 15 15:42:32 2019
+```
+
 ### 排查案例
 
 解决主机不能访问虚拟机CentOS中的站点
@@ -198,9 +379,118 @@ echo "server ntp1.aliyun.com" | tee /etc/ntp.conf
 systemctl restart ntpd.service
 ```
 
+### 设置语言
+
+```sh
+# check what is the current language of your system
+cat /etc/locale.conf
+# or
+locale |grep -i lang
+
+# To check what locale are available on your system you can use “localectl” command with “list-locales” option.
+localectl list-locales |grep en_US.utf8
+
+# change the language
+localectl set-locale LANG=en_US.utf8
+# logout and login and you will see new locale is effective
+```
+
+### virtualbox windows 宿主机 CentOS 7 虚拟机 共享文件
+
+[VirtualBox虚拟机设置共享文件夹（CentOS） - Excel2016 - 博客园](https://www.cnblogs.com/skyvip/p/18151918)
+
+```sh
+# yum install -y perl gcc dkms kernel-devel kernel-headers make bzip2
+# yum -y install bzip2 xorg-x11-drivers xorg-x11-utils
+
+# 挂载virtualbox 的光盘 VBoxGuestAdditions.iso
+mkdir /mnt/cd
+sudo mount /dev/cdrom /mnt/cd
+cd /mnt/cd
+./VBoxLinuxAdditions.run
+
+# (⎈|qjca:kube-system)/mnt/cd sudo sh VBoxLinuxAdditions.run
+# Verifying archive integrity...  100%   MD5 checksums are OK. All good.
+# Uncompressing VirtualBox 7.0.12 Guest Additions for Linux  100%
+# VirtualBox Guest Additions installer
+# Removing installed version 7.0.12 of VirtualBox Guest Additions...
+# Copying additional installer modules ...
+# Installing additional modules ...
+# VirtualBox Guest Additions: Starting.
+# VirtualBox Guest Additions: Setting up modules
+# VirtualBox Guest Additions: Building the VirtualBox Guest Additions kernel
+# modules.  This may take a while.
+# VirtualBox Guest Additions: To build modules for other installed kernels, run
+# VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup <version>
+# VirtualBox Guest Additions: or
+# VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup all
+# VirtualBox Guest Additions: Kernel headers not found for target kernel
+# 3.10.0-1160.71.1.el7.x86_64. Please install them and execute
+#   /sbin/rcvboxadd setup
+# VirtualBox Guest Additions: reloading kernel modules and services
+# VirtualBox Guest Additions: unable to load vboxguest kernel module, see dmesg
+# VirtualBox Guest Additions: kernel modules and services were not reloaded
+# The log file /var/log/vboxadd-setup.log may contain further information.
+
+sudo yum install -y kernel-devel gcc
+sudo yum -y upgrade kernel kernel-devel
+
+uname -r                                               #查看内核版本
+sudo yum install -y kernel-devel-3.10.0-1160.71.1.el7.x86_64   #安装内核头文件
+/sbin/rcvboxadd setup                                  #运行 VirtualBox Guest Additions 的设置脚本
+
+# VirtualBox Guest Additions: Starting.
+# VirtualBox Guest Additions: Setting up modules
+# VirtualBox Guest Additions: Building the VirtualBox Guest Additions kernel
+# modules.  This may take a while.
+# VirtualBox Guest Additions: To build modules for other installed kernels, run
+# VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup <version>
+# VirtualBox Guest Additions: or
+# VirtualBox Guest Additions:   /sbin/rcvboxadd quicksetup all
+# VirtualBox Guest Additions: Building the modules for kernel
+# 3.10.0-1160.71.1.el7.x86_64.
+# VirtualBox Guest Additions: reloading kernel modules and services
+# VirtualBox Guest Additions: kernel modules and services 7.0.12 r159484 reloaded
+# VirtualBox Guest Additions: NOTE: you may still consider to re-login if some
+# user session specific services (Shared Clipboard, Drag and Drop, Seamless or
+# Guest Screen Resize) were not restarted automatically
+
+
+# 安装成功会提示 restart system，如果没有查看 /var/log/vboxadd-setup.log 的错误提示
+# 如果/var/log/vboxadd-setup.log里面的错误提示为：
+
+# Could not find the X.Org or XFree86 Window System, skipping.
+sudo yum install -y xorg-x11-server-Xorg
+
+# libXrandr.so.2: cannot open shared object file: No such file or directory
+sudo yum install -y libXrandr.x86_64
+
+
+# 添加共享文件夹
+# 在VirtualBox中打开“设置”，选择“共享文件夹”，点击添加。
+# Folder Path 是宿主机路径，Folder Name 是挂载时使用的名字 比如使用 share
+
+sudo mkdir /d
+sudo chown jasolar:jasolar /d
+sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) D_DRIVE /d
+sudo mkdir /e
+sudo chown jasolar:jasolar /e
+sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) E_DRIVE /e
+
+# 设置自动挂载
+#  -a 追加文件
+sudo tee -a /etc/rc.local <<EOF
+mount -t vboxsf -o uid=$UID,gid=$(id -g) D_DRIVE /d
+mount -t vboxsf -o uid=$UID,gid=$(id -g) E_DRIVE /e
+EOF
+chmod +x /etc/rc.local
+```
+
 ## Software
 
 ### yum
+
+[How to Setup Local HTTP Yum Repository on CentOS 7](https://www.tecmint.com/setup-local-http-yum-repository-on-centos-7/)
 
 ```bash
 yum remove git
@@ -212,6 +502,16 @@ yum provides git
 ```
 
 `yum install {package-name-1} {package-name-2}` install the specified packages [ RPM(s) ]
+`yum install --downloadonly --downloaddir=/root/docker docker-ce-24.0.6-1.el7.x86_64` download rpm package without install
+`rpm -ivh --replacefiles --replacepkgs /root/docker/*.rpm` install packages
+
+问题：yum命令Header V3 RSA/SHA1 Signature, key ID c105b9de: NOKEY
+原因：缺少公钥验证
+解决办法：1. 导入缺少的公钥  或者 2. 关掉gpg检查
+列出公钥 `rpm -q gpg-pubkey --qf '%{name}-%{version}-%{release} --> %{summary}\n'`
+导入公钥 `rpm --import /media/CentOS_6.4_Final/RPM-GPG-KEY-CentOS-6`
+关掉 GPG 检查 `echo gpgcheck=0 >> /etc/yum.conf`
+
 `yum localinstall foo.rpm` `yum https://server1.cyberciti.biz/foo.rpm` To install a package from a local file called foo.rpm or http, or ftp mirror:
 `yum downgrade {pkg}` downgrade a package to an earlier version
 `yum reinstall {pkg}` reinstall a package again
@@ -268,13 +568,16 @@ CentOS release files
 # Version,Release两项，当前服务器操作系统的版本就是：6.10
 ```
 
-### [阿里云CentOS 6 EOL如何切换源](https://help.aliyun.com/document_detail/193569.htm)
+### [CentOS 切换阿里云源](https://help.aliyun.com/document_detail/193569.htm)
 
 [CentOS 镜像](https://developer.aliyun.com/mirror/centos)
 
 ```bash
 mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+# CentOS 6 切换阿里云镜像源
 wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-6.repo
+# CentOS 7 切换阿里云镜像源
+curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo
 
 # 非阿里云ECS用户会出现 Couldn't resolve host 'mirrors.cloud.aliyuncs.com' 信息，不影响使用。用户也可自行修改相关配置: eg:
 sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo
@@ -325,6 +628,7 @@ yum install -y zsh
 chsh -s $(which zsh)
 chsh -s "$(command -v zsh)" "${USER}"
 # chsh -s /bin/zsh root
+# sudo vipw
 logout
 login
 sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
