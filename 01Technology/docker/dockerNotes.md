@@ -93,11 +93,31 @@ The default restart policy is no. For the created containers use docker update t
 `docker export <container-id>` 将 container 创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
 `docker import`
 
-#### build image with Dockerfile
+### docker network 命令
+
+```sh
+docker network ls  # 列出所有网络
+docker network inspect  # 查看网络详细信息
+docker network create --driver bridge --subnet 192.168.1.0/24 my_network  # 创建一个新网络
+docker network rm  # 删除一个或多个网络
+docker network connect my_network my_container # 将一个容器连接到一个网络
+docker network disconnect  my_network my_container # 将一个容器从一个网络断开
+docker network rm $(docker network ls --quiet)  # 清理网络
+```
+
+### 和系统交互
+
+拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`
+
+## build image with Dockerfile
+
+[Building best practices | Docker Docs](https://docs.docker.com/build/building/best-practices/)
+[docker buildx build | Docker Docs](https://docs.docker.com/reference/cli/docker/buildx/build/#push)
 
 `docker build -t imageName /path/to/DockerfileFolder -f /path/to/Dockerfile`
+`docker push ${image}:${imageTag}`
 
-[Dockerfile最佳实践](https://zhuanlan.zhihu.com/p/75013836)
+[Dockerfile 最佳实践](https://zhuanlan.zhihu.com/p/75013836)
 将标准日志与错误日志分别输出到stdout与stderr
 
 日志输出到标准输出与错误输出，方便查看与采集日志。参考 Nginx 的 dockerfile ：
@@ -106,34 +126,6 @@ The default restart policy is no. For the created containers use docker update t
 #forward request and error logs to docker log collector
 RUN ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log
-```
-
-### 和系统交互
-
-拷贝文件: `docker cp scala-2.10.6.tgz ubuntu-hadoop:/home/hadoop/`
-
-### Docker 中国官方镜像
-
-[Docker 镜像加速](https://www.runoob.com/docker/docker-mirror-acceleration.html)
-
-#### `docker pull registry.docker-cn.com/myname/myrepo:mytag`
-
-#### global setting
-
-`vi /etc/docker/daemon.json`
-{
-    "registry-mirrors": ["http://hub-mirror.c.163.com"]
-}
-
-`systemctl restart docker.service`
-
-`docker info | grep -A 2 Mirrors` 检查加速器是否生效
-
-``` html
-国内加速站点
-https://registry.docker-cn.com
-http://hub-mirror.c.163.com
-https://mirror.ccs.tencentyun.com
 ```
 
 ## Troubleshooting
@@ -218,7 +210,6 @@ docker run --detach \
 #### Dockerfile
 
 ``` bash
-
 FROM centos:7
 COPY . /data
 WORKDIR /data
@@ -301,36 +292,65 @@ sudo systemctl start docker
 sudo docker run hello-world
 ```
 
-### 配置镜像仓库
+### daemon.json configuration
 
-[Docker被封禁的离线镜像临时方案 tar 包上传- 掘金](https://juejin.cn/post/7381478389469839397)
-[DockerHub国内镜像源列表（2024年6月18日 亲测可用） - 软件分享 - LINUX DO](https://linux.do/t/topic/114516)
-[国内的 Docker Hub 镜像加速器，由国内教育机构与各大云服务商提供的镜像加速服务 | Dockerized 实践 https://github.com/y0ngb1n/dockerized · GitHub](https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6)
+`docker info` 查看信息
 
+使用DockerHub Proxy，以下以 registry.docker-cn.com 为例：可以根据列表自行替换
+`docker pull registry.docker-cn.com/library/mysql:5.7`
+说明：library是一个特殊的命名空间，它代表的是官方镜像。如果是某个用户的镜像就把library替换为镜像的用户名
+命令行下拉取仓库临时使用其他仓库
+`docker pull registry.docker-cn.com/myname/myrepo:mytag`
 
-为了加速镜像拉取，使用以下命令设置registry mirror
+`/etc/docker/daemon.json` 的配置项 available configuration options in the [dockerd reference docs](https://docs.docker.com/reference/cli/dockerd/#daemon-configuration-file)
+
+* `log-driver，log-opts`：配置日志 [Configure logging drivers | Docker Docs](https://docs.docker.com/engine/logging/configure/)
+* `registry-mirrors`：使用镜像仓库
+* `insecure-registries`: 设置允许使用 HTTP 协议的镜像仓库
+* `data-root`：修改docker镜像默认数据位置，default `/var/lib/docker` on Linux.
+* `bip`：The default Bridge IP defines the IP range that network interface docker0 can use 默认docker网络 172.17.0.0/16
+* `default-address-pools` User generated bridge networks, defines the IP range of network interface docker_gwbridge.
 
 ```sh
+# data-root default is /var/lib/docker
 sudo mkdir -p /etc/docker
+
 sudo tee /etc/docker/daemon.json <<EOF
 {
-    "registry-mirrors": [
-        "https://hub.uuuadc.top",
-        "https://docker.anyhub.us.kg",
-        "https://dockerhub.jobcher.com",
-        "https://dockerhub.icu",
-        "https://docker.ckyl.me",
-        "https://docker.awsl9527.cn"
-    ]
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "500m",
+    "max-file": "10",
+    "compress": "true"
+  },
+  "registry-mirrors": [
+      "https://hub.uuuadc.top",
+      "https://docker.anyhub.us.kg",
+      "https://dockerhub.jobcher.com",
+      "https://dockerhub.icu",
+      "https://docker.ckyl.me",
+      "https://docker.awsl9527.cn",
+      "https://ud6340vz.mirror.aliyuncs.com",
+      "https://ot2k4d59.mirror.aliyuncs.com/"
+  ],
+  "insecure-registries": [
+      "IP:PORT"
+  ],
+  "data-root":"/data/lib/docker",
+  "bip":"192.168.0.1/24",
+  "default-address-pools":[
+    {"base":"192.169.0.0/16","size":24},
+    {"base":"192.170.0.0/16","size":24}
+  ]
 }
 EOF
-sudo systemctl daemon-reload
+
+# 重启服务
+# sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
-使用DockerHub Proxy，以下以 hub.uuuadc.top 为例：可以根据列表自行替换
-docker pull hub.uuuadc.top/library/mysql:5.7
-说明：library是一个特殊的命名空间，它代表的是官方镜像。如果是某个用户的镜像就把library替换为镜像的用户名
+`docker info | grep -A 2 Mirrors` 检查加速器是否生效
 
 ### Configure logging drivers
 
@@ -356,3 +376,61 @@ docker pull hub.uuuadc.top/library/mysql:5.7
 [How to setup log rotation for a Docker container](https://www.freecodecamp.org/news/how-to-setup-log-rotation-for-a-docker-container-a508093912b2/)
 如果不配置
 By default, the stdout and stderr of the container are written in a JSON file located in /var/lib/docker/containers/[container-id]/[container-id]-json.log
+
+### 迁移数据目录 /var/lib/docker
+
+systemctl stop docker.service
+systemctl stop docker.socket
+
+rsync -avzP /var/lib/docker  /data/lib/
+
+### Habor 镜像仓库
+
+docker login http://IP:PORT -u username -p "password"
+docker push ${image}:${imageTag}
+
+### 镜像加速
+
+[Docker 镜像加速](https://www.runoob.com/docker/docker-mirror-acceleration.html)
+[Docker被封禁的离线镜像临时方案 tar 包上传- 掘金](https://juejin.cn/post/7381478389469839397)
+[DockerHub国内镜像源列表（2024年6月18日 亲测可用） - 软件分享 - LINUX DO](https://linux.do/t/topic/114516)
+[国内的 Docker Hub 镜像加速器，由国内教育机构与各大云服务商提供的镜像加速服务 | Dockerized 实践 https://github.com/y0ngb1n/dockerized · GitHub](https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6)
+
+[公开镜像加速 - DaoCloud Enterprise](https://docs.daocloud.io/community/mirror.html)
+很多镜像都在国外，比如 gcr。国内下载很慢，需要加速。 DaoCloud 为此提供了国内镜像加速，便于从国内拉取这些镜像。
+
+使用方法 增加前缀（推荐）：k8s.gcr.io/coredns/coredns => m.daocloud.io/k8s.gcr.io/coredns/coredns
+
+## containerd 命令
+
+ctr 是 containerd 的一个客户端工具。
+crictl 是 CRI 兼容的容器运行时命令行接口，可以使用它来检查和调试 k8s 节点上的容器运行时和应用程序。
+`ctr -v` 输出的是 containerd 的版本，`crictl -v` 输出的是当前 k8s 的版本，从结果显而易见你可以认为 crictl 是用于 k8s 的。
+
+```sh
+# Save the Image as a Tar File
+ctr image export dashboard.tar dashboard
+ctr -n=k8s.io image export dashboard.tar dashboard
+
+# 使用ctr导入镜像
+ctr image import dashboard.tar
+
+# ctr是containerd自带的工具，有命名空间的概念，若是k8s相关的镜像，都默认在k8s.io这个命名空间，所以导入镜像时需要指定命令空间为 k8s.io
+# 使用ctr命令指定命名空间导入镜像
+ctr -n=k8s.io image import dashboard.tar
+
+#查询镜像
+ctr -n=k8s.io images ls
+crictl images
+
+# pull image
+# kubeadm config images list --kubernetes-version=v1.15.2
+ctr image pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
+crictl pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
+
+# 创建 k8s.io 命名空间
+ctr ns create k8s.io
+
+# 查看命名空间
+ctr ns ls
+```
