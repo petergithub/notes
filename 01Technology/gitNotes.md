@@ -53,9 +53,6 @@ Scope must be noun and it represents the section of the section of the codebase
 Final release version
 `git merge --no-ff <branchName>`    使得合并操作总是产生一次新的提交
 `git merge --squash <branchName>`    把branchName上所有提交合并为一次提交到当前分支上再commit
-`git tag <tagName> -m "comment"`
-`git push origin --tags`    一次性推送很多标签
-`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
 
 `git show <commit-id>` show difference for a commit
 `git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
@@ -96,13 +93,43 @@ done
 
 #### tag
 
-`git tag -m "comment" <tagName>`
+`git tag <tagName> -m "comment"`
 `git tag -a <tagName> <commit-id>`
-`git show <tagName>`    查看相应标签的版本信息，并连同显示打标签时的提交对象
-`git push origin --tags`    一次性推送很多标签
-`git checkout -b <branchName> <tagName>`
 `git tag -d <tagname>`    刪除Tag
+`git show <tagName>`    查看相应标签的版本信息，并连同显示打标签时的提交对象
+`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
+
+`git checkout -b <branchName> <tagName>`
+
+`git push origin tagName`
+`git push origin --tags`: 推送refs/tags/* 一次性推送很多标签
 `git push origin :refs/tags/<tagName>`    刪除Tag from remote Git repositories
+
+Remove local git tags that are no longer on the remote repository
+    `git fetch --prune --prune-tags`
+    `git fetch --prune origin "+refs/tags/*:refs/tags/*"`
+
+通过 tagopt 配置若依仓库不拉取tag，本地仓库拉取tag，
+通过 prune 和 pruneTags 随时更新删除掉的tag
+
+```sh
+# 通过 tagopt 配置若依仓库不拉取tag，本地仓库拉取tag，
+# 通过 prune 和 pruneTags 随时更新删除掉的tag
+$cat .git/config
+[remote "ry"]
+        url = git@gitee.com:y_project/RuoYi-Vue.git
+        fetch = +refs/heads/*:refs/remotes/ry/*
+        tagopt = --no-tags
+[remote "origin"]
+        url = ssh://git@gitlab.com/RuoYi-Backend.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
+        tagopt = --tags
+        prune = true
+        pruneTags = true
+[branch "master"]
+        remote = origin
+        merge = refs/heads/master
+```
 
 ### Basic commands
 
@@ -147,8 +174,6 @@ Do the merge, and then pull the stash:
 `git push origin global:global`
 `git push --set-upstream origin develop1.0`
 
-`git push origin tagName`
-`git push origin --tags`: 推送refs/tags/*
 `git push -u origin master` 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
 
 `git pull <远程主机名> <远程分支名>:<本地分支名>`
@@ -410,8 +435,11 @@ git checkout -b split-plugin
 git filter-branch --subdirectory-filter lib/plugins/myown
 ```
 
-
 ## Git configuration
+
+Show config and its origin
+`git config --show-origin user.email`
+`git config --show-origin user.name`
 
 Show all config and its origin: `git config --list --show-origin`
 
