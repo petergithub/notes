@@ -16,7 +16,7 @@
 `$upstream_response_time` 格式会变成2部分 xxxx, xxxx ，可能是什么原因？被拆分的字段代表什么含义？
 这是 `ngx_http_upstream` 的 fail-over 机制在起作用。当 nginx
 尝试了第一个后端节点出现错误时（比如超时），它会自动尝试同一个 upstream {}
-分组中的下一个节点。每个节点的访问时间会以逗号分隔。所以尝试了两个节点便是“xxxx, xxxx”。
+分组中的下一个节点。每个节点的访问时间会以逗号分隔。所以尝试了两个节点便是"xxxx, xxxx"。
 使用$request_body即可打出post的数据
 nginx的limit_conn模块，用来限制瞬时并发连接数
 
@@ -37,7 +37,7 @@ invalid POST format id:13
 
 [nginx documentation](http://nginx.org/en/docs )
 
-NGINX (发音为 “engine X”)
+NGINX (发音为 "engine X")
 cd /data/softwares/tengine-2.1/
 `sudo /usr/local/nginx/sbin/nginx -c /path/to/nginx/conf/nginx.conf` start nginx
 `./sbin/nginx -s <signal>`
@@ -194,6 +194,30 @@ location / {
     rewrite  ^/test.php   /new?id=$arg_id?  permanent;    //重定向后带指定的参数
 ```
 
+## 静态页面 root vs. alias
+
+[Nginx -- static file serving confusion with root & alias - Stack Overflow](https://stackoverflow.com/questions/10631933/nginx-static-file-serving-confusion-with-root-alias)
+
+1. `root` the location part is appended to root part, `final path = root + location`
+2. `alias` the last location part is replaced by the alias part `final path = alias`
+
+示例
+
+```sh
+# 最终路径是 /var/www/app/static/static
+location /static/ {
+    root /var/www/app/static/;
+    autoindex off;
+}
+
+# 最终路径是 /var/www/app/static
+# trailing slash in alias，末尾要加上 /
+location /static/ {
+    alias /var/www/app/static/;
+    autoindex off;
+}
+```
+
 ## Sample
 
 ### SSL双向认证
@@ -231,30 +255,30 @@ Context:     location, if in location, limit_except
 
 ```
 
-Sets the protocol and address of a proxied server and an optional URI to which a location should be mapped. As a protocol, “http” or “https” can be specified. The address can be specified as a domain name or IP address, and an optional port:
+Sets the protocol and address of a proxied server and an optional URI to which a location should be mapped. As a protocol, "http" or "https" can be specified. The address can be specified as a domain name or IP address, and an optional port:
     `proxy_pass http://localhost:8000/uri/;`
 
-or as a UNIX-domain socket path specified after the word “unix” and enclosed in colons:
+or as a UNIX-domain socket path specified after the word "unix" and enclosed in colons:
     `proxy_pass http://unix:/tmp/backend.socket:/uri/;`
 
 If a domain name resolves to several addresses, all of them will be used in a round-robin fashion. In addition, an address can be specified as a server group.
 
 A request URI is passed to the server as follows:
 
-- If the proxy_pass directive is specified **with a URI**, then when a request is passed to the server, the part of a normalized request URI   matching the location is replaced by a URI specified in the directive:
+- If the proxy_pass directive is specified **with a URI**, then when a request is passed to the server, the part of a normalized request URI matching the location is replaced by a URI specified in the directive:
 
 ``` shell
-        location /name/ {
-            proxy_pass http://127.0.0.1/remote/;
-        }
+location /name/ {
+    proxy_pass http://127.0.0.1/remote/;
+}
 ```
 
 - If proxy_pass is specified **without a URI**, the request URI is passed to the server in the same form as sent by a client when the original request is processed, or the full normalized request URI is passed when processing the changed URI:
 
 ``` shell
-        location /some/path/ {
-            proxy_pass http://127.0.0.1;
-        }
+location /some/path/ {
+    proxy_pass http://127.0.0.1;
+}
 ```
 
 ### Sample 1 NginX trailing slash in proxy pass url
@@ -278,12 +302,12 @@ if one go to address [URL1](http://yourserver.com/one/path/here?param=1) nginx w
 #### Both of location and proxy_pass end with slash
 
 ``` shell
-        location /webProject/ {
- 49              proxy_pass   http://localhost:3000/;
- 54         }
+location /webProject/ {
+    proxy_pass   http://localhost:3000/;
+}
 ```
 
-Nginx log:
+Nginx log of user request:
 
 ``` log
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/ HTTP/1.1" 302 114 "-"
@@ -291,7 +315,7 @@ Nginx log:
 [16/Oct/2015:11:30:17 +0800] "GET /webProject/css/jquery-ui.min.css HTTP/1.1" 304 0 "http://localhost/webProject/login?rurl=%2F"
 ```
 
-Node log:
+NodeJS log after nginx proxy request:
 
 ``` log
 GET /
@@ -299,39 +323,15 @@ GET /login?rurl=%2F
 GET /css/jquery-ui.min.css
 ```
 
-#### location ends with slash and proxy_pass not
+#### location not and proxy_pass ends with slash
 
 ``` shell
-        location /webProject/ {
- 49              proxy_pass   http://localhost:3000;
- 54         }
+location /webProject {
+    proxy_pass   http://localhost:3000/;
+}
 ```
 
-Nginx log:
-
-``` log
-[16/Oct/2015:11:36:49 +0800] "GET /webProject/ HTTP/1.1" 302 146 "-"
-[16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2F HTTP/1.1" 302 222 "-"
-[16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F HTTP/1.1" 302 314 "-"
-```
-
-Node log:
-
-``` log
-GET /webProject/
-GET /webProject/login?rurl=%2FsettlementWeb%2F
-GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F
-```
-
-#### proxy_pass ends with slash and location not
-
-``` shell
-        location /webProject {
- 49              proxy_pass   http://localhost:3000/;
- 54         }
-```
-
-Nginx log:
+Nginx log of user request:
 
 ``` log
 [16/Oct/2015:11:42:07 +0800] "GET /webProject/ HTTP/1.1" 302 120 "-"
@@ -339,7 +339,7 @@ Nginx log:
 [16/Oct/2015:11:42:07 +0800] "GET /webProject/login?rurl=%2F%2Flogin%3Frurl%3D%252F%252F HTTP/1.1" 302 236 "-"
 ```
 
-Node log:
+NodeJS log after nginx proxy request:
 
 ``` log
 GET //
@@ -347,15 +347,39 @@ GET //login?rurl=%2F%2F
 GET //login?rurl=%2F%2Flogin%3Frurl%3D%252F%252F
 ```
 
+#### location ends with slash and proxy_pass not
+
+``` shell
+location /webProject/ {
+    proxy_pass   http://localhost:3000;
+}
+```
+
+Nginx log of user request:
+
+```log
+[16/Oct/2015:11:36:49 +0800] "GET /webProject/ HTTP/1.1" 302 146 "-"
+[16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2F HTTP/1.1" 302 222 "-"
+[16/Oct/2015:11:36:49 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F HTTP/1.1" 302 314 "-"
+```
+
+NodeJS log after nginx proxy request:
+
+```log
+GET /webProject/
+GET /webProject/login?rurl=%2FsettlementWeb%2F
+GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F
+```
+
 #### None of location and proxy_pass ends with slash
 
 ``` shell
-         location /webProject {
- 49              proxy_pass   http://localhost:3000;
- 54         }
+location /webProject {
+    proxy_pass   http://localhost:3000;
+}
 ```
 
-Nginx log:
+Nginx log of user request:
 
 ``` log
 [16/Oct/2015:11:45:18 +0800] "GET /webProject/ HTTP/1.1" 302 146 "-"
@@ -363,7 +387,7 @@ Nginx log:
 [16/Oct/2015:11:45:18 +0800] "GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%252F HTTP/1.1" 302 314 "-"
 ```
 
-Node log:
+NodeJS log after nginx proxy request:
 
 ``` log
 GET /webProject/
@@ -484,8 +508,8 @@ http {
 location /api/ {
     proxy_set_header Host 'app-h5.dev.picooc.cn';
 
-    # rewrite “^/api/(.*)$” /$1 break，路径重写：
-    # “^/api/(.*)$”：匹配路径的正则表达式，用了分组语法，把/api/以后的所有部分当做1组
+    # rewrite "^/api/(.*)$" /$1 break，路径重写：
+    # "^/api/(.*)$"：匹配路径的正则表达式，用了分组语法，把/api/以后的所有部分当做1组
     # /$1：重写的目标路径，这里用$1引用前面正则表达式匹配到的分组（组编号从1开始），即/api/后面的所有。这样新的路径就是除去/api/以外的所有，就达到了去除/api前缀的目的
     # break：指令，常用的有2个，分别是：last、break
     # last：重写路径结束后，将得到的路径重新进行一次路径匹配
