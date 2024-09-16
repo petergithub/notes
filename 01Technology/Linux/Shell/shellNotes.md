@@ -101,6 +101,19 @@ echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一�
 echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
 echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
 
+(work ✗) str="www.runoob.com/linux/linux-shell-variable.html"
+(work ✗) echo "str    : ${str}"
+str    : www.runoob.com/linux/linux-shell-variable.html
+(work ✗) echo "str#*/    : ${str#*/}"   # 从 字符串开头 删除到 左数第一个'/'
+str#*/    : linux/linux-shell-variable.html
+(work ✗) echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一个'/'
+str##*/    : linux-shell-variable.html
+(work ✗) echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
+str%/*    : www.runoob.com/linux
+(work ✗) echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
+str%%/*    : www.runoob.com
+(work ✗)
+
 ```
 
 #### 字符串拼接
@@ -228,6 +241,11 @@ fi
 
 ### 其他
 
+```sh
+# 换行符 new line, return, carriage
+echo -e "\n\nCheck permission"
+```
+
 #### [`set`](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html)
 
 执行时传入 `bash -euxo pipefail script.sh` 或者`set -euxo pipefail` 放在脚本开头
@@ -342,17 +360,19 @@ for e ($for_elements); do
 done
 
 # Looping over Arrays
-
 users=(John Harry Jake Scott Philis)
-for u in "${users[@]}"
-do
+for u in "${users[@]}"; do
     echo "$u is a registered user"
+done
+
+IPS="10.0.0.7 10.0.0.8"
+for host in ${IPS}; do
+    echo $host
 done
 ```
 
 ``` bash
-for x in one two three four
-do
+for x in one two three four; do
     echo number $x
 done
 
@@ -362,8 +382,7 @@ number two
 number three
 number four
 
-for myfile in /etc/r*
-do
+for myfile in /etc/r*; do
     if [ -d "$myfile" ]
     then
         echo "$myfile (dir)"
@@ -372,8 +391,7 @@ do
     fi
 done
 
-for((i=0;i<3;i++))
-do
+for((i=0;i<3;i++)); do
     echo $i
 done
 ```
@@ -381,10 +399,9 @@ done
 ### while
 
 ``` bash
-
-    while [ -n "$binnum" ]; do
-    　　...
-    done
+while [ -n "$binnum" ]; do
+　　...
+done
 ```
 
 ### if/else流程控制
