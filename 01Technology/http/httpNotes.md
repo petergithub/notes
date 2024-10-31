@@ -88,6 +88,8 @@ CloudFlare宣布，开始提供Keyless服务，即你把网站放到它们的CDN
 
 Author: Mihan 凹凸实验室 [Nginx 配置 HTTPS 服务器](https://mp.weixin.qq.com/s?__biz=MzIxMzExMjYwOQ==&mid=2651890628&idx=1&sn=ef48f59b49fede80813ac1f53dee22e2&scene=23&srcid=0823lFKQB1MdUfoGjf5h1cCk#rd)
 
+#### 配置 HTTPS
+
 要开启 HTTPS 服务，在配置文件信息块(server block)，必须使用监听命令 listen 的 ssl 参数和定义服务器证书文件和私钥文件，如下所示
 
 ```bash
@@ -120,7 +122,9 @@ SSL 的运行计算需要消耗额外的 CPU 资源，一般多核处理器系�
 
 ### 使用 HSTS 策略强制浏览器使用 HTTPS 连接
 
-HSTS -- HTTP Strict Transport Security，HTTP严格传输安全。它允许一个 HTTPS 网站要求浏览器总是通过 HTTPS 来访问，这使得攻击者在用戶与服务器通讯过程中拦截、篡改信息以及冒充身份变得更为困难. 只要在 Nginx 配置文件加上以下头信息就可以了
+HSTS -- HTTP Strict Transport Security，HTTP严格传输安全。它允许一个 HTTPS 网站要求浏览器总是通过 HTTPS 来访问，这使得攻击者在用戶与服务器通讯过程中拦截、篡改信息以及冒充身份变得更为困难.
+
+要在 Nginx 配置文件加上以下头信息就可以了
 
 ``` nginx
 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preload" always;
@@ -132,6 +136,9 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preloa
 * `always`: 可选，保证所有响应都发送此响应头，包括各种內置错误响应
 
 浏览器在获取该响应头后，在 max-age 的时间内，如果遇到 HTTP 连接，就会通过 307 跳转強制使用 HTTPS 进行连接，并忽略其它的跳转设置（如 301 重定向跳转）
+
+浏览器禁用hsts：chrome://net-internals/#hsts
+[Clear the HSTS Settings](https://kb.teramind.co/en/articles/9399979-how-to-clear-the-hsts-settings)
 
 ## PEM, DER, CRT, and CER
 
