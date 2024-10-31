@@ -54,8 +54,11 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   * [Codeium · Free AI Code Completion & Chat](https://codeium.com/faq)
   * [通义灵码_智能编码助手 阿里云](https://tongyi.aliyun.com/lingma/download)
   * 百度 Comate 2.0代码助手 [Baidu Comate · Coding mate](https://comate.baidu.com/)
+  * [yetone/avante.nvim: Use your Neovim like using Cursor AI IDE!](https://github.com/yetone/avante.nvim)
 * 把真人变成虚拟人的是Meta human，想更简单变虚拟人的是Ready player me；
-* PPT: chatgpt生成的markdown语法内容导入[MindShow](https://www.mindshow.fun/#/home)
+* PPT:
+  * chatgpt生成的markdown语法内容导入[MindShow](https://www.mindshow.fun/#/home)
+  * [AI PPT Maker - Best Online Free (No Sign up)](https://aipptmaker.ai/en)
 * 第三方社群，civitai
 * 数学 [MathGPT 学而思](https://www.mathgpt.com/)
 * 医疗问题回答[MediSearch](https://medisearch.io/zh)
@@ -209,6 +212,8 @@ docker run --detach \
 [Maximizing the Potential of LLMs: A Guide to Prompt Engineering](https://www.ruxu.dev/articles/ai/maximizing-the-potential-of-llms/)
 
 [f/awesome-chatgpt-prompts: This repo includes ChatGPT prompt curation to use ChatGPT better.](https://github.com/f/awesome-chatgpt-prompts)
+
+[提示词技巧](https://mp.weixin.qq.com/s/eqIqbbyqlgkCU78SKuZCMw)
 
 ### [Learn Prompting](https://learnprompting.org/zh-Hans/docs/intro)
 
