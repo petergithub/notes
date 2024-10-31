@@ -299,6 +299,17 @@ if one go to address [URL1](http://yourserver.com/one/path/here?param=1) nginx w
 
 [URL](http://localhost/webProject)
 
+|                                                                          | location | proxy_pass | User Request                      | requst after proxy                     |
+|--------------------------------------------------------------------------|----------|------------|-----------------------------------|----------------------------------------|
+| 1                                                                        | /        | /          | http://localhost/webProject/      | http://localhost:3000/                 |
+| location /webProject/ {<br>    proxy_pass   http://localhost:3000/;<br>} |          |            | http://localhost/webProject/login | http://localhost:3000/login            |
+| 2                                                                        | NA       | /          | http://localhost/webProject/      | http://localhost:3000//                |
+| location /webProject {<br>    proxy_pass   http://localhost:3000/;<br>}  |          |            | http://localhost/webProject/login | http://localhost:3000//login           |
+| 3                                                                        | /        | NA         | http://localhost/webProject/      | http://localhost:3000/webProject/      |
+| location /webProject/ {<br>    proxy_pass   http://localhost:3000;<br>}  |          |            | http://localhost/webProject/login | http://localhost:3000/webProject/login |
+| 4                                                                        | NA       | NA         | http://localhost/webProject/      | http://localhost:3000/webProject/      |
+| location /webProject {<br>    proxy_pass   http://localhost:3000;<br>}   |          |            | http://localhost/webProject/login | http://localhost:3000/webProject/login |
+
 #### Both of location and proxy_pass end with slash
 
 ``` shell
