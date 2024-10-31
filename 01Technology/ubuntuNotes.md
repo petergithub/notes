@@ -261,7 +261,7 @@ MANPATH_MAP /home/pu/opt/OracleDeveloperStudio12.6-linux-x86-bin/developerstudio
 
 [macos - When pasting in Terminal.app, `00~` is pasted at the start and `01~` at the end - Ask Different](https://apple.stackexchange.com/questions/446859/when-pasting-in-terminal-app-00-is-pasted-at-the-start-and-01-at-the-end)
 
-Short answer: Run the command printf '\e[?2004l'. This sends an escape sequence to the terminal that tells it to stop sending bracketed paste sequences.
+Short answer: Run the command `printf '\e[?2004l'`. This sends an escape sequence to the terminal that tells it to stop sending bracketed paste sequences.
 
 or `reset`
 
@@ -445,8 +445,19 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `:wqa` (write, then quit all)
 `:qa!` (force to quit all)
 
+```sh
 在两个文件之间来回跳转 `CTRL+w, w`
 跳转到下一个差异点 `]c`. 反向跳转是: `[c`
+# 设置对比色彩模板 如 evening, darkblue.vim, torte.vim
+# 查看所有模板 ls /usr/share/vim/vim74/colors/
+:colorscheme
+
+# vi ~/.vimrc
+if &diff
+    colorscheme evening
+endif
+
+```
 
 `CTRL+w K`(把当前窗口移到最上边)
 `CTRL+w H`(把当前窗口移到最左边)
@@ -2735,6 +2746,8 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
 ##### ip route 配置静态路由
 
 ```sh
+ip addr show enp0s3
+
 ip route add [network/prefix] via [gateway] dev [interface]
 # 其中，network/prefix 指目标网络和掩码位数，即网络前缀长度，via 指路由数据包的下一跳网关的IP地址，dev interface 指数据包从哪个网络接口出去。如果只想查看路由表，则不需要在命令中添加 add 参数，而是直接输入 ip route
 
@@ -3324,6 +3337,29 @@ configure sudo to never ask for your password. add the following line: `username
 `id <username>`    get the user
 `id -nG <username>`    Find out user group identity
 `less /etc/group` or `groups`    Get all groups in system
+
+#### visudo
+
+授权规则格式：用户 登入主机=(代表用户) 命令
+示例：
+
+root ALL=(ALL) ALL
+
+格式说明：
+
+user: 运行命令者的身份 以%开头的是组
+host: 通过哪些主机
+(runas)：以哪个用户的身份
+command: 运行哪些命令
+
+指定命令 student ALL=(root) /sbin/pidof,/sbin/ifconfig
+
+```sh
+# 允许用户 postgres 不需要密码执行 sudo systemctl restart postgresql 命令
+postgres ALL=(ALL)NOPASSWD: /bin/systemctl start postgresql
+postgres ALL=(ALL)NOPASSWD: /bin/systemctl stop postgresql
+postgres ALL=(ALL)NOPASSWD: /bin/systemctl restart postgresql
+```
 
 ### update hostname
 
