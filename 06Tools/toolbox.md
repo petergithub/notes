@@ -26,6 +26,10 @@ lzop: lzo file
 jd-gui: jad decompile
 mkcert is a simple tool for making locally-trusted development certificates. https://localhost
 
+## windows remember list
+
+[Great Image and File Content Search Freeware](https://anytxt.net/) Searcher A Desktop Search Tool with A Powerful Full-Text Search Engine
+
 ## Application Usage
 
 ### tig
