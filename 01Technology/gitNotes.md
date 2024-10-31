@@ -62,6 +62,10 @@ Final release version
 `git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
 `git log --name-only` show changed file name only
 `git log --follow [file]`    显示某个文件的版本历史，包括文件改名
+`git log --all --full-history -- filename`  find a deleted file in commit history
+`git log --all --full-history -- "**/thefile.*"` find a deleted file in commit history if you do not know the exact path you may use
+`git checkout <SHA>^ -- <path-to-file>`  restore it into your working copy
+
 `git whatchanged [file]`    显示某个文件的版本历史，包括文件改名
 `git blame [file]`    显示指定文件是什么人在什么时间修改过
 `git commit -v`
