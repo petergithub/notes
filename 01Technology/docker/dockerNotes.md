@@ -31,6 +31,7 @@ connect from a container to a service on the host: connect to the special DNS na
 * `--rm` 在容器终止运行后自动删除容器文件
 * `-v, --volume "/path/to/host/machine:/path/to/container`
 * `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
+* `--user $(id -u):$(id -g)` use the current user's UID and GID.
 
 `docker logs -f containerID`
 
@@ -49,6 +50,19 @@ connect from a container to a service on the host: connect to the special DNS na
 * `-a, --all` Show all containers (default shows just running)
 * `-n, --last int` Show n last created containers (includes all states) (default -1)
 * `-l, --latest` Show the latest created container (includes all states)
+
+设置容器时间，需要挂载/usr/share/zoneinfo 因为/etc/localtime 一般是软连接
+
+```sh
+# 设置 TZ=Asia/Shanghai 和 挂载 /etc/localtime
+  --env TZ=Asia/Shanghai \
+  --volume /etc/localtime:/usr/share/zoneinfo/Asia/Shanghai:ro \
+
+# 或者
+  --env TZ=Asia/Shanghai \
+  --volume /usr/share/zoneinfo:/usr/share/zoneinfo:ro \
+  --volume /etc/localtime:/etc/localtime:ro \
+```
 
 #### Docker management
 
