@@ -21,6 +21,11 @@ kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSe
 
 kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
 
+```sh
+# get pod image
+kubectl get deployment -o json ems-backend -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}'
+```
+
 ## Concept
 
 OCI: Open Container Initiative
@@ -41,14 +46,20 @@ get all pods along with cpu and memory requirements in kubernetes `kubectl get p
 
 ### Common
 
-`k logs -f --tail=10 pod-name`
+`kubectl logs -f --tail=10 pod-name`
   `-o custom-columns` option an
   `--sort-by=<jsonpath_exp>` sort the resource list, `--sort-by=.metadata.name`
 [Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
 
-`kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers`
 [JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
 `kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
+
+```sh
+# get name cpu
+kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
+# get the pod's IP address
+kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
+```
 
 ### Debug
 
@@ -77,6 +88,8 @@ go-template `kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{
 `kubectl explain pod` kubectl explain to discover possible API object fields
 `kubectl explain pod.spec` drill deeper to find out more about each attribute
 `kubectl api-resources` Print the supported API resources on the server
+
+`kubectl --kubeconfig=/path/to/cluster-admin.config --namespace monitoring get pod`
 
 `kubectl cluster-info` Displaying cluster information
 `kubectl get nodes/pods/secrets/services/deployment`
@@ -115,6 +128,7 @@ accessing your service through its external ip `curl 104.155.74.57:8080`
 
 `kubectl create -f FILE_NAME.yaml` command is used for creating any resource (not only pods) from a YAML or JSON file.
 `kubectl apply -f FILE_NAME.yaml` 更新
+`kubectl apply -f FOLDER` 更新
 `kubectl edit deploy piggy-mongo` open the YAML definition in your default text editor 修改
 `kubectl patch svc nodeport -p '{"spec":{"externalTrafficPolicy":"Local"}}'` 添加
 
@@ -125,7 +139,13 @@ accessing your service through its external ip `curl 104.155.74.57:8080`
 
 `kubectl exec -it <pod name> -- /bin/sh`  进入pod内部
 `kubectl exec -it [POD_NAME] -c [CONTAINER_NAME] -- /bin/sh -c "kill 1"` restart the specific container
-`kubectl port-forward pod-name 8888:8080` forwarding a local network port 8888 to a port 8080 in the pod
+
+```sh
+# forwarding a local network port 8888 to a port 8080 in the pod
+kubectl port-forward pod-name 8888:8080
+# make this port listen to 0.0.0.0
+kubectl port-forward --address 0.0.0.0 svc/[service-name] -n [namespace] [external-port]:[internal-port]
+```
 
 `k top node` node 资源使用情况
 `k top pod` pod 资源使用情况
@@ -147,6 +167,36 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 `kubectl get pvc` volume claim
 
 `kubectl patch pvc test-pvc -p '{"spec":{"resources":{"requests":{"storage":"50Gi"}}}}'` resize pvc
+
+```json
+{
+    "apiVersion": "v1",
+    "kind": "PersistentVolumeClaim",
+    "metadata": {
+        "annotations": {
+            "pv.kubernetes.io/bind-completed": "yes",
+            "pv.kubernetes.io/bound-by-controller": "yes",
+            "volume.beta.kubernetes.io/storage-provisioner": "cluster.local/nfs-subdir-external-provisioner",
+            "volume.kubernetes.io/storage-provisioner": "cluster.local/nfs-subdir-external-provisioner"
+        },
+        "name": "pvc-test",
+        "namespace": "default"
+    },
+    "spec": {
+        "accessModes": [
+            "ReadWriteOnce"
+        ],
+        "resources": {
+            "requests": {
+                "storage": "1Mi"
+            }
+        },
+        "storageClassName": "nfs-client",
+        "volumeMode": "Filesystem",
+        "volumeName": "pvc-f10cff78-eac8-4e4a-9de3-1b82ec7446f2"
+    }
+}
+```
 
 ### Pod
 
@@ -175,13 +225,24 @@ nodeSelector:
 
 ### Deployment
 
-`kubectl rollout history deployment deployment-name` deployment 历史记录
-`kubectl set image deployment kubia nodejs=luksa/kubia:v3` Changes the container image defined in a Pod
-`kubectl rollout status deployment kubia` the progress of the rollout
-`kubectl rollout history deployment kubia` displaying a deployment’s rollout history
-`kubectl rollout undo deployment kubia` undoing a rollout
-`kubectl rollout undo deployment kubia --to-revision=1`
-`kubectl rollout history deployment/<Deployment-name>  --revision=<revision-number>  -o yaml`
+```sh
+# [kubectl rollout restart | Kubernetes](https://kubernetes.io/docs/reference/kubectl/generated/kubectl_rollout/)
+
+# Restart a deployment
+kubectl rollout restart deployment/nginx
+# deployment 历史记录
+kubectl rollout history deployment deployment-name
+# Changes the container image defined in a Pod
+kubectl set image deployment kubia nodejs=luksa/kubia:v3
+# the progress of the rollout
+kubectl rollout status deployment kubia
+# displaying a deployment’s rollout history
+kubectl rollout history deployment kubia
+# undoing a rollout
+kubectl rollout undo deployment kubia
+kubectl rollout undo deployment kubia --to-revision=1
+kubectl rollout history deployment/<Deployment-name>  --revision=<revision-number>  -o yaml
+```
 
 deployment strategies:
 
@@ -240,6 +301,37 @@ deployment strategies:
     # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#configuration-snippet
     nginx.ingress.kubernetes.io/configuration-snippet: |
         client_body_buffer_size 21m;
+
+    # 为Nginx Ingress配置HTTPS协议的后端服务，默认是HTTP，如果后端服务混合两种协议，可以配置多个相同域名的 Ingress
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-protocol
+    nginx.ingress.kubernetes.io/backend-protocol:  "HTTPS"
+
+```
+
+设置默认的 ingressclass
+`kubectl -n ingress-nginx patch ingressclass nginx -p '{"metadata":{"annotations":{"ingressclass.kubernetes.io/is-default-class":"true"}}}'`
+
+```json
+{
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "IngressClass",
+    "metadata": {
+        "annotations": {
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"networking.k8s.io/v1\",\"kind\":\"IngressClass\",\"metadata\":{\"annotations\":{},\"labels\":{\"app.kubernetes.io/component\":\"controller\",\"app.kubernetes.io/instance\":\"ingress-nginx\",\"app.kubernetes.io/name\":\"ingress-nginx\",\"app.kubernetes.io/part-of\":\"ingress-nginx\",\"app.kubernetes.io/version\":\"1.11.2\"},\"name\":\"nginx\"},\"spec\":{\"controller\":\"k8s.io/ingress-nginx\"}}\n"
+        },
+        "labels": {
+            "app.kubernetes.io/component": "controller",
+            "app.kubernetes.io/instance": "ingress-nginx",
+            "app.kubernetes.io/name": "ingress-nginx",
+            "app.kubernetes.io/part-of": "ingress-nginx",
+            "app.kubernetes.io/version": "1.11.2"
+        },
+        "name": "nginx"
+    },
+    "spec": {
+        "controller": "k8s.io/ingress-nginx"
+    }
+}
 ```
 
 ### ConfigMap
@@ -268,6 +360,19 @@ kubectl create configmap foo --from-file foo.properties -o yaml --dry-run=client
 kubectl label configmap my-config app=grafana env=test
 kubectl create configmap --from-file=... --overrides='{"metadata":{"label":"app": "awesomeapp"}}'
 kubectl create cm foo -o yaml --dry-run|kubectl label -f- --dry-run -o yaml --local f=b
+
+# 使用文件创建，并引用已有的文件 file1.txt
+cat <<EOF > configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-configmap
+data:
+  file1.txt: |
+    $(cat file1.txt)
+  file2.txt: |
+    $(cat file2.txt)
+EOF
 ```
 
 ### System
@@ -375,9 +480,39 @@ K8s 通过 CNI 配置文件来决定使用什么 CNI。基本的使用方法为�
 3. 在这个节点上创建 Pod 之后，Kubelet 就会根据 CNI 配置文件执行前两步所安装的 CNI 插件；
 4. 上步执行完之后，Pod 的网络就配置完成了。
 
+#### Kubernetes集群通信的实现原理
+
+[K8s network之四：Kubernetes集群通信的实现原理 | Mr.Muzi](https://marcuseddie.github.io/2021/K8s-Network-Architecture-section-four.html)
+
 #### Kubernetes集群Pod和Service之间通信的实现原理
 
 [K8s network之五：Kubernetes集群Pod和Service之间通信的实现原理 | Mr.Muzi](https://marcuseddie.github.io/2021/K8s-Network-Architecture-section-five.html)
+
+iptables代理模型
+
+iptables从Kubernetes v1.2版本开始称为kube-proxy的默认模式，直到在v1.12版本中被IPVS取代而成为新的kube-proxy默认工作模式。在该模式中，kube-proxy修改了iptables中的filter和nat表，同时又对iptables的链进行了扩充，自定义了`KUBE-SERVICES，KUBE-SVC-<HASH>，KUBE-SEP-<HASH>，KUBE-NODEPORTS，KUBE-FW-<HASH>，KUBE-XLB-<HASH>，KUBE-POSTROUTING，KUBE-MARK-MASQ和KUBE-MARK-DROP`九个链条，通过在`KUBE-SERVICES`链中加入每个Service的ClusterIP和端口的匹配规则来完成流量的匹配和重定向工作。Kubernetes自定义的链条与iptables原生链条的调用关系如图 4 所示
+
+![图4 Kubernetes 自定义链与与iptables调用链的关系](image/Relationship-between-Kube-customed-chains-and-iptables-demo.png)
+
+Cluster IP
+  当集群内Pod访问Service的Cluster IP时，报文会通过iptables的OUTPUT链进入Kubernetes的自定义链。假设当前集群中有一个Service A，同时有三个后端Pod用来提供服务Service A，kube-proxy采用随机负载均衡算法来选择Pod，针对Cluster IP的处理流程如下图所示：
+![图-6 Service在Cluster IP模式下报文处理过程](image/K8-svc-iptables-clusterIP-mode-flow.png)
+
+Note: 某些链条的名字中含有 <HASH>字样，这是运用SHA256算法对“namespace + name + portname+协议名”生成哈希值，然后通过base32对该哈希值编码，最后取编码值的前16位的值。
+
+1. 报文会首先进入KUBE-SERVICES链条。KUBE-SERVICE针对每个Service会产生两条匹配规则，规则（1）表示如果报文的源地址不是集群内IP地址，同时，报文匹配了请求Service的协议和端口，那么就跳转到（-j）KUBE-MARK-MASQ链条，在报文中加入一个特殊的防火墙标识，打上这个标识的报文会在POSTROUTING阶段执行SNAT(Source Network Address Translation)。如果确实命中了规则（1），那么在打完标记后会继续检查规则（2），规则（2）会将报文带入下一个链条 KUBE-SVC-<HASH>。
+2. KUBE-SVC-<HASH>包含了当前提供Service的后端Pod、负载均衡模式等消息。kube-proxy默认采用的随机负载算法，因此在这种算法下会为每个Pod分配一个命中概率。在图-6中，三个Pod被命中的概率都是三分之一。当选中一个Pod后，就会跳转到和Pod相对应的KUBE-SEP-<HASH>上。
+3. 每个KUBE-SEP-<HASH>和一个Pod相对应，且每个KUBE-SEP-<HASH>均有两条规则。规则（2）表示对请求做DNAT，将请求的目的地址由原来的ClusterIP：Port转换成Pod_IP：Port。这样就将Pod访问Service变成了Pod和Pod之间的访问。规则（1）的目的是为了应对Hairpinning 发夹问题而设计的：Service A的后端Pod中有可能会有某个Pod访问Service A，然后经过iptables时又恰好选中了自己作为服务的提供方。换句话说，Pod要为自己发出去的服务请求做出响应。在Kubernetes中这样会造成访问失败，如果当出现这种场景时就跳转到KUBE-MARK-MASQ链条执行SNAT，将请求的源地址由Pod自身变成节点的node IP，这样就又变成了正常的服务请求和响应模式。如图7所示，左边是没有做SNAT的场景，Pod A收到了一个自己发出的服务请求，请求的源和目的地址都是自己，当发送响应给自己时会导致失败。右边是借助SNAT解决Hairpinning问题的场景，Pod A访问自己所属服务的请求到达Linux内核时会通过SNAT将源地址由Pod A的IP变成节点的Node IP。当Pod A发送响应报文时，报文先发送给Node IP，然后在Linux内核中再次进行NAT，将源IP由Pod A的IP改成Service的IP，目的IP由Node节点的IP改为Pod A的IP，这样就可以正常工作了。
+  ![Hairpinning问题及其解决方法](image/K8s-iptables-Hairpinning-demo.png)
+  图 - 7 Hairpinning问题及其解决方法
+
+4. 执行完DNAT后，会跳转到POSTROUTING链条。POSTROUTING会无条件跳转到KUBE-POSTROUTING链条，这个链条会检查报文是否有跳转到KUBE-MARK-MASQ链条被打上防火墙标识，如果有的话就会执行SNAT，将报文的源地址变为节点的node IP。
+5. 最后由POSTROUTING将报文发出协议栈。
+
+NOTE: SNAT和MASQUERAD的区别
+
+* SNAT是指在数据包从网卡发送出去的时候，把数据包中的源地址部分替换为指定的IP，这样，接收方就认为数据包的来源是被替换的那个指定IP的主机。
+* MASQUERADE是SNAT的一个特例。MASQUERADE是用发送数据的网卡上的IP来替换源IP，因此，对于那些IP不固定的场合，比如通过DHCP分配IP的情况下，就得用MASQUERADE。
 
 ##### 同一个 Node 节点内的 Pod 不能通过 Service 互访
 
@@ -514,6 +649,136 @@ The task of running your containers is up to the components running on each work
 
 [Harbor docs | Managing Helm Charts](https://goharbor.io/docs/2.7.0/working-with-projects/working-with-images/managing-helm-charts/)
 
+### helm Chart Management
+
+```sh
+helm create <name>         # Creates a chart directory along with the common files and directories used in a chart.
+helm package <chart-path>               # Packages a chart into a versioned chart archive file.
+helm lint <chart>                       # Run tests to examine a chart and identify possible issues:
+helm show all <chart>                   # Inspect a chart and list its contents:
+helm show values <chart>                # Displays the contents of the values.yaml file
+helm pull <chart>                       # Download/pull chart
+helm pull <chart> --untar=true          # If set to true, will untar the chart after downloading it
+helm pull <chart> --verify              # Verify the package before using it
+helm pull <chart> --version <number>    # Default-latest is used, specify a version constraint for the chart version to use
+helm dependency list <chart>            # Display a list of a chart’s dependencies:
+```
+
+### helm push chart
+
+[Harbor docs | Managing Helm Charts](https://goharbor.io/docs/2.7.0/working-with-projects/working-with-images/managing-helm-charts/)
+
+Push Charts to the Repository Server with the CLI
+
+```sh
+# As an alternative, you can also upload charts via the CLI. It is not supported by the native helm CLI. A plugin from the community should be installed before pushing. Run helm plugin install to install the push plugin first.
+helm plugin install https://github.com/chartmuseum/helm-push
+helm push --ca-file=ca.crt --username=admin --password=passw0rd chart_repo/hello-helm-0.1.0.tgz myrepo
+
+# if your helm version is >= v3.7.0, please use the following command
+helm cm-push --ca-file=ca.crt --username=admin --password=passw0rd chart_repo/hello-helm-0.1.0.tgz myrepo
+```
+
+### Install and Uninstall Apps
+
+```sh
+helm install <name> <chart>                           # Install the chart with a name
+helm install <name> <chart> --namespace <namespace>   # Install the chart in a specific namespace
+helm install <name> <chart> --set key1=val1,key2=val2 # Set values on the command line (can specify multiple or separate values with commas)
+helm install <name> <chart> --values <yaml-file/url>  # Install the chart with your specified values
+helm install <name> <chart> --dry-run --debug         # Run a test installation to validate chart (p)
+helm install <name> <chart> --verify                  # Verify the package before using it
+helm install <name> <chart> --dependency-update       # update dependencies if they are missing before installing the chart
+helm uninstall <name>                                 # Uninstall a release
+```
+
+There are two ways to pass configuration data during install
+
+* `--values` (or `-f`): Specify a YAML file with overrides. This can be specified multiple times and the rightmost file will take precedence
+* `--set`: Specify overrides on the command line.
+
+### Perform App Upgrade and Rollback
+
+```sh
+helm upgrade <release> <chart>                            # Upgrade a release
+helm upgrade <release> <chart> --atomic                   # If set, upgrade process rolls back changes made in case of failed upgrade.
+helm upgrade <release> <chart> --dependency-update        # update dependencies if they are missing before installing the chart
+helm upgrade <release> <chart> --version <version_number> # specify a version constraint for the chart version to use
+helm upgrade <release> <chart> --values                   # specify values in a YAML file or a URL (can specify multiple)
+helm upgrade <release> <chart> --set key1=val1,key2=val2  # Set values on the command line (can specify multiple or separate valuese)
+helm upgrade <release> <chart> --force                    # Force resource updates through a replacement strategy
+helm rollback <release> <revision>                        # Roll back a release to a specific revision
+helm rollback <release> <revision>  --cleanup-on-fail     # Allow deletion of new resources created in this rollback when rollback fails
+```
+
+### List, Add, Remove, and Update Repositories
+
+```sh
+helm repo add <repo-name> <url>   # Add a repository from the internet:
+helm repo list                    # List added chart repositories
+helm repo update                  # Update information of available charts locally from chart repositories
+helm repo remove <repo_name>      # Remove one or more chart repositories
+helm repo index <DIR>             # Read the current directory and generate an index file based on the charts found.
+helm repo index <DIR> --merge     # Merge the generated index with an existing index file
+helm search repo <keyword>        # Search repositories for a keyword in charts
+helm search hub <keyword>         # Search for charts in the Artifact Hub or your own hub instance
+```
+
+### 下载 dependency 离线安装
+
+[Helm | Helm Dependency](https://helm.sh/docs/helm/helm_dependency/)
+
+Starting from 2.2.0, repository can be defined as the path to the directory of the dependency charts stored locally. The path should start with a prefix of "file://". For example,
+
+```yaml
+# Chart.yaml
+dependencies:
+- name: nginx
+  version: "1.2.3"
+  repository: "file://../dependency_chart/nginx"
+```
+
+### Helm Release monitoring
+
+```sh
+helm list                       # Lists all of the releases for a specified namespace, uses current namespace context if namespace not specified
+helm list --all                 # Show all releases without any filter applied, can use -a
+helm list --all-namespaces      # List releases across all namespaces, we can use -A
+helm list -l key1=value1,key2=value2 # Selector (label query) to filter on, supports '=', '==', and '!='
+helm list --date                # Sort by release date
+helm list --deployed            # Show deployed releases. If no other is specified, this will be automatically enabled
+helm list --pending             # Show pending releases
+helm list --failed              # Show failed releases
+helm list --uninstalled         # Show uninstalled releases (if 'helm uninstall --keep-history' was used)
+helm list --superseded          # Show superseded releases
+helm list -o yaml               # Prints the output in the specified format. Allowed values: table, json, yaml (default table)
+helm status <release>           # This command shows the status of a named release.
+helm status <release> --revision <number>   # if set, display the status of the named release with revision
+helm history <release>          # Historical revisions for a given release.
+helm env                        # Env prints out all the environment information in use by Helm.
+```
+
+### Download Release Information
+
+```sh
+helm get all <release>      # A human readable collection of information about the notes, hooks, supplied values, and generated manifest file of the given release.
+helm get hooks <release>    # This command downloads hooks for a given release. Hooks are formatted in YAML and separated by the YAML '---\n' separator.
+helm get manifest <release> # A manifest is a YAML-encoded representation of the Kubernetes resources that were generated from this release's chart(s). If a chart is dependent on other charts, those resources will also be included in the manifest.
+helm get notes <release>    # Shows notes provided by the chart of a named release.
+helm get values <release>   # Downloads a values file for a given release. use -o to format output
+```
+
+### Plugin Management
+
+```sh
+helm plugin install <path/url1>     # Install plugins
+helm plugin list                    # View a list of all installed plugins
+helm plugin update <plugin>         # Update plugins
+helm plugin uninstall <plugin>      # Uninstall a plugin
+```
+
+### helm 使用例子
+
 ```sh
 /usr/local/bin/helm
 
@@ -533,13 +798,35 @@ helm search repo aliyun
 helm search repo gitlab-ce
 # 查看 chart 信息
 helm show chart aliyun/memcached
+# To see all configurable options with detailed comments
+helm show values prometheus-community/kube-prometheus-stack
+# Displays the contents of the values.yaml file. get a simple idea of the features of this chart
+helm show chart prometheus-community/kube-prometheus-stack
+# Inspect a chart and list its contents
+helm show all prometheus-community/kube-prometheus-stack
 
 helm fetch ali-stable/gitlab-ce
 
 # Install charts
+# helm install command can install from several sources
+# A chart repository
 helm install myrelease oci://<registry url>/<project>/<chart name> --version <version>
+# A local chart archive
+helm install foo foo-0.1.1.tgz
+# An unpacked chart directory
+helm install foo path/to/foo
+# A full URL
+helm install foo https://example.com/charts/foo-1.2.3.tgz
+
+# 导出默认值文件 values.yaml
+helm inspect values prometheus-community/kube-prometheus-stack > values.yaml
+# 使用配置文件修改默认值
+helm install kubernetes-dashboard /data/kubernetes-dashboard-7.5.tgz -f /data/value.yaml --create-namespace --namespace kubernetes-dashboard
 
 helm uninstall gitlab
+
+# To keep track of a release's state, or to re-read configuration information
+helm status happy-panda
 
 helm registry login <registry url>
 ```
@@ -581,6 +868,63 @@ helm push mychart-1.0.0.tgz my-repo
 # 由于 Harbor 主要用于容器镜像管理，而不是传统的 Helm Chart 仓库，因此在更新 Helm Chart 时需要手动重新上传并更新索引文件。
 helm repo update
 
+```
+
+### helm chart 搬运
+
+[containers/skopeo: Work with remote images registries - retrieving information, images, signing content](https://github.com/containers/skopeo)
+
+[【云原生实用技巧】使用 skopeo 批量同步 helm chart 依赖镜像-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2065531)
+[sir5kong/helm-charts-hub: Kubernetes Helm Charts 镜像站，中国区网络加速](https://github.com/sir5kong/helm-charts-hub)
+
+```sh
+# [离线集群 | JuiceFS Document Center](https://juicefs.com/docs/zh/csi/administration/offline/)
+# 获取需要搬运的镜像列表
+helm template kube-prometheus-stack-62.7.0.tgz | grep -E ' *image:' | sed 's/ *image: //' | sort | uniq > images.txt
+```
+
+### Migration helm chart
+
+```sh
+#!/bin/bash
+
+# 脚本需要修改，拉取的镜像不正确
+# Set the private registry URL
+private_registry_url="your_private_registry_url"
+
+# Set the chart directory
+chart_dir="charts/my-chart"
+
+# Function to modify Chart.yaml and values.yaml
+modify_chart() {
+  chart_name=$(grep -m 1 "name:" $chart_dir/Chart.yaml | cut -d ":" -f 2 | sed 's/ //g')
+  sed -i "s/repository:.*/repository: $private_registry_url\/$chart_name/" $chart_dir/values.yaml
+  sed -i "s/registry:.*/registry: $private_registry_url/" $chart_dir/Chart.yaml
+}
+
+# Function to pull and push Docker images
+pull_and_push_images() {
+  chart_name=$(grep -m 1 "name:" $chart_dir/Chart.yaml | cut -d ":" -f 2 | sed 's/ //g')
+  helm dependency update $chart_dir
+  helm dep build $chart_dir
+  for image in $(helm dep list $chart_dir | awk '{print $2}'); do
+    docker pull $image
+    docker tag $image $private_registry_url/$chart_name/$image
+    docker push $private_registry_url/$chart_name/$image
+  done
+}
+
+# Loop through multiple charts (optional)
+for chart in charts/*; do
+  cd $chart
+  modify_chart
+  pull_and_push_images
+  cd ..
+done
+
+# Modify a single chart (optional)
+# modify_chart
+# pull_and_push_images
 ```
 
 ## Setup Cluster
@@ -625,6 +969,28 @@ kube-shell `pip install kube-shell --user -U`
 切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
 git clone https://github.com/junegunn/fzf.git ~/.fzf
 ~/.fzf/install
+
+### Setup prometheus + grafana
+
+
+[Alerts firing right after setting up kube-prometheus-stack](https://groups.google.com/g/prometheus-users/c/_aI-HySJ-xM/m/kqrL1FYVCQAJ?pli=1)
+[KubeControllerManagerDown & kubeSchedulerDown firing on kubeadm 1.18 cluster · Issue #718 · prometheus-operator/kube-prometheus](https://github.com/prometheus-operator/kube-prometheus/issues/718)
+
+kube-scheduler -> bind-address=127.0.0.1
+kube-controller-manager -> bind-address=127.0.0.1
+etcd -> listen-metrics-urls=http://127.0.0.1:<port>
+
+```sh
+# 修改监听的ip
+kubectl -n kube-system edit configmap kube-proxy
+# metricsBindAddress: "0.0.0.0:10249"
+
+# 在三台 master 节点修改文件，后重启Pod
+sed -e "s/- --bind-address=127.0.0.1/- --bind-address=0.0.0.0/" -i /etc/kubernetes/manifests/kube-controller-manager.yaml
+sed -e "s/- --bind-address=127.0.0.1/- --bind-address=0.0.0.0/" -i /etc/kubernetes/manifests/kube-scheduler.yaml
+sed -e "s#- --listen-metrics-urls=http://127.0.0.1:2381#- --listen-metrics-urls=http://0.0.0.0:2381#" -i /etc/kubernetes/manifests/etcd.yaml
+
+```
 
 ## Best Practice
 
@@ -711,7 +1077,9 @@ reference:
 
 kubecost 是目前较优秀的开源 Kubernetes 成本分析工具。kubecost 目前支持 阿里云、AWS 等云厂商对接，它能够提供集群中命名空间、应用等各类资源成本分配，用户还可以基于这些信息在 Kubecost 中设置预算和警报，帮助运维和财务管理人员进一步实现成本管理。
 
-## Docker vs. Containerd
+## containerd
+
+### Docker vs. Containerd
 
 [一文带你了解Docker与Containerd的区别-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2327654)
 
@@ -755,8 +1123,6 @@ ctr 是 containerd 的一个客户端工具。 crictl 是 CRI 兼容的容器运
 | 推送镜像      | docker push             | ctr image push               | 无                        |
 | 查看镜像详情    | docker inspect IMAGE-ID | ?                            | crictl inspect IMAGE-ID  |
 | 显示 POD 列表 | 无                       | 无                            | crictl pods              |
-
-## containerd
 
 ### 设置 containerd 拉取 http 私有仓库
 
@@ -802,4 +1168,37 @@ echo Harbor12345 | nerdctl login --username "admin" --password-stdin  myharbor-m
 nerdctl login --username "admin" --password Harbor12345 myharbor-minio.com:443
 # 登出
 nerdctl logout
+```
+
+## ip-netns management tool
+
+[ip-netns(8) - Linux manual page](https://man7.org/linux/man-pages/man8/ip-netns.8.html)
+[Tracing the path of network traffic in Kubernetes](https://learnk8s.io/kubernetes-network-packets)
+
+The network namespaces can be managed by the ip-netns management tool,
+
+```sh
+# to list the namespaces on a host.
+ip netns list
+
+# run the exec command inside the namespace cni-0f226515
+ip netns exec cni-ebbbed0d-7b1c-36fb-b412-ce337ff74778 ip a
+
+# run the netstat command inside that namespace
+# verify that the container listens for HTTP traffic from within the namespace
+ip netns exec cni-0f226515-e28b-df13-9f16-dd79456825ac netstat -lnp
+
+# find the latest named network namespace
+ls -lt /var/run/netns
+```
+
+`lsns` is a command for listing all available namespaces on a host.
+  `-t, --type type` The supported types are mnt, net, ipc, user, pid and uts.
+  `-p, --task pid` Display only the namespaces held by the process with this pid. `lsns -p 5777`
+
+example：
+
+```sh
+lsns -t net -t mnt
+
 ```
