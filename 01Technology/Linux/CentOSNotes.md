@@ -1,8 +1,353 @@
 # CentOS
 
-## SELinux
+## CentOS7调优实践
 
-### Disable SELinux Temporarily until the next reboot
+[The Linux Kernel documentation — The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/index.html)
+[Performance Tuning Guide | Red Hat Product Documentation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html-single/performance_tuning_guide/index)
+
+[操作系统性能参数调优 | TiDB 文档中心](https://docs.pingcap.com/zh/tidb/stable/tune-operating-system)
+
+[Cockpit - 基于Web的Linux管理工具的安装和使用教程（CentOS为例）](https://www.hangge.com/blog/cache/detail_3024.html)
+[How To Optimize Linux System Performance with tuned-adm | ComputingForGeeks](https://computingforgeeks.com/optimize-linux-system-performance-with-tuned-adm/)
+
+具体调优点
+
+1. 调整文件数限制：如 允许打开的最大文件数
+2. 调整网络参数：如最大连接数，tcp 参数
+3. 其他，如防火墙
+
+### 查看当前系统的所有限制值
+
+```sh
+ulimit -a
+
+-t: cpu time (seconds)              unlimited
+-f: file size (blocks)              unlimited
+-d: data seg size (kbytes)          unlimited
+-s: stack size (kbytes)             8192
+-c: core file size (blocks)         0
+-m: resident set size (kbytes)      unlimited
+-u: processes                       4096
+-n: file descriptors                1024
+-l: locked-in-memory size (kbytes)  64
+-v: address space (kbytes)          unlimited
+-x: file locks                      unlimited
+-i: pending signals                 7257
+-q: bytes in POSIX msg queues       819200
+-e: max nice                        0
+-r: max rt priority                 0
+-N 15:                              unlimited
+```
+
+### 配置内核参数优化 /etc/sysctl.conf
+
+[CentOS7调优实践 | 恰得福来的博客](https://johnny1952.github.io/2021/10/05/CentOS7调优实践/)
+
+sysctl 命令
+
+```sh
+# 查看所有内核参数
+sysctl -a
+# 查看某个参数是否存在，比如 sysctl -N net.core.somaxconn
+sysctl -N ${name}
+# 查看某个参数的具体值，比如sysctl -n net.core.somaxconn
+sysctl -n ${name}
+# 临时设置某个参数的具体值，比如sysctl -w net.core.somaxconn=65535 注意值是有类型的，比如无符号短整型
+sysctl -w ${name}=${value}
+# 重新加载这个配置文件
+sysctl -p filename
+```
+
+/etc/sysctl.conf 文件示例
+
+```sh
+# vi /etc/sysctl.conf
+# 修改文件后，执行sysctl -p加载配置
+
+# 查看某个参数的当前配置
+# sysctl net.ipv4.ip_forward
+
+# 临时设置：使用命令修改单个值，但重启后临时设置会失效
+# sysctl -w net.core.somaxconn = 65535
+
+
+# 打开文件句柄数量
+fs.file-max = 52706963
+fs.nr_open = 52706963
+fs.inotify.max_user_instances = 8192
+fs.inotify.max_user_watches = 1048576
+
+#关闭ipv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+
+# 避免放大攻击
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+# 开启恶意icmp错误消息保护
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+# 关闭路由转发 0
+# 开起路由转发将0改为1即可。默认是1，对于负载均衡服务器来说必须设为1
+# net.ipv4.ip_forward = 0
+# net.ipv4.conf.all.send_redirects = 0
+# net.ipv4.conf.default.send_redirects = 0
+
+#开启反向路径过滤
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+#处理无源路由的包
+# Do not accept source routing
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+#关闭sysrq功能
+# Controls the System Request debugging functionality of the kernel
+# sysrq允许系统在任何时候响应用户按键操作，除非被锁定
+# 默认是16，表示启动sysrq命令，0表示完全禁用 sysrq
+# It is a ‘magical’ key combo you can hit which the kernel will respond to regardless of whatever else it is doing, unless it is completely locked up.
+# https://www.kernel.org/doc/html/latest/admin-guide/sysctl/kernel.html?highlight=kernel%20sysrq#sysrq
+# 是否设置无所谓
+kernel.sysrq = 0
+
+#core文件名中添加pid作为扩展名
+# Controls whether core dumps will append the PID to the core filename.
+# Useful for debugging multi-threaded applications.
+kernel.core_uses_pid = 1
+
+# 修改消息队列长度
+# IPC通信相关参数，建议可以增加
+# Controls the default maxmimum size of a mesage queue
+# MSGMNB - Default maximum size in bytes of a message queue: 16384 bytes (on Linux, this limit can be read and modified via /proc/sys/kernel/msgmnb). The superuser can increase the size of a message queue beyond MSGMNB by a msgctl() system call.
+kernel.msgmnb = 65536
+# Controls the maximum size of a message, in bytes
+# Maximum size for a message text: 8192 bytes (on Linux, this limit can be read and modified via /proc/sys/kernel/msgmax).
+kernel.msgmax = 65536
+
+# 共享内存相关参数
+# 设置最大内存共享段大小bytes
+# maximum shared segment size, in bytes
+# Maximum size in bytes for a shared memory segment。实际是16GB物理内存，设成64GB，可以根据实际测试情况调整，但最小应该在4GB以上（在32位linux系统上最小是4GB） CentOS 7  默认 18446744073692774399
+# kernel.shmmax = 68719476736
+# maximum number of shared memory segments, in pages
+# shmall最少得是 ceil(shmmax/PAGE_SIZE)，执行getconf PAGE_SIZE可得到 PAGE_SIZE 大小。centos7 PAGE_SIZE 是 4096
+# kernel.shmall = 4294967296
+
+# Disable netfilter on bridges.
+# net.bridge.bridge-nf-call-ip6tables = 0
+# net.bridge.bridge-nf-call-iptables = 0
+# net.bridge.bridge-nf-call-arptables = 0
+
+
+# TCP kernel paramater
+
+# 在TIME_WAIT数量等于该值时，不会有新的产生，
+# 这个参数表示操作系统允许TIME_WAIT套接字数量的最大值，如果超过这个数字，TIME_WAIT套接字将立刻被清除并打印警告信息。该参数默认为 8192 (在centos7)，过多的TIME_WAIT套接字会使Web服务器变慢。注：主动关闭连接的服务端会产生TIME_WAIT状态的连接
+# max number of sockets allowed in TIME_WAIT
+net.ipv4.tcp_max_tw_buckets = 6000
+
+#限制仅仅是为了防止简单的DoS 攻击
+# net.ipv4.tcp_max_orphans = 3276800
+# 系统中最多有多少个TCP 套接字不被关联到任何一个用户文件句柄上。如果超过这个数字，孤儿连接将即刻被复位并打印出警告信息。默认是65536
+# CentOS 7 默认 8192
+# Increase max TCP orphans
+# These are sockets which have been closed and no longer have a file handle attached to them
+net.ipv4.tcp_max_orphans = 262144
+# 开启时就是同一个源IP来连接同一个目的端口的数据包时间戳必须是递增的，否则就丢弃。默认是打开的 1
+net.ipv4.tcp_timestamps = 0
+
+# 内核放弃建立连接之前发送SYNACK 包的数量
+# Only retry creating TCP connections twice
+# Minimize the time it takes for a connection attempt to fail
+# 为了打开对端的连接，内核需要发送一个SYN，以确认收到上一个 SYN连接请求包。也就是所谓三次握手中的第二次握手。
+# 这个设置决定了内核放弃连接之前发送SYN+ACK 包的数量。有文章建议设为2个
+net.ipv4.tcp_synack_retries = 1
+# 对于一个新建连接，内核要发送多少个 SYN 连接请求才决定放弃。有文章建议设为2个
+net.ipv4.tcp_syn_retries = 1
+
+# 开启SYN缓存，开启SYN洪水攻击保护。TCP建立连接的3次握手过程中，当服务端收到最初的SYN请求时，会检查应用程序的syn_backlog（上条说的SYN队列）队列是否已满，启用syncookie，可以解决超高并发时的Cant't Connect 问题。但是会导致TIME_WAIT状态fallback为保持2MSL时间，高峰期时会导致客户端可复用连接而无法连接服务器
+# Controls the use of TCP syncookies
+net.ipv4.tcp_syncookies = 1
+
+# Units are in page size (default page size is 4 kb)
+# These are global variables affecting total pages for TCP sockets
+# 8388608 * 4 = 32 GB
+#  low pressure high
+#  When mem allocated by TCP exceeds “pressure”, kernel will put pressure on TCP memory
+#  We set all these values high to basically prevent any mem pressure from ever occurring
+#  on our TCP sockets
+#默认是378357 504477 756714（单位页大小，即4KB），对应的大小大约是1.5GB 1.9GB 2.9GB
+# 提高配置避免出现内存分配压力（根据实际内存大小可以计算一下）
+# net.ipv4.tcp_mem = 786432 1048576 1572864
+net.ipv4.tcp_mem = 94500000 915000000 927000000
+
+# The first value tells the kernel the **minimum** receive/send buffer for each TCP connection,
+# and this buffer is always allocated to a TCP socket, even under high pressure on the system. …
+#
+# The second value specified tells the kernel the **default** receive/send buffer
+# allocated for each TCP socket. This value overrides the /proc/sys/net/core/rmem_default
+# value used by other protocols. …
+#
+# The third and last value specified
+# in this variable specifies the **maximum** receive/send buffer that can be allocated for a TCP socket.
+# Note: The kernel will auto tune these values between the min-max range
+# If for some reason you wanted to change this behavior, disable net.ipv4.tcp_moderate_rcvbuf
+#这个参数定义了TCP接受缓存（用于TCP接受滑动窗口）的最小值、默认值、最大值。
+#默认情况下这几个值是 4096 16384 4194304
+net.ipv4.tcp_rmem = 10240 87380 12582912
+#这个参数定义了TCP发送缓存（用于TCP发送滑动窗口）的最小值、默认值、最大值。
+net.ipv4.tcp_wmem = 10240 87380 12582912
+
+net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_sack = 1
+
+# TCP conn
+# 未收到客户端确认信息的连接请求的最大值
+# 指定所能接受SYN同步包的最大客户端数量，即半连接上限，默认值是128,即SYN_REVD状态的连接数
+# Increase max half-open connections.
+net.ipv4.tcp_max_syn_backlog = 262144
+#内核放弃建立连接之前发送SYN 包的数量
+net.ipv4.tcp_syn_retries = 3
+net.ipv4.tcp_retries1 = 3
+net.ipv4.tcp_retries2 = 15
+
+# tcp conn reuse
+#开启重用。允许将TIME-WAIT sockets 重新用于新的TCP 连接
+net.ipv4.tcp_tw_reuse = 1
+# 启用timewait 快速回收。如果服务器身处NAT环境，tcp_timestamps 为1，安全起见，要禁止
+net.ipv4.tcp_tw_recycle = 1
+## timeout状态时间
+#表示如果套接字由本端要求关闭，这个参数决定了它保持在FIN-WAIT-2状态的时间。默认是60s，可以设置小一些
+# net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_fin_timeout = 1
+
+# keepalive conn
+# 当keepalive启用时，TCP发送keepalive消息的频度。默认是2小时(7200秒)，若将其设置的小一些，可以更快地清理无效的连接。
+#How often TCP sends out keepalive messages when keepalive is enabled. Default: 2hours.
+# 如果TCP连接在空闲30秒后，内核才发起probe(探查)，如果probe3次（每次3秒即tcp_keepalive_intvl值）不成功，内核才彻底放弃，认为连接已失效
+net.ipv4.tcp_keepalive_time = 30
+net.ipv4.tcp_keepalive_intvl = 30
+net.ipv4.tcp_keepalive_probes = 3
+# 允许系统打开的端口范围，扩大端口数
+# 可配成1024 65535进一步扩大可用范围
+net.ipv4.ip_local_port_range = 1024 65535
+
+#net.ipv4.conf.eth1.rp_filter = 0
+#net.ipv4.conf.lo.arp_ignore = 1
+#net.ipv4.conf.lo.arp_announce = 2
+#net.ipv4.conf.all.arp_ignore = 1
+#net.ipv4.conf.all.arp_announce = 2
+
+# 系统允许的最大跟踪连接条目
+net.ipv4.ip_conntrack_max = 265535
+# 在/etc/sysctl.conf文件中增加此属性，并运行>/sbin/sysctl.conf –p
+# 另外在sysctl -p的时候A报error: 'net.ipv4.ip_conntrack_max' is an unknown key ,通过以下命令修正：
+# modprobe ip_conntrack
+# echo "modprobe ip_conntrack" >> /etc/rc.local
+
+# 在内核内存中netfilter可以同时处理的任务数量（连接请求，连接跟踪条目）
+net.netfilter.nf_conntrack_max = 655350
+net.netfilter.nf_conntrack_tcp_timeout_established = 1200
+
+ # 确保无人能修改路由表
+# net.ipv4.conf.all.accept_redirects = 0
+# net.ipv4.conf.default.accept_redirects = 0
+# net.ipv4.conf.all.secure_redirects = 0
+# net.ipv4.conf.default.secure_redirects = 0
+# net.nf_conntrack_max = 6553600
+
+# socket buffer
+#这个参数表示内核套接字发送缓存区默认的大小。默认是212992
+net.core.wmem_default = 8388608
+#这个参数表示内核套接字接受缓存区默认的大小。
+net.core.rmem_default = 8388608
+#这个参数表示内核套接字接受缓存区的最大大小。默认是212992
+net.core.rmem_max = 16777216
+#这个参数表示内核套接字发送缓存区的最大大小。
+net.core.wmem_max = 16777216
+
+# 内核套接字发送缓存区默认的大小。默认是212992
+net.core.wmem_default = 8388608
+# net.core.rmem_default = 6291456
+# 内核套接字接受缓存区默认的大小。
+net.core.rmem_default = 8388608
+# net.core.rmem_default = 6291456
+# 内核套接字接受缓存区的最大大小。byte. 默认是212992
+net.core.rmem_max = 16777216
+# 内核套接字发送缓存区的最大大小。byte
+net.core.wmem_max = 16777216
+# 每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目。
+# Max number of packets that can be queued on interface input
+# If kernel is receiving packets faster than can be processed
+# this queue increases
+net.core.netdev_max_backlog = 262144
+# Max listen queue backlog
+# make sure to increase nginx backlog as well if changed
+# 服务端所能accept即时处理数据的最大客户端数量，即完成连接上限，默认值是128.
+net.core.somaxconn = 65535
+net.core.optmem_max = 81920
+
+# swap 检查物理内存是否够用
+vm.overcommit_memory = 0
+
+# Linux内核参数vm.swappiness，值的范围为0~100，表示系统什么时候开始进行物理内存与虚拟内存的交换。举个例子，系统总内存为64G，vm.swappiness为60，表示在系统内存使用64*0.4=25.6G的时候开始物理内存与虚拟内存的交换，这个动作势必会影响系统的性能。
+# Cloudera建议把这个值修改为1~10，最好设置为1
+# 0 表示禁止使用 swap 空间，只有当系统 OOM 时才允许使用它
+vm.swappiness = 0
+# 开启 OOM
+vm.panic_on_oom=0
+
+vm.max_map_count = 2048000
+```
+
+### 配置文件大小限制 /etc/security/limits.conf
+
+```sh
+# /etc/security/limits.conf
+# The value of the hard nofile parameter cannot be greater than the value of the /proc/sys/fs/nr_open parameter. Otherwise, you may fail to connect to the ECS instance
+
+sudo tee -a /etc/security/limits.d/server.conf <<EOF
+
+* soft nofile 1000000
+* hard nofile 1000000
+* soft nproc 1000000
+* hard nproc 1000000
+* soft memlock 50000000
+* hard memlock 50000000
+* soft msgqueue 8192000
+* hard msgqueue 8192000
+* soft core unlimited
+* hard core unlimited
+* soft stack unlimited
+* hard stack unlimited
+
+# * soft nproc unlimited
+# * hard nproc unlimited
+# * soft memlock unlimited
+# * hard memlock unlimited
+
+EOF
+
+```
+
+### 禁止透明大页
+
+查看透明大页是否启用，[always] never表示已启用，always [never]表示已禁用
+
+对于数据库应用，不推荐使用 THP，因为数据库往往具有稀疏而不是连续的内存访问模式，且当高阶内存碎片化比较严重时，分配 THP 页面会出现较大的延迟。若开启针对 THP 的直接内存规整功能，也会出现系统 CPU 使用率激增的现象，因此建议关闭 THP。
+
+```sh
+sudo tee /sys/kernel/mm/transparent_hugepage/enabled <<EOF
+never
+EOF
+sudo tee /sys/kernel/mm/transparent_hugepage/defrag <<EOF
+never
+EOF
+```
+
+如果是启用状态，修改/etc/rc.local文件并添加echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
+
+### SELinux 关闭selinux
+
+#### Disable SELinux Temporarily until the next reboot
 
 enable status: `sestatus | grep Current` return `Current mode:enforcing`
 
@@ -11,9 +356,35 @@ Check: `sestatus | grep Current` return `Current mode:permissive`
 
 Enable: `setenforce enforcing`
 
-### Disable SELinux Permanently
+#### Disable SELinux Permanently
 
 `sed -i 's/SELinux=enforcing/SELinux=disabled/' /etc/sysconfig/selinux` then reboot system and then check the status with `sestatus`
+
+### Setup ntp 同步时间
+
+```sh
+vi /etc/ntp.conf
+server 172.25.4.133
+
+systemctl status ntpd
+systemctl enable ntpd
+
+# initial sync
+ntpdate 172.25.4.133
+
+# start the daemon
+systemctl start ntpd
+systemctl restart ntpd
+
+# verify everything
+ntpq -p
+
+# systemctl status chronyd
+# systemctl enable chronyd
+# systemctl start chronyd
+# systemctl restart chronyd
+# chronyd -q 'server 172.25.4.133 iburst'
+```
 
 ## 关机
 
@@ -407,9 +778,9 @@ localectl set-locale LANG=en_US.utf8
 mkdir /mnt/cd
 sudo mount /dev/cdrom /mnt/cd
 cd /mnt/cd
-./VBoxLinuxAdditions.run
+sudo sh VBoxLinuxAdditions.run
 
-# (⎈|qjca:kube-system)/mnt/cd sudo sh VBoxLinuxAdditions.run
+# $ /mnt/cd sudo sh VBoxLinuxAdditions.run
 # Verifying archive integrity...  100%   MD5 checksums are OK. All good.
 # Uncompressing VirtualBox 7.0.12 Guest Additions for Linux  100%
 # VirtualBox Guest Additions installer
@@ -435,9 +806,9 @@ cd /mnt/cd
 sudo yum install -y kernel-devel gcc
 sudo yum -y upgrade kernel kernel-devel
 
-uname -r                                               #查看内核版本
+uname -r                 #查看内核版本
 sudo yum install -y kernel-devel-3.10.0-1160.71.1.el7.x86_64   #安装内核头文件
-/sbin/rcvboxadd setup                                  #运行 VirtualBox Guest Additions 的设置脚本
+/sbin/rcvboxadd setup    #运行 VirtualBox Guest Additions 的设置脚本
 
 # VirtualBox Guest Additions: Starting.
 # VirtualBox Guest Additions: Setting up modules
@@ -468,13 +839,13 @@ sudo yum install -y libXrandr.x86_64
 
 # 添加共享文件夹
 # 在VirtualBox中打开“设置”，选择“共享文件夹”，点击添加。
-# Folder Path 是宿主机路径，Folder Name 是挂载时使用的名字 比如使用 share
+# Folder Path 是宿主机路径，Folder Name 是挂载时使用的名字 比如使用 D_DRIVE
 
 sudo mkdir /d
-sudo chown jasolar:jasolar /d
+sudo chown username:username /d
 sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) D_DRIVE /d
 sudo mkdir /e
-sudo chown jasolar:jasolar /e
+sudo chown username:username /e
 sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) E_DRIVE /e
 
 # 设置自动挂载
@@ -554,11 +925,11 @@ yum provides git
 ```shell
 [root@nys yum.repos.d]# rpm -qi centos-release
 Name        : centos-release               Relocations: (not relocatable)
-Version     : 6                                 Vendor: CentOS
+Version     : 6   Vendor: CentOS
 Release     : 10.el6.centos.12.3            Build Date: Tue 26 Jun 2018 10:52:41 PM CST
 Install Date: Mon 23 Jul 2018 11:48:26 AM CST      Build Host: x86-01.bsys.centos.org
 Group       : System Environment/Base       Source RPM: centos-release-6-10.el6.centos.12.3.src.rpm
-Size        : 38232                            License: GPLv2
+Size        : 38232             License: GPLv2
 Signature   : RSA/SHA1, Tue 26 Jun 2018 11:35:30 PM CST, Key ID 0946fca2c105b9de
 Packager    : CentOS BuildSystem <http://bugs.centos.org>
 Summary     : CentOS release file
@@ -596,7 +967,7 @@ yum clean all && yum check-update && yum makecache
 # 修改成
 # http://mirrors.aliyun.com/centos-vault/centos/
 
-# 把epel.repo文件中的
+# 把 epel.repo 文件中的
 # enabled=1
 # 修改成
 # enabled=0
