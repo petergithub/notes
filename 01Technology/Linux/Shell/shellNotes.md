@@ -101,19 +101,17 @@ echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一�
 echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
 echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
 
-(work ✗) str="www.runoob.com/linux/linux-shell-variable.html"
-(work ✗) echo "str    : ${str}"
+$ str="www.runoob.com/linux/linux-shell-variable.html"
+$ echo "str    : ${str}"
 str    : www.runoob.com/linux/linux-shell-variable.html
-(work ✗) echo "str#*/    : ${str#*/}"   # 从 字符串开头 删除到 左数第一个'/'
+$ echo "str#*/    : ${str#*/}"   # 从 字符串开头 删除到 左数第一个'/'
 str#*/    : linux/linux-shell-variable.html
-(work ✗) echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一个'/'
+$ echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一个'/'
 str##*/    : linux-shell-variable.html
-(work ✗) echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
+$ echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
 str%/*    : www.runoob.com/linux
-(work ✗) echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
+$ echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
 str%%/*    : www.runoob.com
-(work ✗)
-
 ```
 
 #### 字符串拼接
@@ -124,8 +122,23 @@ str%%/*    : www.runoob.com
 
 #### 字符串替换 replace
 
+[Shell-Parameter-Expansion - Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion)
+
+`${parameter/pattern/string}`: To replace the first occurrence of a pattern with a given string
+`${parameter//pattern/string}`: To replace all occurrences
+
 * `${var//\"/}` 将"替换成空
 * `${var/a/b}` 将a替换成b
+
+```sh
+# 替换字符中包含 /
+IMAGE="swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/busybox:1.31.1"
+in="swr.cn-north-4.myhuaweicloud.com/ddn-k8s"
+out="172.17.0.1:8081/ems_pro"
+echo ${IMAGE//$in/$out}
+
+172.17.0.1:8081/ems_pro/docker.io/library/busybox:1.31.1
+```
 
 ### Shell 数组
 
@@ -195,30 +208,28 @@ EOF
 
 ```sh
 Operator    Meaning    Example
--z    Zero-length string    [ -z "$myvar" ]
--z string string为空
--n    Non-zero-length string    [ -n "$myvar" ]
-=    String equality    [ "abc" = "$myvar" ]
-!=    String inequality    [ "abc" != "$myvar" ]
--eq    Numeric equality    [ 3 -eq "$myinteger" ]
--ne    Numeric inequality    [ 3 -ne "$myinteger" ]
--lt    Numeric strict less than    [ 3 -lt "$myinteger" ]
--le    Numeric less than or equals    [ 3 -le "$myinteger" ]
--gt    Numeric strict greater than    [ 3 -gt "$myinteger" ]
--ge    Numeric greater than or equals    [ 3 -ge "$myinteger" ]
--f    Exists and is regular file    [ -f "$myfile" ]
-[ -f "somefile" ] : 判断是否是一个文件
--d    Exists and is directory    [ -d "$mydir" ]
--d 是否是目录
--nt    First file is newer than second one    [ "$myfile" -nt ~/.bashrc ]
--ot    First file is older than second one    [ "$myfile" -ot ~/.bashrc ]
+-z  Zero-length string    [ -z "$myvar" ]
+-z  string string为空
+-n  Non-zero-length string  [ -n "$myvar" ]
+=  String equality  [ "abc" = "$myvar" ]
+!=  String inequality  [ "abc" != "$myvar" ]
+-eq  Numeric equality  [ 3 -eq "$myinteger" ]
+-ne  Numeric inequality  [ 3 -ne "$myinteger" ]
+-lt  Numeric strict less than  [ 3 -lt "$myinteger" ]
+-le  Numeric less than or equals  [ 3 -le "$myinteger" ]
+-gt  Numeric strict greater than  [ 3 -gt "$myinteger" ]
+-ge  Numeric greater than or equals  [ 3 -ge "$myinteger" ]
+-f  Exists and is regular file 判断是否是一个文件  [ -f "$myfile" ]
+-d  Exists and is directory 是否是目录 [ -d "$mydir" ]
+-nt  First file is newer than second one  [ "$myfile" -nt ~/.bashrc ]
+-ot  First file is older than second one  [ "$myfile" -ot ~/.bashrc ]
 [ -x "/bin/ls" ] : 判断/bin/ls是否存在并有可执行权限
 [ -n "$var" ] : 判断$var变量是否有值
 [ "$a" = "$b" ] : 判断$a和$b是否相等
 [[ $a == z* ]]   # True if $a starts with a "z" (wildcard matching).
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
--e file     Check if file exists. Is true even if file is a directory but exists.     [ -e $file ] is true.
+-e file   Check if file exists. Is true even if file is a directory but exists.   [ -e $file ] is true.
 ```
 
 #### compound comparison
@@ -315,6 +326,13 @@ log() { # classic logger
 }
 
 log "INFO" "a message"
+
+# 写日志到文件
+LOGFILE="/var/log/repmgr/follow.log"
+# Logging function
+log() {
+    echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a $LOGFILE
+}
 ```
 
 ### for
@@ -322,10 +340,15 @@ log "INFO" "a message"
 `array=( A B C D E F G )`
 `echo "${array[0]}"`
 
-the  for  command  executes  list once for each positional parameter that is set
+the  `for`  command  executes  list once for each positional parameter that is set
 positional parameter: space, line return
 
 ```sh
+items=("apple" "banana" "cherry")
+for item in "${items[@]}"; do
+    echo "$item"
+done
+
 for i in *; do cd $i ;gfa; cd -; done
 
 for VAR in LIST; do CMD; done;
@@ -406,19 +429,34 @@ done
 
 ### if/else流程控制
 
+```sh
+# Use Built-in Commands
+# Whenever possible, leverage built-in shell commands rather than external binaries. Built-in commands execute faster because they don’t require loading an external process. For example, use [[ ]] for conditionals instead of [ ] or test.
+
+# Inefficient
+if [ "$var" -eq 1 ]; then
+    echo "Equal to 1"
+fi
+
+# Efficient
+if [[ "$var" -eq 1 ]]; then
+    echo "Equal to 1"
+fi
+```
+
 ``` bash
-    if condition
-    then
-         do something
-    elif condition
-    then
+if condition
+then
         do something
-    elif condition
-    then
-        do something
-    else
-        do something
-    fi
+elif condition
+then
+    do something
+elif condition
+then
+    do something
+else
+    do something
+fi
 ```
 
 ```bash
@@ -437,13 +475,13 @@ if [[ xaa.zip = *.zip ]]; then echo zip; else echo not zip; fi;
 ```
 
 ``` bash
-    if [ a || b && c ]; then
-    　 ....
-    elif ....; then
-    　 ....
-    else
-    　 ....
-    fi
+if [ a || b && c ]; then
+　 ....
+elif ....; then
+　 ....
+else
+　 ....
+fi
 ```
 
 ### switch流程控制
