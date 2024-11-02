@@ -16,6 +16,8 @@
 
 ## 控制台命令
 
+[PostgreSQL 16: psql](https://www.postgresql.org/docs/16/app-psql.html)
+
 ```sh
 psql --help
 
@@ -275,16 +277,22 @@ GRANT CREATE ON SCHEMA public TO dbuser;
 grant all privileges on all tables in schema public to dbuser;
 grant all privileges on all sequences in schema public to dbuser;
 grant all privileges on all functions in schema public to dbuser;
-
 grant select on all tables in schema public to dbuser;
 --将pgadmin模式的所有权限授权给pgadmin
 grant create,usage on schema pgadmin to pgadmin;
 
+revoke create on schema public from dbuser;
+revoke all privileges on all tables in schema public from dbuser;
+revoke all privileges on all functions in schema public from dbuser;
+revoke all privileges on all sequences in schema public from dbuser;
+
 -- [PostgreSQL: Documentation: 8.0: ALTER USER](https://www.postgresql.org/docs/8.0/sql-alteruser.html)
 -- 设置超级用户
 ALTER ROLE dbuser SUPERUSER CREATEDB CREATEROLE INHERIT LOGIN NOREPLICATION NOBYPASSRLS;
+-- remove the SUPERUSER privilege from a role
+ALTER ROLE dbuser WITH NOSUPERUSER;
 -- 设置只读权限
-alter user 用户名 set default_transaction_read_only = on;
+alter user dbuser set default_transaction_read_only = on;
 -- 密码有效期 仅针对客户端有效，服务器端不受限制
 alter role dbuser valid until '2022-12-31 23:59:59';
 alter role dbuser PASSWORD 'password';
@@ -296,24 +304,61 @@ alter group admin add user pgadmin;
 alter group developer add user dbuser;
 
 -- 撤回在public模式下的权限
-revoke select on all tables in schema public from 用户名;
+revoke select on all tables in schema public from dbuser;
 
 -- 撤回在information_schema模式下的权限
-revoke select on all tables in schema information_schema from 用户名;
+revoke select on all tables in schema information_schema from dbuser;
 
 -- 撤回在pg_catalog模式下的权限
-revoke select on all tables in schema pg_catalog from 用户名;
+revoke select on all tables in schema pg_catalog from dbuser;
 --任何用户都拥有public模式的所有权限
+-- 回收 dbuser在public的create权限
+revoke create on schema public from dbuser;
 --出于安全，回收任何用户在public的create权限
 revoke create on schema public from public;
 
 -- 撤回对数据库的操作权限
-revoke all on database 数据库名 from 用户名;
+revoke all on database 数据库名 from dbuser;
 
 -- 删除用户
-drop user 用户名;
+drop user dbuser;
 
 SELECT * FROM pg_roles;
+
+-- Check Database-Level Privileges
+SELECT datname, has_database_privilege('dbuser', datname, 'CONNECT') AS connect,
+       has_database_privilege('dbuser', datname, 'CREATE') AS create,
+       has_database_privilege('dbuser', datname, 'TEMP') AS temp
+FROM pg_database;
+
+-- Check Schema-Level Privileges
+SELECT nspname, has_schema_privilege('dbuser', nspname, 'CREATE') AS create,
+       has_schema_privilege('dbuser', nspname, 'USAGE') AS usage
+FROM pg_namespace;
+
+-- Check Table-Level Privileges
+SELECT table_schema, table_name,
+       has_table_privilege('dbuser', table_schema || '.' || table_name, 'SELECT') AS select,
+       has_table_privilege('dbuser', table_schema || '.' || table_name, 'INSERT') AS insert,
+       has_table_privilege('dbuser', table_schema || '.' || table_name, 'UPDATE') AS update,
+       has_table_privilege('dbuser', table_schema || '.' || table_name, 'DELETE') AS delete
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+-- Check Sequence-Level Privileges
+SELECT sequence_schema, sequence_name,
+       has_sequence_privilege('dbuser', sequence_schema || '.' || sequence_name, 'USAGE') AS usage,
+       has_sequence_privilege('dbuser', sequence_schema || '.' || sequence_name, 'SELECT') AS select,
+       has_sequence_privilege('dbuser', sequence_schema || '.' || sequence_name, 'UPDATE') AS update
+FROM information_schema.sequences
+WHERE sequence_schema NOT IN ('pg_catalog', 'information_schema');
+
+-- Check Function-Level Privileges
+-- 执行时遇到错误，需要判断 function 的参数
+-- SELECT routine_schema, routine_name,
+--        has_function_privilege('dbuser', routine_schema || '.' || routine_name, 'EXECUTE') AS execute
+-- FROM information_schema.routines
+-- WHERE routine_schema NOT IN ('pg_catalog', 'information_schema');
 
 -- list all privileges of a role (grantee)
 SELECT table_catalog, table_schema, table_name, privilege_type
@@ -328,7 +373,7 @@ SELECT grantee,table_catalog, table_schema, table_name, privilege_type
 -- Table permissions:
 SELECT *
    FROM information_schema.role_table_grants
-   WHERE grantee = 'YOUR_USER';
+   WHERE grantee = 'dbuser';
 -- Ownership
 SELECT *
    FROM pg_tables
@@ -348,7 +393,7 @@ SELECT r.usename AS grantor,
           ON a.grantee = e.usesysid
         JOIN pg_user r
           ON a.grantor = r.usesysid
-       WHERE e.usename = 'YOUR_USER';
+       WHERE e.usename = 'dbuser';
 
 -- list all grantee of a table
 SELECT grantee, privilege_type
@@ -504,7 +549,7 @@ select
      to_char(now(),'yyyy-mm-dd hh24:mi:ss') "巡检时间"
     ,a.datname "datname(数据库名)"
     ,a.pid "pid(进程id)"
-    ,b.rolname "username(用户名)"
+    ,b.rolname "username(dbuser)"
     --,a.application_name "app_name(应用名称)"
     ,a.client_addr "client_ip(客户端ip)"
     --,a.query_start "query_start(当前查询开始时间)"
@@ -1141,19 +1186,30 @@ cmax, 删除该元组的命令在事务中的命令序列号.
 
 ### 死锁
 
-Transaction Age: Newer transactions are more likely to be aborted.
-Lock Priority: PostgreSQL tries to minimize the impact by selecting the transaction with the fewest updates or the smallest number of locks held.
+[数据库内核月报 － PostgreSQL · 内核特性 · 死锁检测与解决](http://mysql.taobao.org/monthly/2021/07/03/)
+[PostgreSQL 源码解读（224）- Locks(The Deadlock Detection Algorithm)_ITPUB博客](https://blog.itpub.net/6906/viewspace-2656469/).
 
-死锁检测机制
+#### 死锁检测机制
 
-等待图分析，PostgreSQL构建一个等待图，表示各个事务之间的锁等待关系。 通过分析，识别出循环依赖（即死锁）。
+等待图（circular dependency in locks）分析，PostgreSQL构建一个等待图，表示各个事务之间的锁等待关系。 通过分析，识别出循环依赖（即死锁）。
 
 选择被中止的事务
 
-* 事务年龄：通常选择最新的事务中止，因为回滚的代价较小。
-* 锁的数量：可能会考虑事务持有的锁数量，选择影响最小的事务中止。
+* 事务年龄：通常选择最新的事务中止，因为回滚的代价较小。Transaction Age: Newer transactions are more likely to be aborted.
+* 锁的数量：可能会考虑事务持有的锁数量，选择影响最小的事务中止。Lock Priority: PostgreSQL tries to minimize the impact by selecting the transaction with the fewest updates or the smallest number of locks held
 
 自动中止 检测到死锁后，数据库会自动中止选定的事务并报告错误。
+
+#### 死锁检测的触发时机
+
+由于 PostgreSQL 不对死锁的预防和避免做任何工作，事务如何察觉到自己可能陷入死锁？PostgreSQL 对发生死锁的预期比较乐观。执行事务的进程在获取锁时，发现锁因为正被其他事务持有，且请求锁的模式 (lock mode) 与持有锁的事务存在冲突而需要等待后：
+
+设置一个死锁定时器，然后立刻进入睡眠，不检测死锁
+如果定时器超时前，进程已经成功获得锁，那么定时器被提前取消，没有发生死锁
+如果定时器超时，则进程被唤醒并执行死锁检测算法
+只有定时器超时后，才执行死锁检测算法。这种设计避免对超时时间以内的每一个睡眠等待进程都执行一次死锁检测，这也是 乐观等待 策略的体现。定时器的超时时间通过 GUC 参数 deadlock_timeout 设置。
+
+死锁检测的触发实现在 ProcSleep() 函数中。这是进程被阻塞而进入睡眠时的函数：
 
 ## 安装和配置管理
 
@@ -1389,13 +1445,14 @@ psql -f dumpfile postgres
 11. `--data-only`: Backs up only the data, excluding the database schema.
 12. `-s, --schema-only` Dump only the object definitions (schema), not data.
 
-psql 通过执行 SQL 文件恢复 psql dbname < dumpfile
+psql 通过执行 SQL 文件恢复 psql -d dbname -f dumpfile
 
 1. `--set ON_ERROR_STOP=on` exit with an exit status of 3 if an SQL error occurs
 2. `-1` or `--single-transaction` restored as a single transaction
 
 ```sh
-psql --set ON_ERROR_STOP=on --single-transaction -f dumpfile dbname
+psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -f globals.backup.sql
+psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -f dumpfile dbname
 ```
 
 #### pg_restore
