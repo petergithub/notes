@@ -1873,6 +1873,11 @@ n(到达下一个窗口) p(到达上一个窗口)
 & 关掉当前窗口, 也可以输入 exit
 , Rename the current window
 
+```sh
+# 移动 Window
+tmux move-window -s <source-session>:<window-number> -t <target-session>:<window-number>
+```
+
 ##### disable automatic rename
 
 If the window name keeps renaming, create file `.tmux.conf` with content below
@@ -1897,6 +1902,19 @@ ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大�
 * `L`           Switch the attached client back to the last session.
 * `l`           Move to the previously selected window.
 * `[`           Enter copy mode to copy text or view the history.
+
+```sh
+# Enable Vi Mode
+#setw -g mode-keys vi
+set-window-option -g mode-keys vi
+```
+
+#### tmux 同步模式
+
+在tmux中，同步模式的作用是让你可以同时在多个窗格（pane）中输入相同的命令。这样，你可以提高效率，特别是在需要在多个服务器或环境中执行相同操作时。
+
+进入同步模式：Ctrl-b，setw synchronize-panes on 启用同步模式。
+退出同步模式：Ctrl-b，setw synchronize-panes off 关闭同步模式。
 
 #### Example: tmux scripts
 
