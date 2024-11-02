@@ -766,6 +766,11 @@ localectl set-locale LANG=en_US.utf8
 # logout and login and you will see new locale is effective
 ```
 
+### virtualbox 设置 Guest 网络访问 host VPN
+
+[virtualbox centos7 nat+host-only方式联网踩坑总结-阿里云开发者社区](https://developer.aliyun.com/article/1150470)
+[networking - How to connect to a VirtualBox guest OS through a VPN? - Super User](https://superuser.com/questions/987150/how-to-connect-to-a-virtualbox-guest-os-through-a-vpn)
+
 ### virtualbox windows 宿主机 CentOS 7 虚拟机 共享文件
 
 [VirtualBox虚拟机设置共享文件夹（CentOS） - Excel2016 - 博客园](https://www.cnblogs.com/skyvip/p/18151918)
@@ -1100,13 +1105,18 @@ $ loginctl show-user ruanyf
 #### journalctl 日志管理
 
 日志的配置文件是`/etc/systemd/journald.conf`
-`journalctl` 查看所有日志（内核日志和应用日志）
-`journalctl -n 20` 显示尾部指定行数的日志
-`journalctl -f` 实时滚动显示最新日志
-`journalctl --since "2015-01-10" --until "2015-01-11 03:00"` 查看指定时间的日志
 
-`journalctl -b` 查看系统本次启动的日志
-`journalctl -b -1` 查看上一次启动的日志（需更改设置）
+```sh
+# 查看所有日志（内核日志和应用日志）
+journalctl
+journalctl -xeu kubelet 查看指定 unit kubelet 的日志
+journalctl -n 20  # 显示尾部指定行数的日志
+journalctl -f  # 实时滚动显示最新日志
+journalctl --since "2015-01-10" --until "2015-01-11 03:00"  # 查看指定时间的日志
+
+journalctl -b  # 查看系统本次启动的日志
+journalctl -b -1  # 查看上一次启动的日志（需更改设置）
+```
 
 ## CentOS Stream 8
 
