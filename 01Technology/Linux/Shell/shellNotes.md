@@ -8,6 +8,12 @@
 
 在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中
 
+```sh
+# do something in current dir
+(cd /some/other/dir && other-command)
+# continue in original dir
+```
+
 `read -p "Press [Enter] key to continue"`
 `read -n 1 -p "Press any key to continue"`
 
@@ -46,14 +52,54 @@ case $_myos in
 esac
 ```
 
+## Shell
+
+```sh
+# 数学表达式：
+i=$(( (i + 1) % 5 ))
+# 序列
+{1..10}
+
+# 使用括号扩展（{...}）来减少输入相似文本，并自动化文本组合。这在某些情况下会很有用，例如
+mv foo.{txt,pdf} some-dir #（同时移动两个文件），
+cp somefile{,.bak} #（会被扩展成 cp somefile somefile.bak）
+mkdir -p test-{a,b,c}/subtest-{1,2,3} #（会被扩展成所有可能的组合，并创建一个目录树）。
+
+# 在 Bash 中，同时重定向标准输出和标准错误：
+通常，为了保证命令不会在标准输入里残留一个未关闭的文件句柄捆绑在你当前所在的终端上，在命令后添加 `</dev/null` 是一个好习惯。
+some-command >logfile 2>&1
+# 或者
+some-command &>logfile
+```
+
 ## Shell 变量
 
-定义变量时，变量名不加美元符号（$，PHP语言中变量需要），注意，变量名和等号之间不能有空格. 如： `var_name="a variable"`
-只读变量 使用 readonly 命令可以将变量定义为只读变量， `readonly var_name`
+```sh
+# 定义变量时，变量名不加美元符号（$，PHP语言中变量需要），注意，变量名和等号之间不能有空格.
+var_name="a variable"
 
-删除变量 `unset var_name`
+# 只读变量 使用 readonly 命令可以将变量定义为只读变量
+readonly var_name
 
-`echo ${var_name}` 变量名外面的花括号是为了帮助解释器识别变量的边界, 非必须
+# 删除变量
+unset var_name
+
+# 变量名外面的花括号是为了帮助解释器识别变量的边界, 非必须
+echo ${var_name}
+
+
+# 在 Bash 中，变量有许多的扩展方式。
+# 用于检查变量是否存在。
+${name:?error message}
+# 当 Bash 脚本只需要一个参数时，可以使用这样的代码
+input_file=${1:?usage: $0 input_file}
+
+# 在变量为空时使用默认值：
+${name:-default}
+# 如果你要在之前的例子中再加一个（可选的）参数，可以使用类似这样的代码
+# 如果省略了 $2，它的值就为空，于是 output_file 就会被设为 logfile。
+output_file=${2:-logfile}
+```
 
 ### 引号
 
@@ -93,6 +139,13 @@ Numerical position in $string of first character in $substring that matches.
 `expr index $string $substring`
 
 ```bash
+# 截断字符串
+${var%suffix}
+${var#prefix}
+# 例如，假设
+var=foo.pdf
+echo ${var%.pdf}.txt # 将输出 foo.txt
+
 # 字符串截取（界定字符本身也会被删除）
 str="www.runoob.com/linux/linux-shell-variable.html"
 echo "str    : ${str}"
