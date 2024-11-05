@@ -107,7 +107,7 @@ select version(); #显示版本信息
 
 -- lists databases
 -- \l
-SELECT datname FROM PGDATAbase WHERE datistemplate = false;
+SELECT datname FROM pg_database WHERE datistemplate = false;
 
 -- 使用数据库
 -- \c database_name
@@ -1122,7 +1122,7 @@ View definition:
     s.query,
     s.backend_type
    FROM pg_stat_get_activity(NULL::integer) s(datid, pid, usesysid, application_name, state, query, wait_event_type, wait_event, xact_start, query_start, backend_start, state_change, client_addr, client_hostname, client_port, backend_xid, backend_xmin, backend_type, ssl, sslversion, sslcipher, sslbits, ssl_client_dn, ssl_client_serial, ssl_issuer_dn, gss_auth, gss_princ, gss_enc, gss_delegation, leader_pid, query_id)
-     LEFT JOIN PGDATAbase d ON s.datid = d.oid
+     LEFT JOIN pg_database d ON s.datid = d.oid
      LEFT JOIN pg_authid u ON s.usesysid = u.oid;
 ```
 
@@ -1226,11 +1226,11 @@ select pg_conf_load_time();
 
 ```sql
 -- 查看数据库表大小
-select PGDATAbase_size('playboy');
+select pg_database_size('playboy');
 -- 1、查询执行数据库大小
-select pg_size_pretty (PGDATAbase_size('db_product'));
+select pg_size_pretty (pg_database_size('ems_test'));
 -- 2、查询数据库实例当中各个数据库大小
-select datname, pg_size_pretty (PGDATAbase_size(datname)) AS size from PGDATAbase;
+select datname, pg_size_pretty (pg_database_size(datname)) AS size from pg_database;
 -- 3、查询单表数据大小
 select pg_size_pretty(pg_relation_size('product')) as size;
 -- 4、查询数据库表包括索引的大小
@@ -1238,7 +1238,7 @@ select pg_size_pretty(pg_total_relation_size('table_name')) as size;
 -- 5、查看表中索引大小
 select pg_size_pretty(pg_indexes_size('product'));
 -- 6、获取各个表中的数据记录数
-select relname as TABLE_NAME, reltuples as rowCounts from pg_class where relkind = 'r' order by rowCounts desc
+select relname as TABLE_NAME, reltuples as rowCounts from pg_class where relkind = 'r' and relname not like 'pg%' order by rowCounts desc;
 -- 7、查看数据库表对应的数据文件
 select pg_relation_filepath('product');
 ```
@@ -1417,28 +1417,27 @@ SET enable_seqscan = 'off';
 
 #### pg_dump 导出数据
 
+[PostgreSQL: Documentation: 16: pg_dump](https://www.postgresql.org/docs/16/app-pgdump.html)
+
 ```sh
-pg_dump -h localhost -p 5432 -U postgres --column-inserts -t table_name -f save_sql.sql database_name
-pg_dump -h localhost -p 5432 -U postgres --column-inserts -t table_name -f save_sql.sql database_name
+pg_dump -h localhost -p 5432 -U postgres --clean --if-exists --create --column-inserts -d database_name -t table_name -f save_sql.sql
 -- 备份postgres库并tar打包
-pg_dump -h 127.0.0.1 -p 5432 -U postgres -f postgres.sql.tar -Ft
+pg_dump -h 127.0.0.1 -p 5432 -U postgres -d database_name -Ft -f postgres.sql.tar
 
 # pg_dumpall backs up each database in a given cluster, and also preserves cluster-wide data such as role and tablespace definitions
 pg_dumpall > dumpfile
-# restored with psql
-psql -f dumpfile postgres
 ```
 
-1. `--column-inserts` #以带有列名的 `INSERT` 命令形式转储数据。This will make restoration very slow; it is mainly useful for making dumps that can be loaded into non-PostgreSQL databases.
-2. `-t` --只转储指定名称的表。
+1. `--column-inserts` 以带有列名的 `INSERT` 命令形式转储数据。This will **make restoration very slow**; it is mainly useful for making dumps that can be loaded into non-PostgreSQL databases
+2. `-t` --只转储指定名称的表
 3. `-f` --指定输出文件或目录名
 4. `-F` format, --format=format Selects the format of the output. format can be one of the following:
     1. `p`, plain: Output a plain-text SQL script file (the default).
     2. `c`, custom Output a custom-format archive suitable for input into `pg_restore`.
     3. `t`, tar Output a tar-format archive suitable for input into `pg_restore`.
 5. `-c, --clean` Output commands to DROP all the dumped database objects prior to outputting the commands for creating them.
-6. `-C, --create` create the database itself and reconnect to the created database
-7. `--if-exists` Use `DROP ... IF EXISTS` commands to drop objects in `--clean` mode
+6. `--if-exists` Use `DROP ... IF EXISTS` commands to drop objects in `--clean` mode
+7. `-C, --create` create the database itself and reconnect to the created database
 8. `-t pattern, --table=pattern` Dump only tables with names matching pattern. 可以使用多个-t选项匹配多个表。
 9. `-T pattern, --exclude-table=pattern` Do not dump any tables matching pattern.
 10. `-O, --no-owner` Do not output commands to set ownership of objects to match the original database.
@@ -1452,12 +1451,12 @@ psql 通过执行 SQL 文件恢复 psql -d dbname -f dumpfile
 
 ```sh
 psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -f globals.backup.sql
-psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -f dumpfile dbname
+psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -d dbname -f dumpfile
 ```
 
 #### pg_restore
 
-[PostgreSQL: Documentation: 16: pg_dump](https://www.postgresql.org/docs/16/app-pgdump.html)
+[PostgreSQL: Documentation: 16: pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html)
 
 * `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
 * `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
@@ -1469,37 +1468,68 @@ psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transactio
 * `-t table, --table=table`, Restore definition and/or data of only the named table.
 * `-1, --single-transaction` Execute the restore as a single transaction. This option implies --exit-on-error.
 
+导出参数实验
+
+```sh
+# 没有 --inserts 和 --column-inserts
+COPY public.test_table (id, value) FROM stdin;
+1       Record 1
+2       Record 2
+\.
+
+#  --inserts
+INSERT INTO public.test_table VALUES (1, 'Record 1');
+INSERT INTO public.test_table VALUES (2, 'Record 2');
+
+#  --column-inserts
+INSERT INTO public.test_table (id, value) VALUES (1, 'Record 1');
+INSERT INTO public.test_table (id, value) VALUES (2, 'Record 2');
+
+# --clean 有 DROP 但是没有 IF EXISTS
+ALTER TABLE ONLY public.test_table DROP CONSTRAINT test_table_pkey;
+ALTER TABLE public.test_table ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE public.test_table_id_seq;
+DROP TABLE public.test_table;
+DROP EXTENSION pg_stat_statements;
+
+#  --clean --if-exists: DROP TABLE IF EXISTS
+# TABLE, SEQUENCE, EXTENSION
+ALTER TABLE IF EXISTS ONLY public.test_table DROP CONSTRAINT IF EXISTS test_table_pkey;
+ALTER TABLE IF EXISTS public.test_table ALTER COLUMN id DROP DEFAULT;
+DROP SEQUENCE IF EXISTS public.test_table_id_seq;
+DROP TABLE IF EXISTS public.test_table;
+DROP EXTENSION IF EXISTS pg_stat_statements;
+
+#  --clean --if-exists --create: DROP DATABASE IF EXISTS
+# 数据库
+DROP DATABASE IF EXISTS test_replication;
+--
+-- Name: test_replication; Type: DATABASE; Schema: -; Owner: postgres
+--
+CREATE DATABASE test_replication WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+ALTER DATABASE test_replication OWNER TO postgres;
+```
+
 #### 逻辑备份与恢复
 
 ```sh
 su - postgres
--- 先备份全局对象
+# 先备份全局对象
 pg_dumpall -h localhost -p 5432 -U postgres -f globals.backup.sql --globals-only
--- 再备份数据库
-pg_dump old_db -Fc > old_db.dump
+# 再备份数据库
 # -F c is custom format (compressed, and able to do in parallel with -j N) -b is including blobs, -v is verbose, -f is the backup file name.
-pg_dump -h localhost -p 5432 -U postgres -F c -b -v -f "/path/to/old_db.dump" old_db
-pg_dump -h localhost -p 5432 -U postgres --column-inserts -f save_sql.sql -d database_name -t table_name
+pg_dump -h localhost -p 5432 -U postgres -Fc --clean --if-exists --create --large-objects -v -d old_db -f /path/to/old_db.dump
+# 纯 SQL 格式导出 恢复慢
+pg_dump -h localhost -p 5432 -U postgres --column-inserts -f save_sql.sql -d old_db -t table_name
+pg_dump -d old_db -t table_name | gzip > backup.tgz
 
--- 逻辑恢复
-su - postgres
--- #先恢复全局对象
-psql
-```
 
-```sql
--- \i FILE  execute commands from file
-\i backup.sql
---创建对应的数据库
-create database newDb OWNER usera;
-\q
-```
+# 逻辑恢复 先恢复全局对象
+psql -c globals.backup.sql
+# pg_restore 恢复数据库
+pg_restore -h localhost -p 5432 -U postgres -d old_db -v /path/to/old_db.dump
 
-```sh
--- #pg_restore进行恢复
-pg_restore -h localhost -p 5432 -U postgres -d old_db -v "/path/to/old_db.dump"
-
--- To reload an archive file into the same database it was dumped from, discarding the current contents of that database:
+# To reload an archive file into the same database it was dumped from, discarding the current contents of that database
 pg_restore -d newDb --clean --create old_db.dump
 ```
 
