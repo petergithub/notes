@@ -681,6 +681,11 @@ sed -i 's/^BBB/#&/' file
 
 # If BBB is in the middle of the line:
 sed-i  's/^[^#]*BBB/#&/' file
+
+# 从文本内的第一个包含start内容的部分截取直到end为止；
+sed -n '/start/,/end/p' file
+# 设置为时间，可以用于截取一定时间范围内的日志
+sed -n '/2021:09:20:10/,/2021:09:20:39/p' access.log
 ```
 
 多个模式 `sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'`
@@ -1878,13 +1883,6 @@ n(到达下一个窗口) p(到达上一个窗口)
 tmux move-window -s <source-session>:<window-number> -t <target-session>:<window-number>
 ```
 
-##### disable automatic rename
-
-If the window name keeps renaming, create file `.tmux.conf` with content below
-`set-option -g allow-rename off` or `set -g default-terminal "xterm-256color"` or `DISABLE_AUTO_TITLE=true` in .zshrc for zsh
-echo "set-option -g allow-rename off" > ~/.tmux.conf
-Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`
-
 #### panel operation
 
 " 将当前面板上下分屏"
@@ -1892,7 +1890,7 @@ Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:sou
 x 关闭当前面板
 <光标键> 移动光标选择对应面板
 ! 将当前面板置于新窗口,即新建一个窗口,其中仅包含当前面板
-CTRL+b+o交换两个panel位置
+CTRL+o 交换两个panel位置
 space 调整panel摆放方式
 CTRL+方向键     以1个单元格为单位移动边缘以调整当前面板大小
 ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大小
@@ -1903,7 +1901,18 @@ ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大�
 * `l`           Move to the previously selected window.
 * `[`           Enter copy mode to copy text or view the history.
 
+#### tmux setting .tmux.conf
+
 ```sh
+# Reload tmux config `.tmux.conf` within tmux, by pressing `CTRL+b` and then `:source-file ~/.tmux.conf` or simply from a shell: `tmux source-file ~/.tmux.conf`
+
+# disable automatic rename
+# DISABLE_AUTO_TITLE=true` in .zshrc for zsh
+set-option -g allow-rename off
+# or
+set-option -g allow-rename off
+set -g default-terminal "xterm-256color"
+
 # Enable Vi Mode
 #setw -g mode-keys vi
 set-window-option -g mode-keys vi
