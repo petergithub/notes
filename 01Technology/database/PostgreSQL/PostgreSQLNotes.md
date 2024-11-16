@@ -1,6 +1,7 @@
 # PostgreSQL Notes
 
 [PostgreSQL 16.3 Documentation](https://www.postgresql.org/docs/16/index.html)
+[PostgreSQL 15.7 手册](http://www.postgres.cn/docs/current/index.html)
 [PostgreSQL 中文社区 15.7 手册](http://www.postgres.cn/docs/15/index.html)
 [PostgreSQL 教程 | 菜鸟教程](https://www.runoob.com/postgresql/postgresql-tutorial.html)
 
@@ -244,6 +245,8 @@ CREATE SEQUENCE tablename_colname_seq;
 CREATE TABLE tablename(
     colname integer DEFAULT nextval('tablename_colname_seq') NOT NULL
 );
+-- 设置sequence 自增 id 值
+SELECT pg_catalog.setval('tablename_colname_seq', 1, true);
 
 -- 根据已有表结构创建表
 create table if not exists 新表 (like 旧表 including indexes including comments including defaults);
@@ -253,7 +256,7 @@ create table if not exists 新表 (like 旧表 including indexes including comme
 
 -- 命令行导出建表语句
 pg_dump -t 'schema-name.table-name' --schema-only database-name
-TABLE=basetest; pg_dump -U postgres ems_dev -t $TABLE --schema-only > $TABLE.sql
+TABLE=basetest; pg_dump -U postgres dbname -t $TABLE --schema-only > $TABLE.sql
 ```
 
 ### 创建用户和授权
@@ -297,6 +300,11 @@ alter user dbuser set default_transaction_read_only = on;
 alter role dbuser valid until '2022-12-31 23:59:59';
 alter role dbuser PASSWORD 'password';
 
+-- 将 owner 转移给其他角色
+ALTER TABLE table_name OWNER TO new_owner;
+ALTER SEQUENCE sequence_name OWNER TO new_owner;
+ALTER FUNCTION function_name OWNER TO new_owner;
+
 -- 用户加入到指定的用户组
 --将pgadmin加入到admin组
 alter group admin add user pgadmin;
@@ -316,11 +324,10 @@ revoke select on all tables in schema pg_catalog from dbuser;
 revoke create on schema public from dbuser;
 --出于安全，回收任何用户在public的create权限
 revoke create on schema public from public;
-
 -- 撤回对数据库的操作权限
 revoke all on database 数据库名 from dbuser;
 
--- 删除用户
+-- 删除用户 删除前需要回收用户的权限，然后才能删除
 drop user dbuser;
 
 SELECT * FROM pg_roles;
@@ -434,6 +441,9 @@ SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE da
 
 -- 2. 重命名
 ALTER DATABASE name RENAME TO newname;
+
+-- 列出所有数据库
+select datname from pg_catalog.pg_database where datname not in ('postgres','template0','template1') order by 1;
 ```
 
 ### 时间操作
@@ -462,6 +472,42 @@ select NOW()::timestamp + '1 year 1 month 1 day 1 hour 1 min 1 sec';
 
 ```sql
 SELECT * from pg_stat_activity;
+SELECT * from pg_stat_activity where datname = 'dbname' and client_addr not in ( '172.28.7.53', '172.28.7.54') order by client_addr, application_name;
+```
+
+### 获取数据库表大小
+
+```sql
+-- 查看数据库表大小
+select pg_database_size('playboy');
+-- 1、查询执行数据库大小
+select pg_size_pretty (pg_database_size('dbname'));
+-- 2、查询数据库实例当中各个数据库大小
+select datname, pg_size_pretty (pg_database_size(datname)) AS size from pg_database;
+-- 3、查询单表数据大小
+select pg_size_pretty(pg_relation_size('product')) as size;
+-- 4、查询数据库表包括索引的大小
+select pg_size_pretty(pg_total_relation_size('table_name')) as size;
+-- 5、查看表中索引大小
+select pg_size_pretty(pg_indexes_size('product'));
+-- 6、获取各个表中的数据记录数
+select relname as TABLE_NAME, reltuples as rowCounts from pg_class where relkind = 'r' and relname not like 'pg%' order by rowCounts desc;
+-- 7、查看数据库表对应的数据文件
+select pg_relation_filepath('product');
+```
+
+### 一些特殊需求的 SQL
+
+对比两张表的结构和数据是否完全相同
+
+```sql
+SELECT *
+FROM table1
+WHERE table1 NOT IN (SELECT * FROM table2)
+UNION ALL
+SELECT *
+FROM table2
+WHERE table2 NOT IN (SELECT * FROM table1);
 ```
 
 ### timing
@@ -569,6 +615,11 @@ order by current_timestamp-state_change desc
 limit 5;
 ```
 
+pg_stat_statements
+
+1. 执行时间单位 毫秒
+2. dbid 可以到 pg_database 查询 `select oid, datname,datdba from pg_database where oid = $dbid;`
+
 ```sql
 -- [PostgreSQL 16: F.32. pg_stat_statements — track statistics of SQL planning and execution](https://www.postgresql.org/docs/16/pgstatstatements.html)
 -- 查询最耗时的5个sql  需要开启 pg_stat_statements
@@ -576,15 +627,13 @@ select * from pg_stat_statements order by total_exec_time desc limit 5;
 
 -- 获取执行时间最慢的3条SQL，并给出CPU占用比例
 SELECT substring(query, 1, 1000) AS short_query,
-round(total_exec_time::numeric, 2) AS total_exec_time,
-calls,
-round((100 * total_exec_time / sum(total_exec_time::numeric) OVER ())::numeric, 2) AS percentage_cpu
+   round(total_exec_time::numeric, 2) AS total_exec_time, calls,
+   round((100 * total_exec_time / sum(total_exec_time::numeric) OVER ())::numeric, 2) AS percentage_cpu
 FROM pg_stat_statements
-ORDER BY total_exec_time DESC
-LIMIT 3;
--- 重置
-SELECT pg_stat_statements_reset(0,0,s.queryid) FROM pg_stat_statements AS s
-            WHERE s.query = 'UPDATE pgbench_branches SET bbalance = bbalance + $1 WHERE bid = $2';
+ORDER BY total_exec_time DESC LIMIT 3;
+
+-- 重置 If no parameter is specified or all the specified parameters are 0(invalid), it will discard all statistics. By default, this function can only be executed by superusers. Access may be granted to others using GRANT.
+SELECT pg_stat_statements_reset();
 
 -- 6、分析评估SQL执行情况
 EXPLAIN ANALYZE SELECT * FROM product
@@ -856,9 +905,9 @@ with
 -- 返回结果
    locktype    | datname | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid |                                                                               lock_conflict
 ---------------+---------+----------+------+-------+------------+---------------+---------+-------+----------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- transactionid | ems_dev |          |      |       |            | 13015         |         |       |          | Pid: 5093                                                                                                                                                                 +
+ transactionid | dbname |          |      |       |            | 13015         |         |       |          | Pid: 5093                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: true , Mode: ExclusiveLock , FastPath: false , VirtualTransaction: 98/168 , Session_State: idle in transaction                                              +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 54107 , Application_Name: DBeaver 24.1.5 - Main <ems_dev>                                +
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 54107 , Application_Name: DBeaver 24.1.5 - Main <dbname>                                +
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 08:07:08.144585+00 , Query_Start: 2024-10-14 08:10:55.0805+00 , Xact_Elapse: 01:34:44.600878 , Query_Elapse: 01:30:57.664963                       +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | SELECT x.* FROM public.fact_consumption_data_point_hourly x                                                                                                               +
@@ -866,15 +915,15 @@ with
                |         |          |      |       |            |               |         |       |          | --------                                                                                                                                                                  +
                |         |          |      |       |            |               |         |       |          | Pid: 5311                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: false , Mode: ShareLock , FastPath: false , VirtualTransaction: 16/13636 , Session_State: active                                                            +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <ems_dev>                                +
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <dbname>                                +
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 09:13:43.544583+00 , Query_Start: 2024-10-14 09:13:43.545181+00 , Xact_Elapse: 00:28:09.20088 , Query_Elapse: 00:28:09.200282                      +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | UPDATE public.fact_consumption_data_point_hourly                                                                                                                          +
                |         |          |      |       |            |               |         |       |          |         SET consumption_time_id=$1                                                                                                                                        +
                |         |          |      |       |            |               |         |       |          |         WHERE id=$2
- tuple         | ems_dev | 26319    |    0 |    26 |            |               |         |       |          | Pid: 5311                                                                                                                                                                 +
+ tuple         | dbname | 26319    |    0 |    26 |            |               |         |       |          | Pid: 5311                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: true , Mode: ExclusiveLock , FastPath: false , VirtualTransaction: 16/13636 , Session_State: active                                                         +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <ems_dev>                                +
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <dbname>                                +
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 09:13:43.544583+00 , Query_Start: 2024-10-14 09:13:43.545181+00 , Xact_Elapse: 00:28:09.20088 , Query_Elapse: 00:28:09.200282                      +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | UPDATE public.fact_consumption_data_point_hourly                                                                                                                          +
@@ -883,7 +932,7 @@ with
                |         |          |      |       |            |               |         |       |          | --------                                                                                                                                                                  +
                |         |          |      |       |            |               |         |       |          | Pid: 5311                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: true , Mode: ExclusiveLock , FastPath: false , VirtualTransaction: 16/13636 , Session_State: active                                                         +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <ems_dev>                                +
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 56616 , Application_Name: DBeaver 24.1.5 - Main <dbname>                                +
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 09:13:43.544583+00 , Query_Start: 2024-10-14 09:13:43.545181+00 , Xact_Elapse: 00:28:09.20088 , Query_Elapse: 00:28:09.200282                      +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | UPDATE public.fact_consumption_data_point_hourly                                                                                                                          +
@@ -892,7 +941,7 @@ with
                |         |          |      |       |            |               |         |       |          | --------                                                                                                                                                                  +
                |         |          |      |       |            |               |         |       |          | Pid: 5343                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: false , Mode: ExclusiveLock , FastPath: false , VirtualTransaction: 59/1874 , Session_State: active                                                         +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 56880 , Application_Name: DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae+
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 56880 , Application_Name: DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae+
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 09:19:36.976799+00 , Query_Start: 2024-10-14 09:19:36.977812+00 , Xact_Elapse: 00:22:15.768664 , Query_Elapse: 00:22:15.767651                     +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | update \r                                                                                                                                                                 +
@@ -901,7 +950,7 @@ with
                |         |          |      |       |            |               |         |       |          | --------                                                                                                                                                                  +
                |         |          |      |       |            |               |         |       |          | Pid: 5400                                                                                                                                                                 +
                |         |          |      |       |            |               |         |       |          | Lock_Granted: false , Mode: ExclusiveLock , FastPath: false , VirtualTransaction: 55/12002 , Session_State: active                                                        +
-               |         |          |      |       |            |               |         |       |          | Username: ems , Database: ems_dev , Client_Addr: 172.28.36.196/32 , Client_Port: 57379 , Application_Name: DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae+
+               |         |          |      |       |            |               |         |       |          | Username: user , Database: dbname , Client_Addr: 172.28.36.196/32 , Client_Port: 57379 , Application_Name: DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae+
                |         |          |      |       |            |               |         |       |          | Xact_Start: 2024-10-14 09:30:54.633174+00 , Query_Start: 2024-10-14 09:30:54.635058+00 , Xact_Elapse: 00:10:58.112289 , Query_Elapse: 00:10:58.110405                     +
                |         |          |      |       |            |               |         |       |          | SQL (Current SQL in Transaction):                                                                                                                                         +
                |         |          |      |       |            |               |         |       |          | update \r                                                                                                                                                                 +
@@ -1003,10 +1052,10 @@ order by '/'||array_to_string(a0.pathid,'/'),a0.depth;
 -- 返回结果
      pathid      | depth |  id  | parentid |  tree_id  |              term_pid              |          cancel_pid          | datname | usename |                        application_name                         |  client_addr  | wait_event_type |  wait_event   |        state
 -----------------+-------+------+----------+-----------+------------------------------------+------------------------------+---------+---------+-----------------------------------------------------------------+---------------+-----------------+---------------+---------------------
- /5093           |     1 | 5093 |        0 |  5093     | select pg_terminate_backend(5093); | select pg_cancel_backend(5093); | ems_dev | ems     | DBeaver 24.1.5 - Main <ems_dev>                                 | 172.28.36.196 | Client          | ClientRead    | idle in transaction
- /5093/5311      |     2 | 5311 |     5093 |    5311   |                                    |                              | ems_dev | ems     | DBeaver 24.1.5 - Main <ems_dev>                                 | 172.28.36.196 | Lock            | transactionid | active
- /5093/5311/5343 |     3 | 5343 |     5311 |      5343 |                                    |                              | ems_dev | ems     | DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae | 172.28.36.196 | Lock            | tuple         | active
- /5093/5311/5400 |     3 | 5400 |     5311 |      5400 |                                    |                              | ems_dev | ems     | DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae | 172.28.36.196 | Lock            | tuple         | active
+ /5093           |     1 | 5093 |        0 |  5093     | select pg_terminate_backend(5093); | select pg_cancel_backend(5093); | dbname | user     | DBeaver 24.1.5 - Main <dbname>                                 | 172.28.36.196 | Client          | ClientRead    | idle in transaction
+ /5093/5311      |     2 | 5311 |     5093 |    5311   |                                    |                              | dbname | user     | DBeaver 24.1.5 - Main <dbname>                                 | 172.28.36.196 | Lock            | transactionid | active
+ /5093/5311/5343 |     3 | 5343 |     5311 |      5343 |                                    |                              | dbname | user     | DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae | 172.28.36.196 | Lock            | tuple         | active
+ /5093/5311/5400 |     3 | 5400 |     5311 |      5400 |                                    |                              | dbname | user     | DBeaver 24.1.5 - SQLEditor <ETL\xe9\x87\x8d\xe7\x82\xb9\xe8\xae | 172.28.36.196 | Lock            | tuple         | active
 (4 rows)
 ```
 
@@ -1072,7 +1121,7 @@ JOIN  pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = b
 #### pg_stat_activity structure
 
 ```sql
-ems_dev=> \d+ pg_stat_activity
+dbname=> \d+ pg_stat_activity
                                   View "pg_catalog.pg_stat_activity"
       Column      |           Type           | Collation | Nullable | Default | Storage  | Description
 ------------------+--------------------------+-----------+----------+---------+----------+-------------
@@ -1220,27 +1269,6 @@ cmax, 删除该元组的命令在事务中的命令序列号.
 select pg_terminate_backend(pid);
 -- 查看最新加载配置的时间
 select pg_conf_load_time();
-```
-
-### 获取数据大小
-
-```sql
--- 查看数据库表大小
-select pg_database_size('playboy');
--- 1、查询执行数据库大小
-select pg_size_pretty (pg_database_size('ems_test'));
--- 2、查询数据库实例当中各个数据库大小
-select datname, pg_size_pretty (pg_database_size(datname)) AS size from pg_database;
--- 3、查询单表数据大小
-select pg_size_pretty(pg_relation_size('product')) as size;
--- 4、查询数据库表包括索引的大小
-select pg_size_pretty(pg_total_relation_size('table_name')) as size;
--- 5、查看表中索引大小
-select pg_size_pretty(pg_indexes_size('product'));
--- 6、获取各个表中的数据记录数
-select relname as TABLE_NAME, reltuples as rowCounts from pg_class where relkind = 'r' and relname not like 'pg%' order by rowCounts desc;
--- 7、查看数据库表对应的数据文件
-select pg_relation_filepath('product');
 ```
 
 ### 参数级别
@@ -1405,7 +1433,6 @@ SET enable_seqscan = 'off';
 
 [PostgreSQL 数据库备份与恢复](https://cloud.tencent.com/developer/article/2315304)
 [PostgreSQL: Documentation: 16: 26.1. SQL Dump](https://www.postgresql.org/docs/16/backup-dump.html)
-[PostgreSQL: Documentation: 17: pg_restore](https://www.postgresql.org/docs/current/app-pgrestore.html)
 
 [The Current State of Open Source Backup Management for PostgreSQL | Severalnines](https://severalnines.com/blog/current-state-open-source-backup-management-postgresql/)
 [A Complete Guide to PostgreSQL Backup & Recovery](https://www.enterprisedb.com/postgresql-database-backup-recovery-what-works-wal-pitr)
@@ -1426,6 +1453,12 @@ pg_dump -h 127.0.0.1 -p 5432 -U postgres -d database_name -Ft -f postgres.sql.ta
 
 # pg_dumpall backs up each database in a given cluster, and also preserves cluster-wide data such as role and tablespace definitions
 pg_dumpall > dumpfile
+pg_dumpall -h localhost -p 5432 -U postgres -f /tmp/pg_dumpall.sql
+
+# 并行备份
+pg_dump -U username -F t -j 4 -f backup.tar database_name
+# 压缩备份
+pg_dump -U username database_name | gzip > /tmp/backup.gz
 ```
 
 1. `--column-inserts` 以带有列名的 `INSERT` 命令形式转储数据。This will **make restoration very slow**; it is mainly useful for making dumps that can be loaded into non-PostgreSQL databases
@@ -1444,29 +1477,20 @@ pg_dumpall > dumpfile
 11. `--data-only`: Backs up only the data, excluding the database schema.
 12. `-s, --schema-only` Dump only the object definitions (schema), not data.
 
-psql 通过执行 SQL 文件恢复 psql -d dbname -f dumpfile
+psql 通过执行 SQL 文件恢复 `psql -d dbname -f sqlfile`
+[PostgreSQL 16: psql](https://www.postgresql.org/docs/16/app-psql.html)
 
 1. `--set ON_ERROR_STOP=on` exit with an exit status of 3 if an SQL error occurs
 2. `-1` or `--single-transaction` restored as a single transaction
 
 ```sh
+# 执行 SQL 恢复
 psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -f globals.backup.sql
 psql -h localhost -p 5432 -U postgres --set ON_ERROR_STOP=on --single-transaction -d dbname -f dumpfile
+
+# 从压缩的备份文件中恢复
+gunzip -c backup.gz | psql -U username target_database
 ```
-
-#### pg_restore
-
-[PostgreSQL: Documentation: 16: pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html)
-
-* `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
-* `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
-* `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
-* `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
-* `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
-* `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
-* `-s, --schema-only` Restore only the schema (data definitions), not data, to the extent that schema entries are present in the archive. This option is the inverse of --data-only.
-* `-t table, --table=table`, Restore definition and/or data of only the named table.
-* `-1, --single-transaction` Execute the restore as a single transaction. This option implies --exit-on-error.
 
 导出参数实验
 
@@ -1510,19 +1534,47 @@ CREATE DATABASE test_replication WITH TEMPLATE = template0 ENCODING = 'UTF8' LOC
 ALTER DATABASE test_replication OWNER TO postgres;
 ```
 
+#### pg_restore
+
+[PostgreSQL: Documentation: 16: pg_restore](https://www.postgresql.org/docs/16/app-pgrestore.html)
+
+```sh
+# 列出备份文件内容而不恢复，输出到 /tmp/list1
+pg_restore -v -l -f /tmp/list1 /tmp/test_replication.dump
+# 恢复 日志输出到 /tmp/restore.log
+pg_restore -h localhost -p 5432 -U postgres -d dbname --clean --if-exists -v pg.dump > /tmp/restore.log 2>&1
+
+# 管道恢复
+pg_dump -h localhost -p 5432 -U postgres -Fc -d test_replication | pg_restore -h localhost -p 5432 -U postgres --clean --if-exists -v -d test_replication_restore
+
+# 使用并行作业恢复
+pg_restore -U username -j 4 -d target_database backup_file
+```
+
+* `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
+* `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
+* `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
+* `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
+* `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
+* `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
+* `-l, --list` List the table of contents of the archive. The output of this operation can be used as input to the -L option.
+* `-s, --schema-only` Restore only the schema (data definitions), not data, to the extent that schema entries are present in the archive. This option is the inverse of --data-only.
+* `-t table, --table=table`, Restore definition and/or data of only the named table.
+* `-1, --single-transaction` Execute the restore as a single transaction. This option implies --exit-on-error.
+* `-O, --no-owner` Do not output commands to set ownership of objects to match the original database. With -O, any user name can be used for the initial connection, and this user will own all the created objects.
+
 #### 逻辑备份与恢复
 
 ```sh
 su - postgres
 # 先备份全局对象
-pg_dumpall -h localhost -p 5432 -U postgres -f globals.backup.sql --globals-only
+pg_dumpall -h localhost -p 5432 -U postgres --globals-only -f globals.backup.sql
 # 再备份数据库
 # -F c is custom format (compressed, and able to do in parallel with -j N) -b is including blobs, -v is verbose, -f is the backup file name.
 pg_dump -h localhost -p 5432 -U postgres -Fc --clean --if-exists --create --large-objects -v -d old_db -f /path/to/old_db.dump
 # 纯 SQL 格式导出 恢复慢
 pg_dump -h localhost -p 5432 -U postgres --column-inserts -f save_sql.sql -d old_db -t table_name
-pg_dump -d old_db -t table_name | gzip > backup.tgz
-
+pg_dump -d old_db -t table_name | gzip > /tmp/backup.gz
 
 # 逻辑恢复 先恢复全局对象
 psql -c globals.backup.sql
@@ -1584,7 +1636,7 @@ pg_ctl start
 ```sql
 /* KILL ALL EXISTING CONNECTION FROM ORIGINAL DB (sourcedb) to avoid the error ERROR:  source database "SOURCE_DB" is being accessed by other users*/
 SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity
-WHERE pg_stat_activity.datname = 'SOURCE_DB' AND pid <> pg_backend_pid();
+ WHERE pg_stat_activity.datname = 'SOURCE_DB' AND pid <> pg_backend_pid();
 
 /* CLONE DATABASE TO NEW ONE(TARGET_DB) */
 CREATE DATABASE TARGET_DB WITH TEMPLATE SOURCE_DB OWNER USER_DB;
@@ -2142,7 +2194,9 @@ lock_timeout = 120s
 
 ## PostgreSQL 主从同步
 
-[PostgreSQL: Documentation: 16: 27.1. Comparison of Different Solutions](https://www.postgresql.org/docs/16/different-replication-solutions.html)
+[PostgreSQL 27.1. Comparison of Different Solutions](https://www.postgresql.org/docs/16/different-replication-solutions.html)
+[PostgreSQL 27.2. Log-Shipping Standby Servers](https://www.postgresql.org/docs/16/warm-standby.html)
+
 [进阶数据库系列（十五）：PostgreSQL 主从同步原理与实践-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2315296)
 
 [浅谈 PostgreSQL 高可用方案-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2425953)
@@ -2155,7 +2209,7 @@ lock_timeout = 120s
 
 [PostgreSQL: Documentation: 16: Chapter 20. Server Configuration](https://www.postgresql.org/docs/16/runtime-config.html)
 
-当异步主从发生角色切换后，主库的wal目录中可能还有没完全同步到从库的内容，因此老的主库无法直接切换为新主库的从库。使用pg_rewind可以修复老的主库，使之成为新主库的只读从库。而不需要重建整个从库。
+当异步主从发生角色切换后，主库的wal目录中可能还有没完全同步到从库的内容，因此老的主库无法直接切换为新主库的从库。使用 pg_rewind 可以修复老的主库，使之成为新主库的只读从库。而不需要重建整个从库。
 
 pg_rewind（PostgreSQL 9.5官方包含，用于主从故障切换），一般推荐使用repmgr rejoin机制。
 
@@ -2269,6 +2323,8 @@ If this option is not specified and the server supports temporary replication sl
 * 需要自己编写监控和切换脚本，自己维护切换后的系统状态。
 * 存在着脑裂的问题。
 
+#### 一些参考的脚本
+
 ```sh
 #!/bin/bash
 # /etc/keepalived/check_pg.sh
@@ -2374,6 +2430,475 @@ if [ $? eq 0 ];then
    exit 1
 fi
 ```
+
+#### PostgreSQL 主库配置
+
+[Setting Up PostgreSQL Replication: A Step-by-Step Guide | by Umair Hassan | Medium](https://medium.com/@umairhassan27/setting-up-postgresql-replication-on-slave-server-a-step-by-step-guide-1ff36bb9a47f)
+
+```sql
+-- 创建数据库账号replica，并将密码设置为replica
+CREATE ROLE replica login replication encrypted password 'password';
+
+-- 查询账号是否创建成功
+SELECT usename from pg_user where usename = 'replica';
+-- 查询权限是否创建成功
+SELECT rolname from pg_roles where rolname = 'replica';
+```
+
+配置 pg_hba.conf 文件
+
+```sh
+# 配置 pg_hba.conf 文件
+tee -a $PGDATA/pg_hba.conf << EOF
+
+host    all             all             db02IP/32            md5
+host    replication     replica         db02IP/32            md5
+EOF
+```
+
+配置 postgresql.conf 文件 并将参数修改为以下内容：
+
+```sh
+# vi $PGDATA/postgresql.conf
+listen_addresses = '*'   #监听的IP地址
+max_connections = 10000    #最大连接数，从库的max_connections必须要大于主库的
+
+# [wal_level synchronous_commit: 20.5. Write Ahead Log](https://www.postgresql.org/docs/16/runtime-config-wal.html#RUNTIME-CONFIG-WAL-SETTINGS)
+wal_level = replica      #记录足够的信息以支持常见的备库用途，包括流复制和热备 minimal, replica, or logical
+synchronous_commit = on  #开启同步复制 Valid values are remote_apply, on (the default), remote_write, local, and off.
+# [max_wal_senders wal_sender_timeout: 20.6. Replication](https://www.postgresql.org/docs/16/runtime-config-replication.html#GUC-MAX-WAL-SENDERS)
+max_wal_senders = 10     #同步最大的进程数量
+wal_sender_timeout = 60s #流复制主机发送数据的超时时间
+#max_replication_slots = 10     # max number of replication slots (change requires restart)
+primary_slot_name = 'node_a_slot'     # replication slot on sending server, 主库设置是为了主从切换后，变为从库的预先准备
+
+# archive_timeout = 0 # force a WAL file switch after this number of seconds; 0 disables
+
+# create a replication slot
+psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('node_a_slot');"
+# Querying Replication Slots
+psql -U postgres -c "SELECT slot_name, slot_type, active FROM pg_replication_slots;"
+
+# 启动服务
+systemctl restart postgresql
+```
+
+```sql
+-- 测试数据
+CREATE DATABASE test_replication;
+\c test_replication
+CREATE TABLE test_table (id serial primary key, value text);
+INSERT INTO test_table (value) VALUES ('Record 1');
+INSERT INTO test_table (value) VALUES ('Record 2');
+SELECT * FROM test_table;
+```
+
+#### PostgreSQL 从库配置
+
+```sh
+# 安装但是不启动，也不初始化数据目录
+mkdir -p $PGDATA
+chown -R postgres:postgres $PGDATA
+chmod 0700 /data/pgdata
+
+# Perform an initial data synchronization from the primary server to the standby server.
+# [PostgreSQL 16: pg_basebackup](https://www.postgresql.org/docs/16/app-pgbasebackup.html)
+pg_basebackup -h db01 -p 5432 -U replica -D $PGDATA -X stream -R
+# R if you are using this to create a standby, this will automatically add a recovery.conf to the backup folder
+# X will include the wall files generated while the backup was being taken, this will ensure that your backup is up-to-date
+```
+
+修改 $PGDATA/postgresql.conf
+
+```sh
+# vi $PGDATA/postgresql.conf
+# primary_conninfo = 'host=<主节点IP> port=5432 user=replica password=replica' #对应主库的连接信息
+# primary_conninfo = 'host=db01 port=5432 user=replica password=password' #对应主库的连接信息
+recovery_target_timeline = 'latest' #流复制同步到最新的数据 default latest
+max_connections = 1000             # 最大连接数，从节点需设置比主节点大
+# hot_standby = on     # 开启热备 "off" disallows queries during recovery (change requires restart). default on
+
+# max_standby_streaming_delay = 30s  # 数据流备份的最大延迟时间 default 30s, 超时则杀掉从库正在执行的冲突 SQL
+# wal_receiver_status_interval = 1s  # 从节点向主节点报告自身状态的最长间隔时间 default 10s
+# hot_standby_feedback = on          # 如果有错误的数据复制向主进行反馈 default off
+primary_slot_name = 'node_a_slot'                       # replication slot on sending server
+
+# create a replication slot
+# 从库也创建好，是为了主从切换
+psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('node_a_slot');"
+# Querying Replication Slots
+psql -U postgres -c "SELECT slot_name, slot_type, active FROM pg_replication_slots;"
+
+# 启动服务
+systemctl restart postgresql
+```
+
+#### PostgreSQL 主从配置验证
+
+```sh
+pg_basebackup -D $PGDATA -h db01 -p 5432 -U replica -X stream -P
+# pg_basebackup: error: directory "/data/pgdata" exists but is not empty
+
+# 在主节点中运行以下命令，查看sender进程。
+ps auxww | grep ^postgres
+ps aux |grep walsender
+
+# 在从节点中运行以下命令，查看receiver进程
+ps aux |grep walreceiver
+
+pg_controldata | grep 'Database cluster state'
+# 主库返回 in production
+# 从库返回 in archive recovery
+
+
+# 在主库中查看从库状态。
+# [PostgreSQL 16: 9.27. System Administration Functions Table 9.91. Backup Control Functions](https://www.postgresql.org/docs/16/functions-admin.html#FUNCTIONS-ADMIN-BACKUP-TABLE)
+psql -U postgres -c "select pg_current_wal_lsn();"
+
+psql -U postgres -c "\x" -c "select * from pg_stat_replication;"
+-[ RECORD 1 ]----+-----------------------------
+pid              | 31055
+usesysid         | 16388
+usename          | replica
+application_name | walreceiver
+client_addr      | 127.0.0.1
+client_hostname  |
+client_port      | 41552
+backend_start    | 2024-10-23 11:48:56.27194+08
+backend_xmin     |
+state            | streaming
+sent_lsn         | 0/7000060
+write_lsn        | 0/7000060
+flush_lsn        | 0/7000060
+replay_lsn       | 0/7000060
+write_lag        |
+flush_lag        |
+replay_lag       |
+sync_priority    | 0
+sync_state       | async
+reply_time       | 2024-10-23 11:51:16.34397+08
+
+
+# Monitor replication status:
+[PostgreSQL 16: 9.27. System Administration Functions Table 9.92. Recovery Information Functions](https://www.postgresql.org/docs/16/functions-admin.html#FUNCTIONS-RECOVERY-INFO-TABLE)
+psql -U postgres -c "select pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn(), pg_last_xact_replay_timestamp();"
+
+psql -U postgres -c "\x" -c "SELECT * FROM pg_stat_wal_receiver;"
+-[ RECORD 1 ]---------+---------------
+pid                   | 29078
+status                | streaming
+receive_start_lsn     | 0/7000000
+receive_start_tli     | 1
+written_lsn           | 0/7000060
+flushed_lsn           | 0/7000060
+received_tli          | 1
+last_msg_send_time    | 2024-10-23 11:50:56.321083+08
+last_msg_receipt_time | 2024-10-23 11:50:56.323755+08
+latest_end_lsn        | 0/7000060
+latest_end_time       | 2024-10-23 11:48:56.288978+08
+slot_name             |
+sender_host           | db01
+sender_port           | 5432
+conninfo              | user=replica password=******** channel_binding=disable dbname=replication host=db01 port=5432 fallback_application_name=walreceiver sslmode=disable sslcompression=0 sslcertmode=disable sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=disable krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable
+```
+
+#### PostgreSQL Replication Switchover
+
+[PostgreSQL Replication Switchover: A Step-by-Step Guide | by Umair Hassan | Medium](https://medium.com/@umairhassan27/postgresql-replication-switchover-a-step-by-step-guide-d42107d860)
+
+```sh
+# Verify Standby Synchronization
+SELECT CASE
+    WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+    ELSE EXTRACT(EPOCH FROM now() - pg_last_xact_replay_timestamp())
+END AS log_delay;
+
+# Allow Current Live IP in Current Backup 配置 pg_hba.conf 文件
+tee -a $PGDATA/pg_hba.conf << EOF
+host    replication     replica         db01IP/32            md5
+EOF
+
+# Shutdown the Primary
+systemctl stop postgresql
+# pg_ctl stop -D $PGDATA
+
+# Promote the Standby to Read-Write
+psql -U postgres -c "SELECT pg_promote();"
+# pg_ctl promote -D $PGDATA
+#This command promotes the standby to a read-write primary.
+
+# Create standby.signal on Old Primary
+touch $PGDATA/standby.signal
+
+# Edit postgresql.auto.conf on Old Primary
+#Update the postgres.auto.conf file with NEW MASTER SERVER DETAILS
+vi $PGDATA/postgresql.auto.conf
+
+#Modify the primary_conninfo parameter to reflect the new standby IP:
+primary_conninfo = 'user=replica password=''password'' channel_binding=disable host=db02 port=5432 sslmode=disable sslcompression=0 sslcertmode=disable sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=disable krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable'
+
+# Querying Replication Slots
+psql -U postgres -c "SELECT slot_name, slot_type, active FROM pg_replication_slots;"
+# 确认 node_a_slot 存在
+psql -U postgres -c "SELECT * FROM pg_create_physical_replication_slot('node_a_slot');"
+
+# TODO: 通过 pg_rewind 工具 配置postgresql.auto.conf添加primary_conninfo参数
+
+# Start Old Primary as a Standby
+# pg_ctl start -D $PGDATA
+systemctl start postgresql
+
+# Monitor Logs The logs will have something like “Starting as a standby”
+tail -100f $PGDATA/startup.log
+
+# Verify switchover
+
+# Verify the switchover using the available views.
+# First we will check if the server is receiving wals or not run below query on new slave:
+select * from pg_stat_wal_receiver;
+select pg_last_wal_receive_lsn(), pg_last_wal_replay_lsn(), pg_last_xact_replay_timestamp();
+
+IS_STANDBY=$(sudo -u postgres psql -U postgres -tAc "SELECT pg_is_in_recovery()")
+
+# Verify by matching the tables in both DB's
+# 测试数据
+CREATE DATABASE test_replication;
+\c test_replication
+CREATE TABLE test_table (id serial primary key, value text);
+INSERT INTO test_table (value) VALUES ('Record 1');
+INSERT INTO test_table (value) VALUES ('Record 2');
+SELECT * FROM test_table;
+
+# Check the new slave is Read-only or not (It should be read-only)
+SELECT pg_is_in_recovery();
+# This query will return a single boolean value:
+# true if the server is a standby and false if it's the primary.
+```
+
+主备切换脚本
+
+```sh
+#!/bin/bash
+# 需要在主从库上配置 ssh 和数据库免密登录
+
+set -euxo pipefail
+
+PRIMARY_OLD=db01
+STANDBY_OLD=db02
+
+# stop old primary
+ssh $PRIMARY_OLD -t sudo systemctl stop postgresql
+
+# Promote the old standby to new primary
+psql -h $STANDBY_OLD -U postgres -c "SELECT pg_promote();"
+ssh $STANDBY_OLD -t sudo tail -15 $PGDATA/startup.log
+
+# Startup old primary as new standby
+ssh $PRIMARY_OLD -t sudo touch $PGDATA/standby.signal
+ssh $PRIMARY_OLD -t sudo systemctl start postgresql
+
+# view log
+ssh $PRIMARY_OLD -t sudo tail -20 $PGDATA/startup.log
+psql -h $STANDBY_OLD -U postgres -c "SELECT pg_is_in_recovery();"
+psql -h $PRIMARY_OLD -U postgres -c "SELECT pg_is_in_recovery();"
+
+echo $STANDBY_OLD is primary, $PRIMARY_OLD is standby
+```
+
+#### PostgreSQL keepalived setup
+
+[PostgreSQL从小白到高手教程 - 第48讲：PG高可用实现keepalived-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2400069)
+
+```sh
+# 有内容修改
+# 需要使用抢占模式配置，注释掉 nopreempt
+# #nopreempt
+# Don't run scripts configured to be run as root if any part of the path
+# is writable by a non-root user.
+#  enable_script_security
+sudo cp /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.default
+sudo cp conf/keepalived.conf /etc/keepalived/keepalived.conf
+mkdir -p /data/project/keepalived/
+cp conf/check_pg_primary.sh /data/project/keepalived/
+
+sudo systemctl enable keepalived
+sudo systemctl start keepalived
+sudo systemctl restart keepalived
+
+# view log
+sudo journalctl -xeu keepalived
+```
+
+keepliaved configuration file: keepalived.conf
+
+```conf
+; master node
+! https://github.com/kubernetes/kubeadm/blob/main/docs/ha-considerations.md#keepalived-configuration
+! [Keepalived Man page for Linux](https://www.keepalived.org/manpage.html)
+!
+! /etc/keepalived/keepalived.conf
+! /usr/local/etc/keepalived/keepalived.conf
+! /container/service/keepalived/assets/keepalived.conf
+! /usr/local/etc/keepalived/check_pg_primary.sh
+! Configuration File for keepalived
+global_defs {
+    router_id LVS_DEVEL_postgres
+    script_user username
+    enable_script_security
+}
+vrrp_script check_pg_primary {
+  script "/data/project/keepalived/check_pg_primary.sh"
+  interval 2
+  weight -2
+  fall 10
+  rise 2
+}
+
+vrrp_instance VI_1 {
+    state MASTER        #  is MASTER for one and BACKUP for all other hosts, hence the virtual IP will initially be assigned to the MASTER.
+    interface ens192
+    virtual_router_id 53  #  should be the same for all keepalived cluster hosts while unique amongst all clusters in the same subnet
+    priority 101        #  should be higher on the control plane node than on the backups. Hence 101 and 100 respectively will suffice.
+    #nopreempt #不可抢占
+
+    authentication {
+        auth_type PASS
+        auth_pass 43   #  should be the same for all keepalived cluster hosts,
+    }
+    virtual_ipaddress {
+        10.2.8.81  #  is the virtual IP address negotiated between the keepalived cluster hosts.
+    }
+    track_script {
+        check_pg_primary
+    }
+
+    #notify "/container/service/keepalived/assets/notify.sh"
+}
+```
+
+```conf
+; backup node
+! https://github.com/kubernetes/kubeadm/blob/main/docs/ha-considerations.md#keepalived-configuration
+! [Keepalived Man page for Linux](https://www.keepalived.org/manpage.html)
+!
+! /etc/keepalived/keepalived.conf
+! /usr/local/etc/keepalived/keepalived.conf
+! /container/service/keepalived/assets/keepalived.conf
+! /usr/local/etc/keepalived/check_pg_primary.sh
+! Configuration File for keepalived
+global_defs {
+    router_id LVS_DEVEL_postgres
+    script_user username
+    enable_script_security
+}
+vrrp_script check_pg_primary {
+  script "/data/project/keepalived/check_pg_primary.sh"
+  interval 2
+  weight -2
+  fall 10
+  rise 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP        #  is MASTER for one and BACKUP for all other hosts, hence the virtual IP will initially be assigned to the MASTER.
+    interface ens192
+    virtual_router_id 53  #  should be the same for all keepalived cluster hosts while unique amongst all clusters in the same subnet
+    priority 101        #  should be higher on the control plane node than on the backups. Hence 101 and 100 respectively will suffice.
+    #nopreempt #不可抢占
+
+    authentication {
+        auth_type PASS
+        auth_pass 43   #  should be the same for all keepalived cluster hosts,
+    }
+    virtual_ipaddress {
+        10.2.8.81  #  is the virtual IP address negotiated between the keepalived cluster hosts.
+    }
+    track_script {
+        check_pg_primary
+    }
+
+    #notify "/container/service/keepalived/assets/notify.sh"
+}
+```
+
+
+
+
+```sh
+
+#!/bin/sh
+# /data/project/keepalived/check_pg_primary.sh
+
+export PGHOME=/data/software/pgsql-16.3
+export PATH=$PGHOME/bin:$PATH
+
+# Check if the node is in recovery mode (standby)
+#IS_STANDBY=$(sudo -u postgres psql -h localhost -U postgres -d postgres -tAc "SELECT pg_is_in_recovery()")
+IS_STANDBY=$(psql -h db01 -U postgres -d postgres -tAc "SELECT pg_is_in_recovery()")
+
+if [ $? -ne 0 ]; then
+    echo "error when execute sql"
+    exit 1
+fi
+
+if [ "$IS_STANDBY" == "t" ]; then
+    echo "Node is standby"
+    exit 1
+elif [ "$IS_STANDBY" == "f" ]; then
+    echo "Node is primary"
+    exit 0
+```
+
+#### PostgreSQL pg_rewind
+
+[PostgreSQL pg_rewind](https://www.postgresql.org/docs/16/app-pgrewind.html)
+[PgSQL · 特性分析 · 神奇的pg_rewind-阿里云开发者社区](https://developer.aliyun.com/article/608907)
+[PgSQL · 特性分析 · 时间线解析 - 数据库内核月报](http://mysql.taobao.org/monthly/2015/07/03/?spm=a2c6h.12873639.article-detail.10.51497a76cSjrad)
+
+pg_rewind requires that the target server either has the `wal_log_hints` option enabled in `postgresql.conf` or data checksums enabled when the cluster was initialized with initdb. Neither of these are currently on by default. `full_page_writes` must also be set to on, but is enabled by default.
+
+```sh
+# 主库执行
+pg_rewind --target-pgdata=/data/pgdata --source-server='host=db02 port=5432 user=postgres' --progress --dry-run
+
+# 执行完后从库需要检查以下设置
+# postgresql.conf 确保从库关闭备份，主库打开备份
+# 从库
+archive_mode = off
+archive_command = ''
+archive_cleanup_command = ''
+# 主库
+archive_mode = on
+archive_command = 'rsync -Pavz %p /data/nfsdata/postgresql16.3/archivedir/%f'
+archive_cleanup_command = 'pg_archivecleanup /data/nfsdata/postgresql16.3/archivedir %r'
+restore_command = 'cp /data/nfsdata/postgresql16.3/archivedir/%f %p'            # command to use to restore an archived WAL file
+recovery_target_timeline = 'latest'     # 'current', 'latest', or timeline ID
+
+# postgresql.auto.conf 确认跟踪的库为主库
+host=db01
+```
+
+* `-n --dry-run` Do everything except actually modifying the target directory.
+* `-P --progress` Enables progress reporting.
+* `-c --restore-target-wal` Use restore_command defined in the target cluster configuration to retrieve WAL files from the WAL archive if these files are no longer available in the pg_wal directory.
+* `-R --write-recovery-conf` Create standby.signal and append connection settings to postgresql.auto.conf in the output directory. --source-server is mandatory with this option.
+* `--debug` Print verbose debugging output that is mostly useful for developers debugging pg_rewind.
+
+#### PostgreSQL 同步异常
+
+```sh
+2024-11-11 17:33:44.021 CST [23888] LOG:  waiting for WAL to become available at 0/31000250
+2024-11-11 17:33:49.021 CST [24157] LOG:  started streaming WAL from primary at 0/31000000 on timeline 23
+2024-11-11 17:33:49.021 CST [24157] FATAL:  could not receive data from WAL stream: ERROR:  requested starting point 0/31000000 is ahead of the WAL flush position of this server 0/307D5F08
+2024-11-11 17:33:49.021 CST [23888] LOG:  waiting for WAL to become available at 0/31000250
+
+
+
+2024-11-12 10:11:33.405 CST [3738] LOG:  restored log file "000000170000000000000031" from archive
+2024-11-12 10:11:33.419 CST [3738] LOG:  invalid record length at 0/310001C0: expected at least 24, got 0
+
+```
+
 
 ### repmgr
 
