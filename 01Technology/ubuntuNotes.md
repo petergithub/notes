@@ -220,6 +220,7 @@ UNIX人认为在到达一行的结尾时新增一行`<Line feed> (LF) \n`, 而Ma
     `:%s/^M//g` #去掉所有的^M.
 3. `sed -e 's/^M//n/g' myfile.txt` // evluate
  `sed -i 's/^M//n/g' myfile.txt` // replace
+ `sed -i 's/\r$//' myfile.txt` // replace
 
 vi下显示回车换行符等特殊符号
 显示换行 `:set list` 进入`list mode`, 可以看到以`$`表示的换行符和以`^I`表示的制表符.
@@ -389,7 +390,7 @@ find help on just about any subject, by giving an argument to the `:help` comman
 read the output of an external command.  For example, `:r !ls`  reads the output of the `ls` command and puts it below the cursor
 
 `:r FILENAME`  retrieves disk file FILENAME and puts it below the cursor position
-`:x` == `:wq` 当文件被修改时两个命令时相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间
+`:x` == `:wq` 当文件被修改时两个命令是相同的. 但如果未被修改, 使用`:x`不会更改文件的修改时间, 而使用`:wq`会改变文件的修改时间
 `:w !sudo tee %`  在VIM中保存一个当前用户无权限修改的文件 查阅vim的文档（输入`:help :w`）, 会提到命令`:w!{cmd}`, 让vim执行一个外部命令{cmd}, 然后把当前缓冲区的内容从stdin传入. `tee`是一个把stdin保存到文件的小工具. 而`%`, 是vim当中一个只读寄存器的名字, 总保存着当前编辑文件的文件路径. 所以执行这个命令, 就相当于从vim外部修改了当前编辑的文件.
 `:help cmdline-special` to see meaning of `%`
 replace a character by a newline in Vim: Use `\r` instead of `\n`
@@ -577,26 +578,27 @@ Vim中查看文件编码 `:set fileencoding`
 说明: cp指令用于复制文件或目录，如同时指定两个以上的文件或目录，且最后的目的地是一个已经存在的目录，则它会把前面指定的所有文件或目录复制到此目录中。若同时指定多个文件或目录，而最后的目的地并非一个已存在的目录，则会出现错误信息
 参数:
 -a 或 --archive 此参数的效果和同时指定"-dpR"参数相同
--b 或 --backup 删除、覆盖目的文件先备份，备份的文件或目录亦建立为符号链接，并指向源文件或目录链接的源文件或目录。假如没有加上这个参数，在复制过程中若遇到符号链接，则会直接复制源文件或目录
 -d same as --no-dereference --preserve=links: never follow symbolic links in SOURCE
+-p 或 --preserve=mode,ownership,timestamps 保留源文件或目录的属性，包括所有者、所属组、权限与时间
+--preserve[=ATTR_LIST] preserve the specified attributes (default: mode,ownership,timestamps), if possible additional attributes: context, links, xattr, all
+-R 或 --recursive 递归处理，将指定目录下的文件及子目录一并处理
+-v 或 --verbose 显示执行过程
+-x 或 --one-file-system 复制的文件或目录存放的文件系统，必须与cp指令执行时所处的文件系统相同，否则不复制，亦不处理位于其他分区的文件
+
+-b 或 --backup 删除、覆盖目的文件先备份，备份的文件或目录亦建立为符号链接，并指向源文件或目录链接的源文件或目录。假如没有加上这个参数，在复制过程中若遇到符号链接，则会直接复制源文件或目录
 -f 或 --force 强行复制文件或目录， 不论目的文件或目录是否已经存在
 -i 或 --interactive 覆盖文件之前先询问用户
 -l 或 --link 对源文件建立硬链接，而非复制文件
 -P, --no-dereference never follow symbolic links in SOURCE
 -P 或 --parents 保留源文件或目录的路径，此路径可以是绝对路径或相对路径，且目的目录必须已经丰在
--p 或 --preserve=mode,ownership,timestamps 保留源文件或目录的属性，包括所有者、所属组、权限与时间
---preserve[=ATTR_LIST] preserve the specified attributes (default: mode,ownership,timestamps), if possible additional attributes: context, links, xattr, all
 -r 递归处理，将指定目录下的文件与子目录一并处理。若源文件或目录的形态，不属于目录或符号链接，则一律视为普通文件处理
--R 或 --recursive 递归处理，将指定目录下的文件及子目录一并处理
 -s 或 --symbolic-link 对源文件建立符号链接，而非复制文件
 -S <备份字尾字符串> 或 --suffix=<备份字尾字符串> 用"-b"参数备份目的文件后，备份文件的字尾会被加上一个备份字符串。默认的备份字尾符串是符号"~"
 -u 或 --update 使用这项参数之后，只会在源文件的修改时间(Modification Time)较目的文件更新时，或是名称相互对应的目的文件并不存在，才复制文件
--v 或 --verbose 显示执行过程
 -V <备份方式> 或 --version-control=<备份方式> 指定当备份文件时，备份文件名的命名方式，有以下3种:
     1.numbered或t, 将使用备份编号，会在字尾加上~1~字符串，其数字编号依次递增
     2.simple或never 将使用简单备份，默认的备份字尾字符串是~, 也可通过-S来指定
     3.existing或nil将使用当前方式，程序会先检查是否存在着备份编号，若有则采用备份编号，若无则采用简单备份
--x 或 --one-file-system 复制的文件或目录存放的文件系统，必须与cp指令执行时所处的文件系统相同，否则不复制，亦不处理位于其他分区的文件
 --help 显示在线帮助
 --sparse=<使用时机> 设置保存希疏文件的时机
 --version 显示版本
@@ -766,6 +768,11 @@ key3=<font color="#6fa5e9">value3</font>
 * `+n`     for greater than n,
 * `-n`     for less than n,
 * `n`      for exactly n.
+
+```sh
+# 查找并删除 30 天前的文件
+find /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
+```
 
 #### 删除时排除文件
 
@@ -3355,7 +3362,7 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `useradd -g <groupName> <username>`    Add a new user to primary group
 `useradd -G <groupName> <username>`    Add a new user to secondary group
 `usermod -G {groupname1,groupname2,...} <username>`    Remove user from group which is not list in the command
-`usermod -aG sudoGroup username` add the user to the sudo group `/etc/sudoers`, edit it by `visudo`.
+`usermod -aG sudoGroupName username` add the user to the sudo group `/etc/sudoers`, edit it by `visudo`.
     sudo group: wheel in CentOS, sudo in Ubuntu
 configure sudo to never ask for your password. add the following line: `username ALL=(ALL) NOPASSWD: ALL` in the bottom of the file.
 
