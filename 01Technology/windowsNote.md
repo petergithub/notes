@@ -9,7 +9,7 @@ Windows 睡眠快捷键 Win+X U S 或者设置电源选项关盖即休眠
 ```bat
 REM REM 是 "Remark" 的缩写，用于添加注释。
 REM 查找端口占用
-netstat -ano | findstr :48080
+netstat -ano | findstr :8080
 
 REM 查找进程号
 tasklist | findstr 4476
@@ -35,6 +35,7 @@ Windows Terminal
 PowerToy
     将窗口最大化至全屏	Control+Command+F	WindowsKey+Up
     保存屏幕（截图）	Command+Shift+3	WindowsKey+Shift+S
+
 MobaXterm
 XShell Esc+. (escape+dot) == Alt+.
 [QuickLook](https://github.com/QL-Win/QuickLook/releases)
@@ -54,9 +55,9 @@ git config path C:\Program Files\Git\etc\gitconfig
 `Shift+Delete` Delete line
 `Ctrl+Enter` new line after current line
 
-## Virtualbox
+### Virtualbox
 
-### share foler with host
+#### share foler with host
 
 virtualbox windows 宿主机 CentOS 7 虚拟机 共享文件
 
@@ -107,7 +108,7 @@ EOF
 chmod +x /etc/rc.local
 ```
 
-### config NAT and host network
+#### config NAT and host network
 
 [networking - How to connect to a VirtualBox guest OS through a VPN? - Super User](https://superuser.com/questions/987150/how-to-connect-to-a-virtualbox-guest-os-through-a-vpn)
 
@@ -177,7 +178,7 @@ NETMASK=255.255.255.0
 
 CentOS 网卡文件 /etc/sysconfig/network-scripts/ifcfg-enp0s3
 
-## Git bash
+### Git bash
 
 设置环境变量，更改 home 目录
 HOME=D:\home
@@ -189,7 +190,7 @@ export MSYS=winsymlinks:nativestrict
 
 [Installing Zsh (and oh-my-zsh) in Windows Git Bash | Dominik Rys](https://dominikrys.com/posts/zsh-in-git-bash-on-windows/)
 
-## MobaXterm
+### MobaXterm
 
 D:\Programs\MobaXterm_Portable_v24.1\MobaXterm_Personal_24.1.exe
 
@@ -205,7 +206,7 @@ Persistent root （/） directory: _AppDataDir_\MobaXterm\slash
 /home/mobaxterm/.shell.base:159: defining function based on alias `cls'
 /home/mobaxterm/.shell.base:159: parse error near `()'
 
-### MobaXterm 上传下载文件的几种情况
+#### MobaXterm 上传下载文件的几种情况
 
 1. 通过 堡垒机 Web 页面 SSO 调用 MobaXterm 登录目标服务器，可以自动打开 sftp browser 来上传下载文件。
 2. 通过 MobaXterm 先连接堡垒机，再跳到目标服务器，此时不会打开 sftp browser，是因为 MobaXterm 本身不知道后一次跳转。此时上传下载可以使用 rz、sz。
@@ -213,7 +214,7 @@ Persistent root （/） directory: _AppDataDir_\MobaXterm\slash
 
 参考 [MobaXterm file browser not following terminal after multiple SSH hops - Super User](https://superuser.com/questions/1804247/mobaxterm-file-browser-not-following-terminal-after-multiple-ssh-hops)
 
-### MobaXterm 使用 rz sz
+#### MobaXterm 使用 rz sz
 
 服务器安装 lrzsz
 
@@ -231,6 +232,43 @@ yum -y install lrzsz
 2. 鼠标右键
 3. Send file using Z-modem
 4. 选择上传文件
+
+## network
+
+### tracert
+
+tracert 命令格式如下
+
+tracert [-d] [-h maximum_hops] [-j computer-list] [-w timeout] target_name
+
+如果不带选项的话，会将IP地址解析成主机名，因为需要查询DNS，所以速度比较慢。
+
+* -d 选项：不将IP地址解析成主机名，因此路由追踪速度快很多。
+* -h 选项：说明路由的最大跳数，默认是30跳。
+* -w 选项：说明等待每一个ICMP响应报文的时间，默认4s，如果接收超时，则显示星号*。跳数和等待时间，使用默认值即可，所以平时一般都不需要添加这两个选项。
+* -j 选项：说明ICMP报文要使用IP头中的松散源路由选项，后面是经过的中间节点的地址或主机名字,最多9个，各个中间节点用空格隔开。
+
+这里说明下松散源路由和严格源路由，严格源路由是指，相邻路由器之间不得有中间路由器，并且所经过路由器的顺序不可更改。而松散源路由，则相反，相邻路由器之间可以有中间路由器。一般的路由追踪，也用不到-j这个选项。除非是针对大的网络故障，需要检测几条路径到达同一个目的地址，才需要使用-j选项。所以，通常情况下，我们使用tracert–d这种格式就可以了。我们以追踪百度网站为例。
+
+```batch
+tracert -d www.baidu.com
+```
+
+### Pathping
+
+Pathping 命令的格式如下：pathping [-g host-list] [-hmaximum_hops] [-n] [-p period] [-q num_queries] [-w timeout] target_name
+
+-g选项：使用松散源路由，功能与tracert 命令的-j选项相同。
+-h选项：追踪的最大跳数，功能与tracert 命令的-h选项相同。
+-n选项：不将IP地址解析成主机名，功能与tracert 命令的-d选项相同。
+-q选项：发送给每个路由器的请求报文的数量，默认100个。
+-p选项：两次ping之间的时间间隔，默认0.25秒。
+-w选项：每次等待回声响应的时间，默认3秒。功能与tracert 命令的-w选项相同。
+因此，在通常情况下，我们使用pathping -n格式就行了，路由追踪速度更快。下面，还是以百度为例：Pathping运行的第一个结果就是路由表，这个和tracert的结果是一致的。
+
+```batch
+PATHPING -n www.baidu.com
+```
 
 ## WSL
 
