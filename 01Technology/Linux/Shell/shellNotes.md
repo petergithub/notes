@@ -390,10 +390,12 @@ log() {
 
 ### for
 
-`array=( A B C D E F G )`
-`echo "${array[0]}"`
+```sh
+array=( A B C D E F G )
+echo "${array[0]}"
+```
 
-the  `for`  command  executes  list once for each positional parameter that is set
+the `for` command executes list once for each positional parameter that is set
 positional parameter: space, line return
 
 ```sh
@@ -403,14 +405,13 @@ for item in "${items[@]}"; do
 done
 
 for i in *; do cd $i ;gfa; cd -; done
-
 for VAR in LIST; do CMD; done;
-
 for VAR in *.zip; do CMD; done;
 for file in $(ls); do echo $file; done;
+vars="a b c"; for var in ${vars}; do echo $var; done
 
 # 数字自增
-for i in 1 2 3 4 5; do echo $i; done;
+for i in 1 2 3 4 5; do echo $i; done
 for i in $(seq 1 5); do echo $i; done
 for i in {01..10}; do echo $i; done
 for (( i = 0; i < 5; i++)); do echo $i; done;
@@ -424,7 +425,8 @@ IFS=- read -ra parts <<< foo-bar-baz; echo $parts, ${parts[0]}, ${parts[1]}
 
 ```
 
-```bash
+```zsh
+#!/bin/zsh
 # 遍历对象
 for_elements=(
     a
@@ -434,7 +436,9 @@ for_elements=(
 for e ($for_elements); do
     echo $e
 done
+```
 
+```bash
 # Looping over Arrays
 users=(John Harry Jake Scott Philis)
 for u in "${users[@]}"; do
@@ -744,6 +748,35 @@ for (( i = 0; i < 5; i++)); do
     echo "sleep $SEC sec"
     sleep $SEC;
 done
+```
+
+### backup PostgreSQL database
+
+```sh
+#!/bin/bash
+
+BACKUP_PATH=/tmp
+#BACKUP_PATH=/data/backup
+
+RESULT=$(psql -h localhost -p 5432 -U postgres --tuples-only --no-align -c "select datname from pg_catalog.pg_database where datname not in ('postgres','template0','template1') order by 1;")
+
+echo $RESULT
+# demo test
+
+for db in $RESULT; do
+    BACKUP_FILE="${BACKUP_PATH}/${db}_$(date +'%Y-%m-%d-%H-%M-%S').dump"
+    echo "backup $db to $BACKUP_FILE"
+    pg_dump -h localhost -p 5432 -U postgres -Fc -d $db -f $BACKUP_FILE
+done
+
+#dbs=("test" "demo")
+#for db in "${dbs[@]}"; do
+#    BACKUP_FILE="${BACKUP_PATH}/${db}_$(date +'%Y-%m-%d-%H-%M-%S').dump"
+#    echo "backup $db to $BACKUP_FILE"
+#    pg_dump -h localhost -p 5432 -U postgres -Fc -d $db -f $BACKUP_FILE
+#done
+
+#pg_dumpall -h localhost -p 5432 -U postgres -f /tmp/pg_dumpall.sql
 ```
 
 ### monitor process script

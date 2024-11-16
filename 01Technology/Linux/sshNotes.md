@@ -287,7 +287,7 @@ options
 
 * Using `-o` or `--outdir` you can save standard output to files
 * Using `-e` or `--errdir` you can save standard error to files
-* -i, --inline Display standard output and standard error as each host completes.
+* `-i, --inline` Display standard output and standard error as each host completes.
 * `-h host_file, --hosts host_file` Read hosts from the given host_file.
 * `-H, --host "[user@]host[:port] [ [user@]host[:port ] ... ]"` Add the given host strings to the list of hosts.
 
