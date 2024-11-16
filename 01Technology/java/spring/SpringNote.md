@@ -32,6 +32,63 @@
 Springboot 根据配置的 pom.xml 来判断使用 Tomcat，jetty，Undertow。通过使用 ASM 工具来扫描 class 文件实现，比如环境中是否存在 Undertow.class。
 `@ConditionalOnClass({ Servlet.class, Undertow.class, SslClientAuthMode.class })`
 
+### Spring Boot Actuator 的 Endpoints
+
+[Spring Boot Actuator: Endpoints](https://docs.spring.io/spring-boot/docs/2.5.6/reference/html/actuator.html#actuator.endpoints)
+
+以下是Spring Boot Actuator 常见的管理API端点，出于安全考虑，只有health和info端点是暴露的。通过配置 `management.endpoints.web.exposure.include=*`可以暴露所有端点，但请注意，这可能会带来安全风险
+
+health：提供应用的健康状态信息。
+info：提供应用的基本信息，如版本号等。
+beans：列出应用中所有的Spring Beans。
+caches：展示应用中的缓存信息。
+conditions：列出所有的条件注解@Conditional。
+configprops：展示所有@ConfigurationProperties注解的Bean的属性值。
+env：展示环境变量和配置属性的值。
+loggers：展示和修改日志级别。
+heapdump：生成应用的堆转储文件。
+threaddump：生成应用的线程转储文件。
+metrics：提供应用的度量信息。
+scheduledtasks：列出应用中所有的定时任务。
+mappings：列出应用中所有的URL映射。
+
+启用并暴露端点
+
+访问http://localhost:8080/actuator，返回可用的端点列表
+
+一旦我们引入了合适的starter到maven配置中，我们便可以通过 http://localhost:8080/actuator/health 和 http://localhost:8080/actuator/info来进行两个端点的访问
+
+暴露所有端点
+
+下面通过配置来暴露除了/shutdown之外的所有端点，在application.properties中进行如下配置：
+
+management.endpoints.web.exposure.include=*
+
+暴露指定端点
+
+可以通过逗号分隔符来配置多个端点，比如我们暴露/beans和/loggers端点：
+
+management.endpoints.web.exposure.include=beans, loggers
+
+排除一些端点。比如暴露除了/threaddump之外的所有端点：
+
+management.endpoints.web.exposure.include=*
+management.endpoints.web.exposure.exclude=threaddump
+
+开启指定端点
+下面来看一下如何细粒度的开启指定的端点。首先，需要关闭默认开启的所有端点：
+
+management.endpoints.enabled-by-default=false
+开启并暴露/health端点：
+
+management.endpoint.health.enabled=true
+management.endpoints.web.exposure.include=health
+
+开启Shutdown端点
+因为/shutdown端点比较敏感的原因，该端点默认是不可用的。可在application.properties文件中通过如下配置进行启动：
+
+management.endpoint.shutdown.enabled=true
+
 ## Spring 基础
 
 ### Bean 创建流程
