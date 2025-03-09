@@ -22,10 +22,10 @@
 echo "`date` (print as a date result: Mar  9 17:20:49 CST 2022) end sleep 2 sec; date (print as date string: date)"
 ```
 
-* `$?` 上一个命令的返回代码. 0为true, 1为false
-* `$$` 进程标识号
-* `$*` 该变量包含了所有输入的命令行参数值
-* `$0` is a magic variable for the full path of the executed script. If your script is invoked as "`sh script-name`", then `$0` will be exactly "script-name". [self-deleting shell script - Stack Overflow](https://stackoverflow.com/questions/8981164/self-deleting-shell-script/1086907#1086907)
+- `$?` 上一个命令的返回代码. 0为true, 1为false
+- `$$` 进程标识号
+- `$*` 该变量包含了所有输入的命令行参数值
+- `$0` is a magic variable for the full path of the executed script. If your script is invoked as "`sh script-name`", then `$0` will be exactly "script-name". [self-deleting shell script - Stack Overflow](https://stackoverflow.com/questions/8981164/self-deleting-shell-script/1086907#1086907)
 
 ## alias
 
@@ -223,8 +223,8 @@ str%%/*    : www.runoob.com
 `${parameter/pattern/string}`: To replace the first occurrence of a pattern with a given string
 `${parameter//pattern/string}`: To replace all occurrences
 
-* `${var//\"/}` 将"替换成空
-* `${var/a/b}` 将a替换成b
+- `${var//\"/}` 将"替换成空
+- `${var/a/b}` 将a替换成b
 
 ```sh
 # 替换字符中包含 /
@@ -332,8 +332,8 @@ Operator    Meaning    Example
 
 #### compound comparison
 
-* -a logical and: exp1 -a exp2 returns true if both exp1 and exp2 are true.
-* -o logical or: exp1 -o exp2 returns true if either exp1 or exp2 is true.
+- -a logical and: exp1 -a exp2 returns true if both exp1 and exp2 are true.
+- -o logical or: exp1 -o exp2 returns true if either exp1 or exp2 is true.
 
 These are similar to the Bash comparison operators && and ||, used within double brackets. `[[ condition1 && condition2 ]]`
 The `-o` and `-a` operators work with the test command or occur within single test brackets.
@@ -359,13 +359,13 @@ echo -e "\n\nCheck permission"
 
 执行时传入 `bash -euxo pipefail script.sh` 或者`set -euxo pipefail` 放在脚本开头
 
-* `set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
-* `set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
-* `set -e` 当有错误发生的时候abort执行
-* `set +e` 表示关闭`-e`选项, 同`-o errexit`
-* `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
-* `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
-* `bash -n scriptname`  # don't run commands; check for syntax errors only
+- `set -u` 遇到不存在的变量就会报错，并停止执行， 同`set -o nounset`
+- `set -x` debug输出, 在运行结果之前，先输出执行的那一行命令, 同`set -o xtrace`
+- `set -e` 当有错误发生的时候abort执行
+- `set +e` 表示关闭`-e`选项, 同`-o errexit`
+- `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
+- `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
+- `bash -n scriptname`  # don't run commands; check for syntax errors only
 
 有些Linux命令，例如rm的-f参数可以强制忽略错误，此时脚本便无法捕捉到errexit，这样的参数在脚本里是不推荐使用的。
 

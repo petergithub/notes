@@ -320,12 +320,12 @@ SELECT * FROM tbl force index(role_id) WHERE `role_id`=14838229 and `time` >= '2
 SELECT id FROM `user` WHERE id / 10 % 2=0 limit 2;
 ```
 
-* `SUBSTR(string, start, length)`
-* `SUBSTRING_INDEX(string, delimiter, number)` returns a substring of a string before a specified number of delimiter occurs.
-  * `SELECT SUBSTRING_INDEX("www.example.com", ".", 2);` return `www.example`
-* `LOCATE(substring, string, start)` returns the position of the first occurrence of a substring in a string.
-  * `SELECT LOCATE("com", "a.com", 3) AS MatchPosition`; return `3`
-  * [MySQL LOCATE() Function](https://www.w3schools.com/sql/func_mysql_locate.asp)
+- `SUBSTR(string, start, length)`
+- `SUBSTRING_INDEX(string, delimiter, number)` returns a substring of a string before a specified number of delimiter occurs.
+  - `SELECT SUBSTRING_INDEX("www.example.com", ".", 2);` return `www.example`
+- `LOCATE(substring, string, start)` returns the position of the first occurrence of a substring in a string.
+  - `SELECT LOCATE("com", "a.com", 3) AS MatchPosition`; return `3`
+  - [MySQL LOCATE() Function](https://www.w3schools.com/sql/func_mysql_locate.asp)
 
 ### Complicated SQL
 
@@ -610,14 +610,14 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;` or `show table status from databaseName like 'tableName'`
 查看列字符集 `select TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,COLLATION_NAME from information_schema.COLUMNS;` or `show full columns from tableName`
 
-* `utf8_bin`: case-sensitive, because it compares the binary values of the characters.
-* Both `utf8_general_ci` and `utf8_unicode_ci` perform case-insensitive comparison. operations performed using the `_general_ci` collation are faster than those for the `_unicode_ci` collation. For example, comparisons for the utf8_general_ci collation are faster, but slightly less correct, than comparisons for utf8_unicode_ci.
+- `utf8_bin`: case-sensitive, because it compares the binary values of the characters.
+- Both `utf8_general_ci` and `utf8_unicode_ci` perform case-insensitive comparison. operations performed using the `_general_ci` collation are faster than those for the `_unicode_ci` collation. For example, comparisons for the utf8_general_ci collation are faster, but slightly less correct, than comparisons for utf8_unicode_ci.
 
-* `utf8_bin` compares the bits blindly. No case folding, no accent stripping.
-* `utf8_general_ci` compares one byte with one byte. It does case folding and accent stripping, but no 2-character comparisions: ij is not equal ĳ in this collation.
-* `utf8_*_ci` is a set of language-specific rules, but otherwise like unicode_ci. Some special cases: Ç, Č, ch, ll
-* `utf8_unicode_ci` follows an old Unicode standard for comparisons. ij=ĳ, but ae != æ
-* `utf8_unicode_520_ci` follows an newer Unicode standard. ae = æ
+- `utf8_bin` compares the bits blindly. No case folding, no accent stripping.
+- `utf8_general_ci` compares one byte with one byte. It does case folding and accent stripping, but no 2-character comparisions: ij is not equal ĳ in this collation.
+- `utf8_*_ci` is a set of language-specific rules, but otherwise like unicode_ci. Some special cases: Ç, Č, ch, ll
+- `utf8_unicode_ci` follows an old Unicode standard for comparisons. ij=ĳ, but ae != æ
+- `utf8_unicode_520_ci` follows an newer Unicode standard. ae = æ
 
 [utf8_collations](http://mysql.rjweb.org/utf8_collations.html)
 
@@ -722,18 +722,18 @@ MySQL 5.7 Reference Manual [mysqldump - A Database Backup Program](https://dev.m
 `mysqldump -u USERNAME -p dbName > dbName.sql | gzip > sql.gz` 生成两个文件 sql 和 gz
 `mysqldump -uroot --default-character-set=utf8 --hex-blob --single-transaction dbName table1Name table2Name > dbName.sql`
 
-* `--no-data, -d` 没有数据
-* `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
-* `--add-drop-table` 在每个create语句之前增加一个drop table
-* `--skip-add-drop-table` without drop table
-* `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
-* `--default-character-set=utf8` 带语言参数导出
-* `--single-transaction`  This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
-* `--lock-tables=false , -l`  Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
-* `--where, -w` export with condition `mysqldump -u root -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
-* `--insert-ignore`  Write `INSERT IGNORE` statements rather than `INSERT` statements
-* `--force, -f`  Ignore all errors; continue even if an SQL error occurs during a
-* `--compress`
+- `--no-data, -d` 没有数据
+- `--hex-blob` 为有blob数据做的,防止乱码和导入失败用
+- `--add-drop-table` 在每个create语句之前增加一个drop table
+- `--skip-add-drop-table` without drop table
+- `--no-create-info, -t` Do not write CREATE TABLE statements that re-create each dumped table.
+- `--default-character-set=utf8` 带语言参数导出
+- `--single-transaction`  This option sets the transaction isolation mode to REPEATABLE READ without blocking any applications. It is useful only with transactional tables such as InnoDB
+- `--lock-tables=false , -l`  Lock all tables before dumping them. The tables are locked with READ LOCAL to allow concurrent inserts in the case of MyISAM tables. For transactional tables such as InnoDB and BDB, `--single-transaction` is a much better option, because it does not need to lock the tables at all.
+- `--where, -w` export with condition `mysqldump -u root -p123456 schemaName tableName --where=" sensorid=11 and fieldid=0" > /home/xyx/Temp.sql`
+- `--insert-ignore`  Write `INSERT IGNORE` statements rather than `INSERT` statements
+- `--force, -f`  Ignore all errors; continue even if an SQL error occurs during a
+- `--compress`
 
 ``` bash
 
@@ -773,8 +773,8 @@ LINES TERMINATED BY '\r\n';
 `mysql -uroot -p dbName < dbName.sql` or
 `mysql -uroot -p dbName -e "source /path/to/dbName.sql"`
 
-* `--force, -f`  Ignore all errors; continue even if an SQL error occurs
-* `--skip-column-names, -N`  Do not write column names in results.
+- `--force, -f`  Ignore all errors; continue even if an SQL error occurs
+- `--skip-column-names, -N`  Do not write column names in results.
 
 #### Load local file into mysql
 
@@ -1274,13 +1274,13 @@ creator_trx_id：生成该 ReadView 的事务的事务 Id。
 
 以上内容是对于 RR 级别来说，而对于 RC 级别，其实整个过程几乎一样，唯一不同的是生成 ReadView 的时机，
 
-* RR 级别只在事务开始时生成一次，之后一直使用该 ReadView。
-* RC 级别则在每次 select 时，都会生成一个 ReadView。
+- RR 级别只在事务开始时生成一次，之后一直使用该 ReadView。
+- RC 级别则在每次 select 时，都会生成一个 ReadView。
 
 #### MVCC 解决了幻读了没有
 
-* 快照读：生成一个事务快照（ReadView），之后都从这个快照获取数据。普通 select 语句就是快照读。
-* 当前读：读取数据的最新版本。常见的 update/insert/delete、还有 select ... for update、select ... lock in share mode 都是当前读。
+- 快照读：生成一个事务快照（ReadView），之后都从这个快照获取数据。普通 select 语句就是快照读。
+- 当前读：读取数据的最新版本。常见的 update/insert/delete、还有 select ... for update、select ... lock in share mode 都是当前读。
 
 对于快照读，MVCC 因为因为从 ReadView 读取，所以必然不会看到新插入的行，所以天然就解决了幻读的问题。
 
@@ -1341,8 +1341,8 @@ InnoDB的锁，与索引类型，事务的隔离级别相关
 
 加锁select主要是指：
 
-* select ... for update
-* select ... in share mode
+- select ... for update
+- select ... in share mode
 
 1. 如果，在唯一索引(unique index)上使用唯一的查询条件(unique search condition)，会使用记录锁(record lock)，而不会封锁记录之间的间隔，即不会使用间隙锁(gap lock)与临键锁(next-key lock)；
 2. 其他的查询条件和索引条件，InnoDB会封锁被扫描的索引范围，并使用间隙锁与临键锁，避免索引范围区间插入记录；
@@ -1624,15 +1624,15 @@ mysql数据库一般都是按照这个步骤去演化的，成本也是由低到
 
 #### MySQL日志分析工具 [mysqldumpslow](https://dev.mysql.com/doc/refman/5.7/en/mysqldumpslow.html )
 
-* --help
-* -a  Do not abstract all numbers to N and strings to 'S'.
-* -g pattern  Consider only queries that match the (grep-style) pattern.
-* -s  sort_type
-  * t, at: Sort by query time or average query time
-  * l, al: Sort by lock time or average lock time
-  * r, ar: Sort by rows sent or average rows sent
-  * c: Sort by count
-* -t N  Display only the first N queries in the output.
+- --help
+- -a  Do not abstract all numbers to N and strings to 'S'.
+- -g pattern  Consider only queries that match the (grep-style) pattern.
+- -s  sort_type
+  - t, at: Sort by query time or average query time
+  - l, al: Sort by lock time or average lock time
+  - r, ar: Sort by rows sent or average rows sent
+  - c: Sort by count
+- -t N  Display only the first N queries in the output.
 
 ##### mysqldumpslow Sample
 
@@ -1656,35 +1656,35 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 
 #### EXPLAIN列的解释
 
-* id 列 编号是 select 的序列号，有几个 select 就有几个id，并且id的顺序是按 select 出现的顺序增长的。 id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。
-* select_type 表示对应行是简单还是复杂的查询,simple、primary（复杂查询中最外层的 select）、subquery（包含在 select 中的子查询，不在 from 子句中)、derived（包含在 from 子句中的子查询，结果存放在临时表）
-* table：显示这一行的数据是关于哪张表的，当 from 子句中有子查询时，table列是 derivenN 格式，表示当前查询依赖 id=N 的查询
-* type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
-* possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
-* key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
-* key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
-* ref：显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有:const(常量)，字段名(例: film.id)
-* rows：mysql估计要读取并检测的行数，注意这个不是结果集里的行数。
-* Extra：关于MYSQL如何解析查询的额外信息
+- id 列 编号是 select 的序列号，有几个 select 就有几个id，并且id的顺序是按 select 出现的顺序增长的。 id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。
+- select_type 表示对应行是简单还是复杂的查询,simple、primary（复杂查询中最外层的 select）、subquery（包含在 select 中的子查询，不在 from 子句中)、derived（包含在 from 子句中的子查询，结果存放在临时表）
+- table：显示这一行的数据是关于哪张表的，当 from 子句中有子查询时，table列是 derivenN 格式，表示当前查询依赖 id=N 的查询
+- type：这是重要的列，显示连接使用了何种类型。从最好到最差的连接类型为const、eq_reg、ref、range、index和ALL
+- possible_keys：显示可能应用在这张表中的索引。如果为空，没有可能的索引。可以为相关的域从WHERE语句中选择一个合适的语句
+- key: 实际使用的索引。如果为NULL，则没有使用索引。很少的情况下，MYSQL会选择优化不足的索引。这种情况下，可以在SELECT语句中使用USE INDEX（indexname）来强制使用一个索引或者用IGNORE INDEX（indexname）来强制MYSQL忽略索引
+- key_len：使用的索引的长度。在不损失精确性的情况下，长度越短越好
+- ref：显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有:const(常量)，字段名(例: film.id)
+- rows：mysql估计要读取并检测的行数，注意这个不是结果集里的行数。
+- Extra：关于MYSQL如何解析查询的额外信息
 
 #### Type
 
 性能从最好到最差：system、const、eq_ref、ref、range、index和ALL
 
-* const, system：mysql能对查询的某部分进行优化并将其转化成一个常量，用于 primary key 或 unique key 的所有列与常数比较
-* eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录
-* ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较， 可能会找到多个符合条件的行。
-* range：范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行
-* index：扫描全索引就能拿到结果，一般是扫描某个二级索引
-* ALL：即全表扫描，扫描你的聚簇索引的所有叶子节点
+- const, system：mysql能对查询的某部分进行优化并将其转化成一个常量，用于 primary key 或 unique key 的所有列与常数比较
+- eq_ref：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录
+- ref：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一性索引的部分前缀，索引要和某个值相比较， 可能会找到多个符合条件的行。
+- range：范围扫描通常出现在 in(), between ,> ,<, >= 等操作中。使用一个索引来检索给定范围的行
+- index：扫描全索引就能拿到结果，一般是扫描某个二级索引
+- ALL：即全表扫描，扫描你的聚簇索引的所有叶子节点
 
 #### 需要强调rows是核心指标
 
 绝大部分rows小的语句执行一般很快。所以优化语句基本上都是在优化rows, 一般来说
 
-* rows<1000，是在可接受的范围内的。
-* rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
-* rows大于1万时，应慎重考虑SQL的设计，优化SQL
+- rows<1000，是在可接受的范围内的。
+- rows在1000~1w之间，在密集访问时可能导致性能问题，但如果不是太频繁的访问(频率低于1分钟一次)，又难再优化的话，可以接受，但需要注意观察
+- rows大于1万时，应慎重考虑SQL的设计，优化SQL
 
 这个没有绝对值可参考，一般来说越小越好，，如果100万数据量的数据库，rows是70万，通过这个可以判断sql的查询性能很差，如果100万条数据量的数据库，rows是1万，从我个人的角度，还是能接受的。
 
@@ -1692,11 +1692,11 @@ deferred join延迟关联 `select <cols> from profiles inner join (select <prima
 
 该列包含MySQL解决查询的详细信息
 
-* Using index:使用覆盖索引，如果select后面查询的字段都可以从索引树中获取，这种情况一般可以说是用到了覆盖索引
-* Using where:使用 where 语句来处理结果，并且查询的列未被索引覆盖
-* Using index condition:查询的列不完全被索引覆盖，where条件中是一个前导列的范围;
-* Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现
-* Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中
+- Using index:使用覆盖索引，如果select后面查询的字段都可以从索引树中获取，这种情况一般可以说是用到了覆盖索引
+- Using where:使用 where 语句来处理结果，并且查询的列未被索引覆盖
+- Using index condition:查询的列不完全被索引覆盖，where条件中是一个前导列的范围;
+- Using filesort：当Query 中包含order by 操作，而且无法利用索引完成排序操作的时候，MySQL Query Optimizer 不得不选择相应的排序算法来实现
+- Using temporary：在某些操作中必须使用临时表时，在 Extra 信息中就会出现Using temporary ,主要常见于 GROUP BY 和 ORDER BY 等操作中
 
 当执行计划Extra 出现Using filesort 、Using temporary 时，可以考虑是否需要进行sql优化和调整索引，最后再调整my.cnf 中与排序或者临时表相关的参数，如sort_buffer_size或者tmp_table_size.
 
@@ -1844,20 +1844,20 @@ bin log location default: /var/lib/mysql/binlog*
 
 `mysqlbinlog /path/to/binlog > tmpfile.sql`
 
-* `--start-position=4`                   起始pos点
-* `--stop-position=1024`                   结束pos点
-* `--start-datetime="2013-11-29 13:18:54"` 起始时间点
-* `--stop-datetime="2013-11-29 13:21:53"`  结束时间点
-* `--database=dbname`                     指定只恢复dbname数据库(一台主机上往往有多个数据库，只限本地log日志)
-* `--base64-output=decode-rows` 当bin-log的模式设置为row时（binlog_format=row）指定解码
-* `--verbose, -v` The output will contain lines beginning with ###,
+- `--start-position=4`                   起始pos点
+- `--stop-position=1024`                   结束pos点
+- `--start-datetime="2013-11-29 13:18:54"` 起始时间点
+- `--stop-datetime="2013-11-29 13:21:53"`  结束时间点
+- `--database=dbname`                     指定只恢复dbname数据库(一台主机上往往有多个数据库，只限本地log日志)
+- `--base64-output=decode-rows` 当bin-log的模式设置为row时（binlog_format=row）指定解码
+- `--verbose, -v` The output will contain lines beginning with ###,
  Specify --verbose or -v twice to also display data types and some metadata for each column
 
-* `--read-from-remote-server, -R` connect to a server and request its binary log
-* `--user=name, -u`              Connect to the remote server as username.连接到远程主机的用户名
-* `--password[=name], -p`        Password to connect to remote server.连接到远程主机的密码
-* `--host=name, -h`              Get the binlog from server.从远程主机上获取binlog日志
-* `--database=db_name, -d db_name`              Get the binlog from server.从远程主机上获取binlog日志
+- `--read-from-remote-server, -R` connect to a server and request its binary log
+- `--user=name, -u`              Connect to the remote server as username.连接到远程主机的用户名
+- `--password[=name], -p`        Password to connect to remote server.连接到远程主机的密码
+- `--host=name, -h`              Get the binlog from server.从远程主机上获取binlog日志
+- `--database=db_name, -d db_name`              Get the binlog from server.从远程主机上获取binlog日志
 
 The original column names are lost and replaced by `@N`, where `N` is a column number. you can get column name from `INFORMATION_SCHEMA.COLUMNS`
 `SELECT ORDINAL_POSITION,COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, COLUMN_COMMENT, COLUMN_TYPE, COLUMN_KEY FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'db_name' AND TABLE_NAME = 'tbl_name';`
@@ -2011,13 +2011,13 @@ ANALYZE TABLE ;
 
 ### MySQL读写分离解决方案
 
-* 通过amoeba 实现MySQL读写分离
-* 通过keepalived构建高可用的amoeba服务
-* MySQL-Proxy（官方）
-* Amoeba for MySQL
-* MaxScale
-* Atlas（360）, based on MySQL-Proxy 0.8.2
-* Cobar（Alibaba）
+- 通过amoeba 实现MySQL读写分离
+- 通过keepalived构建高可用的amoeba服务
+- MySQL-Proxy（官方）
+- Amoeba for MySQL
+- MaxScale
+- Atlas（360）, based on MySQL-Proxy 0.8.2
+- Cobar（Alibaba）
 
 HA: percona xtradb cluster, galera cluster
 

@@ -356,17 +356,17 @@ taskkill /f /im explorer.exe & start explorer.exe
 
 ## tool
 
-* [QuickLook](https://github.com/QL-Win/QuickLook/releases)
-* [EverythingToolbar](https://github.com/srwi/EverythingToolbar/releases)
-* [pot-desktop: 一个跨平台的划词翻译和OCR软件 | A cross-platform software for text translation and recognition.](https://github.com/pot-app/pot-desktop)
-* [搜狗输入法产品使用说明](https://docs.qq.com/doc/DTEtkUHl4am9PbnFX?needShowTips=1)
+- [QuickLook](https://github.com/QL-Win/QuickLook/releases)
+- [EverythingToolbar](https://github.com/srwi/EverythingToolbar/releases)
+- [pot-desktop: 一个跨平台的划词翻译和OCR软件 | A cross-platform software for text translation and recognition.](https://github.com/pot-app/pot-desktop)
+- [搜狗输入法产品使用说明](https://docs.qq.com/doc/DTEtkUHl4am9PbnFX?needShowTips=1)
 
-* [5 Windows Alternatives to Mac's Alfred App](https://www.makeuseof.com/free-windows-alternatives-to-macs-alfred-app/)
-* [6 Best Alfred App Alternatives for Windows to Be More Productive - TechWiser](https://techwiser.com/alfred-alternatives-windows/)
-* [个人在 Windows 上常用软件清单 · Dejavu's Blog](https://blog.dejavu.moe/posts/windows-apps/)
-* [DevToys - A Swiss Army knife for developers](https://devtoys.app/)
-* [PDFgear - Bring Accessible PDF Software to the Masses](https://www.pdfgear.com/)
-* [appstat | Process Monitor for Windows](https://pragmar.com/appstat/)
+- [5 Windows Alternatives to Mac's Alfred App](https://www.makeuseof.com/free-windows-alternatives-to-macs-alfred-app/)
+- [6 Best Alfred App Alternatives for Windows to Be More Productive - TechWiser](https://techwiser.com/alfred-alternatives-windows/)
+- [个人在 Windows 上常用软件清单 · Dejavu's Blog](https://blog.dejavu.moe/posts/windows-apps/)
+- [DevToys - A Swiss Army knife for developers](https://devtoys.app/)
+- [PDFgear - Bring Accessible PDF Software to the Masses](https://www.pdfgear.com/)
+- [appstat | Process Monitor for Windows](https://pragmar.com/appstat/)
 
 ### shortcut
 
@@ -580,10 +580,10 @@ tracert [-d] [-h maximum_hops] [-j computer-list] [-w timeout] target_name
 
 如果不带选项的话，会将IP地址解析成主机名，因为需要查询DNS，所以速度比较慢。
 
-* -d 选项：不将IP地址解析成主机名，因此路由追踪速度快很多。
-* -h 选项：说明路由的最大跳数，默认是30跳。
-* -w 选项：说明等待每一个ICMP响应报文的时间，默认4s，如果接收超时，则显示星号*。跳数和等待时间，使用默认值即可，所以平时一般都不需要添加这两个选项。
-* -j 选项：说明ICMP报文要使用IP头中的松散源路由选项，后面是经过的中间节点的地址或主机名字,最多9个，各个中间节点用空格隔开。
+- -d 选项：不将IP地址解析成主机名，因此路由追踪速度快很多。
+- -h 选项：说明路由的最大跳数，默认是30跳。
+- -w 选项：说明等待每一个ICMP响应报文的时间，默认4s，如果接收超时，则显示星号*。跳数和等待时间，使用默认值即可，所以平时一般都不需要添加这两个选项。
+- -j 选项：说明ICMP报文要使用IP头中的松散源路由选项，后面是经过的中间节点的地址或主机名字,最多9个，各个中间节点用空格隔开。
 
 这里说明下松散源路由和严格源路由，严格源路由是指，相邻路由器之间不得有中间路由器，并且所经过路由器的顺序不可更改。而松散源路由，则相反，相邻路由器之间可以有中间路由器。一般的路由追踪，也用不到-j这个选项。除非是针对大的网络故障，需要检测几条路径到达同一个目的地址，才需要使用-j选项。所以，通常情况下，我们使用tracert–d这种格式就可以了。我们以追踪百度网站为例。
 

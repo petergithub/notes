@@ -99,42 +99,42 @@ Add comments for multi-lines
 
 编辑命令
 
-* CTRL+a : 移到命令行首
-* CTRL+e : 移到命令行尾
-* ALT+f : 按单词前移（右向）
-* ALT+b : 按单词后移（左向）
-* CTRL+xx: 在命令行首和光标之间移动
-* CTRL+u : 从光标处删除至命令行首 remove line command
-* CTRL+k : 从光标处删除至命令行尾
-* CTRL+w : 从光标处删除至字首
-* ALT+d : 从光标处删除至字尾 `esc +d`   Delete the Word after the cursor
-* CTRL+d : 删除光标处的字符
-* CTRL+h : 删除光标前的字符
-* CTRL+y : 粘贴至光标后
-* ALT+c : 从光标处更改为首字母大写的单词
-* ALT+u : 从光标处更改为全部大写的单词
-* ALT+l : 从光标处更改为全部小写的单词
-* CTRL+t : 交换光标处和之前的字符 It will reverse two characters
-* ALT+t : 交换光标处和之前的单词 `esc+t` transpose two adjacent words
-* ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
+- CTRL+a : 移到命令行首
+- CTRL+e : 移到命令行尾
+- ALT+f : 按单词前移（右向）
+- ALT+b : 按单词后移（左向）
+- CTRL+xx: 在命令行首和光标之间移动
+- CTRL+u : 从光标处删除至命令行首 remove line command
+- CTRL+k : 从光标处删除至命令行尾
+- CTRL+w : 从光标处删除至字首
+- ALT+d : 从光标处删除至字尾 `esc +d`   Delete the Word after the cursor
+- CTRL+d : 删除光标处的字符
+- CTRL+h : 删除光标前的字符
+- CTRL+y : 粘贴至光标后
+- ALT+c : 从光标处更改为首字母大写的单词
+- ALT+u : 从光标处更改为全部大写的单词
+- ALT+l : 从光标处更改为全部小写的单词
+- CTRL+t : 交换光标处和之前的字符 It will reverse two characters
+- ALT+t : 交换光标处和之前的单词 `esc+t` transpose two adjacent words
+- ALT+Backspace: 与 CTRL+w 相同类似, 分隔符有些差别 [感谢 rezilla 指正]
 
 重新执行命令
 
-* CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
-* CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
-* CTRL+g: 从历史搜索模式退出
-* CTRL+p: 历史中的上一条命令
-* CTRL+n: 历史中的下一条命令
-* ALT+.: 使用上一条命令的最后一个参数
+- CTRL+r: 逆向搜索命令历史 reverse-i-search in bash
+- CTRL+s: forward-search-history (it is used by `stty` in Ubuntu, add `stty -ixon` in .bashrc)
+- CTRL+g: 从历史搜索模式退出
+- CTRL+p: 历史中的上一条命令
+- CTRL+n: 历史中的下一条命令
+- ALT+.: 使用上一条命令的最后一个参数
 
 控制命令
 
-* CTRL+l: 清屏
-* CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令
-* CTRL+s: 阻止屏幕输出
-* CTRL+q: 允许屏幕输出
-* CTRL+c: 终止命令
-* CTRL+z: 挂起命令
+- CTRL+l: 清屏
+- CTRL+o: 执行当前命令, 并选择上一条命令 循环执行历史命令
+- CTRL+s: 阻止屏幕输出
+- CTRL+q: 允许屏幕输出
+- CTRL+c: 终止命令
+- CTRL+z: 挂起命令
 
 #### history cmd
 
@@ -146,34 +146,34 @@ history with date and time
 
 `man zshbuiltins` to see more format:
 
-* -f     prints full time-date stamps in the US `MM/DD/YY hh:mm' format
-* -i     prints full time-date stamps in ISO8601 `yyyy-mm-dd hh:mm' format
-* -t fmt prints time and date stamps in the given format; fmt is formatted with the strftime function with the zsh extensions  described  for  the  %D{string} prompt format in the section EXPANSION OF PROMPT SEQUENCES in zshmisc(1).  The resulting formatted string must be no more than 256 characters or will not be printed
+- -f     prints full time-date stamps in the US `MM/DD/YY hh:mm' format
+- -i     prints full time-date stamps in ISO8601 `yyyy-mm-dd hh:mm' format
+- -t fmt prints time and date stamps in the given format; fmt is formatted with the strftime function with the zsh extensions  described  for  the  %D{string} prompt format in the section EXPANSION OF PROMPT SEQUENCES in zshmisc(1).  The resulting formatted string must be no more than 256 characters or will not be printed
 
 Bang (!) 命令 [documention](https://www.gnu.org/software/bash/manual/html_node/Event-Designators.html#Event-Designators)
 
-* `!!` or `!-1` : 执行上一条命令 Run the last command-name
-* `!-2` : 执行倒数第二条命令
-* `!-3` : 执行倒数第三条命令
-* `!!:1` or `!^`: to call 1st arg, `echo !!:1`
-* `!!:2`    to call 2nd arg, `echo !!:2`
-* `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同
-* `!$:p`: 打印输出 !$ 的内容
-* `!*`: 上一条命令的所有参数
-* `!*:p`: 打印输出 `!*` 的内容
+- `!!` or `!-1` : 执行上一条命令 Run the last command-name
+- `!-2` : 执行倒数第二条命令
+- `!-3` : 执行倒数第三条命令
+- `!!:1` or `!^`: to call 1st arg, `echo !!:1`
+- `!!:2`    to call 2nd arg, `echo !!:2`
+- `!$`: 上一条命令的最后一个参数, 与 ALT+. 相同
+- `!$:p`: 打印输出 !$ 的内容
+- `!*`: 上一条命令的所有参数
+- `!*:p`: 打印输出 `!*` 的内容
 
-* `!foo`: 执行最近的以 foo 开头的命令, 如 !ls
-* `!foo:p`: 仅打印输出, 而不执行
-* `^foo`: 删除上一条命令中的 foo
-* `^foo^foo`: 将上一条命令中的 foo 替换为 bar
-* 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式，quick substitution
-  * `!!:gs/foo/bar/` 推荐使用
-  * `fc -s foo=bar` GNU bash, zsh
-  * `^foo^bar^:G` zsh
-  * `^foo^bar^` 未验证出来
+- `!foo`: 执行最近的以 foo 开头的命令, 如 !ls
+- `!foo:p`: 仅打印输出, 而不执行
+- `^foo`: 删除上一条命令中的 foo
+- `^foo^foo`: 将上一条命令中的 foo 替换为 bar
+- 将上一条命令中所有的 `foo` 都替换为 `bar`的几种方式，quick substitution
+  - `!!:gs/foo/bar/` 推荐使用
+  - `fc -s foo=bar` GNU bash, zsh
+  - `^foo^bar^:G` zsh
+  - `^foo^bar^` 未验证出来
 
-* `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响
-* `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
+- `rm !(2.txt) 从目录中删除除 2.txt 外的所有文件, 使用 !(文件名) 的方式来避免命令对某个文件的影响
+- `[ ! -d /home/exist ] && mkdir /home/exist` 检查某个目录是否存在, 没有则创建
 
 Bash History: Correct / Repeat The Last Command With a Substitution
 echo $?    获取上一次命令执行的结果, 0表示成功, 非0表示失败
@@ -341,11 +341,11 @@ Move around inside of long line: `gj` and `gk` move up and down one displayed li
 
 You need to select to the next matching parenthesis.
 
-* `v%` if the cursor is on the starting/ending parenthesis
-* `vib` if the cursor is inside the parenthesis block
+- `v%` if the cursor is on the starting/ending parenthesis
+- `vib` if the cursor is inside the parenthesis block
 
-* select text between quotes: `vi"` for double quotes, `vi'` for single quotes
-* select a curly brace block (very common on C-style languages): `viB`, `vi{`
+- select text between quotes: `vi"` for double quotes, `vi'` for single quotes
+- select a curly brace block (very common on C-style languages): `viB`, `vi{`
 
 ##### i & a
 
@@ -610,26 +610,26 @@ Vim中查看文件编码 `:set fileencoding`
 
 示例:
 
-* 复制文件，只有源文件较目的文件的修改时间新时，才复制文件 `cp -u -v file1 file2`
-* 采用交互方式将文件file1复制成文件file2 `cp -i file1 file2`
-* 将文件file1复制成file2，因为目的文件已经存在，所以指定使用强制复制的模式 `cp -f file1 file2`
-* 将目录dir1复制成目录dir2 `cp -R file1 file2`
-* 同时将文件file1、file2、file3与目录dir1复制到dir2 `cp -R file1 file2 file3 dir1 dir2`
-* 复制时保留文件属性 `cp -p a.txt tmp/`
-* 复制时保留文件的目录结构 `cp -P /var/tmp/a.txt ./temp/`
-* 复制时产生备份文件 `cp -b a.txt tmp/`
-* 复制时产生备份文件，尾标 ~1~格式 `cp -b -V t a.txt /tmp`
-* 指定备份文件尾标 `cp -b -S _bak a.txt /tmp`
+- 复制文件，只有源文件较目的文件的修改时间新时，才复制文件 `cp -u -v file1 file2`
+- 采用交互方式将文件file1复制成文件file2 `cp -i file1 file2`
+- 将文件file1复制成file2，因为目的文件已经存在，所以指定使用强制复制的模式 `cp -f file1 file2`
+- 将目录dir1复制成目录dir2 `cp -R file1 file2`
+- 同时将文件file1、file2、file3与目录dir1复制到dir2 `cp -R file1 file2 file3 dir1 dir2`
+- 复制时保留文件属性 `cp -p a.txt tmp/`
+- 复制时保留文件的目录结构 `cp -P /var/tmp/a.txt ./temp/`
+- 复制时产生备份文件 `cp -b a.txt tmp/`
+- 复制时产生备份文件，尾标 ~1~格式 `cp -b -V t a.txt /tmp`
+- 指定备份文件尾标 `cp -b -S _bak a.txt /tmp`
 
 ### less
 
 `less -n -i -S`
 
-* `-i, --ignore-case` Causes searches to ignore case;
-* `-n` Suppresses line  numbers
-* `-S` Causes lines longer than the screen width to be chopped rather than folded
-* `-e, --quit-at-eof` Causes less to automatically exit the second time it reaches end-of-file. 查看多个小文件时使用
-* `-xn,... or --tabs=n,...` Sets tab stops.
+- `-i, --ignore-case` Causes searches to ignore case;
+- `-n` Suppresses line  numbers
+- `-S` Causes lines longer than the screen width to be chopped rather than folded
+- `-e, --quit-at-eof` Causes less to automatically exit the second time it reaches end-of-file. 查看多个小文件时使用
+- `-xn,... or --tabs=n,...` Sets tab stops.
 
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
@@ -777,16 +777,16 @@ key3=<font color="#6fa5e9">value3</font>
 
 `find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
 
-* `find /home/admin -atime -1`  1天内访问过的文件
-* `find /home/admin -ctime -1`  1天内状态改变过的文件
-* `find /home/admin -mtime -1`  1天内修改过的文件
-* `find /home/admin -amin -1`  1分钟内访问过的文件
-* `find /home/admin -cmin -1`  1分钟内状态改变过的文件
-* `find /home/admin -mmin -1`  1分钟内修改过的文件
+- `find /home/admin -atime -1`  1天内访问过的文件
+- `find /home/admin -ctime -1`  1天内状态改变过的文件
+- `find /home/admin -mtime -1`  1天内修改过的文件
+- `find /home/admin -amin -1`  1分钟内访问过的文件
+- `find /home/admin -cmin -1`  1分钟内状态改变过的文件
+- `find /home/admin -mmin -1`  1分钟内修改过的文件
 
-* `+n`     for greater than n,
-* `-n`     for less than n,
-* `n`      for exactly n.
+- `+n`     for greater than n,
+- `-n`     for less than n,
+- `n`      for exactly n.
 
 ```sh
 # 查找并删除 30 天前的文件
@@ -1125,13 +1125,13 @@ A为字符串, B为正则表达式.
 
 例如
 
-* `$0 ~ /program[0-9]+\.c/ { print $0 }`
-* `$0 ~ /program[0-9]+\.c/` 用来判断`$0`(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
-* `awk '$5 ~ /ldb/ {print}' f.txt` #第五列包含 ldb
-* `w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0
-* `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
-* `awk '$3==0 && $6=="LISTEN" ' netstat.txt` 过滤记录
-* `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt` 保留表头 引入内建变量NR
+- `$0 ~ /program[0-9]+\.c/ { print $0 }`
+- `$0 ~ /program[0-9]+\.c/` 用来判断`$0`(数据行)中是否含有可 match `/program[0-9]+\.c/` 的子字符串, 若`$0`中含有该类字符串, 则执行 print (打印该行数据).
+- `awk '$5 ~ /ldb/ {print}' f.txt` #第五列包含 ldb
+- `w | awk '/pts\/0/ {print $1}'`    print who is on the TTY pts/0
+- `awk '/ldb/ && !/LISTEN/ {print}' f.txt`   #匹配ldb和不匹配LISTEN
+- `awk '$3==0 && $6=="LISTEN" ' netstat.txt` 过滤记录
+- `awk '$3==0 && $6=="TIME_WAIT" || NR==1 ' netstat.txt` 保留表头 引入内建变量NR
 
 当Pattern 中被用来比对的字符串为`$0`时, 可省略`$0`, 故本例的 Pattern 部分`$0 ~/program[0-9]+\.c/` 可仅用`/program[0-9]+\.c/`表示(有关匹配及正则表达式请参考 附录 E )
 
@@ -1380,8 +1380,8 @@ rsyslog
 `at` want a command to run once at a later date, `at 4:01pm`
 If you want a command to be run once at system boot, the correct solution is to use either
 
-* system RC scripts (/etc/rc.local)
-* crontab with the `@reboot` special prefix (see manpage)
+- system RC scripts (/etc/rc.local)
+- crontab with the `@reboot` special prefix (see manpage)
 
 #### [Unable to run a service command via cron - Stack Overflow](https://stackoverflow.com/questions/8127433/unable-to-run-a-service-command-via-cron)
 
@@ -1436,25 +1436,25 @@ sbin is not in the path when run via cron. Specify the full path to service. Thi
 
 `unzip project.war WEB-INF/lib/project.jar` only unzip the jar from the war
 
-* `-q` perform operations quietly
-* `-l` lists the contents of a ZIP archive to ensure your file is inside.
-* `-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
+- `-q` perform operations quietly
+- `-l` lists the contents of a ZIP archive to ensure your file is inside.
+- `-c` Use the -c option to write the contents of named files to stdout (screen) without having to uncompress the entire archive.
 
 examples:
 
-* 防止linux下文件解压乱码 `unzip -O cp936`
-* update zip file `zip -u project.war WEB-INF/lib/jaxen-core.jar`
-* delete file in zip `zip -d project.war WEB-INF/lib/jaxen-core.jar`
+- 防止linux下文件解压乱码 `unzip -O cp936`
+- update zip file `zip -u project.war WEB-INF/lib/jaxen-core.jar`
+- delete file in zip `zip -d project.war WEB-INF/lib/jaxen-core.jar`
 
 Find a file in lots of zip files: `for f in *.zip; do echo "$f: "; unzip -c $f | grep -i <pattern>; done`
 `zless`,`zipgrep`,`zgrep`,`zcat`
 
 #### tar
 
-* `-r` specifies that you want to append files to the archive,
-* `-v` enables verbose output for tracking progress
-* `-f` specifies the name of the tar archive
-* `--delete` option is used to delete a file from an archive
+- `-r` specifies that you want to append files to the archive,
+- `-v` enables verbose output for tracking progress
+- `-f` specifies the name of the tar archive
+- `--delete` option is used to delete a file from an archive
 
 `tar -tf filename.tar.gz`    List files inside the tar.gz file
 `tar -rvf existingTar.tar new1.txt new2.txt` Adding Files to a Tar Archive
@@ -1474,12 +1474,12 @@ The `-i` option ignores the EOF at the end of the tar archives, from the man pag
 
 #### jar
 
-* list files without extracting `jar tvf <filename>.jar`
-* extract files in the jar `jar xvf <jar name>.jar [class name]`
-* update files `jar xvf package.jar com/vdm/Method.class`
+- list files without extracting `jar tvf <filename>.jar`
+- extract files in the jar `jar xvf <jar name>.jar [class name]`
+- update files `jar xvf package.jar com/vdm/Method.class`
 
-* add file with folder path `cd C:\sp\Workspace\packager4p5\bin\classes; jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class`
-* add file without backup folder path into jar `jar uvf C:\package.jar -C backup file`
+- add file with folder path `cd C:\sp\Workspace\packager4p5\bin\classes; jar uvf C:\package.jar com\vdm\Method.class com\vdm\UtilsG.class`
+- add file without backup folder path into jar `jar uvf C:\package.jar -C backup file`
 
 `java -Dlog4j.configuration=file:log4j.xml  -classpath .;jdom.jar;jPDFNotesS.jar com.PDFFrame`  (linux 下用 :)
 java命令引入jar时可以-cp参数, 但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar), 通常的jar都在同一目录, 且多于1个
@@ -1515,23 +1515,23 @@ unzip -c yourapp.jar META-INF/MANIFEST.MF
 `sort` `-t` 设定间隔符 `-k` 指定列数
 `sort [-fbMnrtuk] [file or stdin]`
 
-* `-n`: 使用『纯数字』进行排序(默认是以文字型态来排序的);
-* `-r`: 反向排序;
-* `-t`: 分隔符, 默认是用 [tab] 键来分隔;
-* `-k`: 排序区间 (field), 可以多个，表示多字段排序
+- `-n`: 使用『纯数字』进行排序(默认是以文字型态来排序的);
+- `-r`: 反向排序;
+- `-t`: 分隔符, 默认是用 [tab] 键来分隔;
+- `-k`: 排序区间 (field), 可以多个，表示多字段排序
 
 示例:
 
-* `/etc/passwd` 内容是以 `:` 来分隔的, 以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
-* 默认是以字符串来排序的, 如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
-* 如果要对`/etc/passwd`,先以第六个域的第2个字符到第4个字符进行正向排序, 再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
+- `/etc/passwd` 内容是以 `:` 来分隔的, 以第三栏来排序 `cat /etc/passwd | sort -t ':' -k 3`
+- 默认是以字符串来排序的, 如果想要使用数字倒序排序 `cat /etc/passwd | sort -t ':' -k 3nr`
+- 如果要对`/etc/passwd`,先以第六个域的第2个字符到第4个字符进行正向排序, 再基于第一个域进行反向排序 `cat /etc/passwd |  sort -t':' -k 6.2,6.4 -k 1r`
 
 `uniq [-icu]`
 uniq 去除排序过的文件中的重复行, 因此uniq经常和sort合用. 也就是说, 为了使uniq起作用, 所有的重复行必须是相邻的.
 
-* `-i`  : 忽略大小写字符的不同;
-* `-c`  : 进行计数
-* `-u`  : 只显示唯一的行
+- `-i`  : 忽略大小写字符的不同;
+- `-c`  : 进行计数
+- `-u`  : 只显示唯一的行
 
 Sample:
 删除交集，不同的部分放到一个新文件中    `cat list.txt list.txt.old | sort | uniq -u > list.txt.new`
@@ -1541,17 +1541,17 @@ Sample:
 cut命令可以从一个文本文件或者文本流中提取文本列
 `cut -d '分隔字符' -f fields` 用于有特定分隔字符
 
-* `-d`  : 后面接分隔字符. 与 -f 一起使用;
-* `-f`  : 依据 -d 的分隔字符将一段信息分割成为数段, 用 -f 取出第几段的意思;
-* `-c`  : 以字符 (characters) 的单位取出固定字符区间;
+- `-d`  : 后面接分隔字符. 与 -f 一起使用;
+- `-f`  : 依据 -d 的分隔字符将一段信息分割成为数段, 用 -f 取出第几段的意思;
+- `-c`  : 以字符 (characters) 的单位取出固定字符区间;
 
 操作PATH变量
 
-* 找出第五个路径 `echo $PATH | cut -d ':' -f 5`
-* 找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
-* 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
-* 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
-* 找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
+- 找出第五个路径 `echo $PATH | cut -d ':' -f 5`
+- 找出第三和第五个路径 `echo $PATH | cut -d ':' -f 3,5`
+- 找出第三到最后一个路径 `echo $PATH | cut -d ':' -f 3-`
+- 找出第一到第三个路径 `echo $PATH | cut -d ':' -f 1-3`
+- 找出第一到第三, 还有第五个路径 `echo $PATH | cut -d ':' -f 1-3,5`
 
 ### tr 合并换行 多行变一行
 
@@ -1569,41 +1569,41 @@ Remove all the space characters in a string `echo "A5 0a D0 49 00 01 02 03  01 3
 
 #### curl option
 
-* `-o, --output /path/to/file`    Write output to filex` instead of stdout
-* `-i, --include`    (HTTP)  Include  the  HTTP-header in the output
-* `-I, --head`    Fetch the HTTP-header only!
-* `-L, --location`    Follow redirects
-* `-v, --verbose`    Makes the fetching more  verbose/talkative
-* `--trace <file>`    Enables  a  full  trace  dump of all incoming and outgoing data
-* `-X, --request <command>`    Specifies a custom request method curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词
-* `-s, --silent`    Silent  or  quiet  mode. Don't show progress meter or error messages.  Makes Curl mute. It will still output the data  you  ask for
-* `--cookie "key1=value1;k2=v2"` Pass cookie
-* `-H, --header`    Sent with header `-H "host:login.example.com" -H "Content-Type: application/json"`
-* `-u, --USER`    username:password
-* `-w, --write-out "@curl-format.txt"`    tells cURL to use our format file
-* `-m, --max-time <seconds>`    超时时间. Maximum time in seconds that you allow the whole operation to  take.
-* `-F, --form`  `-F "filename=@file.tar.gz"` 上传文件
-* `-G, --get`  make all data specified with -d, --data, --data-binary or --data-urlencode to be used in an HTTP GET request instead of the POST request that otherwise would be used. The data will be appended to the URL with a '?' separator.
-* `--data-urlencode <data>` (HTTP) This posts data, similar to the other -d, --data options with the exception that this performs URL-encoding.
-* `-x` use proxy `curl -x http://127.0.0.1:1087 -Lv https://www.google.com`
-* `-C/--continue-at <offset>` Continue/Resume a previous file transfer at the given offset. Use `-C -` to tell curl to automatically find out where/how to resume the transfer.
-* Change user agent
-  * `curl -A "user-agent-name-here" url`
-  * `curl --user-agent "user-agent-name-here" url`
-  * `curl -H "User-Agent: user-Agent-Name-Here"`
+- `-o, --output /path/to/file`    Write output to filex` instead of stdout
+- `-i, --include`    (HTTP)  Include  the  HTTP-header in the output
+- `-I, --head`    Fetch the HTTP-header only!
+- `-L, --location`    Follow redirects
+- `-v, --verbose`    Makes the fetching more  verbose/talkative
+- `--trace <file>`    Enables  a  full  trace  dump of all incoming and outgoing data
+- `-X, --request <command>`    Specifies a custom request method curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词
+- `-s, --silent`    Silent  or  quiet  mode. Don't show progress meter or error messages.  Makes Curl mute. It will still output the data  you  ask for
+- `--cookie "key1=value1;k2=v2"` Pass cookie
+- `-H, --header`    Sent with header `-H "host:login.example.com" -H "Content-Type: application/json"`
+- `-u, --USER`    username:password
+- `-w, --write-out "@curl-format.txt"`    tells cURL to use our format file
+- `-m, --max-time <seconds>`    超时时间. Maximum time in seconds that you allow the whole operation to  take.
+- `-F, --form`  `-F "filename=@file.tar.gz"` 上传文件
+- `-G, --get`  make all data specified with -d, --data, --data-binary or --data-urlencode to be used in an HTTP GET request instead of the POST request that otherwise would be used. The data will be appended to the URL with a '?' separator.
+- `--data-urlencode <data>` (HTTP) This posts data, similar to the other -d, --data options with the exception that this performs URL-encoding.
+- `-x` use proxy `curl -x http://127.0.0.1:1087 -Lv https://www.google.com`
+- `-C/--continue-at <offset>` Continue/Resume a previous file transfer at the given offset. Use `-C -` to tell curl to automatically find out where/how to resume the transfer.
+- Change user agent
+  - `curl -A "user-agent-name-here" url`
+  - `curl --user-agent "user-agent-name-here" url`
+  - `curl -H "User-Agent: user-Agent-Name-Here"`
 
 #### Sample
 
-* 显示通信过程  `curl -v www.sina.com`
-* 更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
-* HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.
+- 显示通信过程  `curl -v www.sina.com`
+- 更详细的信息 `curl --trace output.txt www.sina.com` or `curl --trace-ascii output.txt www.sina.com`
+- HTTP动词 curl默认的HTTP动词是GET, 使用`-X`参数可以支持其他动词.
     `curl -X POST www.example.com` `curl -X DELETE www.example.com`
-* HTTP认证    `curl --user name:password example.com`
-* 跨域请求 CORS: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`
-* socks5 proxy `curl -v https://ww.example.com --socks5-hostname localhost:7070`
-* 上传文件 `curl -F "key=value" -F "filename1=@file1.tar.gz -F "filename1=@file1.tar.gz" http://localhost/upload`
-* 上传文件数组 `curl -F "key=value" -F "files[]=@file1.tar.gz -F "files[]=@file1.tar.gz" http://localhost/upload`
-* `curl -G`
+- HTTP认证    `curl --user name:password example.com`
+- 跨域请求 CORS: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`
+- socks5 proxy `curl -v https://ww.example.com --socks5-hostname localhost:7070`
+- 上传文件 `curl -F "key=value" -F "filename1=@file1.tar.gz -F "filename1=@file1.tar.gz" http://localhost/upload`
+- 上传文件数组 `curl -F "key=value" -F "files[]=@file1.tar.gz -F "files[]=@file1.tar.gz" http://localhost/upload`
+- `curl -G`
 
 ```bash
 curl -G \
@@ -1615,9 +1615,9 @@ curl -G \
 
 ##### 分段下载
 
-* download part 1  `curl --header "range:bytes=0-99" -o file.part1 -L URL` or `curl --range 0-99 URL`
-* down load part 2  `curl --header "range:bytes=100-" -o file.part2 -L URL` or `curl --range 100-`
-* `cat file.part* > file`  merge to one file
+- download part 1  `curl --header "range:bytes=0-99" -o file.part1 -L URL` or `curl --range 0-99 URL`
+- down load part 2  `curl --header "range:bytes=100-" -o file.part2 -L URL` or `curl --range 100-`
+- `cat file.part* > file`  merge to one file
 
 ##### POST application/x-www-form-urlencoded 提交表单并设置header
 
@@ -1687,8 +1687,8 @@ Step one: create a new file, curl-format.txt, and paste in:
 
 Step two, make a request: `curl -w "@curl-format.txt" -o /dev/null -s http://example.com`
 
-* `-w "@curl-format.txt"` tells cURL to use our format file
-* `-o /dev/null` redirects the output of the request to /dev/null
+- `-w "@curl-format.txt"` tells cURL to use our format file
+- `-o /dev/null` redirects the output of the request to /dev/null
 
 And here is what you get back:
 
@@ -1717,37 +1717,37 @@ wget 'http://www.example.com:9000/json' \
 
 #### wget options
 
-* `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.
-* `--no-check-certificate`
+- `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.
+- `--no-check-certificate`
 
 ### rsync
 
 `rsync -Pavz src/ dest` Copy contents of `src/` to destination
 
-* `-a` 等于 `-rlptgoD`
-* `-r` 是递归
-* `-l` 是链接文件, 意思是拷贝链接文件;
-* `-p` 表示保持文件原有权限
-* `-t` 保持文件原有时间;
-* `-g` 保持文件原有用户组
-* `-o` 保持文件原有属主;
-* `-D` 相当于块设备文件
+- `-a` 等于 `-rlptgoD`
+- `-r` 是递归
+- `-l` 是链接文件, 意思是拷贝链接文件;
+- `-p` 表示保持文件原有权限
+- `-t` 保持文件原有时间;
+- `-g` 保持文件原有用户组
+- `-o` 保持文件原有属主;
+- `-D` 相当于块设备文件
 
-* `-z` 传输时压缩;
-* `-P` 等于 `--partial --progress`
-* `--partial` 保留那些因故没有完全传输的文件
-* `--progress` 进度
+- `-z` 传输时压缩;
+- `-P` 等于 `--partial --progress`
+- `--partial` 保留那些因故没有完全传输的文件
+- `--progress` 进度
 
-* `--partial-dir=.rsync-partial`
+- `--partial-dir=.rsync-partial`
 
-* `-v` 详细输出信息
-* `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
-* `-e, --rsh=COMMAND` choose an alternative remote shell program to use
+- `-v` 详细输出信息
+- `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
+- `-e, --rsh=COMMAND` choose an alternative remote shell program to use
 
 Note: The trailing slash (/) on the source directory modifies the behavior of the rsync command.
 
-* If you do not use a trailing slash, the source directory is copied to the destination directory, and then the contents of the directory.
-* When you do use the trailing slash, rsync only copies the content of the source without creating an additional directory level.
+- If you do not use a trailing slash, the source directory is copied to the destination directory, and then the contents of the directory.
+- When you do use the trailing slash, rsync only copies the content of the source without creating an additional directory level.
 
 ### [Unison file synchronizer](https://github.com/bcpierce00/unison)
 
@@ -1755,12 +1755,12 @@ Unison works across platforms, allowing you to synchronize a Windows laptop with
 
 ### nc 传输文件
 
-* -l 表示监听端口，等待接收数据
-* -p 1234 表示要监听端口号1234
-* -u udp
-* `-v` verbose
-* `-w timeout`
-* `-z` Only scan for listening daemons, without sending any data to them.  Cannot be used together with -l.
+- -l 表示监听端口，等待接收数据
+- -p 1234 表示要监听端口号1234
+- -u udp
+- `-v` verbose
+- `-w timeout`
+- `-z` Only scan for listening daemons, without sending any data to them.  Cannot be used together with -l.
 
 ```sh
 # 接收端等待接收文件
@@ -1959,9 +1959,9 @@ ALT+方向键     以5个单元格为单位移动边缘以调整当前面板大�
 
 #### tmux key binding
 
-* `L`           Switch the attached client back to the last session.
-* `l`           Move to the previously selected window.
-* `[`           Enter copy mode to copy text or view the history.
+- `L`           Switch the attached client back to the last session.
+- `l`           Move to the previously selected window.
+- `[`           Enter copy mode to copy text or view the history.
 
 #### tmux setting .tmux.conf
 
@@ -2051,18 +2051,18 @@ init       1       root    3r     FIFO        0,8       0t0       6323 pipe
 
 FD – Represents the file descriptor. Some of the values of FDs are,
 
-* cwd – Current Working Directory
-* txt – Text file
-* mem – Memory mapped file
-* mmap – Memory mapped device
-* NUMBER – Represent the actual file descriptor. The character after the number i.e `1u`, represents the mode in which the file is opened. r for read, w for write, u for read and write.
+- cwd – Current Working Directory
+- txt – Text file
+- mem – Memory mapped file
+- mmap – Memory mapped device
+- NUMBER – Represent the actual file descriptor. The character after the number i.e `1u`, represents the mode in which the file is opened. r for read, w for write, u for read and write.
 
 TYPE – Specifies the type of the file. Some of the values of TYPEs are,
 
-* REG – Regular File
-* DIR – Directory
-* FIFO – First In First Out
-* CHR – Character special file
+- REG – Regular File
+- DIR – Directory
+- FIFO – First In First Out
+- CHR – Character special file
 
 DEVICE
 
@@ -2070,43 +2070,43 @@ http://www.kernel.org/pub/linux/docs/lanana/device-list/devices-2.6.txt
 
 Parameters:
 
-* `+D` will recurse
-* `+d` will not recurse
-* `-c` based on process names starting with
-* `-u` specific user
-* `-p` specific process
-* `-t` list the process id
-* `-r` repeat until interrupt
-* `+r` repeat until no open files found
-* `-i` network. selects the listing of files any of whose Internet address matches the address specified in i.  If no address is specified, this option selects the listing of all Internet and x.25 (HP-UX) network files. `-i:1433`
-* `-n` inhibits the conversion of network numbers to host names for network files.
-* `-P` inhibits the conversion of port numbers to port names for network files.
+- `+D` will recurse
+- `+d` will not recurse
+- `-c` based on process names starting with
+- `-u` specific user
+- `-p` specific process
+- `-t` list the process id
+- `-r` repeat until interrupt
+- `+r` repeat until no open files found
+- `-i` network. selects the listing of files any of whose Internet address matches the address specified in i.  If no address is specified, this option selects the listing of all Internet and x.25 (HP-UX) network files. `-i:1433`
+- `-n` inhibits the conversion of network numbers to host names for network files.
+- `-P` inhibits the conversion of port numbers to port names for network files.
 
 Samples:
 
-* List open files thread in order `lsof -n |awk '{print $1,$2}'|sort|uniq -c |sort -nr| head`
-* List processes which opened a specific file: `lsof /var/log/syslog`
-* List opened files under a directory: `lsof +D /var/log/`
-* List opened files based on process names starting with: `lsof -c ssh -c init`
-* can give multiple -c switch on a single command line.
-* List processes using a mount point: `lsof /home`, `lsof +D /home/`
-* List files opened by a specific user: `lsof -u username`
-* Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the `^` to exclude only the particular user as follows: `lsof -u ^username`
-* List all open files by a specific process: `lsof -p 1753`
-* Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
-* Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
-* List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
-* List processes which are listening on a particular port: `lsof -i :25`
-* List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
-* list only network files with TCP state LISTEN `lsof -iTCP -sTCP:LISTEN -P -n | less`
+- List open files thread in order `lsof -n |awk '{print $1,$2}'|sort|uniq -c |sort -nr| head`
+- List processes which opened a specific file: `lsof /var/log/syslog`
+- List opened files under a directory: `lsof +D /var/log/`
+- List opened files based on process names starting with: `lsof -c ssh -c init`
+- can give multiple -c switch on a single command line.
+- List processes using a mount point: `lsof /home`, `lsof +D /home/`
+- List files opened by a specific user: `lsof -u username`
+- Sometimes you may want to list files opened by all users, expect some 1 or 2. In that case you can use the `^` to exclude only the particular user as follows: `lsof -u ^username`
+- List all open files by a specific process: `lsof -p 1753`
+- Kill all process that belongs to a particular user: kill -9 `lsof -t -u username`
+- Execute lsof in repeat mode: `lsof -u username -c init -a -r5`
+- List all network connections: `lsof -i` use `-i4` or `-i6` to list only `IPV4` or `IPV6` respectively.
+- List processes which are listening on a particular port: `lsof -i :25`
+- List all TCP or UDP connections: `lsof -i tcp; lsof -i udp;`
+- list only network files with TCP state LISTEN `lsof -iTCP -sTCP:LISTEN -P -n | less`
 
 ### strace 跟踪进程中的系统调用
 
 strace 常用来跟踪进程执行时的系统调用和所接收的信号。strace可以跟踪到一个进程产生的系统调用,包括参数，返回值，执行消耗的时间。 Mac OS 是 dtruss
 
-* `strace command` 执行名称为command的命令或程序并跟踪系统调用
-* `strace -p procid` 跟踪ID为的procid的进程系统调用情况
-* `strace -c -p procid` 统计ID为的procid的进程系统调用次数与用时，按CTRL+C结束统计，执行结果如下：
+- `strace command` 执行名称为command的命令或程序并跟踪系统调用
+- `strace -p procid` 跟踪ID为的procid的进程系统调用情况
+- `strace -c -p procid` 统计ID为的procid的进程系统调用次数与用时，按CTRL+C结束统计，执行结果如下：
 
 example:
 
@@ -2218,11 +2218,11 @@ ALT+Delete, and then press the up or down arrow key.
 
 `split [-<行数>][-b][-c][-l] file.txt`
 
-* -b, --bytes=size 对file进行切分 每个小文件大小为size 可以指定单位b，k，m
-* -l, --lines=number 对file进行切分 每个文件都有number行
-* -d 添加数字后缀
-* -a 2 表示用2位数来顺序命名 后缀长度
-* smaillFile_ 分割后文件的前缀
+- -b, --bytes=size 对file进行切分 每个小文件大小为size 可以指定单位b，k，m
+- -l, --lines=number 对file进行切分 每个文件都有number行
+- -d 添加数字后缀
+- -a 2 表示用2位数来顺序命名 后缀长度
+- smaillFile_ 分割后文件的前缀
 
 `split -b 100M bigFile.txt smaillFile_` split file into small files
 `split -l 10000 bigFile.txt -d -a 2 smaillFile_`
@@ -2359,18 +2359,18 @@ date -d "1970-01-01 UTC `echo "$(date +%s)-$(cat /proc/uptime|cut -f 1 -d' ')+12
 
 #### 良好状态指标
 
-* CPU利用率：User Time <= 70%，System Time <= 35%，User Time + System Time <= 70% (同时可以结合idle值来看，也就是%id，如果%id<=70% 则表示IO的压力较大) `top`输出
-* 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的 `cs` in `vmstat`
-* 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue
-* wa（wait）: 参考值：小于25%，超过25%的wa的值可以表示磁盘子系统可能没有被正确平衡，也可能是磁盘密集工作负载的结果，系统的磁盘或其它I/o可能有问题，可以通过iostat/sar -C命令进一步分解分析
-* r: 参考值：对于单个处理器来说, r 小于4. 队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`
+- CPU利用率：User Time <= 70%，System Time <= 35%，User Time + System Time <= 70% (同时可以结合idle值来看，也就是%id，如果%id<=70% 则表示IO的压力较大) `top`输出
+- 上下文切换：与CPU利用率相关联，如果CPU利用率状态良好，大量的上下文切换也是可以接受的 `cs` in `vmstat`
+- 可运行队列：每个处理器的可运行队列<=3个线程 `vmstat`输出中`r`列表示run queue
+- wa（wait）: 参考值：小于25%，超过25%的wa的值可以表示磁盘子系统可能没有被正确平衡，也可能是磁盘密集工作负载的结果，系统的磁盘或其它I/o可能有问题，可以通过iostat/sar -C命令进一步分解分析
+- r: 参考值：对于单个处理器来说, r 小于4. 队列大于4时，表明系统的cpu或内存可能有问题，如果r经常大于4，且id经常少于40，表示cpu的负荷很重。当队列变长时，队列中进程在等待cpu调度执行时所花的时间会变长. `vmstat`
 
 如何衡量当前系统是否负载过高?
 如果每个cpu(可以按CPU核心的数量计算)上当前活动进程数
 
-* 不大于3，则系统性能良好;
-* 不大于4，表示可以接受;
-* 如大于5，则系统性能问题严重
+- 不大于3，则系统性能良好;
+- 不大于4，表示可以接受;
+- 如大于5，则系统性能问题严重
 当负载为8.13,如果有2个cpu核心,则8.13/2=4.065, 此系统性能可以接受
 
 建议设置严格的报警值为: CPU核心的数量
@@ -2497,8 +2497,8 @@ cat /proc/cpuinfo | grep "processor" | wc -l
 
 #### Memory 良好状态指标
 
-* swap in （si） == 0，swap out （so） == 0  `si, so` in `vmstat`
-* 应用程序可用内存/系统物理内存 >= 30%  (可用内存=系统free memory+buffers+cached) `free`
+- swap in （si） == 0，swap out （so） == 0  `si, so` in `vmstat`
+- 应用程序可用内存/系统物理内存 >= 30%  (可用内存=系统free memory+buffers+cached) `free`
 
 使用`sar -B`、`sar -r` 和 `sar -W`查看
 `dmesg | grep oom-killer shows the OutOfMemory-killer at work`
@@ -2621,14 +2621,14 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 
 #### Disk 良好状态指标
 
-* Use% <= 90%
-* `iowait` % < 20%, `iostat -c 2 5` 查看 iowait 的值
-* 提高命中率的一个简单方式就是增大文件缓存区面积，缓存区越大预存的页面就越多，命中率也越高
-* Linux 内核希望能尽可能产生次缺页中断（从文件缓存区读），并且能尽可能避免主缺页中断（从硬盘读），这样随着次缺页中断的增多，文件缓存区也逐步增大，直到系统只有少量可用物理内存的时候 Linux 才开始释放一些不用的页
-* 一般地系统I/O响应时间`await`应该低于5ms, 如果大于10ms就比较大了
-* 如果`svctm`的值与`await`很接近，表示几乎没有I/O等待，磁盘性能很好，如果`await`的值远高于`svctm`的值，则表示I/O队列等待太长，系统上运行的应用程序将变慢
-* 如果`%util`超过60, 可能会影响IO性能; 如果到达100%, 说明硬件设备已经饱和.
-* 如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）
+- Use% <= 90%
+- `iowait` % < 20%, `iostat -c 2 5` 查看 iowait 的值
+- 提高命中率的一个简单方式就是增大文件缓存区面积，缓存区越大预存的页面就越多，命中率也越高
+- Linux 内核希望能尽可能产生次缺页中断（从文件缓存区读），并且能尽可能避免主缺页中断（从硬盘读），这样随着次缺页中断的增多，文件缓存区也逐步增大，直到系统只有少量可用物理内存的时候 Linux 才开始释放一些不用的页
+- 一般地系统I/O响应时间`await`应该低于5ms, 如果大于10ms就比较大了
+- 如果`svctm`的值与`await`很接近，表示几乎没有I/O等待，磁盘性能很好，如果`await`的值远高于`svctm`的值，则表示I/O队列等待太长，系统上运行的应用程序将变慢
+- 如果`%util`超过60, 可能会影响IO性能; 如果到达100%, 说明硬件设备已经饱和.
+- 如果`avgqu-sz`值大于1, 可能是硬件设备已经饱和（部分前端硬件设备支持并行写入）
 
 `iostat -xz 2 5`查看 svctm, await, util, avgqu-sz 的值
 使用`sar -b`、`sar -u` 和 `sar -d`查看
@@ -2649,9 +2649,9 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 
 [Linux系统排查3——I/O篇 - 王智愚 - 博客园](http://www.cnblogs.com/Security-Darren/p/4700386.html)
 
-* 文件系统只读
-* 磁盘已满
-* I节点使用完
+- 文件系统只读
+- 磁盘已满
+- I节点使用完
 
 ##### 遇到只读的文件系统
 
@@ -2674,8 +2674,8 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 
 identify the directory which is using all your inodes:
 
-* `sudo find / -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n | tail -n 15`  check the root filesystem `/`
-* `sudo du --inodes -d 3 / | sort -n | tail`
+- `sudo find / -xdev -printf '%h\n' | sort | uniq -c | sort -k 1 -n | tail -n 15`  check the root filesystem `/`
+- `sudo du --inodes -d 3 / | sort -n | tail`
 
 一旦遇到I节点用光的情形, 有以下几种选择:
 
@@ -2775,9 +2775,9 @@ Linux查看网卡数据吞吐量方法
 
 #### Network 良好状态指标
 
-* 对于UDP, 接收、发送缓冲区不长时间有等待处理的网络包
-* 对于TCP, 不会出现因为缓存不足而存在丢包的事，因为网络等其他原因，导致丢了包，协议层也会通过重传机制来保证丢的包到达对方。所以，tcp而言更多的专注重传率 `cat /proc/net/snmp | grep Tcp`
-* 连接数如果超过1024报警 `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`
+- 对于UDP, 接收、发送缓冲区不长时间有等待处理的网络包
+- 对于TCP, 不会出现因为缓存不足而存在丢包的事，因为网络等其他原因，导致丢了包，协议层也会通过重传机制来保证丢的包到达对方。所以，tcp而言更多的专注重传率 `cat /proc/net/snmp | grep Tcp`
+- 连接数如果超过1024报警 `netstat -na | sed -n '3,$p' |awk '{print $5}' | grep -v 127\.0\.0\.1 | grep -v 0\.0\.0\.0 | wc -l`
 
 ##### UDP
 
@@ -2793,10 +2793,10 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
 
 ##### 网卡
 
-* 先用`ifconfig`看看有多少块网卡和bonding. bonding是个很棒的东西, 可以把多块网卡绑起来, 突破单块网卡的带宽限制
-* 然后检查每块网卡的速度, 比如`ethtool eth0`.
-* 再检查bonding, 比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的, 再留意其捆绑的网卡的速度.
-* 最后检查测试客户机与服务机之间的带宽, 先简单`ping`或`traceroute` 一下得到RTT时间, `iperf`之类的可稍后.
+- 先用`ifconfig`看看有多少块网卡和bonding. bonding是个很棒的东西, 可以把多块网卡绑起来, 突破单块网卡的带宽限制
+- 然后检查每块网卡的速度, 比如`ethtool eth0`.
+- 再检查bonding, 比如`cat /proc/net/bonding/bond0`, 留意其Bonding Mode是负载均衡的, 再留意其捆绑的网卡的速度.
+- 最后检查测试客户机与服务机之间的带宽, 先简单`ping`或`traceroute` 一下得到RTT时间, `iperf`之类的可稍后.
 
 ##### Network troubleshooting
 
@@ -2893,24 +2893,24 @@ while true;do netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}
 
 属于net-tools工具集
 
-* `-t`、`-u`、`-w`和`-x`分别表示TCP、UDP、RAW和UNIX套接字连接;
-* `-a` 显示出等待连接（也就是说处于监听模式）的套接字;
-* `-l` 显示正在被监听(listen)的端口
-* `-n` 表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
-* `-p` 选项表示列出监听的程序
-* `-r` 显示路由信息
-* `-i` 显示网卡借口统计
-* `-s` 显示网络协议统计
-* `--numeric , -n`
+- `-t`、`-u`、`-w`和`-x`分别表示TCP、UDP、RAW和UNIX套接字连接;
+- `-a` 显示出等待连接（也就是说处于监听模式）的套接字;
+- `-l` 显示正在被监听(listen)的端口
+- `-n` 表示直接显示端口数字而不是通过察看/etc/service来转换为端口名;
+- `-p` 选项表示列出监听的程序
+- `-r` 显示路由信息
+- `-i` 显示网卡借口统计
+- `-s` 显示网络协议统计
+- `--numeric , -n`
        Show numerical addresses instead of trying to determine symbolic  host,
        port or user names.
 
 Example
 
-* `netstat -anp | grep PORT` Listening open ports
-* `netstat -antup` 查看已建立的连接进程, 所占用的端口
-* `netstat -tulpn | grep sqlservr`
-* Mac OS X: `netstat -anv | grep PORT` 倒数第四个是进程号  或者 `lsof -i -P | grep 9091`
+- `netstat -anp | grep PORT` Listening open ports
+- `netstat -antup` 查看已建立的连接进程, 所占用的端口
+- `netstat -tulpn | grep sqlservr`
+- Mac OS X: `netstat -anv | grep PORT` 倒数第四个是进程号  或者 `lsof -i -P | grep 9091`
 
 ##### ss
 
@@ -2927,13 +2927,13 @@ VLAN             |    vconfig            |     ip link
 组播             |    ipmaddr            |     ip maddr
 统计             |    netstat            |    ss
 
-* `ss -l` 查看所有打开的网络端口, `-pl`参数，会列出具体的程序名称
-* `ss -a` 查看所有的socket连接
+- `ss -l` 查看所有打开的网络端口, `-pl`参数，会列出具体的程序名称
+- `ss -a` 查看所有的socket连接
     `-ta` 只查看TCP sockets
     `-ua` 只查看UDP sockets
     `-wa` 只查看RAW sockets
     `-xa` 只查看UNIX sockets
-* `ss -s` 查看当前服务器的网络连接统计
+- `ss -s` 查看当前服务器的网络连接统计
 
 ``` bash
     Total: 295 (kernel 312)
@@ -3072,9 +3072,9 @@ dstat: 默认, 已有足够信息
 `vmstat [options] [delay [count]]`
 `vmstat -SM`
 
-* `-w, --wide`             wide output
-* `-S, --unit <char>`      define display unit
-* `-M` switch shows the output in megabytes to make it easier to read
+- `-w, --wide`             wide output
+- `-S, --unit <char>`      define display unit
+- `-M` switch shows the output in megabytes to make it easier to read
 
 ``` bash
 
@@ -3089,37 +3089,37 @@ dstat: 默认, 已有足够信息
 Part `FIELD DESCRIPTION FOR VM MODE` in `man vmstat`
 procs（进程）:
 
-* r, run queue: 运行队列中进程数量(就是说多少个进程真的分配到CPU, 当这个值超过了CPU数目，就会出现CPU瓶颈了)
-* b, blocked: 等待IO的进程数量
+- r, run queue: 运行队列中进程数量(就是说多少个进程真的分配到CPU, 当这个值超过了CPU数目，就会出现CPU瓶颈了)
+- b, blocked: 等待IO的进程数量
 
 memory（内存）:
 
-* swpd: 虚拟内存已使用大小，如果大于0，表示你的机器物理内存不足了，如果不是程序内存泄露的原因，那么你该升级内存了或者把耗内存的任务迁移到其他机器
-* free: 空闲的物理内存的大小
-* buff: 用作缓冲的内存大小
-* cache: 用作缓存的内存大小
+- swpd: 虚拟内存已使用大小，如果大于0，表示你的机器物理内存不足了，如果不是程序内存泄露的原因，那么你该升级内存了或者把耗内存的任务迁移到其他机器
+- free: 空闲的物理内存的大小
+- buff: 用作缓冲的内存大小
+- cache: 用作缓存的内存大小
 
 swap:
 
-* si: Amount of memory swapped in from disk (/s). 每秒从磁盘读入虚拟内存的大小，如果这个值大于0，表示物理内存不够用或者内存泄露了
-* so: Amount of memory swapped to disk (/s)，如果这个值大于0，同上
+- si: Amount of memory swapped in from disk (/s). 每秒从磁盘读入虚拟内存的大小，如果这个值大于0，表示物理内存不够用或者内存泄露了
+- so: Amount of memory swapped to disk (/s)，如果这个值大于0，同上
 
 io：（现在的Linux版本块的大小为1024bytes）
 
-* bi: 块设备每秒接收的块数量(数据从磁盘读入内存)，这里的块设备是指系统上所有的磁盘和其他块设备，默认块大小1024byte
-* bo: 块设备每秒发送的块数量，例如我们读取文件，bo就要大于0。bi和bo一般都要接近0，不然就是IO过于频繁，需要调整
+- bi: 块设备每秒接收的块数量(数据从磁盘读入内存)，这里的块设备是指系统上所有的磁盘和其他块设备，默认块大小1024byte
+- bo: 块设备每秒发送的块数量，例如我们读取文件，bo就要大于0。bi和bo一般都要接近0，不然就是IO过于频繁，需要调整
 
 system：
 
-* in, interrupts: 每秒中断数，包括时钟中断
-* cs, context switch: 每秒上下文切换数, 值要越小越好，太大了，要考虑调低线程或者进程的数目
+- in, interrupts: 每秒中断数，包括时钟中断
+- cs, context switch: 每秒上下文切换数, 值要越小越好，太大了，要考虑调低线程或者进程的数目
 
 cpu（以百分比表示）
 
-* us, user time: 用户进程执行时间占比(%)，例如在做高运算的任务时，如加密解密，那么会导致us很大，这样，r也会变大，造成系统瓶颈
-* sy, system time: 系统进程执行时间占比(%)，如果太高，表示系统调用时间长，如IO频繁操作
-* id: 空闲时间(包括IO等待时间)
-* wa: 等待IO时间
+- us, user time: 用户进程执行时间占比(%)，例如在做高运算的任务时，如加密解密，那么会导致us很大，这样，r也会变大，造成系统瓶颈
+- sy, system time: 系统进程执行时间占比(%)，如果太高，表示系统调用时间长，如IO频繁操作
+- id: 空闲时间(包括IO等待时间)
+- wa: 等待IO时间
 
 `vmstat(8)` 命令, 每行会输出一些系统核心指标, 这些指标可以让我们更详细的了解系统状态. 后面跟的参数2, 表示每2秒输出一次统计信息, 表头提示了每一列的含义, 介绍和性能调优相关的列:
 `r`: 等待在CPU资源的进程数. 这个数据比平均负载更加能够体现CPU负载情况, 数据中不包含等待IO的进程. 如果这个数值大于机器CPU核数, 那么机器的CPU资源已经饱和.
@@ -3136,11 +3136,11 @@ cpu（以百分比表示）
 `iostat 2 3`
 参数:
 
-* `2 3`表示, 数据显示每隔2秒刷新一次, 共显示3次.
-* `-d` 表示, 显示设备（磁盘）使用状态
-* `-x` 获得更多统计信息
-* `-k` 某些使用block为单位的列强制使用Kilobytes为单位
-* `-m` 以m为单位, 而不以block原始size
+- `2 3`表示, 数据显示每隔2秒刷新一次, 共显示3次.
+- `-d` 表示, 显示设备（磁盘）使用状态
+- `-x` 获得更多统计信息
+- `-k` 某些使用block为单位的列强制使用Kilobytes为单位
+- `-m` 以m为单位, 而不以block原始size
 
 1. 查看详细状态 `iostat -dxm 3`
 2. 查看磁盘状态 `iostat -d -k 2 3`
@@ -3192,19 +3192,19 @@ cpu（以百分比表示）
 `sar`命令来自sysstat工具包, 可以记录系统的CPU负载、I/O状况和内存使用记录, 便于历史数据的回放
 可以查看CPU、内存和磁盘记录, 网络设备的吞吐率. 在排查性能问题时, 可以通过网络设备的吞吐量, 判断网络设备是否已经饱和.
 
-* `sar 2 5`: for each 2 seconds. 5 lines are displayed.
-* `-b` 显示磁盘I/O, Report I/O and transfer rate statistics
-* `-d` Report activity for each block device
-* `-r` 显示收集的内存记录
-* `-u` CPU统计信息  Report CPU utilization
-* `-n` Report network statistics
-* `-B` Report paging statistics 分页信息
-* `-W` 查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降, 则服务器状况不良
+- `sar 2 5`: for each 2 seconds. 5 lines are displayed.
+- `-b` 显示磁盘I/O, Report I/O and transfer rate statistics
+- `-d` Report activity for each block device
+- `-r` 显示收集的内存记录
+- `-u` CPU统计信息  Report CPU utilization
+- `-n` Report network statistics
+- `-B` Report paging statistics 分页信息
+- `-W` 查看页面交换发生状况 页面发生交换时，服务器的吞吐量会大幅下降, 则服务器状况不良
     pswpin/s：每秒系统换入的交换页面（swap page）数量
     pswpout/s：每秒系统换出的交换页面（swap page）数量
-* `-e [ hh:mm:ss ]` Set the ending time of the report
-* `-s [ hh:mm:ss ]` Set the starting time of the report, `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
-* `-f [ filename ]` records from filename (created by the -o filename flag), file location: /var/log/sysstat/sadd or `/var/log/sa/sadd`, sysstat工具只存储1个月内的系统使用记录, 每天的记录以sadd为文件名保存. `sar -f /var/log/sysstat/sa08`查看本月8号的CPU使用记录
+- `-e [ hh:mm:ss ]` Set the ending time of the report
+- `-s [ hh:mm:ss ]` Set the starting time of the report, `sar -s 20:00:00` 查看当天20:00:00后的CPU统计记录
+- `-f [ filename ]` records from filename (created by the -o filename flag), file location: /var/log/sysstat/sadd or `/var/log/sa/sadd`, sysstat工具只存储1个月内的系统使用记录, 每天的记录以sadd为文件名保存. `sar -f /var/log/sysstat/sa08`查看本月8号的CPU使用记录
 
 1. 要判断系统瓶颈问题，有时需几个 sar 命令选项结合起来
     * 怀疑CPU存在瓶颈，可用 `sar -u` 和 `sar -q` 等来查看
@@ -3288,15 +3288,15 @@ tmp目录是所有用户共有的临时文件夹, 所有用户都拥有读写权
 
 ##### 特殊位作用
 
-* SUID:对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属主身份来执行.
-* SGID对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属组身份来执行.
-* STICKY: 粘滞位, 通常对目录而言. 通常对于全局可写目录（other也可写）来说, 让该目录具有sticky后, 删除只对属于自己的文件有效（但是仍能编辑修改别人的文件, 除了root的）. 不能根据安全上下文获取对别人的文件的写权限
+- SUID:对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属主身份来执行.
+- SGID对一个可执行文件, 不是以发起者身份来获取资源, 而是以可执行文件的属组身份来执行.
+- STICKY: 粘滞位, 通常对目录而言. 通常对于全局可写目录（other也可写）来说, 让该目录具有sticky后, 删除只对属于自己的文件有效（但是仍能编辑修改别人的文件, 除了root的）. 不能根据安全上下文获取对别人的文件的写权限
 
 ##### 设置方式
 
-* SUID: 置于 u 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod u+s`
-* SGID: 置于 g 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod g+s`
-* STICKY: 粘滞位, 置于 o 的 x 位, 原位置有执行权限, 就置为 t , 否则为T  `#chmod o+t`
+- SUID: 置于 u 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod u+s`
+- SGID: 置于 g 的 x 位, 原位置有执行权限, 就置为 s, 没有了为 S . `#chmod g+s`
+- STICKY: 粘滞位, 置于 o 的 x 位, 原位置有执行权限, 就置为 t , 否则为T  `#chmod o+t`
 
 在一些文件设置了特殊权限后, 字母不是小写的s或者t, 而是大写的S和T, 那代表此文件的特殊权限没有生效, 是因为你尚未给它对应用户的x权限
 去除特殊位有:  `#chmou u-s`等
@@ -3345,11 +3345,11 @@ EXAMPLES:
 
 状态可能是 open(开放的)，filtered(被过滤的)， closed(关闭的)，或者unfiltered(未被过滤的)。
 
-* open(开放的)意味着目标机器上的应用程序正在该端口接收 TCP 连接或者 UDP 报文。
-* closed(关闭的) 端口没有应用程序在它上面监听，但是他们随时可能开放。
-* filtered(被过滤的) 意味着防火墙，过滤器或者其它网络障碍阻止了该端口被访问，Nmap无法得知 它是 open(开放的) 还是 closed(关闭的)。
-* unfiltered(未被过滤的) 当端口对Nmap的探测做出响应，但是Nmap无法确定它们是关闭还是开放
-* open|filtered 和 closed|filtered时，如果Nmap报告状态组合时，那说明Nmap无法确定该端口处于两个状态中的哪一个状态。
+- open(开放的)意味着目标机器上的应用程序正在该端口接收 TCP 连接或者 UDP 报文。
+- closed(关闭的) 端口没有应用程序在它上面监听，但是他们随时可能开放。
+- filtered(被过滤的) 意味着防火墙，过滤器或者其它网络障碍阻止了该端口被访问，Nmap无法得知 它是 open(开放的) 还是 closed(关闭的)。
+- unfiltered(未被过滤的) 当端口对Nmap的探测做出响应，但是Nmap无法确定它们是关闭还是开放
+- open|filtered 和 closed|filtered时，如果Nmap报告状态组合时，那说明Nmap无法确定该端口处于两个状态中的哪一个状态。
 
 `-Pn` Treat all hosts as online -- skip host discovery
 `-p1-6553,8080` 扫描1到6553,和8080 端口
@@ -3562,8 +3562,8 @@ You can then go to packages.ubuntu.com and search for the package there.
 Here is the page for [procps](http://packages.ubuntu.com/source/xenial/procps)
 If you scroll to the bottom of the page, you'll see links to the source code repositories:
 
-* Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
-* Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
+- Debian Package Source Repository git://git.debian.org/collab-maint/procps.git
+- Debian Package Source Repository ([Browsable](https://anonscm.debian.org/cgit/collab-maint/procps.git/))
 
 ### Software manage
 

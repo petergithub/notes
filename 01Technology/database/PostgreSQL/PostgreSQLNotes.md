@@ -54,31 +54,31 @@ Output format options:
 
 ```
 
-* \password dbuser 命令（设置密码）和\q命令（退出）
-* \h 查看SQL命令的解释，比如\h select。
-* \? 查看psql命令列表。
-* \l 列出所有数据库。
-* \x Expanded display 类似 MySQL \G
-* \c [database_name] 连接其他数据库。
-* \d 列出当前数据库的所有表格。
-* \dt 列出数据库中所有表
-* \d [table_name] 列出表结构
-* \di 列出数据库中所有 index
-* \dv 列出数据库中所有 view \dv *.*
-* \d+ pg_roles 查看 view 定义
-* \dp [PATTERN] list table, view, and sequence access privileges
-* \sv pg_roles 查看 view 定义, \sv+ 展示行号
-* \du 列出所有用户。
-* \encoding 显示字符集
-* \i path/to/sql 执行sql文件
-* \x 扩展展示结果信息，相当于MySQL的 \G
-* \e 打开文本编辑器。
-* \conninfo 列出当前数据库和连接的信息。
-* \o filename.txt 查询结果输出到文件
-* \t 查询结果不返回表头
-* \pset format unaligned 不对齐
-* \set ECHO_HIDDEN on|off 显示某个命令实际执行的SQL语句
-* \timing 开启显示执行时间 或者 `time psql -P pager=off -c 'SELECT ...' >outfile`
+- \password dbuser 命令（设置密码）和\q命令（退出）
+- \h 查看SQL命令的解释，比如\h select。
+- \? 查看psql命令列表。
+- \l 列出所有数据库。
+- \x Expanded display 类似 MySQL \G
+- \c [database_name] 连接其他数据库。
+- \d 列出当前数据库的所有表格。
+- \dt 列出数据库中所有表
+- \d [table_name] 列出表结构
+- \di 列出数据库中所有 index
+- \dv 列出数据库中所有 view \dv *.*
+- \d+ pg_roles 查看 view 定义
+- \dp [PATTERN] list table, view, and sequence access privileges
+- \sv pg_roles 查看 view 定义, \sv+ 展示行号
+- \du 列出所有用户。
+- \encoding 显示字符集
+- \i path/to/sql 执行sql文件
+- \x 扩展展示结果信息，相当于MySQL的 \G
+- \e 打开文本编辑器。
+- \conninfo 列出当前数据库和连接的信息。
+- \o filename.txt 查询结果输出到文件
+- \t 查询结果不返回表头
+- \pset format unaligned 不对齐
+- \set ECHO_HIDDEN on|off 显示某个命令实际执行的SQL语句
+- \timing 开启显示执行时间 或者 `time psql -P pager=off -c 'SELECT ...' >outfile`
 
 ```sh
 pg_ctl restart # restart db
@@ -700,11 +700,11 @@ select pg_xlog_location_diff(pg_current_xlog_insert_location(),pg_current_xlog_l
 `SELECT pg_cancel_backend(pid);` – session还在，事务回退;
 `SELECT pg_terminate_backend(pid);` --session消失，事务回退
 
-* `pg_stat_activity`: A table with one entry per server process, showing details of the running query for each. 只返回 session 的最后一条查询，而不一定是导致阻塞的查询
-* `pg_locks`: Information on current locks held within the database by open transactions, with one row per lockable object.
-* `pg_blocking_pids()`: A function that can find the process IDs (PIDs) of sessions that are blocking the PostgreSQL server process of a supplied PID. [pg_blocking_pids() - pgPedia](https://pgpedia.info/p/pg_blocking_pids.html)
-* `pg_cancel_backend()`: Function that cancels the currently running query by sending a SIGINT to a process ID.
-* `pg_terminate_backend()`: Terminate a backend process completely (the query and usually the connection) on the database (uses SIGTERM instead of SIGINT).
+- `pg_stat_activity`: A table with one entry per server process, showing details of the running query for each. 只返回 session 的最后一条查询，而不一定是导致阻塞的查询
+- `pg_locks`: Information on current locks held within the database by open transactions, with one row per lockable object.
+- `pg_blocking_pids()`: A function that can find the process IDs (PIDs) of sessions that are blocking the PostgreSQL server process of a supplied PID. [pg_blocking_pids() - pgPedia](https://pgpedia.info/p/pg_blocking_pids.html)
+- `pg_cancel_backend()`: Function that cancels the currently running query by sending a SIGINT to a process ID.
+- `pg_terminate_backend()`: Terminate a backend process completely (the query and usually the connection) on the database (uses SIGTERM instead of SIGINT).
 
 select * from pg_catalog.pg_locks;
 
@@ -1235,13 +1235,13 @@ SET default_transaction_isolation TO  'REPEATABLE READ';
 SELECT pg_reload_conf();
 ```
 
-* 开始事务：`BEGIN` or `BEGIN TRANSACTION`
-* 提交事务：`COMMIT;` or `END TRANSACTION;`
-* 回滚更改：`ROLLBACK`
-* 设置savepoint：`savepoint bpoint;`
-* 回滚更改到 save point：`rollback to savepoint bpoint;`
-* 查看自动提交状态 `\echo :AUTOCOMMIT`
-* 打开/关闭自动提交 `set AUTOCOMMIT on`, `set AUTOCOMMIT off`
+- 开始事务：`BEGIN` or `BEGIN TRANSACTION`
+- 提交事务：`COMMIT;` or `END TRANSACTION;`
+- 回滚更改：`ROLLBACK`
+- 设置savepoint：`savepoint bpoint;`
+- 回滚更改到 save point：`rollback to savepoint bpoint;`
+- 查看自动提交状态 `\echo :AUTOCOMMIT`
+- 打开/关闭自动提交 `set AUTOCOMMIT on`, `set AUTOCOMMIT off`
 
 ### 基于多版本的并发控制(MVCC)
 
@@ -1267,8 +1267,8 @@ cmax, 删除该元组的命令在事务中的命令序列号.
 
 选择被中止的事务
 
-* 事务年龄：通常选择最新的事务中止，因为回滚的代价较小。Transaction Age: Newer transactions are more likely to be aborted.
-* 锁的数量：可能会考虑事务持有的锁数量，选择影响最小的事务中止。Lock Priority: PostgreSQL tries to minimize the impact by selecting the transaction with the fewest updates or the smallest number of locks held
+- 事务年龄：通常选择最新的事务中止，因为回滚的代价较小。Transaction Age: Newer transactions are more likely to be aborted.
+- 锁的数量：可能会考虑事务持有的锁数量，选择影响最小的事务中止。Lock Priority: PostgreSQL tries to minimize the impact by selecting the transaction with the fewest updates or the smallest number of locks held
 
 自动中止 检测到死锁后，数据库会自动中止选定的事务并报告错误。
 
@@ -1574,17 +1574,17 @@ pg_dump -h localhost -p 5432 -U postgres -Fc -d test_replication | pg_restore -h
 pg_restore -U username -j 4 -d target_database backup_file
 ```
 
-* `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
-* `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
-* `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
-* `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
-* `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
-* `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
-* `-l, --list` List the table of contents of the archive. The output of this operation can be used as input to the -L option.
-* `-s, --schema-only` Restore only the schema (data definitions), not data, to the extent that schema entries are present in the archive. This option is the inverse of --data-only.
-* `-t table, --table=table`, Restore definition and/or data of only the named table.
-* `-1, --single-transaction` Execute the restore as a single transaction. This option implies --exit-on-error.
-* `-O, --no-owner` Do not output commands to set ownership of objects to match the original database. With -O, any user name can be used for the initial connection, and this user will own all the created objects.
+- `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
+- `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
+- `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
+- `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
+- `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
+- `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
+- `-l, --list` List the table of contents of the archive. The output of this operation can be used as input to the -L option.
+- `-s, --schema-only` Restore only the schema (data definitions), not data, to the extent that schema entries are present in the archive. This option is the inverse of --data-only.
+- `-t table, --table=table`, Restore definition and/or data of only the named table.
+- `-1, --single-transaction` Execute the restore as a single transaction. This option implies --exit-on-error.
+- `-O, --no-owner` Do not output commands to set ownership of objects to match the original database. With -O, any user name can be used for the initial connection, and this user will own all the created objects.
 
 #### 逻辑备份与恢复
 
@@ -2057,10 +2057,10 @@ checkpoint_timeout参数用于设置WAL检查点之间的时间。将此设置�
 
 设置 archive_mode 无效,这个参数设置为无效的时候，能够提升以下的操作的速度
 
-* CREATE TABLE AS SELECT
-* CREATE INDEX
-* ALTER TABLE SET TABLESPACE
-* CLUSTER等。
+- CREATE TABLE AS SELECT
+- CREATE INDEX
+- ALTER TABLE SET TABLESPACE
+- CLUSTER等。
 
 #### autovacuum
 
@@ -2069,10 +2069,10 @@ checkpoint_timeout参数用于设置WAL检查点之间的时间。将此设置�
 
 PostgreSQL's VACUUM command has to process each table on a regular basis for several reasons:
 
-* To recover or reuse disk space occupied by updated or deleted rows.
-* To update data statistics used by the PostgreSQL query planner.
-* To update the visibility map, which speeds up index-only scans.
-* To protect against loss of very old data due to transaction ID wraparound or multixact ID wraparound.
+- To recover or reuse disk space occupied by updated or deleted rows.
+- To update data statistics used by the PostgreSQL query planner.
+- To update the visibility map, which speeds up index-only scans.
+- To protect against loss of very old data due to transaction ID wraparound or multixact ID wraparound.
 
 #### 一份参数文件1
 
@@ -2300,15 +2300,15 @@ Perform an initial data synchronization from the primary server to the standby s
 pg_basebackup -h db01 -p 5432 -U replica -D $PGDATA -X stream -R
 ```
 
-* `-h` specifies a non-local host. Here, you need to enter the IP address of your server with the primary cluster.
-* `-p` specifies the port number it connects to on the primary server. By default, PostgreSQL uses port :5432.
-* `-U` allows you to specify the user you connect to the primary cluster as. This is the role you created in the previous step.
-* `-D` flag is the output directory of the backup. This is your replica's data directory that you emptied just before.
-* `-Fp` specifies the data to be outputted in the plain format instead of as a tar file. This is the default format.
-* `-Xs` streams the contents of the WAL log as the backup of the primary is performed. This value is the default.
-* `-R, --write-recovery-conf` creates an empty file, named `standby.signal`, in the replica's data directory. This file lets your replica cluster know that it should operate as a standby server. The `-R` option also adds the connection information about the primary server to the postgresql.auto.conf file. This is a special configuration file that is read whenever the regular postgresql.conf file is read, but the values in the .auto file override the values in the regular configuration file.
-* `-C, --create-slot` Specifies that the replication slot named by the --slot option should be created before starting the backup. An error is raised if the slot already exists.
-* `-S slotname, --slot=slotname` This option can only be used together with -X stream. It causes WAL streaming to use the specified replication slot. If the base backup is intended to be used as a streaming-replication standby using a replication slot, the standby should then use the same replication slot name as primary_slot_name. This ensures that the primary server does not remove any necessary WAL data in the time between the end of the base backup and the start of streaming replication on the new standby.
+- `-h` specifies a non-local host. Here, you need to enter the IP address of your server with the primary cluster.
+- `-p` specifies the port number it connects to on the primary server. By default, PostgreSQL uses port :5432.
+- `-U` allows you to specify the user you connect to the primary cluster as. This is the role you created in the previous step.
+- `-D` flag is the output directory of the backup. This is your replica's data directory that you emptied just before.
+- `-Fp` specifies the data to be outputted in the plain format instead of as a tar file. This is the default format.
+- `-Xs` streams the contents of the WAL log as the backup of the primary is performed. This value is the default.
+- `-R, --write-recovery-conf` creates an empty file, named `standby.signal`, in the replica's data directory. This file lets your replica cluster know that it should operate as a standby server. The `-R` option also adds the connection information about the primary server to the postgresql.auto.conf file. This is a special configuration file that is read whenever the regular postgresql.conf file is read, but the values in the .auto file override the values in the regular configuration file.
+- `-C, --create-slot` Specifies that the replication slot named by the --slot option should be created before starting the backup. An error is raised if the slot already exists.
+- `-S slotname, --slot=slotname` This option can only be used together with -X stream. It causes WAL streaming to use the specified replication slot. If the base backup is intended to be used as a streaming-replication standby using a replication slot, the standby should then use the same replication slot name as primary_slot_name. This ensures that the primary server does not remove any necessary WAL data in the time between the end of the base backup and the start of streaming replication on the new standby.
 
 The specified replication slot has to exist unless the option -C is also used.
 
@@ -2343,8 +2343,8 @@ If this option is not specified and the server supports temporary replication sl
 
 缺点：
 
-* 需要自己编写监控和切换脚本，自己维护切换后的系统状态。
-* 存在着脑裂的问题。
+- 需要自己编写监控和切换脚本，自己维护切换后的系统状态。
+- 存在着脑裂的问题。
 
 #### 一些参考的脚本
 
@@ -2901,11 +2901,11 @@ recovery_target_timeline = 'latest'     # 'current', 'latest', or timeline ID
 host=db01
 ```
 
-* `-n --dry-run` Do everything except actually modifying the target directory.
-* `-P --progress` Enables progress reporting.
-* `-c --restore-target-wal` Use restore_command defined in the target cluster configuration to retrieve WAL files from the WAL archive if these files are no longer available in the pg_wal directory.
-* `-R --write-recovery-conf` Create standby.signal and append connection settings to postgresql.auto.conf in the output directory. --source-server is mandatory with this option.
-* `--debug` Print verbose debugging output that is mostly useful for developers debugging pg_rewind.
+- `-n --dry-run` Do everything except actually modifying the target directory.
+- `-P --progress` Enables progress reporting.
+- `-c --restore-target-wal` Use restore_command defined in the target cluster configuration to retrieve WAL files from the WAL archive if these files are no longer available in the pg_wal directory.
+- `-R --write-recovery-conf` Create standby.signal and append connection settings to postgresql.auto.conf in the output directory. --source-server is mandatory with this option.
+- `--debug` Print verbose debugging output that is mostly useful for developers debugging pg_rewind.
 
 #### PostgreSQL 同步异常
 
@@ -2931,20 +2931,20 @@ repmgr 是 EDB 公司的一个开源工具套件（类似于 MySQL 的 MHA），
 
 优点
 
-* 配置操作简单，可一键式完成相关部署操作；
-* 支持 Auto Failover 和 Manual Switchover；
-* 不使用任何额外的端口进行通信;
-* 对数据库侵入小，和主备流复制基本一致;
-* 通过调用已注册事件的用户脚本来提供通知;
-* 不使用任何额外的端口进行通信。
+- 配置操作简单，可一键式完成相关部署操作；
+- 支持 Auto Failover 和 Manual Switchover；
+- 不使用任何额外的端口进行通信;
+- 对数据库侵入小，和主备流复制基本一致;
+- 通过调用已注册事件的用户脚本来提供通知;
+- 不使用任何额外的端口进行通信。
 
 缺点
 
-* 没有对VIP的管理，如果要实现VIP的管理，需要自己写脚本来实现。
-* 无法从 PostgreSQL 服务关闭的节点检索另一个节点的状态
-* 不会检测备用库是否在恢复配置中使用未知或不存在的节点错误配置
-* 不提供分布式控制解决方案
-* 不能在备机单个节点 down 掉时，自动拉起
+- 没有对VIP的管理，如果要实现VIP的管理，需要自己写脚本来实现。
+- 无法从 PostgreSQL 服务关闭的节点检索另一个节点的状态
+- 不会检测备用库是否在恢复配置中使用未知或不存在的节点错误配置
+- 不提供分布式控制解决方案
+- 不能在备机单个节点 down 掉时，自动拉起
 
 [Create a highly available PostgreSQL cluster in linux using repmgr and keepalived | by Fekete József | Medium](https://medium.com/@fekete.jozsef.joe/create-a-highly-available-postgresql-cluster-in-linux-using-repmgr-and-keepalived-9d72aa9ef42f)
 [PostgreSQL HA with Repmgr and Keepalived | by ilosaurus | Medium](https://medium.com/@muhilhamsyarifuddin/postgresql-ha-with-repmgr-and-keepalived-f466bb6aa437)
@@ -2960,16 +2960,16 @@ Pgpool-II 是在 PostgreSQL 服务器和 PostgreSQL 数据库客户端之间工�
 
 优点
 
-* 连接池：提供连接池功能，提高数据库性能。
-* 负载均衡：可以在多个 PostgreSQL 实例之间分发查询请求。
-* 自动故障转移：支持自动故障转移和读写分离。
+- 连接池：提供连接池功能，提高数据库性能。
+- 负载均衡：可以在多个 PostgreSQL 实例之间分发查询请求。
+- 自动故障转移：支持自动故障转移和读写分离。
 
 缺点
 
-* 复杂性：配置和管理相对复杂。
-* 性能开销：在高负载情况下，Pgpool-II 本身可能成为瓶颈。
-* 一致性：需要额外处理数据一致性问题。
-* 如果必要，需要额外需要一台服务器部署 Pgpool
+- 复杂性：配置和管理相对复杂。
+- 性能开销：在高负载情况下，Pgpool-II 本身可能成为瓶颈。
+- 一致性：需要额外处理数据一致性问题。
+- 如果必要，需要额外需要一台服务器部署 Pgpool
 
 [Configuring Pgpool-II RUNNING-MODE](https://www.pgpool.net/docs/45/en/html/configuring-pgpool.html#RUNNING-MODE)
 The most popular mode ever used is "streaming replication mode".
@@ -2978,13 +2978,13 @@ The most popular mode ever used is "streaming replication mode".
 
 pgpool-Ⅱ有连接池、复制、负载均衡等功能，使用这些功能需要配置在不同的工作模式下。
 
-* 原始模式：只实现故障切换功能，当配置多个后端数据库情形，第一个后端数据库故障时切换到第二个后端数据库，依次类推。这种模式pgpool不负责后端数据库数据同步，数据库的数据同步由用户负责，对应配置文件为$prefix/etc/pgpool.conf.sample，这种模式不支持负载均衡。
-* 连接池模式：实现连接池的功能和原始模式的故障切换功能。
-* 内置复制模式：这种模式下pgpool负责后端数据库数据同步，pgpool节点上的写操作需等待所有后端数据库将数据写入后才向客户端返回成功，是强同步复制方式，配置文件为$prefix/etc/pgpoo1.conf.sampie-repIication，这种模式实现负载均衡的功能。
-* 主备模式：使用第三方工具(如：Slony，流复制)完成pgpool的后端数据库的数据同步复制，中间件层使用pgpool-Ⅱ，pgpool提供高可用和连接池的功能。配置文件为$prefix/etc/pgpool.conf.sample-master-slave，这种模式支持负载均衡。
-* 配合流复制的主备模式：使用PostgreSQL流复制方式，PostgreSQL流复制负责pgpool后端数据库数据同步，对应的配置文件为$prefix/etc/pgpool.conf.sample-stream，这种模式支持负载均衡。pgpool+pg复制实现高可用解决方案
-* 配合Slony的主备模式：
-* 并行模式：实现查询的并行执行。并行模式不能与主备模式同时使用。
+- 原始模式：只实现故障切换功能，当配置多个后端数据库情形，第一个后端数据库故障时切换到第二个后端数据库，依次类推。这种模式pgpool不负责后端数据库数据同步，数据库的数据同步由用户负责，对应配置文件为$prefix/etc/pgpool.conf.sample，这种模式不支持负载均衡。
+- 连接池模式：实现连接池的功能和原始模式的故障切换功能。
+- 内置复制模式：这种模式下pgpool负责后端数据库数据同步，pgpool节点上的写操作需等待所有后端数据库将数据写入后才向客户端返回成功，是强同步复制方式，配置文件为$prefix/etc/pgpoo1.conf.sampie-repIication，这种模式实现负载均衡的功能。
+- 主备模式：使用第三方工具(如：Slony，流复制)完成pgpool的后端数据库的数据同步复制，中间件层使用pgpool-Ⅱ，pgpool提供高可用和连接池的功能。配置文件为$prefix/etc/pgpool.conf.sample-master-slave，这种模式支持负载均衡。
+- 配合流复制的主备模式：使用PostgreSQL流复制方式，PostgreSQL流复制负责pgpool后端数据库数据同步，对应的配置文件为$prefix/etc/pgpool.conf.sample-stream，这种模式支持负载均衡。pgpool+pg复制实现高可用解决方案
+- 配合Slony的主备模式：
+- 并行模式：实现查询的并行执行。并行模式不能与主备模式同时使用。
 
 ### Patroni
 
@@ -2994,18 +2994,18 @@ Patroni 是一个基于 Python 的高可用解决方案，利用 etcd、Consul �
 
 优点
 
-* 持续监控和自动故障转移
-* 使用单个命令进行手动/计划切换
-* 内置自动化功能，用于将故障节点再次带回到集群。
-* 用于整个集群配置和进一步工具化的 REST API。
-* 为透明的应用故障转移提供基础能力 每个操作和配置的分布式共识。
-* 与 Linux 看门狗集成，以避免脑裂现象。
+- 持续监控和自动故障转移
+- 使用单个命令进行手动/计划切换
+- 内置自动化功能，用于将故障节点再次带回到集群。
+- 用于整个集群配置和进一步工具化的 REST API。
+- 为透明的应用故障转移提供基础能力 每个操作和配置的分布式共识。
+- 与 Linux 看门狗集成，以避免脑裂现象。
 
 缺点
 
-* 没有实现对VIP的管理，如果要实现VIP的管理，需要自己写脚本来实现
-* 复杂性：需要配置和管理多个组件（如 etcd、Consul 或 ZooKeeper）。
-* 资源消耗：额外的组件会增加系统资源消耗和运维复杂度。
+- 没有实现对VIP的管理，如果要实现VIP的管理，需要自己写脚本来实现
+- 复杂性：需要配置和管理多个组件（如 etcd、Consul 或 ZooKeeper）。
+- 资源消耗：额外的组件会增加系统资源消耗和运维复杂度。
 
 ## MySQL 与 PostgreSQL 之间的区别
 

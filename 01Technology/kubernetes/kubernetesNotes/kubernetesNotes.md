@@ -272,8 +272,8 @@ kubectl rollout history deployment/<Deployment-name>  --revision=<revision-numbe
 
 deployment strategies:
 
-* RollingUpdate
-* Recreate
+- RollingUpdate
+- Recreate
 
 ### Label
 
@@ -453,8 +453,8 @@ EOF
 
 ### [Managing Resources for Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 
-* **request**: the scheduler uses this information to decide which node to place the Pod on. The kubelet also reserves at least the request amount of that system resource specifically for that container to use.  It is default to the limits if requests is not set explicitly.
-* **limit**: the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set
+- **request**: the scheduler uses this information to decide which node to place the Pod on. The kubelet also reserves at least the request amount of that system resource specifically for that container to use.  It is default to the limits if requests is not set explicitly.
+- **limit**: the kubelet enforces those limits so that the running container is not allowed to use more of that resource than the limit you set
 
 #### Exceeding the limits
 
@@ -463,13 +463,13 @@ Memory: When a process tries to allocate memory over its limit, the process is k
 
 #### pod QoS classes
 
-* BestEffort (the lowest priority)
+- BestEffort (the lowest priority)
   1. It’s assigned to pods that don’t have any requests or limits set at all (in any of their containers)
   2. They will be the first ones killed when memory needs to be freed for other pods.
-* Burstable
+- Burstable
   In between BestEffort and Guaranteed is the Burstable QoS class. All other pods fall into this class
   When two single-container pods exist, both in the Burstable class, the system will kill the one using more of its requested memory than the other, percentage-wise
-* Guaranteed (the highest)
+- Guaranteed (the highest)
   1. Requests and limits need to be set for both CPU and memory.
   2. They need to be set for each container.
   3. They need to be equal (the limit needs to match the request for each resource in each container).
@@ -484,9 +484,9 @@ First in line to get killed are pods in the BestEffort class, followed by Bursta
 
 Three possible effects exist:
 
-* `NoSchedule`, which means pods won’t be scheduled to the node if they don’t tol- erate the taint.
-* `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can’t schedule it somewhere else.
-* `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don’t tolerate the NoExecute taint will be evicted from the node.
+- `NoSchedule`, which means pods won’t be scheduled to the node if they don’t tol- erate the taint.
+- `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can’t schedule it somewhere else.
+- `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don’t tolerate the NoExecute taint will be evicted from the node.
 
 ### Deploy process
 
@@ -583,8 +583,8 @@ Note: 某些链条的名字中含有 <HASH>字样，这是运用SHA256算法对�
 
 NOTE: SNAT和MASQUERAD的区别
 
-* SNAT是指在数据包从网卡发送出去的时候，把数据包中的源地址部分替换为指定的IP，这样，接收方就认为数据包的来源是被替换的那个指定IP的主机。
-* MASQUERADE是SNAT的一个特例。MASQUERADE是用发送数据的网卡上的IP来替换源IP，因此，对于那些IP不固定的场合，比如通过DHCP分配IP的情况下，就得用MASQUERADE。
+- SNAT是指在数据包从网卡发送出去的时候，把数据包中的源地址部分替换为指定的IP，这样，接收方就认为数据包的来源是被替换的那个指定IP的主机。
+- MASQUERADE是SNAT的一个特例。MASQUERADE是用发送数据的网卡上的IP来替换源IP，因此，对于那些IP不固定的场合，比如通过DHCP分配IP的情况下，就得用MASQUERADE。
 
 ##### 同一个 Node 节点内的 Pod 不能通过 Service 互访
 
@@ -692,10 +692,10 @@ for intf in /sys/devices/virtual/net/cni0/brif/*; do echo "$intf"; cat $intf/hai
 
 ### Components of the Control Plane
 
-* The etcd distributed persistent storage
-* The API server
-* The Scheduler
-* The Controller Manager
+- The etcd distributed persistent storage
+- The API server
+- The Scheduler
+- The Controller Manager
 
 These components store and manage the state of the cluster, but they aren’t what runs the application containers.
 
@@ -703,9 +703,9 @@ These components store and manage the state of the cluster, but they aren’t wh
 
 The task of running your containers is up to the components running on each worker node:
 
-* The Kubelet
-* The Kubernetes Service Proxy (kube-proxy)
-* The Container Runtime (Docker, rkt, or others)
+- The Kubelet
+- The Kubernetes Service Proxy (kube-proxy)
+- The Container Runtime (Docker, rkt, or others)
 
 ## Useful image
 
@@ -773,8 +773,8 @@ helm uninstall <name>                                 # Uninstall a release
 
 There are two ways to pass configuration data during install
 
-* `--values` (or `-f`): Specify a YAML file with overrides. This can be specified multiple times and the rightmost file will take precedence
-* `--set`: Specify overrides on the command line.
+- `--values` (or `-f`): Specify a YAML file with overrides. This can be specified multiple times and the rightmost file will take precedence
+- `--set`: Specify overrides on the command line.
 
 ### Perform App Upgrade and Rollback
 
@@ -1092,11 +1092,11 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 Common exit codes (`128+x`) associated with docker containers are:
 
-* Exit Code 0: Absence of an attached foreground process
-* Exit Code 1: Indicates failure due to application error
-* Exit Code 137: `128+9` Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
-* Exit Code 139: `128+11` Indicates failure as container received SIGSEGV
-* Exit Code 143: `128+15` Indicates failure as container received SIGTERM
+- Exit Code 0: Absence of an attached foreground process
+- Exit Code 1: Indicates failure due to application error
+- Exit Code 137: `128+9` Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
+- Exit Code 139: `128+11` Indicates failure as container received SIGSEGV
+- Exit Code 143: `128+15` Indicates failure as container received SIGTERM
 
 x: see `man signal`
 

@@ -22,16 +22,16 @@ connect from a container to a service on the host: connect to the special DNS na
 `docker run -it --name=containerName <image_id || repository:tag> bash` Run a command in a new container
 `docker run = docker create + docker start`
 
-* `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
-* `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
-* `-i` 让容器的标准输入保持打开
-* `-p` [host:]port:dockerPort
-* `-d, --detach` 后台运行
-* `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
-* `--rm` 在容器终止运行后自动删除容器文件
-* `-v, --volume "/path/to/host/machine:/path/to/container`
-* `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
-* `--user $(id -u):$(id -g)` use the current user's UID and GID.
+- `--add-host="localhostA:127.0.0.1" --add-host="localhostB:127.0.0.1"` append to /etc/hosts
+- `-t` 分配一个伪终端（pseudo-tty）并绑定到容器的标准输入上
+- `-i` 让容器的标准输入保持打开
+- `-p` [host:]port:dockerPort
+- `-d, --detach` 后台运行
+- `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
+- `--rm` 在容器终止运行后自动删除容器文件
+- `-v, --volume "/path/to/host/machine:/path/to/container`
+- `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
+- `--user $(id -u):$(id -g)` use the current user's UID and GID.
 
 `docker logs -f containerID`
 
@@ -47,9 +47,9 @@ connect from a container to a service on the host: connect to the special DNS na
 
 `docker ps` Show running containers
 
-* `-a, --all` Show all containers (default shows just running)
-* `-n, --last int` Show n last created containers (includes all states) (default -1)
-* `-l, --latest` Show the latest created container (includes all states)
+- `-a, --all` Show all containers (default shows just running)
+- `-n, --last int` Show n last created containers (includes all states) (default -1)
+- `-l, --latest` Show the latest created container (includes all states)
 
 设置容器时间，需要挂载/usr/share/zoneinfo 因为/etc/localtime 一般是软连接
 
@@ -70,10 +70,10 @@ connect from a container to a service on the host: connect to the special DNS na
 
 `docker stats`  a live look at your containers resource utilization
 
-* Memory is listed under the MEM USAGE / LIMIT column. This provides a snapshot of how much memory the container is utilizing and what it’s memory limit is.
-* CPU utilization is listed under the CPU % column.
-* Network traffic is represented under the NET I/O column. It displays the outgoing and incoming traffic consumption of a container.
-* Storage utilization is shown under the BLOCK I/O column. This show you the amount of reads and writes a container is peforming to disk.
+- Memory is listed under the MEM USAGE / LIMIT column. This provides a snapshot of how much memory the container is utilizing and what it’s memory limit is.
+- CPU utilization is listed under the CPU % column.
+- Network traffic is represented under the NET I/O column. It displays the outgoing and incoming traffic consumption of a container.
+- Storage utilization is shown under the BLOCK I/O column. This show you the amount of reads and writes a container is peforming to disk.
 
 `docker stats --no-stream` the first stats pull results
 
@@ -91,10 +91,10 @@ docker inspect <containerID> | grep Restart
 docker update --restart unless-stopped <containerID>
 ```
 
-* `no`              Do not automatically restart the container. (the default)
-* `on-failure`      Restart the container if it exits due to an error, which manifests as a non-zero exit code.
-* `always`          Always restart the container if it stops. If it is manually stopped, it is restarted only when Docker daemon restarts or the container itself is manually restarted. (See the second bullet listed in restart policy details)
-* `unless-stopped`  Similar to always, except that when the container is stopped (manually or otherwise), it is not restarted even after Docker daemon restarts.
+- `no`              Do not automatically restart the container. (the default)
+- `on-failure`      Restart the container if it exits due to an error, which manifests as a non-zero exit code.
+- `always`          Always restart the container if it stops. If it is manually stopped, it is restarted only when Docker daemon restarts or the container itself is manually restarted. (See the second bullet listed in restart policy details)
+- `unless-stopped`  Similar to always, except that when the container is stopped (manually or otherwise), it is not restarted even after Docker daemon restarts.
 
 ### 使用GPU
 
@@ -271,15 +271,15 @@ EXPOSE 8080
 CMD ["/usr/sbin/init"]
 ```
 
-* FROM centos:7：该 image 文件继承的 centos image
-* COPY . /data：将当前目录下的所有文件（除了.dockerignore排除的路径），都拷贝进入 image 文件的/data目录。
-* WORKDIR /data：指定接下来的工作路径为/data。
-* RUN yum install -y iproute：在`/data`目录下，运行`yum`命令安装依赖。注意，安装后所有的依赖，都将打包进入 image 文件, 可以包含多个RUN命令
-* EXPOSE 8080：将容器 `8080` 端口暴露出来， 允许外部连接这个端口。
-* CMD 命令在容器启动后执行, 只能有一个 有两种格式
-  * shell 格式：`CMD <命令>`。实际的命令会被包装为 `sh -c` 的参数的形式进行执行，先运行一个 shell 进程。
-  * exec 格式：`CMD ["可执行文件", "参数1", "参数2"...]`。推荐使用 exec 格式，这类格式在解析时会被解析为 JSON 数组，因此一定要使用双引号 "，而不要使用单引号。
-* 当指定了 ENTRYPOINT 后，CMD 的含义就发生了改变，不再是直接的运行其命令，而是将 CMD 的内容作为参数传给 ENTRYPOINT 指令，换句话说实际执行时，将变为：
+- FROM centos:7：该 image 文件继承的 centos image
+- COPY . /data：将当前目录下的所有文件（除了.dockerignore排除的路径），都拷贝进入 image 文件的/data目录。
+- WORKDIR /data：指定接下来的工作路径为/data。
+- RUN yum install -y iproute：在`/data`目录下，运行`yum`命令安装依赖。注意，安装后所有的依赖，都将打包进入 image 文件, 可以包含多个RUN命令
+- EXPOSE 8080：将容器 `8080` 端口暴露出来， 允许外部连接这个端口。
+- CMD 命令在容器启动后执行, 只能有一个 有两种格式
+  - shell 格式：`CMD <命令>`。实际的命令会被包装为 `sh -c` 的参数的形式进行执行，先运行一个 shell 进程。
+  - exec 格式：`CMD ["可执行文件", "参数1", "参数2"...]`。推荐使用 exec 格式，这类格式在解析时会被解析为 JSON 数组，因此一定要使用双引号 "，而不要使用单引号。
+- 当指定了 ENTRYPOINT 后，CMD 的含义就发生了改变，不再是直接的运行其命令，而是将 CMD 的内容作为参数传给 ENTRYPOINT 指令，换句话说实际执行时，将变为：
 `<ENTRYPOINT> "<CMD>"`
 
 创建 image 文件 `docker image build -t imageName /path/to/DockerfileFolder`
@@ -404,12 +404,12 @@ location: 几个可能的位置
 
 `/etc/docker/daemon.json` 的配置项 available configuration options in the [dockerd reference docs](https://docs.docker.com/reference/cli/dockerd/#daemon-configuration-file)
 
-* `log-driver，log-opts`：配置日志 [Configure logging drivers | Docker Docs](https://docs.docker.com/engine/logging/configure/)
-* `registry-mirrors`：使用镜像仓库
-* `insecure-registries`: 设置允许使用 HTTP 协议的镜像仓库
-* `data-root`：修改docker镜像默认数据位置，default `/var/lib/docker` on Linux.
-* `bip`：The default Bridge IP defines the IP range that network interface docker0 can use 默认docker网络 172.17.0.0/16
-* `default-address-pools` User generated bridge networks, defines the IP range of network interface docker_gwbridge.
+- `log-driver，log-opts`：配置日志 [Configure logging drivers | Docker Docs](https://docs.docker.com/engine/logging/configure/)
+- `registry-mirrors`：使用镜像仓库
+- `insecure-registries`: 设置允许使用 HTTP 协议的镜像仓库
+- `data-root`：修改docker镜像默认数据位置，default `/var/lib/docker` on Linux.
+- `bip`：The default Bridge IP defines the IP range that network interface docker0 can use 默认docker网络 172.17.0.0/16
+- `default-address-pools` User generated bridge networks, defines the IP range of network interface docker_gwbridge.
 
 ```sh
 # data-root default is /var/lib/docker
