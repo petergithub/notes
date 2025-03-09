@@ -99,18 +99,18 @@ kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic second_topic
 ### delete messages from Kafka
 
 ```sh
-# specified that for the partition 0 of the topic “my-topic” we want to delete all the records from the beginning until offset 3. (exlusive 开区间)
+# specified that for the partition 0 of the topic “my_topic” we want to delete all the records from the beginning until offset 3. (exlusive 开区间)
 # offset -1 删除所有
 tee delete-records.json <<EOF
 {
     "partitions": [
         {
-            "topic": "my-topic",
+            "topic": "my_topic",
             "partition": 0,
             "offset": 3
         },
         {
-            "topic": "my-topic",
+            "topic": "my_topic",
             "partition": 1,
             "offset": 3
         }
@@ -120,13 +120,23 @@ tee delete-records.json <<EOF
 EOF
 kafka-delete-records.sh --bootstrap-server localhost:9092 --offset-json-file delete-records.json
 
+# 获取指定时间戳的 offset
+# 获取到最接近指定时间戳的Offset。这个工具会返回每个Partition最接近指定时间戳的Offset。
+# time -1  To check the end offset set parameter time to value -1
+# time -2  To check the start offset, use –time -2
+# time 1730908800000
+kafka-run-class org.apache.kafka.tools.GetOffsetShell \
+--bootstrap-server localhost:9092 \
+--topic my_topic \
+--time 1730908800000
+
 # Change the retention period
 
 # Use the kafka-configs command line tool to alter the retention policy for the topic to a very short period of time. Once the retention period has expired, the messages will be deleted automatically.
 kafka-configs.sh \
   --alter \
   --entity-type topics \
-  --entity-name my-topic \
+  --entity-name my_topic \
   --add-config retention.ms=1000
 ```
 
@@ -142,10 +152,10 @@ kafka-consumer-groups.sh --help
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 
 # view offsets
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my_group
 
 # To manually delete one or multiple consumer groups, the "--delete" option can be used:
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my-group --group my-other-group
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my_group --group my_other_group
 
 # To reset offsets of a consumer group：to display
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
@@ -189,7 +199,6 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --gro
 * --to-current : Resets offsets to current offset.
 * --by-duration <String: duration> : Reset offsets to offset by duration from current timestamp. Format: 'PnDTnHnMnS'
 * --to-offset : Reset offsets to a specific offset.
-```
 
 ## kafka Java client
 
@@ -361,7 +370,7 @@ helm install kafka-ui kafka-ui-0.7.6.tgz -f values.yaml --set existingConfigMap=
 
 ```
 
-### kafka monitor
+## kafka monitor
 
 ```sh
 # JMXTool工具
