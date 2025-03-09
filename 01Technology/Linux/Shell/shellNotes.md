@@ -72,6 +72,49 @@ some-command >logfile 2>&1
 some-command &>logfile
 ```
 
+### stdin, stdout, stderr, <, >, >>, <<, <<<
+
+[Here Documents](https://tldp.org/LDP/abs/html/here-docs.html)
+[How does cat `cat << EOF` exactly work? : r/bash](https://www.reddit.com/r/bash/comments/132dgu9/how_does_cat_cat_eof_exactly_work/)
+
+File 0, aka "standard input" or "stdin" for short, is where the program expects its input to come from;
+file 1, aka "standard output"/"stdout", is where it's output goes;
+file 2, aka "standard error"/"stderr", is where it sends error or warning messages or anything else it wants to communicate without including it in its output. Interactive programs often send prompts to standard error, for instance.
+
+The redirection operators `<` and `>` let you read and write files instead of connecting two running programs. So
+
+`0<` (or just `<`) redirects stdin from a file,
+`1>` (or just `>`) redirects stdout to a file, and
+`2>` redirects stderr to a file.
+`>>` If you double the `>` in an output redirect, it appends to the file instead of clobbering it.
+`<<` it creates a "[here document](https://tldp.org/LDP/abs/html/here-docs.html)", temporarily redirecting the input of the command from the source containing the command itself. It's not actually that useful interactively, because commands read from the terminal by default without any redirection, and you can always press control-D to send end-of-file to them. But it's very handy for shell scripts, since you can effectively embed an input file in the script without having to ship (or create in the script) a second file.
+`<<<` here-strings, which allow you to do one-line heredocs by tripling the < and putting the text right after those instead of on following lines delimited by a sentinel. `cat <<<'this is some text'`
+
+```sh
+#!/usr/bin/env bash
+cat <<EOF
+this is some text
+EOF
+
+cat > webconfig.yml << EOF
+basic_auth_users:
+  prometheus: password
+EOF
+
+cat <<EOF | sudo tee /etc/hosts
+172.17.1.2 middleware01
+EOF
+
+sudo tee /etc/hosts <<EOF
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+EOF
+
+kubectl apply -f - <<EOF
+...
+EOF
+```
+
 ## Shell 变量
 
 ```sh
@@ -283,6 +326,8 @@ Operator    Meaning    Example
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
 -e file   Check if file exists. Is true even if file is a directory but exists.   [ -e $file ] is true.
+-t 1  Check if the file descriptor 1 (standard output) is open and refers to a terminal.
+
 ```
 
 #### compound comparison

@@ -399,6 +399,23 @@ centos关机命令：
 
 ## 自动启动
 
+To set the GRUB timeout in CentOS
+
+1. Change the value of GRUB_TIMEOUT to the desired timeout in /etc/default/grub
+2. Run the command `grub2-mkconfig -o /boot/grub2/grub.cfg` to apply the changes
+
+```sh
+# Timeout values
+# A timeout of 0 boots the default entry immediately without displaying the menu
+# A timeout of -1 (or unset) waits indefinitely
+vi /etc/default/grub
+
+GRUB_TIMEOUT=1
+
+# make effective
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+
 ### CentOS 7 配置系统服务来设置自启动
 
 `systemctl enable mysqld` 把MySQL服务设置成自启动
@@ -808,6 +825,9 @@ sudo sh VBoxLinuxAdditions.run
 # VirtualBox Guest Additions: kernel modules and services were not reloaded
 # The log file /var/log/vboxadd-setup.log may contain further information.
 
+# add your user to the group vboxsf
+sudo usermod -G vboxsf -a $USER
+
 sudo yum install -y kernel-devel gcc
 sudo yum -y upgrade kernel kernel-devel
 
@@ -847,10 +867,10 @@ sudo yum install -y libXrandr.x86_64
 # Folder Path 是宿主机路径，Folder Name 是挂载时使用的名字 比如使用 D_DRIVE
 
 sudo mkdir /d
-sudo chown username:username /d
+sudo chown $USER:$USER /d
 sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) D_DRIVE /d
 sudo mkdir /e
-sudo chown username:username /e
+sudo chown $USER:$USER /e
 sudo mount -t vboxsf -o uid=$UID,gid=$(id -g) E_DRIVE /e
 
 # 设置自动挂载
