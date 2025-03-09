@@ -180,9 +180,8 @@ create database 数据库名 owner 所属用户 encoding UTF8;
 drop database 数据库名;
 
 -- 关闭数据库所有会话
-SELECT pg_terminate_backend(pg_stat_activity.pid)
-FROM pg_stat_activity
-WHERE datname='mydb' AND pid<>pg_backend_pid();
+SELECT * FROM pg_stat_activity WHERE datname='test_replication_restore' AND pid<>pg_backend_pid();
+SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='test_replication_restore' AND pid<>pg_backend_pid();
 
 -- 查看view 定义
 \d+ pg_roles;
@@ -280,7 +279,17 @@ GRANT CREATE ON SCHEMA public TO dbuser;
 grant all privileges on all tables in schema public to dbuser;
 grant all privileges on all sequences in schema public to dbuser;
 grant all privileges on all functions in schema public to dbuser;
+-- 只读权限
 grant select on all tables in schema public to dbuser;
+-- 修改用户只读事务属性
+ALTER USER dbuser SET default_transaction_read_only=on;
+-- 注意：其中public是指定的SCHEMA，可以根据实际情况更改。
+-- 在对应的数据库中，授予权限，如select
+GRANT USAGE, SELECT ON SCHEMA public to dbuser;
+-- 指定表名只读
+GRANT SELECT ON table_name TO username;
+-- 所有表只读
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO dbuser;
 --将pgadmin模式的所有权限授权给pgadmin
 grant create,usage on schema pgadmin to pgadmin;
 
@@ -418,6 +427,20 @@ mail=# select grantee, privilege_type from information_schema.role_table_grants 
  mailreader   |  REFERENCES
  mailreader   |  TRIGGER
 (7 rows)
+```
+
+#### 创建只读账号
+
+```sql
+-- 创建一个用户名为<readonlyuser>，密码为<your_password>的用户
+CREATE USER <readonlyuser> WITH ENCRYPTED PASSWORD '<your_password>';
+-- 修改用户只读事务属性
+ALTER USER <readonlyuser> SET default_transaction_read_only=on;
+-- 设置USAGE权限给到<readonlyuser>
+GRANT USAGE ON SCHEMA public to <readonlyuser>;
+-- 注意：其中public是指定的SCHEMA，可以根据实际情况更改。
+-- 4、在对应的数据库中，授予权限，如select
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO <readonlyuser>;
 ```
 
 ### 字符串操作

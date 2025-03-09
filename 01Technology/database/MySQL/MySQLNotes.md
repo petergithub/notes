@@ -63,7 +63,7 @@ validate your planned changes carefully with a tool such as pt-upgrade
 显示数据表的结构: `DESCRIBE 表名;`
 建立数据表: `CREATE TABLE 表名 (字段名 VARCHAR(20), 字段名 CHAR(1));`
 `SHOW CREATE TABLE`
-删除数据表: `DROP TABLE 表名；`
+删除数据表: `DROP TABLE 表名 IF EXISTS 表名；`
 将表中记录清空: `DELETE FROM 表名;`
 duplicate table structure and data: `CREATE TABLE partnership_0803 AS SELECT * FROM partnership;`
 
