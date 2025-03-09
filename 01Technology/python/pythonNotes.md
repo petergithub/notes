@@ -45,14 +45,28 @@ Python 3.6 以后安装 Python 会同时安装 pip
 use proxy `pip install -i http://pypi.douban.com/simple  --proxy http://localhost:1087 numpy`
 推荐清华大学一个镜像网址站点：`http://e.pypi.python.org`
 
+pip install flask docx -i http://mirrors.aliyun.com/pypi/simple/
+
 [configuration](https://pip.pypa.io/en/stable/user_guide/#configuration)
 
 `vi ~/.config/pip/pip.conf //linux or MacOS`
 
-``` config
+```sh
 [global]
 timeout = 6000
 index-url = http://mirrors.aliyun.com/pypi/simple/
+[install]
+trusted-host=mirrors.aliyun.com
+```
+
+windows系统下：
+
+在 %userprofile% 用户目录下，新建pip文件夹，然后在该文件夹下新建pip.ini文件。填写如下内容：
+
+```ini
+[global]
+index-url = http://mirrors.aliyun.com/pypi/simple/
+; proxy     = http://XXXX.com:port
 [install]
 trusted-host=mirrors.aliyun.com
 ```
@@ -75,6 +89,32 @@ Install packages within a virtual environment without affecting the host system 
 `pip install -r requirements.txt` # Install from our fancy new file
 `pip uninstall somepackage`
 
+[Install packages in a virtual environment using pip and venv - Python Packaging User Guide](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
+
+```sh
+# Create an environment
+$ mkdir myproject
+$ cd myproject
+$ python3 -m venv .venv
+
+# Activate the environment
+$ . venv/bin/activate
+```
+
+windows
+
+```powershell
+# Create a new virtual environment
+py -m venv .venv
+# Activate a virtual environment
+.venv\Scripts\activate
+
+where python
+
+# Install a package
+py -m pip install requests
+```
+
 #### pip install
 
 `-e, --editable <path/url>`
@@ -83,41 +123,7 @@ Install a project in editable mode (i.e. setuptools “develop mode”) from a l
 `pip install -e /path/to/locations/repo` This will overwrite the directory in site-packages with a symbolic link to the locations repository, meaning any changes to code in there will automatically be reflected - just reload the page (so long as you're using the development server).
 [What is the use case for `pip install -e`?](https://stackoverflow.com/questions/42609943/what-is-the-use-case-for-pip-install-e)
 
-### [Conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html)
-
-[Command reference](https://conda.io/projects/conda/en/latest/commands.html)
-
-`conda init <SHELL_NAME>` `conda init zsh`
-`conda --version` Conda displays the number of the version
-`conda update conda` update
-`conda create --name environmentName` Create a new environment
-`conda create python=3.10 --name environmentName` Create a new environment with package
-`conda activate environmentName` To use, or "activate" the new environment
-`conda info --envs` list of all your environments
-`conda activate` Change your current environment back to the default (base)
-`conda deactivate` deactive conda
-`conda remove --name ENVNAME --all` Delete an entire environment
-
-#### Manage packages
-
-`conda search packageName`
-`conda install packageName` install location `~/anaconda3/envs/environmentName/lib/python-VERSION/site-packages`
-`conda install python=3.6` package with version
-`conda search -c CHANNEL PACKAGE --info` `conda search -c conda-forge pyomo --info`
-
 ### Virtual environment
-
-```sh
-# Create an environment
-$ mkdir myproject
-$ cd myproject
-$ python3 -m venv venv
-
-# Activate the environment
-$ . venv/bin/activate
-```
-
-#### Basic Usage
 
 [Pipenv & Virtual Environments](https://docs.python-guide.org/dev/virtualenvs/)
 
@@ -130,7 +136,15 @@ Create a new virtual environment by choosing a Python interpreter and making a .
 
 `python -V` to check version
 
+And to exit virtualenv later:
+`deactivate  # don't exit until you're done using python`
+
+### requirement.txt
+
 ``` bash
+# [Pipenv & Virtual Environments — The Hitchhiker's Guide to Python](https://docs.python-guide.org/dev/virtualenvs/#other-notes)
+pip freeze > requirements.txt
+
 # https://github.com/Damnever/pigar
 pip install pigar
 # Generate requirements.txt for current directory.
@@ -138,13 +152,7 @@ $ pigar
 
 # Generating requirements.txt for given directory in given file.
 $ pigar -p ../dev-requirements.txt -P ../
-
 ```
-
-And to exit virtualenv later:
-`deactivate  # don't exit until you're done using python`
-
-### requirement.txt
 
 #### [Version specifiers](https://www.python.org/dev/peps/pep-0440/#version-specifiers)
 
@@ -191,10 +199,30 @@ if get permission issue with `pip install gevent==1.1.1`, try `python -m pip ins
 You have three options(use only one of them):
 
 1. setup a virtual env to install the package (recommended): `python3 -m venv env && source ./env/bin/activate && python -m pip install package`
-
 2. Install the package to the user folder: `python -m pip install --user package`
-
 3. use sudo to install to the system folder (not recommended)
+
+### [Conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html)
+
+[Command reference](https://conda.io/projects/conda/en/latest/commands.html)
+
+`conda init <SHELL_NAME>` `conda init zsh`
+`conda --version` Conda displays the number of the version
+`conda update conda` update
+`conda create --name environmentName` Create a new environment
+`conda create python=3.10 --name environmentName` Create a new environment with package
+`conda activate environmentName` To use, or "activate" the new environment
+`conda info --envs` list of all your environments
+`conda activate` Change your current environment back to the default (base)
+`conda deactivate` deactive conda
+`conda remove --name ENVNAME --all` Delete an entire environment
+
+#### Manage packages
+
+`conda search packageName`
+`conda install packageName` install location `~/anaconda3/envs/environmentName/lib/python-VERSION/site-packages`
+`conda install python=3.6` package with version
+`conda search -c CHANNEL PACKAGE --info` `conda search -c conda-forge pyomo --info`
 
 ### Tabs to Space
 
