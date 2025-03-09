@@ -27,8 +27,36 @@ initrd /initrd.lz
 ## 5. Click "Install ubuntu"
 ## 6. After install completed, set waiting time for OS 解决Ubuntu 14.04 grub选择启动项10秒等待时间
 #sudo vi /etc/default/grub
+# https://askubuntu.com/questions/148095/how-do-i-set-the-grub-timeout-and-the-grub-default-boot-entry
 #update seconds: GRUB_HIDDEN_TIMEOUT=1
+## sudo grep menuentry /boot/grub/grub.cfg to get the menuentry
+# GRUB_DEFAULT='Windows Boot Manager (on /dev/nvme0n1p1)'
+## or
+# GRUB_DEFAULT=saved
+# GRUB_SAVEDEFAULT=true
 #sudo update-grub
+
+## set apt source list
+## https://blog.csdn.net/xiangxianghehe/article/details/136529419
+sudo vim /etc/apt/sources.list.d/ubuntu.sources
+
+# 阿里云
+Types: deb
+URIs: http://mirrors.aliyun.com/ubuntu/
+Suites: noble noble-updates noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+sudo apt-get update
+sudo apt-get upgrade
+
+# install sougou input, clash, vpn motionpro
+# https://shurufa.sogou.com/linux/guide
+# chrome
+# auto mount /data
+
+# 如果安装过程中提示缺少相关依赖，则执行如下命令解决：
+# sudo apt -f install
 
 
 # dpkg -i AdbeRdr*.deb	# install
@@ -65,6 +93,7 @@ sudo apt-get update # This is very important step to update system first.
 ## auto mount your NTFS disk: Install pysdm or ntfs-config for Ubuntu 14.04
 # vi /etc/fstab
 # /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
+# /dev/nvme0n1p4 /media/pu/Data            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
 ########## GVim config: clone configuration files from stash ##########
 ##sudo apt-get -y install vim-gnome

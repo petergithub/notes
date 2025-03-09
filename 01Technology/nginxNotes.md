@@ -144,20 +144,20 @@ location ~* /js/.*/\.js
 
 按照上面的location写法，以下的匹配示例成立：
 
-- / -> config A
+* / -> config A
     精确完全匹配，即使/index.html也匹配不了
-- /downloads/download.html -> config B
+* /downloads/download.html -> config B
     匹配B以后，往下没有任何匹配，采用B
-- /images/1.gif -> configuration D
+* /images/1.gif -> configuration D
     匹配到F，往下匹配到D，停止往下
-- /images/abc/def -> config D
+* /images/abc/def -> config D
     最长匹配到G，往下匹配D，停止往下
     你可以看到 任何以/images/开头的都会匹配到D并停止，FG写在这里是没有任何意义的，H是永远轮不到的，这里只是为了说明匹配顺序
-- /documents/document.html -> config C
+* /documents/document.html -> config C
     匹配到C，往下没有任何匹配，采用C
-- /documents/1.jpg -> configuration E
+* /documents/1.jpg -> configuration E
     匹配到C，往下正则匹配到E
-- /documents/Abc.jpg -> config CC
+* /documents/Abc.jpg -> config CC
     最长匹配到C，往下正则顺序匹配到CC，不会往下到E
 
 ### 实际使用建议
@@ -216,6 +216,97 @@ location /static/ {
     alias /var/www/app/static/;
     autoindex off;
 }
+```
+
+## Nginx config
+
+### Cache static assets
+
+[Module ngx_http_headers_module](https://nginx.org/en/docs/http/ngx_http_headers_module.html)
+
+The `ngx_http_headers_module` module allows adding the "Expires" and "Cache-Control" header fields, and arbitrary fields, to a response header.
+
+Example Configuration
+
+```sh
+expires    24h;
+expires    modified +24h;
+expires    @24h;
+expires    0;
+expires    -1;
+expires    epoch;
+expires    $expires;
+add_header Cache-Control private;
+
+# [css - How to serve static assets with an efficient cache policy on Nginx? - Stack Overflow](https://stackoverflow.com/questions/61050400/how-to-serve-static-assets-with-an-efficient-cache-policy-on-nginx)
+# Media: images, icons, video, audio, HTC
+location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|mp3|ogg|ogv|webm|htc|woff2|woff)$ {
+    expires 1M;
+    access_log off;
+    # max-age must be in seconds
+    add_header Cache-Control "max-age=2629746, public";
+}
+
+# CSS and Javascript
+location ~* \.(?:css|js)$ {
+    expires 1y;
+    access_log off;
+    add_header Cache-Control "max-age=31556952, public";
+}
+```
+
+syntax
+
+```sh
+Syntax: expires [modified] time;
+expires epoch | max | off;
+Default: expires off;
+Context: http, server, location, if in location
+```
+
+The contents of the "Cache-Control" field depends on the sign of the specified time:
+
+* time is negative — "Cache-Control: no-cache".
+* time is positive or zero — "Cache-Control: max-age=t", where t is a time specified in the directive, in seconds.
+
+The epoch parameter sets "Expires" to the value "Thu, 01 Jan 1970 00:00:01 GMT", and "Cache-Control" to "no-cache".
+
+The max parameter sets "Expires" to the value "Thu, 31 Dec 2037 23:55:55 GMT", and "Cache-Control" to 10 years.
+
+The off parameter disables adding or modifying the "Expires" and "Cache-Control" response header fields.
+
+#### NGINX Content Caching
+
+[NGINX Content Caching | NGINX Documentation](https://docs.nginx.com/nginx/admin-guide/content-cache/content-caching/)
+[nginx缓存静态资源，只需几个配置提升10倍页面加载速度-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/1430637)
+[使用nginx缓存服务器上的静态文件-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2219576)
+
+Enabling the Caching of Responses
+
+```sh
+http {
+    # ...
+    # Enabling the Caching of Responses
+    # proxy_cache_path /data/nginx/cache keys_zone=imgcache:10m;
+    # 设置缓存路径并且使用一块最大100M的共享内存，用于硬盘上的文件索引，包括文件名和请求次数，每个文件在1天内若不活跃（无请求）则从硬盘上淘汰，硬盘缓存最大10G，满了则根据LRU算法自动清除缓存。
+    proxy_cache_path /var/cache/nginx/cache levels=1:2 keys_zone=imgcache:100m inactive=1d max_size=10g;
+    server {
+        proxy_cache imgcache;
+        location / {
+            proxy_pass http://localhost:8000;
+        }
+    }
+}
+```
+
+### gzip enable
+
+[How To Improve Website Performance Using gzip and Nginx on Ubuntu 20.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-improve-website-performance-using-gzip-and-nginx-on-ubuntu-20-04)
+
+```sh
+curl -H "Accept-Encoding: gzip" -I http://localhost/test.html
+curl -H "Accept-Encoding: gzip" -I http://localhost/test.css
+curl -H "Accept-Encoding: gzip" -I http://localhost/test.jpg
 ```
 
 ## Sample
@@ -408,7 +499,11 @@ GET /webProject/login?rurl=%2FsettlementWeb%2Flogin%3Frurl%3D%252FsettlementWeb%
 
 ### Adding cross-origin resource sharing (CORS) support
 
-test with `curl`: `curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp`
+test with `curl`
+
+```sh
+curl -I -X GET -H "Origin: http://www.example.com" "https://api2.example.com/v1/getIp"
+```
 
 [URL](https://gist.github.com/Stanback/7145487)
 
@@ -468,6 +563,7 @@ if ($http_origin ~* \w+.domain.(net|cn|com)) {
     add_header "Access-Control-Allow-Origin" $http_origin;
     add_header "Access-Control-Allow-Credentials" true;
     add_header "Access-Control-Allow-Methods" "GET,POST,OPTIONS";
+    # add_header Access-Control-Allow-Headers $allowed_headers always;
     add_header "Access-Control-Max-Age" 86400;
 }
 ```

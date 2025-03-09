@@ -576,3 +576,4 @@ This error is happening because macOS decided to drop OpenSSL and switched to Li
 * [Switch - Convert Audio Formats: Switch Audio File Converter Software](https://www.nch.com.au/switch/index.html)
 * [Krita 触摸板手绘](https://krita.org/en/post-download/)
 * [Draw 触摸板手绘](https://krita.org/en/post-download/)
+* [PDFgear - Bring Accessible PDF Software to the Masses](https://www.pdfgear.com/)

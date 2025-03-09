@@ -44,7 +44,7 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 * `-S` 打印TCP 数据包的顺序号时, 使用绝对的顺序号, 而不是相对的顺序号.(nt: 相对顺序号可理解为, 相对第一个TCP 包顺序号的差距,比如, 接受方收到第一个数据包的绝对顺序号为232323, 对于后来接收到的第2个,第3个数据包, tcpdump会打印其序列号为1, 2分别表示与第一个数据包的差距为1 和 2. 而如果此时-S 选项被设置, 对于后来接收到的第2个, 第3个数据包会打印出其绝对顺序号:232324, 232325)
 
 * `-w` 将流量保存到文件中, 把raw packets（原始网络包）直接存储到文件中
-* `-r` 读取raw packets文件进行了“流量回放"，网络包被“抓"的速度都按照历史进行了回放, 可以使用`-e`、`-l`和过滤表达式来对输出信息进行控制
+* `-r` 读取raw packets文件进行了"流量回放"，网络包被"抓"的速度都按照历史进行了回放, 可以使用`-e`、`-l`和过滤表达式来对输出信息进行控制
 * `-C 10` 限制每个转储文件的上限, 达到上限后将文件分卷(以MB为单位)
 * `-W 5` 不仅限制每个卷的上限, 而且限制卷的总数
 
@@ -94,7 +94,7 @@ Common usage:
     `expr`用来指定数据报偏移量，表示从某个协议的数据报的第多少位开始提取内容，默认的起始位置是0；
     `size`表示从偏移量的位置开始提取多少个字节，可以设置为1、2、4, 默认提取1个字节
     例题：`ip[0] & 0xf != 5`
-    IP协议的第0-4位，表示IP版本号，可以是IPv4（值为0100）或者IPv6（0110）；第5-8位表示首部长度，单位是“4字节"，如果首部长度为默认的20字节的话，此值应为5，即"0101″。ip[0]则是取这两个域的合体。0xf中的0x表示十六进制，f是十六进制数，转换成8位的二进制数是“0000 1111"。而5是一个十进制数，它转换成8位二进制数为"0000 0101″。
+    IP协议的第0-4位，表示IP版本号，可以是IPv4（值为0100）或者IPv6（0110）；第5-8位表示首部长度，单位是"4字节"，如果首部长度为默认的20字节的话，此值应为5，即"0101″。ip[0]则是取这两个域的合体。0xf中的0x表示十六进制，f是十六进制数，转换成8位的二进制数是"0000 1111"。而5是一个十进制数，它转换成8位二进制数为"0000 0101″。
     这个语句中!=的左侧部分就是提取IP包首部长度域，如果首部长度不等于5，就满足过滤条件。言下之意也就是说，要求IP包的首部中含有可选字段
 
 * `host IP`  `port 53` 监视指定主机和端口的数据包 `tcpdump host 210.27.48.1 and \ (port 53 or  port 21 \)`
@@ -104,11 +104,13 @@ Common usage:
 * `tcpdump 'port ftp or ftp-data'` 获取使用ftp端口和ftp数据端口的网络包, /etc/services存储着所有知名服务和传输层端口的对应关系
 * `tcpdump 'tcp[tcpflags] & tcp-syn != 0 and not dst host qiyi.com'` 获取roclinux.cn和baidu.com之间建立TCP三次握手中第一个网络包，即带有SYN标记位的网络包，另外，目的主机不能是qiyi.com
 * 要提取TCP协议的SYN、ACK、FIN标识字段，语法是`tcp[tcpflags] & tcp-syn`, `tcp[tcpflags] & tcp-ack`, `tcp[tcpflags] & tcp-fin`
-* 查看哪些ICMP包中“目标不可达、主机不可达"的包的表达式`icmp[0:2]==0x0301`
+* 查看哪些ICMP包中"目标不可达、主机不可达"的包的表达式`icmp[0:2]==0x0301`
 * 提取TCP协议里的SYN-ACK数据包，不但可以使用上面的方法，也可以直接使用最本质的方法 `tcp[13]==18`
 * 如果要抓取一个区间内的端口，可以使用portrange语法: `tcpdump -i eth0 -nn 'portrange 52-55' -c 1  -XX`
 
 ## Wireshark Filter
+
+Wireshark 编辑 > 首选项 > 协议 > 找到 TLS > RSA keys list > Edit > Keyfile > 更改目录 确保路径正确
 
 ### Capture filter
 
@@ -124,7 +126,7 @@ Common usage:
 #### Direction（方向）
 
 可能的值: src, dst, src and dst, src or dst
-如果没有特别指明来源或目的地，则默认使用 “src or dst" 作为关键字。
+如果没有特别指明来源或目的地，则默认使用 "src or dst" 作为关键字。
 例如，"host 10.2.2.2″与"src or dst host 10.2.2.2″是一样的。
 
 #### Host(s)
@@ -136,10 +138,10 @@ Common usage:
 #### Logical Operations（逻辑运算）
 
 可能的值：not, and, or.
-否(“not")具有最高的优先级。或(“or")和与(“and")具有相同的优先级，运算时从左至右进行。
+否("not")具有最高的优先级。或("or")和与("and")具有相同的优先级，运算时从左至右进行。
 例如，
-“not tcp port 3128 and tcp port 23″与"(not tcp port 3128) and tcp port 23″相同。
-“not tcp port 3128 and tcp port 23″与"not (tcp port 3128 and tcp port 23)"不同。
+"not tcp port 3128 and tcp port 23″与"(not tcp port 3128) and tcp port 23″相同。
+"not tcp port 3128 and tcp port 23″与"not (tcp port 3128 and tcp port 23)"不同。
 
 #### 例子
 
@@ -156,72 +158,74 @@ src net 192.168.0.0 mask 255.255.255.0  //捕捉源地址为192.168.0.0网络内
 
 ### Display filter
 
+```sh
 http.host == login.tclclouds.com
 ip.addr == 124.251.36.121 or ip.addr == 124.251.36.122
 http and ip.addr == 124.251.36.121 and ip.dst ==124.251.43.33
-`tcp.port == portNumber`
+tcp.port == portNumber
 
-wireshark http数据包过滤条件列表
+# wireshark http数据包过滤条件列表
 
 http.host==6san.com
 http.host contains 6san.com
-//过滤经过指定域名的http数据包，这里的host值不一定是请求中的域名
+# 过滤经过指定域名的http数据包，这里的host值不一定是请求中的域名
 
 http.response.code==302
-//过滤http响应状态码为302的数据包
+# 过滤http响应状态码为302的数据包
 http.response==1
-//过滤所有的http响应包
+# 过滤所有的http响应包
 
 http.request==1
-//过滤所有的http请求，貌似也可以使用http.request
+# 过滤所有的http请求，貌似也可以使用http.request
 http.request.method==POST
-//wireshark过滤所有请求方式为POST的http请求包，注意POST为大写
+# wireshark过滤所有请求方式为POST的http请求包，注意POST为大写
 
 http.cookie contains guid
-//过滤含有指定cookie的http数据包
+# 过滤含有指定cookie的http数据包
 
 http.request.uri=="/online/setpoint"
-//过滤请求的uri，取值是域名后的部分
+# 过滤请求的uri，取值是域名后的部分
 
 http.request.full_uri==" http://task.browser.360.cn/online/setpoint"
-//过滤含域名的整个url则需要使用http.request.full_uri
+# 过滤含域名的整个url则需要使用http.request.full_uri
 
-http.server contains “nginx"
-//过滤http头中server字段含有nginx字符的数据包
-http.content_type == “text/html"
-//过滤content_type是text/html的http响应、post包，即根据文件类型过滤http数据包
+http.server contains "nginx"
+# 过滤http头中server字段含有nginx字符的数据包
+http.content_type == "text/html"
+# 过滤content_type是text/html的http响应、post包，即根据文件类型过滤http数据包
 
-http.content_encoding == “gzip"
-//过滤content_encoding是gzip的http包
-http.transfer_encoding == “chunked"
-//根据transfer_encoding过滤
+http.content_encoding == "gzip"
+# 过滤content_encoding是gzip的http包
+http.transfer_encoding == "chunked"
+# 根据transfer_encoding过滤
 http.content_length == 279
-http.content_length_header == “279"
-//根据content_length的数值过滤
+http.content_length_header == "279"
+# 根据content_length的数值过滤
 
 http.server
-//过滤所有含有http头中含有server字段的数据包
+# 过滤所有含有http头中含有server字段的数据包
 
-http.request.version == “HTTP/1.1"
-//过滤HTTP/1.1版本的http包，包括请求和响应
-http.response.phrase == “OK"
-//过滤http响应中的phrase
+http.request.version == "HTTP/1.1"
+# 过滤HTTP/1.1版本的http包，包括请求和响应
+http.response.phrase == "OK"
+# 过滤http响应中的phrase
 
-snmp || dns || icmp //显示SNMP或DNS或ICMP封包。
-ip.addr == 10.1.1.1  //显示来源或目的IP地址为10.1.1.1的封包。
-ip.src != 10.1.2.3 or ip.dst != 10.4.5.6  //显示来源不为10.1.2.3或者目的不为10.4.5.6的封包。
+snmp || dns || icmp # 显示SNMP或DNS或ICMP封包。
+ip.addr == 10.1.1.1  # 显示来源或目的IP地址为10.1.1.1的封包。
+ip.src != 10.1.2.3 or ip.dst != 10.4.5.6  # 显示来源不为10.1.2.3或者目的不为10.4.5.6的封包。
 换句话说，显示的封包将会为：
 来源IP：除了10.1.2.3以外任意；目的IP：任意
 以及
 来源IP：任意；目的IP：除了10.4.5.6以外任意
-ip.src != 10.1.2.3 and ip.dst != 10.4.5.6  //显示来源不为10.1.2.3并且目的IP不为10.4.5.6的封包。
+ip.src != 10.1.2.3 and ip.dst != 10.4.5.6  # 显示来源不为10.1.2.3并且目的IP不为10.4.5.6的封包。
 换句话说，显示的封包将会为：
 来源IP：除了10.1.2.3以外任意；同时须满足，目的IP：除了10.4.5.6以外任意
-tcp.port == 25  //显示来源或目的TCP端口号为25的封包。
-tcp.dstport == 25  //显示目的TCP端口号为25的封包。
-tcp.flags  //显示包含TCP标志的封包。
-tcp.flags.syn == 0×02  //显示包含TCP SYN标志的封包。
-如果过滤器的语法是正确的，表达式的背景呈绿色。如果呈红色，说明表达式有误。
+tcp.port == 25  # 显示来源或目的TCP端口号为25的封包。
+tcp.dstport == 25  # 显示目的TCP端口号为25的封包。
+tcp.flags  # 显示包含TCP标志的封包。
+tcp.flags.syn == 0×02  # 显示包含TCP SYN标志的封包。
+# 如果过滤器的语法是正确的，表达式的背景呈绿色。如果呈红色，说明表达式有误。
+```
 
 ## Example
 

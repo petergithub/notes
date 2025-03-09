@@ -270,6 +270,9 @@ or `reset`
 
 [What is your most productive shortcut with Vim?](https://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim/1220118#1220118)
 
+[wsdjeg/vim-galore-zh_cn: Vim 从入门到精通](https://github.com/wsdjeg/vim-galore-zh_cn)
+[Moolenaar.net - Vim](https://www.moolenaar.net/vim.html)
+
 命令提示 Command line completion with `CTRL-D` and `<TAB>`
 `:help` help document
 `:help cmdline-special` special character
@@ -302,11 +305,13 @@ Typing ":set xxx" sets the option "xxx".  Some options are:
 
 #### Move
 
-`%`    move to the matching parenthesis (), {}, []
+`%`    move to the matching parenthesis (), {}, [] Or from a "#if" to the matching "#endif". Actually, % can jump to many different matching
 `(` / `)` move a sentence back/forward
 `{` / `}` move paragraph back/forward
 After a search, `CTRL-O` takes you back to older positions, `CTRL-I` to newer positions
 `gi` Go to last edited location (very useful if you performed some searching and than want go back to edit)
+`[{` to jump back to the `{` at the start of the current code block.
+`gd` to jump from the use of a variable to its local declaration.
 
 Move around inside of long line: `gj` and `gk` move up and down one displayed line by using gj and gk. That way, you can treat your one wrapped line as multiple lines
 
@@ -446,9 +451,23 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 `:wqa` (write, then quit all)
 `:qa!` (force to quit all)
 
-```sh
-在两个文件之间来回跳转 `CTRL+w, w`
 跳转到下一个差异点 `]c`. 反向跳转是: `[c`
+`dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
+`do` (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
+`:diffu[pdate]` #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
+`zo` (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
+`zc` (folding close)重新折叠
+
+`CTRL+w, w` 在两个文件之间来回跳转
+`CTRL+w K`(把当前窗口移到最上边)
+`CTRL+w H`(把当前窗口移到最左边)
+`CTRL+w J`(把当前窗口移到最下边)
+`CTRL+w L`(把当前窗口移到最右边)
+`CTRL+w,r` 交换上/下、左/右两个分隔窗口的位置
+其中2和4两个操作会把窗口改成垂直分割方式.
+`> -`, `> +` 调整窗口大小
+
+```sh
 # 设置对比色彩模板 如 evening, darkblue.vim, torte.vim
 # 查看所有模板 ls /usr/share/vim/vim74/colors/
 :colorscheme
@@ -459,20 +478,6 @@ if &diff
 endif
 
 ```
-
-`CTRL+w K`(把当前窗口移到最上边)
-`CTRL+w H`(把当前窗口移到最左边)
-`CTRL+w J`(把当前窗口移到最下边)
-`CTRL+w L`(把当前窗口移到最右边)
-`CTRL+w,r` 交换上/下、左/右两个分隔窗口的位置
-其中2和4两个操作会把窗口改成垂直分割方式.
-`> -`, `> +` 调整窗口大小
-
-`dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
-`do` (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
-`:diffu[pdate]` #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
-`zo` (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
-`zc` (folding close)重新折叠
 
 #### Mutiple tab
 
@@ -624,7 +629,8 @@ Vim中查看文件编码 `:set fileencoding`
 * `-n` Suppresses line  numbers
 * `-S` Causes lines longer than the screen width to be chopped rather than folded
 * `-e, --quit-at-eof` Causes less to automatically exit the second time it reaches end-of-file. 查看多个小文件时使用
-*
+* `-xn,... or --tabs=n,...` Sets tab stops.
+
 for `less`, the sequences \(, \), \n, and in some implementations \{, \}, \+, \?, \| and other backslash+alphanumerics have special meanings. You can get away with not quoting $^] in some positions in some implementations.
 
 less `&pattern` is like `grep` in `less`
@@ -633,6 +639,19 @@ Display only lines which match the pattern; lines which do not match the pattern
 `&arp.*eth0` will display lines containing arp followed by eth0
 `&arp|dns`  will display lines containing arp or dns
 `!` can invert any of the above: `&!event`
+
+less config file,
+
+```sh
+# create an .lesskey file to set default options
+tee -a ~/.lesskey <<EOF
+#env
+LESS = --tabs=4
+EOF
+
+# run lesskey to activate the default options
+lesskey
+```
 
 ### grep
 
@@ -1251,27 +1270,36 @@ kill -9 $PID
 `date +%Y%m%d%H%M%S.%N` 20161101191653.792204176
 
 `date -R` for `--rfc-2822` format which displays correct offset
+
+```bash
+TZ=Asia/Shanghai date -R
+> Wed, 30 Aug 2017 13:58:05 +0800
+TZ=UTC-8 date -R
+> Wed, 30 Aug 2017 13:58:32 +0800
+TZ=UTC date -R
+> Wed, 30 Aug 2017 05:58:36 +0000
+TZ=UTC+8 date -R
+> Tue, 29 Aug 2017 21:58:33 -0800
+```
+
+设置时区
+
 Valid timezones are defined in `/usr/share/zoneinfo/`
 `man timezone`
 >The offset is positive if the local timezone is west of the Prime Meridian and negative if it is east
 
 example: timezone `UTC+0800` is `TZ=UTC-8` or `TZ=Asia/Shanghai`
 
-```bash
-~$ TZ=Asia/Shanghai date -R
-Wed, 30 Aug 2017 13:58:05 +0800
-~$ TZ=UTC-8 date -R
-Wed, 30 Aug 2017 13:58:32 +0800
-~$ TZ=UTC date -R
-Wed, 30 Aug 2017 05:58:36 +0000
-~$ TZ=UTC+8 date -R
-Tue, 29 Aug 2017 21:58:33 -0800
+```sh
+# Display Current Date and Time with timedatectl
+timedatectl
+# 列出支持的时区
+timedatectl list-timezones | grep keyword
+# 设置时区
+timedatectl set-timezone Asia/Shanghai
+# Set Universal Time (UTC) in Ubuntu
+timedatectl set-timezone UTC
 ```
-
-`timedatectl`  Display Current Date and Time with timedatectl
-`timedatectl list-timezones | grep keyword` 列出支持的时区
-`timedatectl set-timezone Asia/Shanghai` 时区设置
-`timedatectl set-timezone UTC` Set Universal Time (UTC) in Ubuntu
 
 ### crontab
 
@@ -1457,6 +1485,31 @@ The `-i` option ignores the EOF at the end of the tar archives, from the man pag
 java命令引入jar时可以-cp参数, 但-cp不能用通配符(JDK 5中多个jar时要一个个写,不能*.jar), 通常的jar都在同一目录, 且多于1个
 如: java -Djava.ext.dirs=lib MyClass
 
+```sh
+# 创建 MANIFEST.MF 文件
+tee MANIFEST.MF << EOF
+Manifest-Version: 1.0
+Created-By: Maven JAR Plugin 3.4.1
+Build-Jdk-Spec: 21
+Main-Class: org.springframework.boot.loader.JarLauncher
+Start-Class: com.ruoyi.RuoYiApplication
+Spring-Boot-Version: 2.5.15
+Spring-Boot-Classes: BOOT-INF/classes/
+Spring-Boot-Lib: BOOT-INF/lib/
+Spring-Boot-Classpath-Index: BOOT-INF/classpath.idx
+Spring-Boot-Layers-Index: BOOT-INF/layers.idx
+EOF
+
+# 打包您的类文件和资源，并指定清单文件
+# cvfm 是 jar 命令的选项，分别代表 create（创建）、verbose（详细模式）、file manifest（指定清单文件）和 metadata（包含清单文件中的元数据）
+# -C bin/ 指定了类文件的目录，最后的点 . 表示包含当前目录下的所有文件。
+jar cvfm yourapp.jar MANIFEST.MF -C bin/ .
+
+# 验证 JAR 文件是否正确设置了主清单属性
+# -c 打印到控制台 不解压缩为文件
+unzip -c yourapp.jar META-INF/MANIFEST.MF
+```
+
 ### sort, uniq and cut
 
 `sort` `-t` 设定间隔符 `-k` 指定列数
@@ -1587,14 +1640,15 @@ export var1="20220916161114CA35C0"
 curl -X POST http://localhost:3000/data --header 'Content-Type:application/json' -d '{"name":"'"$name"'", "age": '$age'}'
 ```
 
-##### Print 10 times
-
-`seq 10 | xargs -I@ -n1 curl -w "%{time_namelookup} %{time_connect} %{time_appconnect} %{time_starttransfer} \n" -so /dev/null https://www.baidu.com`
-
 ##### Print request time detail
 
 ``` bash
-    curl -so /dev/null -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" https://www.baidu.com
+curl -so /dev/null -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" https://www.baidu.com
+
+# Print 5 times
+seq 5 | xargs -I@ -n1 curl -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" -so /dev/null https://www.baidu.com
+# Print 5 times
+for i in $(seq 1 5); do curl -so /dev/null -w "namelookup: %{time_namelookup} tcp: %{time_connect} ssl: %{time_appconnect}  pretransfer: %{time_pretransfer} redirect: %{time_redirect} starttransfer: %{time_starttransfer} total: %{time_total}\n" "https://www.baidu.com";  done
 ```
 
 Time to domain lookup: `time_namelookup`
@@ -1663,7 +1717,8 @@ wget 'http://www.example.com:9000/json' \
 
 #### wget options
 
-* `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.  For instance:
+* `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.
+* `--no-check-certificate`
 
 ### rsync
 
@@ -2451,6 +2506,10 @@ cat /proc/cpuinfo | grep "processor" | wc -l
 `ps aux | sort -nk +4 | tail` 列出头十个最耗内存的进程
 进程内存 `ps -O rss` 指定 rss 可以查看进程的内存
 实时查看进程内存 `pidstat -sr`
+
+1. Reserved (保留内存)：保留内存是指操作系统已经为某个应用程序预留的虚拟内存地址空间，但并没有实际分配物理内存。换句话说，保留的内存区域可以被应用程序使用，但在实际使用之前，操作系统不必立刻为其分配物理 RAM。保留内存的目的是为了保证应用程序可以在将来使用这些地址，而不会与其他应用程序发生冲突。
+2. Committed (承诺内存)：承诺内存是指已经分配并实际使用的内存。这部分内存可以被视为已承诺给应用程序使用的物理内存，操作系统为其分配了物理 RAM。简单来说，承诺内存就是已经被分配并实际存在于物理内存中的那部分内存。
+3. Resident (常驻内存)：常驻内存指的是当前在物理 RAM 中驻留的内存页。这部分内存是已经承诺并分配的内存，且确实加载到了物理内存中。常驻内存与承诺内存的主要区别在于，承诺内存不一定在物理内存中，可能会被交换到磁盘上，而常驻内存则永远是在物理内存中。
 
 #### 实时查看进程内存
 
@@ -3276,6 +3335,12 @@ CPU Modes:
 `nmap -p PORT -Pn IP`
 `nmap -A -T4 scanme.nmap.org playground`
 
+EXAMPLES:
+  nmap -v -A scanme.nmap.org
+  nmap -v -sn 192.168.0.0/16 10.0.0.0/8
+  nmap -v -iR 10000 -Pn -p 80
+
+
 寻找网络中所有在线主机 `nmap -sP 192.168.0.0/24`
 
 状态可能是 open(开放的)，filtered(被过滤的)， closed(关闭的)，或者unfiltered(未被过滤的)。
@@ -3374,25 +3439,49 @@ configure sudo to never ask for your password. add the following line: `username
 
 #### visudo
 
-授权规则格式：用户 登入主机=(代表用户) 命令
-示例：
-
-root ALL=(ALL) ALL
-
-格式说明：
-
-user: 运行命令者的身份 以%开头的是组
-host: 通过哪些主机
-(runas)：以哪个用户的身份
-command: 运行哪些命令
-
-指定命令 student ALL=(root) /sbin/pidof,/sbin/ifconfig
+```sh
+# 默认不使用用户的环境变量，使用最小权限去执行
+sudo visudo
+# -E 表示使用用户的环境变量
+sudo -E visudo
+```
 
 ```sh
+# 授权规则格式：用户 登入主机=(代表用户) 命令
+root ALL=(ALL) ALL
+
+# 格式说明：
+# user: 运行命令者的身份 以%开头的是组
+# host: 通过哪些主机
+# (runas)：以哪个用户的身份
+# command: 运行哪些命令
+
+# 指定命令
+student ALL=(root) /sbin/pidof,/sbin/ifconfig
+
 # 允许用户 postgres 不需要密码执行 sudo systemctl restart postgresql 命令
 postgres ALL=(ALL)NOPASSWD: /bin/systemctl start postgresql
 postgres ALL=(ALL)NOPASSWD: /bin/systemctl stop postgresql
 postgres ALL=(ALL)NOPASSWD: /bin/systemctl restart postgresql
+# 用户添加无密码运行命令
+yourusername ALL=(ALL) NOPASSWD: /usr/bin/make, /usr/bin/git
+# 用户添加无密码运行所有命令
+yourusername ALL=(ALL) NOPASSWD: ALL
+
+# 用户组（例如sudo组）无密码运行所有命令
+%sudo ALL=(ALL) NOPASSWD: ALL
+
+# 通过 env_keep 保留用户自己的环境变量
+# This allows running arbitrary commands, but so does ALL, and it means
+# different sudoers have their choice of editor respected.
+Defaults:%sudo env_keep += "EDITOR"
+# 保留 JAVA_HOME 和 PATH 两个环境变量
+Defaults env_keep += "JAVA_HOME PATH"
+
+# 全局设置 env_reset 表示重置环境变量，即不使用用户的 $PATH
+Defaults        env_reset
+# !env_reset 表示不重置环境变量，使用用户的
+#Defaults       !env_reset
 ```
 
 ### update hostname

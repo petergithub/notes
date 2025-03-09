@@ -103,6 +103,21 @@ Redis单机qps（每秒的并发）可以达到110000次/s，写的速度是8100
 10. 是否使用了多核 CPU 或 NUMA 架构的机器运行 Redis 实例？使用多核 CPU 时，可以给 Redis 实例绑定物理核；使用 NUMA 架构时，注意把 Redis 实例和网络中断处理程序运行在同一个 CPU Socket 上。
 11. 网卡压力过大。分析：a) TCP/IP层延迟变大，丢包重传变多 b) 是否存在流量过大的实例占满带宽。解决：a) 机器网络资源监控，负载过高及时报警 b) 提前规划部署策略，访问量大的实例隔离部署
 
+### 分析 Redis 性能的一些命令
+
+`redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
+用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
+
+`client list`
+`--bigkeys`
+`--latency`, 用来测试 Redis 服务端的响应延迟
+`--latency-history`
+`redis-cli -h <host> -p <port> -a <pwd> -n <db> info memory`
+
+`info memory`
+`info keyspace`
+`info commandstats` 输出中包含处理过的每一种命令的调用次数、消耗的总 CPU 时间(单位 ms)以及平均 CPU 耗时，这对了解自己的程序所使用的 Redis 操作情况非常有用。
+
 ### Redis常用的删除策略有以下三种
 
 [Key eviction | Redis](https://redis.io/docs/reference/eviction/#eviction-policies)
@@ -176,53 +191,23 @@ sqlite>select * from memory where type='list' and num_elements > 1000 ;
 ## Command
 
 startup redis server `./redis-server redis_6379.conf`
-`src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>`
-`-r` 4: repeat 4 times
-`-i` 2: 2 seconds sleep between each PING command
-
-redis log file: `less  /etc/redis/redis.conf | grep logfile`
+redis log file: `less /etc/redis/redis.conf | grep logfile`
 get all config `config get *`
-
-用于分析 Redis 性能的一些命令
-`redis-cli -h <host> -p <port> -a <pwd> -n <db> --bigkeys` 从指定的 Redis DB 中持续采样，实时输出当时得到的 value 占用空间最大的 key 值，并在最后给出各种数据结构的 biggest key 的总结报告:
-用的是scan方式，不用担心会阻塞redis很长时间不能处理其他的请求。执行的结果可以用于分析redis的内存的只用状态，每种类型key的平均大小。
-
-`client list`
-`--bigkeys`
-`--latency`, 用来测试 Redis 服务端的响应延迟
-`--latency-history`
-`redis-cli -h <host> -p <port> -a <pwd> -n <db> info memory`
-
-`info memory`
-`info keyspace`
-`info commandstats` 输出中包含处理过的每一种命令的调用次数、消耗的总 CPU 时间(单位 ms)以及平均 CPU 耗时，这对了解自己的程序所使用的 Redis 操作情况非常有用。
-
-### Setup redis server
-
-1. config redis.conf
-
-```txt
-vi redis.conf
-
-daemonize yes
-dbfilename dump_6379.rdb
-logfile "/data/log/redis_6379.log"
-dir "/data/software/redis-account"
-```
-
-2. start
-
-`redis-server redis.master6379.conf --daemonize yes`  redis-server in background as a daemon thread
-`redis-server sentinel.26379.conf --sentinel --daemonize yes` or `redis-sentinel sentinel.26379.conf --daemonize yes`
-
-shutdown redis server: `redis-cli shutdown` or `redis-server stop`
-restart redis server: `redis-server restart`
-shutdown redis sentinel: `redis-cli -h localhost -p 26379 shutdown`
 
 ### redis-cli
 
-Redis的value存储中文后，get之后显示16进制的字符串”\xe4\xb8\xad\xe5\x9b\xbd”
-启动`redis-cli`时，在其后面加上 `--raw` ，汉字即可显示正常。
+[Redis CLI | Docs](https://redis.io/docs/latest/develop/tools/cli)
+
+```sh
+src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>
+redis-cli -h <host> -p <port> -a <pwd> -n <db>
+```
+
+* `-r 4`: repeat 4 times
+* `-i 2`: 2 seconds sleep between each PING command
+* `--raw`：输出原始格式，不进行格式化。存储中文后，get之后显示16进制的字符串 `\xe4\xb8\xad\xe5\x9b\xbd`，加上 `--raw` ，汉字即可显示正常。
+* `--scan`：使用 SCAN 命令来迭代数据库中的键。
+* `--eval`：在 Redis 服务器上执行 Lua 脚本。
 
 ### 常规操作命令
 
@@ -351,6 +336,28 @@ Redis 客户端可以订阅任意数量的频道。
 * `UNSUBSCRIBE [channel [channel ...]]` 指退订给定的频道。
 * `PUBSUB subcommand [argument [argument ...]]` 查看订阅与发布系统状态。
 * `PUBSUB CHANNELS [pattern]` 列出当前的活跃频道。
+
+## Setup redis server
+
+### config redis.conf
+
+```txt
+vi redis.conf
+
+daemonize yes
+dbfilename dump_6379.rdb
+logfile "/data/log/redis_6379.log"
+dir "/data/software/redis-account"
+```
+
+### start/shutdown redis
+
+`redis-server redis.master6379.conf --daemonize yes`  redis-server in background as a daemon thread
+`redis-server sentinel.26379.conf --sentinel --daemonize yes` or `redis-sentinel sentinel.26379.conf --daemonize yes`
+
+shutdown redis server: `redis-cli shutdown` or `redis-server stop`
+restart redis server: `redis-server restart`
+shutdown redis sentinel: `redis-cli -h localhost -p 26379 shutdown`
 
 ## Redis 6.0
 

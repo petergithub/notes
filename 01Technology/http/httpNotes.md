@@ -70,6 +70,15 @@ https SSL增加的时间大概多少 time(ssl) = 3 * time(tcp)
 HTTP耗时 = TCP握手(三个包)
 HTTPs耗时 = TCP握手(三个包) + SSL握手(需要9个包)
 
+![SSL process](image/ssl.process.png)
+SSL process
+
+![SSL message](image/sslmessages.gif)
+SSL message
+
+![SSL tcp process](image/tcp.ssl.process.png)
+SSL tcp process
+
 ### Keyless SSL
 
 https CDN 部署方式, 私钥不需要提供给CDN
@@ -137,7 +146,7 @@ add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preloa
 
 浏览器在获取该响应头后，在 max-age 的时间内，如果遇到 HTTP 连接，就会通过 307 跳转強制使用 HTTPS 进行连接，并忽略其它的跳转设置（如 301 重定向跳转）
 
-浏览器禁用hsts：chrome://net-internals/#hsts
+浏览器禁用 hsts：chrome://net-internals/#hsts 或者 edge://net-internals/#hsts
 [Clear the HSTS Settings](https://kb.teramind.co/en/articles/9399979-how-to-clear-the-hsts-settings)
 
 ## PEM, DER, CRT, and CER
@@ -230,7 +239,7 @@ Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocr
 
 openssl s_client -connect example.com:443 -showcerts -servername example.com
 openssl s_client -connect example.com:443 -servername example.com 2>/dev/null
-openssl s_client -connect -debug example.com:443 -servername example.com
+openssl s_client -connect example.com:443 -servername example.com -debug
 
 ### 证书文件与私钥不匹配
 

@@ -357,6 +357,8 @@ Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
 
 [Elastic APM - Free and open application performance monitoring](https://www.elastic.co/guide/en/apm/guide/current/apm-overview.html)
 
+[online-inspection-tracker: 线上UI自动化巡检系统](https://github.com/TheCoolQATeam/online-inspection-tracker) 基于Testng + Playwright + SpringBoot + Vue + Ant-Design搭建
+
 ##### 国内开源 open-falcon
 
 ### 07 Support

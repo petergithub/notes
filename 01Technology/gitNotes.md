@@ -559,8 +559,10 @@ You have an empty repository To get started you will need to run these commands 
 
 #### Configure Git for the first time
 
+```sh
 git config --global user.name peter
 git config --global user.email "email@gmail.com"
+```
 
 #### Working with your repository
 
