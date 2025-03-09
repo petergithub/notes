@@ -83,31 +83,63 @@ connect from a container to a service on the host: connect to the special DNS na
 
 [How do I make a Docker container start automatically on system boot? - Stack Overflow](https://stackoverflow.com/questions/30449313/how-do-i-make-a-docker-container-start-automatically-on-system-boot)
 
-The default restart policy is no. For the created containers use docker update to update restart policy.
+```sh
+# check a docker container restart policy
+docker inspect <containerID> | grep Restart
 
-`docker update --restart unless-stopped <containerID>`
+# The default restart policy is no. For the created containers use docker update to update restart policy.
+docker update --restart unless-stopped <containerID>
+```
+
+* `no`              Do not automatically restart the container. (the default)
+* `on-failure`      Restart the container if it exits due to an error, which manifests as a non-zero exit code.
+* `always`          Always restart the container if it stops. If it is manually stopped, it is restarted only when Docker daemon restarts or the container itself is manually restarted. (See the second bullet listed in restart policy details)
+* `unless-stopped`  Similar to always, except that when the container is stopped (manually or otherwise), it is not restarted even after Docker daemon restarts.
+
+### 使用GPU
+
+从Docker 19.03开始，安装好docker之后，只需要使用 --gpus 即可指定容器使用显卡。如果不指定 --gpus ，运行nvidia-smi 会提示Command not found
+
+```sh
+docker run --gpus all --name 容器名 -d -t 镜像id
+```
 
 ### image
 
-`docker images` Show all images in your local repository
+```sh
+docker images # Show all images in your local repository
+docker image inspect imageName --format '{{json .RepoDigests}}'
+# ["nginx@sha256:644a70516a26004c97d0d85c7fe1d0c3a67ea8ab7ddf4aff193d9f301670cf36","localhost:5000/library/nginx@sha256:644a70516a26004c97d0d85c7fe1d0c3a67ea8ab7ddf4aff193d9f301670cf36"]
+docker images --digests
 
-`docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]`
-`docker tag server:latest myname/server:latest` Rename image
-`docker tag IMAGE[:TAG] [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]`
+docker commit [OPTIONS] CONTAINER [REPOSITORY[:TAG]]
+docker tag server:latest myname/server:latest # Rename image
+docker tag IMAGE[:TAG] [REGISTRY_HOST[:REGISTRY_PORT]/]REPOSITORY[:TAG]
 
-`docker rm <container_id/contaner_name>`
-`docker rm $(docker ps -a -q | grep -v $(docker ps -q))` Remove all containers from this machine except the running one
-`docker rm $(docker ps -a -q)` Remove all containers from this machine
-`docker rmi <image_id/image_name ...>`
-`docker image prune` clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. [Prune unused Docker objects](https://docs.docker.com/config/pruning/)
+# remove container
+docker rm <container_id/contaner_name>
+docker rm $(docker ps -a -q | grep -v $(docker ps -q)) # Remove all containers from this machine except the running one
+docker rm $(docker ps -a -q) # Remove all containers from this machine
 
-`docker save <image-id> -o filename` 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
-`docker load -i filename` Load an image from a tar archive or STDIN
+# remove image
+docker rmi <image_id/image_name ...>
+# 清理无用的镜像
+docker image rm $(docker image ls | awk '{print $1 ":" $2}' | grep -v nginx | grep -v pandora)
 
-`docker export <container-id>` 将 container 创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
-`docker import`
+# clean up unused images. By default, docker image prune only cleans up dangling images. A dangling image is one that is not tagged and is not referenced by any container. [Prune unused Docker objects](https://docs.docker.com/config/pruning/)
+docker image prune
+
+docker save <image-id> -o filename # 创建一个镜像的压缩文件，这个文件能够在另外一个主机的Docker上使用. 和export命令不同，这个命令为每一个层都保存了它们的元数据。这个命令只能对镜像生效。
+docker load -i filename # Load an image from a tar archive or STDIN
+
+docker export <container-id> # 将 container 创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
+docker import
+
+```
 
 ### docker network 命令
+
+Docker容器访问宿主机网络 `http://host.docker.internal`
 
 ```sh
 docker network ls  # 列出所有网络
@@ -188,15 +220,21 @@ root      7477  7161  0 Jul10 ?        00:00:38 node index.js
 
 `docker system prune` is a shortcut that prunes images, containers, and networks. Volumes are not pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
 
-## Sample
+## Image is useful
 
 start a ubuntu container and running bash `docker run -itd ubuntu:14.04 /bin/bash`
 start a nginx server with `docker run -d -p 80:80 --name webserver nginx`
 start a tensorflow container `docker run -d --name tensorflow tensorflow/tensorflow`
-`docker run --name redis -p 6379:6379 -d redis`
-`docker run --name mongo -d mongo:4.2.7`
+`docker run --rm --name redis -p 6379:6379 -d redis`
+`docker run --rm --name mongo -d mongo:4.2.7`
 
-Jenkins with blue ocean: `docker run -d -p 8081:8080 -p 50000:50000 -v /data/docker/jenkins/jenkins_home:/var/jenkins_home -v /usr/share/apache-maven:/usr/local/maven    -v /etc/localtime:/etc/localtime --name jenkins jenkinsci/blueocean:1.25.5`
+Jenkins with blue ocean: `docker run -d -p 8081:8080 -p 50000:50000 -v /data/docker/jenkins/jenkins_home:/var/jenkins_home -v /usr/share/apache-maven:/usr/local/maven -v /etc/localtime:/etc/localtime --name jenkins jenkinsci/blueocean:1.25.5`
+
+```sh
+# windows image
+# [dockur/windows: Windows inside a Docker container.](https://github.com/dockur/windows)
+docker run -it --rm -p 8006:8006 -e VERSION="11" --device=/dev/kvm --device=/dev/net/tun --cap-add NET_ADMIN --stop-timeout 120 dockurr/windows
+```
 
 ### gitlab
 
@@ -305,6 +343,54 @@ sudo usermod -aG docker $(whoami)
 sudo systemctl start docker
 sudo docker run hello-world
 ```
+
+### Windows 11 install
+
+[WSL 上的 Docker 容器入门 | Microsoft Learn](https://learn.microsoft.com/zh-cn/windows/wsl/tutorials/wsl-containers)
+[Windows | Docker Docs](https://docs.docker.com/desktop/setup/install/windows-install/)
+
+[WSL | Docker Docs](https://docs.docker.com/desktop/features/wsl/)
+By default, Docker Desktop stores the data for the WSL 2 engine at C:\Users\[USERNAME]\AppData\Local\Docker\wsl. If you want to change the location, for example, to another drive you can do so via the Settings -> Resources -> Advanced page from the Docker Dashboard. Read more about this and other Windows settings at Changing settings
+
+[Windows11 Docker镜像存储路径更改（非C盘路径）-阿里云开发者社区](https://developer.aliyun.com/article/980658)
+
+```bat
+# 查看WSL应用
+wsl --list -v
+
+# 导出docker镜像文件
+wsl --export docker-desktop-data "D:\docker\docker-desktop-data.tar"
+wsl --export docker-desktop "D:\docker\docker-desktop.tar"
+
+# 注销docker-desktop-data、docker-desktop
+wsl --unregister docker-desktop-data
+wsl --unregister docker-desktop
+
+# 指定文件夹重新导入
+wsl --import docker-desktop-data D:\docker\data "D:\docker\docker-desktop-data.tar" --version 2
+wsl --import docker-desktop D:\docker\desktop "D:\docker\docker-desktop.tar" --version 2
+```
+
+[Configure Docker in Windows | Microsoft Learn](https://learn.microsoft.com/en-us/virtualization/windowscontainers/manage-docker/configure-docker-daemon#configure-docker-with-a-configuration-file)
+
+location: 几个可能的位置
+%USERPROFILE%/.docker/daemon.json
+%USERPROFILE%/.docker/machine/default/config.json
+
+或者在桌面版设置里配置 daemon.json
+
+```json
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false
+}
+```
+
 
 ### daemon.json configuration
 
