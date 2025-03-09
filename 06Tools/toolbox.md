@@ -1,5 +1,9 @@
 # Toolbox
 
+## iOS remember list
+
+[ElevenReader - Free Read Aloud Text App | ElevenLabs](https://elevenreader.io/) 一个手机 App（支持 iOS 和安卓），把电子书转成有声书，支持中文，但是内置的老外语音读起来很生硬。
+
 ## macOS remember list
 
 mathpix: converting equations in images to LaTeX
@@ -30,7 +34,26 @@ mkcert is a simple tool for making locally-trusted development certificates. htt
 
 [Great Image and File Content Search Freeware](https://anytxt.net/) Searcher A Desktop Search Tool with A Powerful Full-Text Search Engine
 
+## VS Code
+
+[10 VS Code Extensions I Can't Live Without](https://www.howtogeek.com/vs-code-extensions-i-cant-live-without/)
+
+### VS Code Windows
+
+`Shift+Delete` Delete line
+`Ctrl+Enter` new line after current line
+
+### VS Code Mac
+
+`Cmd + Shift + P` Show and run command
+
 ## Application Usage
+
+### 写作工具
+
+Obsidian 写作、同步所有整理后的 markdown 文件。
+
+[GitHub - microsoft/markitdown: Python tool for converting files and office documents to Markdown.](https://github.com/microsoft/markitdown)
 
 ### tig
 
@@ -59,10 +82,6 @@ mkcert is a simple tool for making locally-trusted development certificates. htt
 地址栏输入： chrome://net-internals/#hsts.
 找到底部 Delete domain security policies一栏，输入想处理的域名，点击delete。
 搞定了，再次访问http域名不再自动跳转https了。
-
-### Visual Studio Code
-
-`Cmd + Shift + P` Show and run command
 
 ### Atom
 
@@ -145,3 +164,7 @@ ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 ### Extend
 
 From OSX to Ubuntu https://nicolas.perriault.net/code/2016/from-osx-to-ubuntu/
+
+## Network
+
+MagicDNS automatically registers DNS names for devices in your network. [MagicDNS · Tailscale Docs](https://tailscale.com/kb/1081/magicdns)
