@@ -1,5 +1,28 @@
 # Spring Note
 
+## Spring Cloud
+
+[spring-cloud docs](https://docs.spring.io/spring-cloud/docs/)
+
+[Spring Cloud](https://spring.io/projects/spring-cloud)
+
+Release 2023.0.x aka Leyton Spring Boot Generation 3.3.x, 3.2.x [Spring Cloud 2023.0 Release Notes](https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2023.0-Release-Notes#202303)
+
+[Spring Cloud Kubernetes Doc 3.1.0-M1](https://docs.spring.io/spring-cloud-kubernetes/docs/3.1.0-M1/reference/html/)
+
+[Supported Versions · spring-cloud/spring-cloud-release Wiki](https://github.com/spring-cloud/spring-cloud-release/wiki/Supported-Versions)
+
+### 链路追踪
+
+[OpenTelemetry](https://opentelemetry.io/zh/docs/what-is-opentelemetry/)
+[Intro to OpenTelemetry Java | OpenTelemetry](https://opentelemetry.io/zh/docs/languages/java/intro/)
+
+[OpenTelemetry - 骑牛上青山的专栏 - 掘金](https://juejin.cn/column/7174678064054583355)
+
+[Spring Cloud Sleuth在Spring Boot应用程序中的集成-腾讯云开发者社区-腾讯云](https://cloud.tencent.com/developer/article/2261788)
+
+[9.1 什么是可观测性 | 深入高可用系统原理与设计](https://www.thebyte.com.cn/Observability/What-is-Observability.html)
+
 ## spring boot
 
 ### spring boot启动流程

@@ -352,6 +352,8 @@ Solution: This exception usually arises when the socket operations performed on 
 
 ### 内存检查步骤
 
+[记一次内存利用率问题排查](https://mp.weixin.qq.com/s/0E6GxkCnuT8lpReeoeCbHg)
+
 查看java线程在内存增长时线程数 `jstack PID | grep 'java.lang.Thread.State' | wc -l` 或者 `cat /proc/pid/status | grep Thread`
 
 用pmap查看进程内的内存 `RSS` 情况，观察java的heap和stack大小 `pmap -x pid |less`
@@ -505,6 +507,22 @@ java -Xlog:help
 file=, 也可以直接指定文件名，file=可以被省略 `java -Xlog:gc*:file=/project/log/gc.log,filecount=50,filesize=50m`
 
 示例：`java -Xlog:gc*=info:file=/project/log/gc.log,filecount=50,filesize=50m:time -version`
+
+```sh
+LOG_PATH=/data/logs/gateway
+# heapError 存放路径
+HEAP_ERROR_PATH=$LOG_PATH/hprof
+HEAP_DUMP="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HEAP_ERROR_PATH -XX:ErrorFile=$HEAP_ERROR_PATH/hs_err_pid%p.log"
+# GC LOG
+GC_LOG=-Xlog:gc*:file=$LOG_PATH/gc_pid%p.log:time,level
+# JVM 参数
+#JAVA_OPS="-Xms512m -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HEAP_ERROR_PATH"
+JAVA_OPS="-Xms1024m -Xmx1024m $HEAP_DUMP $GC_LOG"
+
+CONFIG="--spring.config.location=file:$BASE_PATH/application.yaml"
+nohup $JAVA_HOME/bin/java -server $JAVA_OPS $JAVA_AGENT -jar $BASE_PATH/$SERVER_NAME.jar $CONFIG > nohup.out 2>&1 &
+
+```
 
 #### 动态修改JVM日志级别
 
