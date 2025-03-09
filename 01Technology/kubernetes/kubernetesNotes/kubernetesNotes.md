@@ -26,63 +26,20 @@ kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.
 kubectl get deployment -o json ems-backend -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}'
 ```
 
-## Concept
-
-OCI: Open Container Initiative
-CRI: Container Runtime Interface
-runc 是一个兼容oci的容器运行时。它实现OCI规范并运行容器进程。
-
-### [Requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
-
-Meaning of memory，Mi表示（1Mi=1024x1024）,M表示（1M=1000x1000）（其它单位类推， 如Ki/K Gi/G）
-For example, the following represent roughly the same value: `128974848, 129e6, 129M, 123Mi`
-1 (byte), 1k (kilobyte) or 1Ki (kibibyte), 1M (megabyte) or 1Mi (mebibyte)
-
-Meaning of CPU:
-The expression 0.1 is equivalent to the expression 100m, which can be read as "one hundred millicpu". Some people say "one hundred millicores", and this is understood to mean the same thing. A request with a decimal point, like 0.1, is converted to 100m by the API, and precision finer than 1m is not allowed. For this reason, the form 100m might be preferred.
-`0.1 = 100m`
-
-get all pods along with cpu and memory requirements in kubernetes `kubectl get po -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,memory-request:spec.containers[*].resources.requests.memory,memory-limit:spec.containers[*].resources.limits.memory" --sort-by=".spec.containers[*].resources.limits.memory`
-
-### Common
-
-`kubectl logs -f --tail=10 pod-name`
-  `-o custom-columns` option an
-  `--sort-by=<jsonpath_exp>` sort the resource list, `--sort-by=.metadata.name`
-[Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
-
-[JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
-`kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
-
-```sh
-# get name cpu
-kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
-# get the pod's IP address
-kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
-```
-
-### Debug
-
-排查问题
-`kubectl get events`
-`kubectl -n namespace top pods --containers`
-`kubectl top pod --all-namespaces | sort --reverse --key 4 --numeric | grep -v system | less` sort by memory
-`kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
-`kubectl get events --sort-by=.metadata.creationTimestamp`
-`kubectl get events -o yaml|less`
-
-jsonpath 查询申请的内存
-`kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145`
-
-go-template `kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'`
-
-`kubectl cluster-info dump`
-
-### Command
+## kubectl
 
 [kubectl Overview](https://jamesdefabia.github.io/docs/user-guide/kubectl-overview/)
+[kubectl-cheatsheet An assortment of compact kubectl examples](https://github.com/fabric8io/kansible/blob/master/vendor/k8s.io/kubernetes/docs/user-guide/kubectl-cheatsheet.md)
 
-`kubectl help get`
+```sh
+#   mkdir -p $HOME/.kube
+#   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+#   sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# Alternatively, if you are the root user, you can run:
+#   export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl --kubeconfig=/etc/kubernetes/admin.conf get nodes
+kubectl help get
+```
 
 `minikube start` Starting a Minikube virtual machine
 `kubectl explain pod` kubectl explain to discover possible API object fields
@@ -129,6 +86,23 @@ accessing your service through its external ip `curl 104.155.74.57:8080`
 `kubectl create -f FILE_NAME.yaml` command is used for creating any resource (not only pods) from a YAML or JSON file.
 `kubectl apply -f FILE_NAME.yaml` 更新
 `kubectl apply -f FOLDER` 更新
+
+```sh
+# cat <<EOF | kubectl apply -f -
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testmap
+  namespace: monitoring
+data:
+  webconfig.yml: |
+    basic_auth_users:
+      prometheus: password
+EOF
+
+```
+
 `kubectl edit deploy piggy-mongo` open the YAML definition in your default text editor 修改
 `kubectl patch svc nodeport -p '{"spec":{"externalTrafficPolicy":"Local"}}'` 添加
 
@@ -161,6 +135,58 @@ use localhost:8001 rather than the actual API server host and port. You’ll sen
 a container’s CPU utilization is the container’s actual CPU usage divided by its requested CPU
 `kubectl cordon <node>` marks the node as unschedulable (but doesn’t do anything with pods running on that node).
 `kubectl drain <node>` marks the node as unschedulable and then evicts all the pods from the node.
+
+### Common
+
+`kubectl logs -f --tail=10 pod-name`
+  `-o custom-columns` option an
+  `--sort-by=<jsonpath_exp>` sort the resource list, `--sort-by=.metadata.name`
+[Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
+
+[JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
+`kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
+
+```sh
+# get name cpu
+kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
+# get the pod's IP address
+kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
+```
+
+### Debug
+
+排查问题
+`kubectl get events`
+`kubectl -n namespace top pods --containers`
+`kubectl top pod --all-namespaces | sort --reverse --key 4 --numeric | grep -v system | less` sort by memory
+`kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
+`kubectl get events --sort-by=.metadata.creationTimestamp`
+`kubectl get events -o yaml|less`
+
+jsonpath 查询申请的内存
+`kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145`
+
+go-template `kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'`
+
+`kubectl cluster-info dump`
+
+## Concept
+
+OCI: Open Container Initiative
+CRI: Container Runtime Interface
+runc 是一个兼容oci的容器运行时。它实现OCI规范并运行容器进程。
+
+### [Requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
+
+Meaning of memory，Mi表示（1Mi=1024x1024）,M表示（1M=1000x1000）（其它单位类推， 如Ki/K Gi/G）
+For example, the following represent roughly the same value: `128974848, 129e6, 129M, 123Mi`
+1 (byte), 1k (kilobyte) or 1Ki (kibibyte), 1M (megabyte) or 1Mi (mebibyte)
+
+Meaning of CPU:
+The expression 0.1 is equivalent to the expression 100m, which can be read as "one hundred millicpu". Some people say "one hundred millicores", and this is understood to mean the same thing. A request with a decimal point, like 0.1, is converted to 100m by the API, and precision finer than 1m is not allowed. For this reason, the form 100m might be preferred.
+`0.1 = 100m`
+
+get all pods along with cpu and memory requirements in kubernetes `kubectl get po -o custom-columns="Name:metadata.name,CPU-request:spec.containers[*].resources.requests.cpu,CPU-limit:spec.containers[*].resources.limits.cpu,memory-request:spec.containers[*].resources.requests.memory,memory-limit:spec.containers[*].resources.limits.memory" --sort-by=".spec.containers[*].resources.limits.memory`
 
 ### PVC
 
@@ -287,7 +313,15 @@ deployment strategies:
 
 ### Ingress
 
+[Annotations - Ingress-Nginx Controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size)
+
 ```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-test
+  namespace: default
+  annotations:
     # HTTP 413 错误 （ Request entity too large 请求实体太大 ）
     # Custom max body size
     # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size
@@ -305,6 +339,18 @@ deployment strategies:
     # 为Nginx Ingress配置HTTPS协议的后端服务，默认是HTTP，如果后端服务混合两种协议，可以配置多个相同域名的 Ingress
     # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#backend-protocol
     nginx.ingress.kubernetes.io/backend-protocol:  "HTTPS"
+    # 永久重定向
+    nginx.ingress.kubernetes.io/permanent-redirect: "https://www.example.com"
+    nginx.ingress.kubernetes.io/permanent-redirect-code: "308" # 重定向返回状态码
+    # 302 临时重定向
+    nginx.ingress.kubernetes.io/temporal-redirect: "https://www.volcengine.com" # 重定向到指定的目标网站
+    # 开启 HTTP 重定向到 HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" # 开启 HTTP 重定向到 HTTPS
+
+    # enable gzip
+    nginx.ingress.kubernetes.io/server-snippet: |
+      gzip on;
+      gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
 ```
 
@@ -334,20 +380,46 @@ deployment strategies:
 }
 ```
 
-### ConfigMap
+nginx ingress enable gzip [ConfigMap - Ingress-Nginx Controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#use-gzip)
 
-`kubectl create configmap fortune-config --from-literal=sleep-interval=2 --from-literal=foo=bar --from-literal=bar=baz`
-`kubectl create -f fortune-config.yaml`
-`kubectl create configmap my-config --from-file=config-file.conf`
-`kubectl create configmap my-config --from-file=/path/to/dir`
+example: [Kubernetes Ingress Compression | James Joy's Blog](https://jamesjoy.site/posts/2023-06-12-kubernetes-ingress-compression)
 
-PATCH `kubectl patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'`
-
-CREATING A TLS CERTIFICATE FOR THE INGRESS
-`kubectl create secret tls tls-secret --cert=tls.cert --key=tls.key`
-`kubectl create secret generic fortune-https --from-file=https.key --from-file=https.cert --from-file=foo`
+nginx enable gzip [Compression and Decompression | NGINX Documentation](https://docs.nginx.com/nginx/admin-guide/web-server/compression)
 
 ```sh
+kecm ingress-nginx-controller -n ingress-nginx -o yaml
+```
+
+```yaml
+# Edit the file to add use-gzip: "true" and enable-brotli: "true":
+apiVersion: v1
+data:
+  allow-snippet-annotations: "true"
+  use-proxy-protocol: "true"
+  use-gzip: "true"
+  enable-brotli: "true"
+kind: ConfigMap
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+```
+
+### ConfigMap
+
+```sh
+kubectl create configmap fortune-config --from-literal=sleep-interval=2 --from-literal=foo=bar --from-literal=bar=baz
+kubectl create -f fortune-config.yaml
+kubectl create configmap my-config --from-file=config-file.conf
+kubectl create configmap my-config --from-file=/path/to/dir
+
+# PATCH
+kubectl patch configmap tcp-services --type merge -p '{"data":{"5672": "rabbitmq-system/rabbitmqcluster:5672"}}'
+
+# creating a tls certificate for the ingress
+kubectl create secret tls tls-secret-name --cert=tls.cert --key=tls.key
+# 包含自定义文件
+kubectl create secret generic generic-name --from-file=https.key --from-file=https.cert --from-file=foo
+
 # Copying Kubernetes Secrets Between Namespaces:
 kubectl get secret <secret-name> --namespace=<source-namespace>  -o yaml \
   | sed 's/namespace: <from-namespace>/namespace: <to-namespace>/' \
@@ -610,6 +682,12 @@ for intf in /sys/devices/virtual/net/cni0/brif/*; do echo 1 > $intf/hairpin_mode
 for intf in /sys/devices/virtual/net/cni0/brif/*; do echo "$intf"; cat $intf/hairpin_mode; done
 ```
 
+#### 网络问题排查
+
+1. 查看 route -n 路由表
+2. 查看 arp 表 arp -a
+3. 检查隧道状态
+
 ## Kubernetes internal
 
 ### Components of the Control Plane
@@ -657,6 +735,7 @@ helm package <chart-path>               # Packages a chart into a versioned char
 helm lint <chart>                       # Run tests to examine a chart and identify possible issues:
 helm show all <chart>                   # Inspect a chart and list its contents:
 helm show values <chart>                # Displays the contents of the values.yaml file
+helm template <chart>           # 得到等效的 k8s manifests
 helm pull <chart>                       # Download/pull chart
 helm pull <chart> --untar=true          # If set to true, will untar the chart after downloading it
 helm pull <chart> --verify              # Verify the package before using it
