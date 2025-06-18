@@ -2,15 +2,16 @@
 
 [TOC]
 
-## Recent
+[Settings – Maven Settings](https://maven.apache.org/ref/3.9.10/maven-settings/settings.html)
 
-`-U` (aka `--update-snapshots`): force maven update local repository
-`mvn dependency:list -e -U -X`
-`mvn eclipse:eclipse -DdownloadSources`
-`-Dmaven.test.skip` = `-DskipTests`
-`mvn test -Dtest=TestPaypal -Plocal`
+## Basic
 
 ``` bash
+
+# 查看当前使用的 settings.xml 文件路径
+mvn help:effective-settings
+
+
 # List all your Maven dependencies
 # detect multiple versions of the same dependency
 mvn -o dependency:list \
@@ -25,33 +26,91 @@ pom.xml
 `compile`编译范围, `provided`已提供范围(在当JDK或者一个容器已提供该依赖之后才使用), `runtime`运行时范围(在运行和测试系统的时候需要，但在编译的时候不需要), `test`测试范围(编译和运行时都不需要，在测试编译和测试时使用), `system`系统范围(必须显式的提供一个对于本地系统中JAR文件的路径)
 `optional`:设置指依赖是否可选，默认为false,即子项目默认都继承，为true,则子项目必需显示的引入，与dependencyManagement里定义的依赖类似 。
 
-## Basic
+```sh
+# -v 显示版本信息
+# -e 显示详细错误信息
+# -o Work offline Running in Offline Mode
+mvn -v
+# 运行任何检查, 验证包是否有效且达到质量标准
+mvn verify
+# 验证工程是否正确, 所有需要的资源是否可用
+mvn validate
+# 产生应用需要的任何额外的源代码, 如xdoclet
+mvn generate-sources
+# 在集成测试可以运行的环境中处理和发布包
+mvn integration-test
+# 输出完整的带有参数的目标列
+mvn help:describe -Dfull
+    # -Dplugin=help 使用help插件的describe目标来输出Maven Help插件的信息
+    # -Dplugin=compiler -Dmojo=compile    列出了Compiler插件的compile目标的所有信息
+    # -Dplugin=exec    列出所有Maven exec插件可用的目标
 
-create variable M2_REPO for workspace
-    mvn eclipse:configure-workspace -Declipse.workspace=C:\workspace
-首先通过cvs或svn下载代码到本机, 然后执行mvn eclipse:eclipse生成eclipse项目文件, 然后导入到eclipse就行了, 修改代码后执行mvn compile或mvn test检验, 也可以下载eclipse的maven插件.
-mvn archetype:create -DgroupId=packageName -DartifactId=projectName 创建Maven的普通java项目
-    options include: -DarchetypeArtifactId=maven-archetype-webapp(创建Maven的Web项目), maven-archetype-j2ee-simple
-mvn eclipse:eclipse (eclipse:clean, idea:idea)        create (clear) configuration files of eclipse (idea) project
-    options include:
-        -Dwtpversion=2.0 生成Wtp插件的web2.0项目e.g. mvn eclipse:eclipse -Dwtpversion=2.0
-        -Declipse.workspace=C:\workspace 指明了eclipse的workspace, 这样如果发现依赖包也在workspace里就会进行项目依赖而不是jar包依赖
-        -DdownloadSources  -DdownloadJavadocs (default value:-DdownloadSources=true -DdownloadJavadocs=true)
-mvn clean清空生成的文件
-mvn compile编译    mvn test-compile编译项目测试代码        mvn test编译并测试
-mvn test -skipping compile -skipping test-compile    只测试而不编译, 也不测试编译(-skipping 的灵活运用, 当然也可以用于其他组合命令)
-mvn test -Dtest=TestChannelService  执行指定测试类
-mvn test -Dtest=xxxxTest#testＭethodA   执行指定测试类里的方法testＭethodA
-`mvn test -Dtest=TestClass#testMethod -pl moduleName` run only single test in multi-module project
-mvn package  生成target目录, 编译、测试代码, 生成测试报告, 生成jar/war文件    mvn jar:jar    打jar包
-mvn jetty:run 调用 Jetty插件的 Run目标在 Jetty Servlet容器中启动 web应用 mvn tomcat:run
-mvn install 在本地Repository中安装jar    mvn clean install 删除再编译
-mvn install:install-file -DgroupId=com.lowagie -DartifactId=itextasian -Dversion=1.0 -Dpackaging=jar -Dfile=c:\sp\doing\itextasian.jar
-mvn site  生成项目相关信息的网站
-mvn exec:java -Dexec.mainClass=org.sonatype.mavenbook.weather.Main Exec 插件让我们能够在不往classpath载入适当的依赖的情况下, 运行这个程序
-统一修改父子版本号 `mvn versions:set -DnewVersion=xxx-SNAPSHOT/RELEASE`
+# see how all of the current project’s ancestor POMs are contributing to the effective POM.它暴露了 Maven的默认设置
+mvn help:effective-pom
+# 想要查看完整的依赖踪迹, 包含那些因为冲突或者其它原因而被拒绝引入的构件, 打开 Maven的调试标记运行
+mvn install -X
+# 给任何目标添加maven.test.skip 属性就能跳过测试
+mvn install -Dmaven.test.skip=true
+# 打印出已解决依赖的列表
+mvn dependency:resolve
+# 打印整个依赖树
+mvn dependency:tree
+#  -U  (aka  --update-snapshots ): force maven update local repository
+mvn dependency:list -e -U -X
 
-## Advanced
+# 创建Maven的普通java项目
+mvn archetype:create -DgroupId=packageName -DartifactId=projectName
+# 清空生成的文件
+mvn clean
+# 编译
+mvn compile
+# 编译项目测试代码
+mvn test-compile
+# 编译并测试
+mvn test
+# 只测试而不编译, 也不测试编译(-skipping 的灵活运用, 当然也可以用于其他组合命令)
+mvn test -skipping compile -skipping test-compile
+# 执行指定测试类
+mvn test -Dtest=TestChannelService
+# 执行指定测试类里的方法testＭethodA
+mvn test -Dtest=xxxxTest#testＭethodA
+# run only single test in multi-module project
+mvn test -Dtest=TestClass#testMethod -pl moduleName
+mvn -Dmaven.test.skip
+mvn -DskipTests
+
+# 生成target目录, 编译、测试代码, 生成测试报告, 生成jar/war文件
+mvn package
+# 打jar包
+mvn jar:jar
+# 调用 Jetty插件的 Run目标在 Jetty Servlet容器中启动 web应用
+mvn jetty:run
+mvn tomcat:run
+# 在本地Repository中安装jar
+mvn install
+# 删除再编译
+mvn clean install
+mvn install:install-file -DgroupId=com.lowagie -DartifactId=itextasian -Dversion=1.0 -Dpackaging=jar -Dfile=/path/to/itextasian.jar
+# 生成项目相关信息的网站
+mvn site
+# 插件让我们能够在不往classpath载入适当的依赖的情况下, 运行这个程序
+mvn exec:java -Dexec.mainClass=org.sonatype.mavenbook.weather.Main Exec
+# 统一修改父子版本号
+mvn versions:set -DnewVersion=xxx-SNAPSHOT/RELEASE
+
+# 下载单个 jar
+mvn dependency:get -Dartifact=org.riversun:random-forest-codegen:1.0.0 -Ddest=./
+
+# 删掉当前 POM 文件中所有依赖文件. 解决依赖更新后但版本号不变,导致的依赖文件没有下载最新版本
+mvn dependency:purge-local-repository -DreResolve=false
+```
+
+### Proxy
+
+`export MAVEN_OPTS="-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080"`
+or `mvn -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080`
+
+## Usage example
 
 ### Add a jar, source and Javadoc to the local/remote Maven repository
 
@@ -69,6 +128,48 @@ install sources:`mvn install:install-file -DgroupId=es.upct.girtel -DartifactId=
 
 deploy root-pom.pom to snapshots 库:
 `mvn deploy:deploy-file -DgroupId=com -DartifactId=root-pom -Dversion=1.0.1-SNAPSHOT -Dpackaging=pom -DrepositoryId=maven-snapshots -Drepo.login=user -Drepo.pwd=password -Durl=http://maven.com/repository/maven-snapshots -Dfile=root-pom.pom`
+
+### Password Encryption
+
+[Password Encryption – Maven](https://maven.apache.org/guides/mini/guide-encryption.html)
+
+加密密码
+
+```sh
+# create a master password
+mvn --encrypt-master-password <password>
+# {jSMOWnoPFgsHVpMvz5VrIt5kRbzGpI8u+9EF1iFQyJQ=}
+```
+
+Store this password in the ${user.home}/.m2/settings-security.xml; it should look like
+
+```xml
+<settingsSecurity>
+  <master>{jSMOWnoPFgsHVpMvz5VrIt5kRbzGpI8u+9EF1iFQyJQ=}</master>
+</settingsSecurity>
+```
+
+```sh
+# encrypt server passwords
+mvn --encrypt-password <password>
+# {COQLCE6DU6GtcS5P=}
+```
+
+```xml
+<settings>
+...
+  <servers>
+...
+    <server>
+      <id>my.server</id>
+      <username>foo</username>
+      <password>Oleg reset this password on 2009-03-11, expires on 2009-04-11 {COQLCE6DU6GtcS5P=}</password>
+    </server>
+...
+  </servers>
+...
+</settings>
+```
 
 ### Specify the location for the testResource folder
 
@@ -184,33 +285,6 @@ mvn --batch-mode release:clean release:prepare release:perform -Dtag=v${releaseV
     </distributionManagement>
 ```
 
-### Command
-
-mvn -v    显示版本信息        -e 显示详细错误信息    -o    Work offline Running in Offline Mode
-mvn verify    运行任何检查, 验证包是否有效且达到质量标准
-mvn validate    验证工程是否正确, 所有需要的资源是否可用
-mvn generate-sources    产生应用需要的任何额外的源代码, 如xdoclet
-mvn hibernate3:hbm2ddl    使用Hibernate3插件构造数据库
-mvn integration-test    在集成测试可以运行的环境中处理和发布包
-mvn help:describe -Dfull 输出完整的带有参数的目标列
-    -Dplugin=help 使用help插件的describe目标来输出Maven Help插件的信息
-    -Dplugin=compiler -Dmojo=compile    列出了Compiler插件的compile目标的所有信息
-    -Dplugin=exec    列出所有Maven exec插件可用的目标
-`mvn help:effective-pom` see how all of the current project’s ancestor POMs are contributing to the effective POM.它暴露了 Maven的默认设置
-mvn install -X 想要查看完整的依赖踪迹, 包含那些因为冲突或者其它原因而被拒绝引入的构件, 打开 Maven的调试标记运行
-mvn install -Dmaven.test.skip=true 给任何目标添加maven.test.skip 属性就能跳过测试
-mvn dependency:resolve 打印出已解决依赖的列表
-mvn dependency:tree 打印整个依赖树
-mvn dependency:list -e -U -X
-
-下载单个 jar `mvn dependency:get -Dartifact=org.riversun:random-forest-codegen:1.0.0 -Ddest=./`
-删掉当前 POM 文件中所有依赖文件 `mvn dependency:purge-local-repository -DreResolve=false` 解决依赖更新后但版本号不变,导致的依赖文件没有下载最新版本
-
-### Proxy
-
-`export MAVEN_OPTS="-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080"`
-or `mvn -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080`
-
 ## Introduction to the Standard Directory Layout
 
 src/main/java Application/Library sources
@@ -231,7 +305,7 @@ README.txt Project's readme
 ### configuration
 
 setting.xml change local reponsitory
-  `<localRepository>c:/sp/.m2/repository</localRepository>`
+  `<localRepository>$HOME/.m2/repository</localRepository>`
 
 ### pom.xml
 
@@ -276,34 +350,81 @@ springside define version in parent/pom.xml `<dependencyManagement>`
 
 [sonatype/nexus3 docker image](https://hub.docker.com/r/sonatype/nexus3/)
 
-`docker run -d -p 8081:8081 --name nexus2 -v /Users/pu/workspace/dockerWorkspace/sonatype-nexus2/sonatype-work:/sonatype-work sonatype/nexus`
-`docker run -d -p 8081:8081 --name nexus3 -v /Users/pu/workspace/dockerWorkspace/sonatype-nexus3/nexus-data:/nexus-data sonatype/nexus3`
+`docker run -d -p 8081:8081 --name nexus2 -v /data/docker/sonatype-nexus2/sonatype-work:/sonatype-work sonatype/nexus`
+`docker run -d -p 8081:8081 --name nexus3 -v /data/docker/sonatype-nexus3/nexus-data:/nexus-data sonatype/nexus3`
 `docker logs -f nexus`
 
 [localhost nexus3](http://localhost:8081) 用户名 admin 默认密码 admin123
 To test: `curl -u admin:admin123 http://localhost:8081/service/metrics/ping`
 
-[mvn deploy](https://terasolunaorg.github.io/guideline/5.0.x/en/Appendix/Nexus.html#mvn-deploy-how-to)
+[Maven Repositories](https://help.sonatype.com/en/maven-repositories.html)
+
+[How do I deploy my jar in my remote repository? – Maven](https://maven.apache.org/guides/getting-started/#How_do_I_deploy_my_jar_in_my_remote_repository.3F)
+
+For deploying jars to an external repository, you have to configure the repository url in the `pom.xml` and the authentication information for connecting to the repository in the `settings.xml`.
+
+setting.xml
+
+```xml
+<settings>
+  <servers>
+    <server>
+      <id>maven-server-id</id>
+      <username>username</username>
+      <password>pwd</password>
+    </server>
+  </servers>
+
+  <mirrors>
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>
+      <url>https://maven.example.com/repository/maven-group/</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>maven-profile-id</id>
+      <repositories>
+        <repository>
+          <id>maven-repository-id</id>
+          <url>https://maven.example.com</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+</settings>
+```
+
+project pom.xml
 
 ``` xml
-    <parent>
-        <groupId>com.company</groupId>
-        <artifactId>company-root-pom</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </parent>
+<parent>
+    <groupId>com.company</groupId>
+    <artifactId>company-root-pom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</parent>
 
-    <distributionManagement>
-        <!-- use the following if you're not using a snapshot version. -->
-        <repository>
-            <id>maven-releases</id>
-            <name>RepositoryProxy</name>
-            <url>http://gw01:18081/repository/maven-releases/</url>
-        </repository>
-        <!-- use the following if you ARE using a snapshot version. -->
-        <snapshotRepository>
-            <id>maven-snapshots</id>
-            <name>RepositoryProxySnap</name>
-            <url>http://gw01:18081/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+<distributionManagement>
+    <!-- use the following if you're not using a snapshot version. -->
+    <repository>
+        <id>maven-releases</id>
+        <name>RepositoryProxy</name>
+        <url>https://maven.example.com/repository/maven-releases/</url>
+    </repository>
+    <!-- use the following if you ARE using a snapshot version. -->
+    <snapshotRepository>
+        <id>maven-snapshots</id>
+        <name>RepositoryProxySnap</name>
+        <url>https://maven.example.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+</distributionManagement>
 ```
