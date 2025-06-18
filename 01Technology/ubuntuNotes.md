@@ -125,7 +125,7 @@ Add comments for multi-lines
 - CTRL+g: 从历史搜索模式退出
 - CTRL+p: 历史中的上一条命令
 - CTRL+n: 历史中的下一条命令
-- ALT+.: 使用上一条命令的最后一个参数
+- ALT+.: 使用上一条命令的最后一个参数；zsh 从后往前数。bash 从前往后数
 
 控制命令
 
@@ -302,6 +302,12 @@ Typing ":set xxx" sets the option "xxx".  Some options are:
         'hls' 'hlsearch'        highlight all matching phrases
      You can either use the long or the short option name.
   Prepend "no" to switch an option off:   :set noic
+
+#### custom keyboard shortcut
+
+`inoremap jj <ESC>`    Remap Your ESCAPE Key in Vim
+`nnoremap j VipJ`
+`:map`    列出当前已定义的映射
 
 #### Move
 
@@ -484,11 +490,12 @@ endif
 `:n` next file `:p` previous file
 `:bn` 和 `:bp` `:n` 使用这两个命令来切换下一个或上一个文件. （陈皓注: 我喜欢使用:n到下一个文件）
 
-#### custom keyboard shortcut
+#### vim folder
 
-`inoremap jj <ESC>`    Remap Your ESCAPE Key in Vim
-`nnoremap j VipJ`
-`:map`    列出当前已定义的映射
+```sh
+# 在 vim 中，按下 :e，然后输入 ..，再按下回车，将打开上层目录的内容，你可以像浏览文件一样浏览目录
+:e ..
+```
 
 #### vi regular expression 正则表达式
 
@@ -621,6 +628,36 @@ Vim中查看文件编码 `:set fileencoding`
 - 复制时产生备份文件，尾标 ~1~格式 `cp -b -V t a.txt /tmp`
 - 指定备份文件尾标 `cp -b -S _bak a.txt /tmp`
 
+### rsync
+
+`rsync -Pavz src/ dest` Copy contents of `src/` to destination
+
+- `-a` 等于 `-rlptgoD`
+- `-r` 是递归
+- `-l` 是链接文件, 意思是拷贝链接文件;
+- `-p` 表示保持文件原有权限
+- `-t` 保持文件原有时间;
+- `-g` 保持文件原有用户组
+- `-o` 保持文件原有属主;
+- `-D` 相当于块设备文件
+
+- `-z` 传输时压缩;
+- `-P` 等于 `--partial --progress`
+- `--partial` 保留那些因故没有完全传输的文件
+- `--progress` 进度
+
+- `--partial-dir=.rsync-partial`
+
+- `-v` 详细输出信息
+- `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
+- `-e, --rsh=COMMAND` choose an alternative remote shell program to use
+- `--exclude=PATTERN` PATTERN='*.txt' 表示忽略所有 .txt 文件 This option is a simplified form of the --filter option that specifies an exclude rule and does not allow the full  rule-parsing  syntax  of  normal filter rules.  This is equivalent to specifying -f'- PATTERN'.
+
+Note: The trailing slash (/) on the source directory modifies the behavior of the rsync command.
+
+- If you do not use a trailing slash, the source directory is copied to the destination directory, and then the contents of the directory.
+- When you do use the trailing slash, rsync only copies the content of the source without creating an additional directory level.
+
 ### less
 
 `less -n -i -S`
@@ -653,6 +690,91 @@ EOF
 lesskey
 ```
 
+### find
+
+`find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
+`find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`
+`find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
+`find . -name '*.xml' -o -name '*.java'` matches multiple patterns
+`Operators`  Operators join together the other items within the expression.
+`-o` (meaning logical OR) and `-a` (meaning logical AND).  Where an operator is missing, `-a` is assumed
+
+`find * -type f | grep fileName`    查找文件并列出相对路径
+`ls -R | grep fileName` 只是列出文件名
+`find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
+`find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
+`find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
+`find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`  File’s data was last modified n*24 hours ago
+`find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
+`find . -type l -ls` To list all of the symlinks or symbolic links or soft links in a Linux system, run
+
+`find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
+
+- `find /home/admin -atime -1`  1天内访问过的文件
+- `find /home/admin -ctime -1`  1天内状态改变过的文件
+- `find /home/admin -mtime -1`  1天内修改过的文件
+- `find /home/admin -amin -1`  1分钟内访问过的文件
+- `find /home/admin -cmin -1`  1分钟内状态改变过的文件
+- `find /home/admin -mmin -1`  1分钟内修改过的文件
+
+- `+n`     for greater than n,
+- `-n`     for less than n,
+- `n`      for exactly n.
+
+```sh
+# 查找并删除 30 天前的文件
+find /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
+```
+
+#### 删除时排除文件
+
+delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
+`rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
+
+`ls | grep -v notDelete.log | xargs rm -r`
+
+#### 文件个数 count files in directory recursively
+
+`find . -type f | wc -l`
+`la -lR | grep "^-" | wc -l`
+
+#### 文件夹个数 count directories in directory recursively
+
+`find -mindepth 1 -type d | wc -l`
+`ls -lR | grep ^d | wc -l`
+
+#### 删除.svn文件夹
+
+`find . -type d -name ".svn" | xargs rm -rf`
+`find . -name "*.svn"  | xargs rm -rf`  或
+`find . -type d -iname ".svn" -exec rm -rf {} \;`
+
+#### 多目录重命名文件
+
+`for file in $(find . -name sync1.properties) do echo $file; done`
+`for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done`
+
+#### 文件内多字符串替换
+
+```sh
+# xml 文件格式的内容替换成 properties 的等号格式
+# sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'
+find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s#]]></entry>##g; s#</entry>##g; /<?xml version="1.0" encoding="UTF-8"?>/d; /DOCTYPE properties SYSTEM "http:\/\/java.sun.com\/dtd\/properties.dtd"/d; /<properties>/d; /<\/properties>/d' {} \;
+```
+
+#### 查找包含class的jar文件
+
+`find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done`
+`find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done`
+
+#### 文件及文件名乱码处理 删除文件名乱码文件 重命名 rename
+
+1. `ls -i` print the index number of each file(文件的i节点) 12345
+2. `find . -inum 12345 -print -exec rm {} -r \;` rm
+3. `find . -inum 23244066 -exec mv {} NewName \;` mv
+
+命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
+
 ### grep
 
 grep pattern files - 搜索 files 中匹配 pattern 的内容
@@ -683,13 +805,10 @@ On Linux, you can also type `egrep` instead of `grep -E`
 escape double quote with backslash `echo "\"member\":\"time\"" |grep -e "member\""` or with  single quote `echo '"member":"time"' |grep -e 'member"'`
 escape square brackets with backslash:   `grep "test\[1]" log.txt`
 
-`grep -l old *.htm | xargs sed -n "/old/p"`  (`-n` 静默替换)
-把web文件下所有文件中的`//old.example.com`替换为`//new.example.com`: `sed -i 's/\/\/new.example.com/\/\/old.example.com/g' $(grep -rl '//old.example.com' web/*)`
-
 pgrep 和 pkill
 pgrep -l apache2
 
-### sed
+### sed (Stream Editor)
 
 [Regular Expressions - sed, a stream editor](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)
 
@@ -757,103 +876,30 @@ key3=<font color="#6fa5e9">value3</font>
 
 替换 "> 为 =，但是包含 font 标签的不替换，因为 font 标签结尾 "> 是正常的 `cat message_en.properties | sed -e '/font/! s/">/=/g'` 解释：`/font/!` 表示不匹配该行
 
-### find
-
-`find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
-`find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`
-`find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
-`find . -name '*.xml' -o -name '*.java'` matches multiple patterns
-`Operators`  Operators join together the other items within the expression.
-`-o` (meaning logical OR) and `-a` (meaning logical AND).  Where an operator is missing, `-a` is assumed
-
-`find * -type f | grep fileName`    查找文件并列出相对路径
-`ls -R | grep fileName` 只是列出文件名
-`find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
-`find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
-`find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
-`find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`  File’s data was last modified n*24 hours ago
-`find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
-`find . -type l -ls` To list all of the symlinks or symbolic links or soft links in a Linux system, run
-
-`find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
-
-- `find /home/admin -atime -1`  1天内访问过的文件
-- `find /home/admin -ctime -1`  1天内状态改变过的文件
-- `find /home/admin -mtime -1`  1天内修改过的文件
-- `find /home/admin -amin -1`  1分钟内访问过的文件
-- `find /home/admin -cmin -1`  1分钟内状态改变过的文件
-- `find /home/admin -mmin -1`  1分钟内修改过的文件
-
-- `+n`     for greater than n,
-- `-n`     for less than n,
-- `n`      for exactly n.
-
-```sh
-# 查找并删除 30 天前的文件
-find /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
-```
-
-#### 删除时排除文件
-
-delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
-`rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
-
-`ls | grep -v notDelete.log | xargs rm -r`
-
-#### 文件个数 count files in directory recursively
-
-`find . -type f | wc -l`
-`la -lR | grep "^-" | wc -l`
-
-#### 文件夹个数 count directories in directory recursively
-
-`find -mindepth 1 -type d | wc -l`
-`ls -lR | grep ^d | wc -l`
-
 #### 替换多文件中的内容
 
-`find . -name '*.htm' | xargs sed -n '/old/p'`  (静默替换)
-`find . -name '*.htm' | xargs sed -i 's/old/new/g'` (替换或者 s#old#new#g)
-`sed -n '/old/p' $(grep -l old *.htm)`
-`sed -i 's/package com.tools;//g' ../*/ExportGtcConfigFile.java`
-`sed -i 's#https://git.com/Serving#git@git.com:Serving/' */.git/config`
+```sh
+# -n 静默替换
+find . -name '*.htm' | xargs sed -n '/old/p'
+grep -l old *.htm | xargs sed -n "/old/p"
 
-##### sed: 1: "/path/to/file.txt": extra characters at the end of l command
+# 也可以使用 s#old#new#g
+find . -name '*.htm' | xargs sed -i 's/old/new/g'
+
+# 只修改指定文件，目录使用通配符
+sed -i 's#https://git.com/project#git@git.com:project/' */.git/config
+
+# 批量修改文件
+sed -i "s#namespace: ns-test#namespace: bj-ns-test#g" $(grep -rl 'namespace: ns-test')
+
+# 把web文件下所有文件中的//old.example.com 替换为 //new.example.com
+sed -i 's#//new.example.com#//old.example.com#g' $(grep -rl '//old.example.com' web/*)
+```
+
+##### 问题 sed: 1: "/path/to/file.txt": extra characters at the end of l command
 
 Unlike Ubuntu, BSD/macOS requires the extension to be explicitly specified. The workaround is to set an empty string:
 `sed -i '' 's/megatron/pony/g' /path/to/file.txt`
-
-#### 删除.svn文件夹
-
-`find . -type d -name ".svn" | xargs rm -rf`
-`find . -name "*.svn"  | xargs rm -rf`  或
-`find . -type d -iname ".svn" -exec rm -rf {} \;`
-
-#### 多目录重命名文件
-
-`for file in $(find . -name sync1.properties) do echo $file; done`
-`for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done`
-
-#### 文件内多字符串替换
-
-```sh
-# xml 文件格式的内容替换成 properties 的等号格式
-# sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'
-find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s#]]></entry>##g; s#</entry>##g; /<?xml version="1.0" encoding="UTF-8"?>/d; /DOCTYPE properties SYSTEM "http:\/\/java.sun.com\/dtd\/properties.dtd"/d; /<properties>/d; /<\/properties>/d' {} \;
-```
-
-#### 查找包含class的jar文件
-
-`find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done`
-`find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done`
-
-#### 文件及文件名乱码处理 删除文件名乱码文件 重命名 rename
-
-1. `ls -i` print the index number of each file(文件的i节点) 12345
-2. `find . -inum 12345 -print -exec rm {} -r \;` rm
-3. `find . -inum 23244066 -exec mv {} NewName \;` mv
-
-命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
 #### rename
 
@@ -1636,7 +1682,7 @@ curl -G \
 ```sh
 # 字符串$name 使用 "'" 来转义
 # 数字 $age 使用 ' 来转义
-export var1="20220916161114CA35C0"
+export name="20220916161114CA35C0"
 curl -X POST http://localhost:3000/data --header 'Content-Type:application/json' -d '{"name":"'"$name"'", "age": '$age'}'
 ```
 
@@ -1720,35 +1766,6 @@ wget 'http://www.example.com:9000/json' \
 - `-c, --continue` Continue getting a partially-downloaded file.  This is useful when you want to finish up a download started by a previous instance of Wget, or by another program.
 - `--no-check-certificate`
 
-### rsync
-
-`rsync -Pavz src/ dest` Copy contents of `src/` to destination
-
-- `-a` 等于 `-rlptgoD`
-- `-r` 是递归
-- `-l` 是链接文件, 意思是拷贝链接文件;
-- `-p` 表示保持文件原有权限
-- `-t` 保持文件原有时间;
-- `-g` 保持文件原有用户组
-- `-o` 保持文件原有属主;
-- `-D` 相当于块设备文件
-
-- `-z` 传输时压缩;
-- `-P` 等于 `--partial --progress`
-- `--partial` 保留那些因故没有完全传输的文件
-- `--progress` 进度
-
-- `--partial-dir=.rsync-partial`
-
-- `-v` 详细输出信息
-- `-c` using checksum (-c) rather than time to detect if the file has changed. (Useful for validating backups)
-- `-e, --rsh=COMMAND` choose an alternative remote shell program to use
-
-Note: The trailing slash (/) on the source directory modifies the behavior of the rsync command.
-
-- If you do not use a trailing slash, the source directory is copied to the destination directory, and then the contents of the directory.
-- When you do use the trailing slash, rsync only copies the content of the source without creating an additional directory level.
-
 ### [Unison file synchronizer](https://github.com/bcpierce00/unison)
 
 Unison works across platforms, allowing you to synchronize a Windows laptop with a Unix server, for example.
@@ -1781,9 +1798,9 @@ nc -l -p 1234 | tar xvf -
 # host1
 nc -l 9999
 # host2
-nc -vz <host1> 9999
+nc -vzw 1 <host1> 9999
 # udp -u
-nc -uv host2 8472
+nc -uvzw 1 host2 8472
 Connection to host2 8472 port [udp/otv] succeeded!
 
 ```
@@ -2128,7 +2145,39 @@ The command to print a prompt to the screen and to store the resulting input int
 
 `mmdbinspect -db GeoLite2-City.mmdb 1.1.1.1`
 
-## Softwares
+### Squid Http proxy
+
+[How to Install and Configure Squid Proxy on Ubuntu](https://phoenixnap.com/kb/setup-install-squid-proxy-server-ubuntu)
+[How to install a Squid server - Ubuntu Server documentation](https://documentation.ubuntu.com/server/how-to/web-services/install-a-squid-server/index.html)
+
+```sh
+sudo apt install squid -y
+sudo vi /etc/squid/squid.conf
+```
+
+config squid
+
+```sh
+# /etc/squid/squid.conf
+# Squid normally listens to port 3128, chang to 8081
+http_port 8081
+
+# And finally deny all other access to this proxy
+#http_access deny all
+http_access allow all
+```
+
+```sh
+# restart squid
+sudo systemctl restart squid
+
+curl -x squid_host:8081 www.example.com
+
+export https_proxy=http://squid_host:8081 http_proxy=http://squid_host:8081
+curl -v "https://www.example.com"
+```
+
+## Software
 
 ### Software List
 
@@ -2198,6 +2247,20 @@ CTRL+ALT+PageDown: Navigating from comment to comment
 CTRL+ALT+c: create comment
 ALT+Insert, and then press the up or down arrow key:  insert a new row in a table
 ALT+Delete, and then press the up or down arrow key.
+
+### convert heic to jpg
+
+[software recommendation - Any app on Ubuntu to open and/or convert HEIF pictures (.HEIC, High Efficiency Image File Format)? - Ask Ubuntu](https://askubuntu.com/questions/958355/any-app-on-ubuntu-to-open-and-or-convert-heif-pictures-heic-high-efficiency-i)
+
+```sh
+sudo add-apt-repository ppa:strukturag/libheif
+# sudo add-apt-repository ppa:strukturag/libde265
+# sudo add-apt-repository --remove ppa:strukturag/libde265
+sudo apt update
+sudo apt install libheif-examples
+
+for file in *.HEIC; do heif-convert -q 50 $file ${file/%.HEIC/.jpg}; done
+```
 
 ## Miscellaneous
 
@@ -3428,7 +3491,7 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 `useradd -G <groupName> <username>`    Add a new user to secondary group
 `usermod -G {groupname1,groupname2,...} <username>`    Remove user from group which is not list in the command
 `usermod -aG sudoGroupName username` add the user to the sudo group `/etc/sudoers`, edit it by `visudo`.
-    sudo group: wheel in CentOS, sudo in Ubuntu
+    sudo group: `wheel` in CentOS, `sudo` in Ubuntu
 configure sudo to never ask for your password. add the following line: `username ALL=(ALL) NOPASSWD: ALL` in the bottom of the file.
 
 `passwd <username>`    update password
@@ -3501,11 +3564,16 @@ vi /etc/hosts
 
 ### 设置 DNS
 
+修改 /etc/resolv.conf ，默认为软连接，可以不再使用软连接，创建新文件
+
+```sh
+sudo apt install resolvconf
 sudo vi /etc/resolvconf/resolv.conf.d/head
 sudo resolvconf -u
 cat /etc/resolv.conf
 
 nameserver 192.168.1.1
+```
 
 ### ca-certificates update
 
@@ -3583,6 +3651,7 @@ aptitude name for failed resolving dependency
 
 #### apt command
 
+```sh
 repos/mirros location: /etc/apt/
 3rd party repos/mirros location: /etc/apt/sources.list.d
 
@@ -3609,6 +3678,16 @@ apt-get changelog vsftpd    #downloads a package change-log and shows the packag
 apt clean
 apt autoclean
 apt autoremove
+```
+
+ubuntu:24.04
+
+```sh
+docker run -it --rm -v /data/docker/ubuntu/package:/data/package
+# default download path /var/cache/apt/archives/
+# cp /var/cache/apt/archives/*.deb <your_directory_here>
+sudo apt install --download-only docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
 
 #### dpkg command
 

@@ -139,35 +139,6 @@ iTerm 在远程的服务器上右键 scp 下载：
 
 Display: `Preference -> Profiles -> Colors -> Foreground: black, Background: white, Bold: gray, Minimum contrast: middle`
 
-### chrome
-
-Alt+U or click the icon to copy URL without encoding from address bar
-
-#### Extension
-
-[Bypass Paywalls web browser extension for Chrome and Firefox.](https://github.com/iamadamdev/bypass-paywalls-chrome)
-
-尝试油猴脚本
-
-#### 在Chrome 浏览器上滚动截屏
-
-1. 打开 Chrome 浏览器，进入需要截图的网站页面
-2. 打开开发者工具：在页面任何地方点击鼠标右键，在弹出菜单中选择「检查」选项。或者使用快捷键组合：option + command + i。
-3. 打开命令行（command palette）：command + shift + p。
-4. 在命令行中输入「screen」，这时自动补齐功能会显示出一些包含 「Screen」 关键字的命令。移动方向键到「Capture full size screenshot」并回车,chrome就会自动下载整个页面截屏文件。
-
-#### How to Enable DNS Over HTTPS (DoH)
-
-1. Select the three-dot menu in your browser > Settings.
-2. Select Privacy and security > Security.
-3. Scroll down and enable Use secure DNS.
-4. Select the With option, and from the drop-down menu choose Cloudflare (1.1. 1.1).
-5. [Browser Security Check | Cloudflare](https://www.cloudflare.com/ssl/encrypted-sni)
-
-### firefox
-
-firefox profile location: `/users/$user/library/application support/firefox/profiles`
-
 ### shell
 
 1. last parameter from last command: `esc+.`, `!$`
@@ -230,21 +201,6 @@ anyproxy
 
 # 以支持 Https 方式启动
 anyproxy --intercept
-```
-
-### WPS
-
-`COMMAND+Fn+Up/Down (Ctrl+PageUp/PageDown)` 切换到上/下一个工作表 Sheet
-Cloud document storage location: /Users/pu/Library/Containers/com.kingsoft.wpsoffice.mac/Data/Library/Application Support/Kingsoft/WPS Cloud Files/userdata/qing/filecache
-
-### Calibre
-
-自定义翻译源，打开 Ebook viewer，双击查询，然后点击 `Add sources`，加入以下格式的链接
-
-```sh
-https://cn.bing.com/search?q=define:{word}
-https://www.google.com/search?q=define:{word}
-https://fanyi.baidu.com/#en/zh/{word}
 ```
 
 #### plugin

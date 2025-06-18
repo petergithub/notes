@@ -1,7 +1,6 @@
 # Git Notes
 
 [TOC]
-`git push https://github.com/petergithub/eclipsePluginOpen.git master`
 
 ## 规范
 
@@ -71,7 +70,6 @@ Final release version
 `git commit -v`
 
 `git ls-files` List all tracked files
-`git checkout anotherBranch -- path/to/file` Copy file from another branch
 
 ```bash
 # Replace master branch entirely from another latestBranch:
@@ -263,6 +261,27 @@ When you want to start keeping track again
 `git gc --aggressive --prune`
 `git push origin --force --all`
 
+### 查看其他分支的文件内容
+
+```sh
+# 列出指定分支或提交中的文件和目录
+git ls-tree -r feature-branch --name-only
+
+# 查看特定提交、标签、树或文件的内容。通过指定另一个分支的文件路径来查看其内容。
+git show <branch_name>:<file_path>
+# 显示feature-branch分支中src/app.js文件的内容。
+git show feature-branch:src/app.js
+
+# 使用git cat-file命令
+# git cat-file命令是一个低级别的Git命令，用于查看Git对象的内容。你可以通过它来查看另一个分支的文件内容。
+git cat-file -p <branch_name>:<file_path>
+# 显示feature-branch分支中src/app.js文件的内容。
+git cat-file -p feature-branch:src/app.js
+
+# Copy file from another branch
+git checkout anotherBranch -- path/to/file
+```
+
 ### .gitignore文件的例子 [git ignore](https://www.gitignore.io/api/intellij,linux,windows,eclipse,java,scala,osx,maven,gradle,sbt,svn)
 
 ``` bash
@@ -449,8 +468,17 @@ Show all config and its origin: `git config --list --show-origin`
 
 ### git auto complete　自动补全
 
+[Git - Git in Bash](https://git-scm.com/book/en/v2/Appendix-A:-Git-in-Other-Environments-Git-in-Bash)
+
 download git-completion.bash from source code and load it from .bashrc
 `wget --no-check-certificate -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash && echo >> ~/.bashrc && echo "if [ -f ~/.git-completion.bash ]; then . ~/.git-completion.bash; fi" >> ~/.bashrc && source ~/.bashrc`
+
+```sh
+# customize your prompt to show information about the current directory’s Git repository
+. ~/git-prompt.sh
+export GIT_PS1_SHOWDIRTYSTATE=1
+export PS1='\w$(__git_ps1 " (%s)")\$ '
+```
 
 ### git status 中文
 
@@ -510,6 +538,17 @@ git clone git://host.xz/path/to/repo.git
 | `GIT_TRACE_PERFORMANCE=true` | Enable performance related trace messages |
 | `GIT_TRACE_SETUP=true` | Enable trace messages printing the `.git`, working tree and current working directory after Git has completed its setup phase |
 | `GIT_TRACE_SHALLOW=true` | Enable trace messages that can help debugging fetching/cloning of shallow repositories |
+
+## tig
+
+`Ctrl+R` Starting an interactive rebase from Tig, configured in `~/.tigrc`
+`Shift+I` copy the current commit ID to the clipboard.
+`r` Refs View
+`m` Main view
+`t` Tree View
+`Shift+S` Status view
+ `u` stage/unstage the selected file
+ `e` edit file
 
 ## Examples
 

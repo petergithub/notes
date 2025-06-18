@@ -83,9 +83,16 @@ accessing your service through its external ip `curl 104.155.74.57:8080`
 
 `kubectl scale rc kubia --replicas=3` increasing the desired replica count
 
-`kubectl create -f FILE_NAME.yaml` command is used for creating any resource (not only pods) from a YAML or JSON file.
-`kubectl apply -f FILE_NAME.yaml` 更新
-`kubectl apply -f FOLDER` 更新
+```sh
+# command is used for creating any resource (not only pods) from a YAML or JSON file.
+kubectl create -f FILE_NAME.yaml
+# 更新
+kubectl apply -f FILE_NAME.yaml
+kubectl apply -f FOLDER
+
+# 删除
+kubectl delete -f FILE_NAME.yaml
+```
 
 ```sh
 # cat <<EOF | kubectl apply -f -
@@ -151,6 +158,26 @@ a container’s CPU utilization is the container’s actual CPU usage divided by
 kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
 # get the pod's IP address
 kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
+```
+
+### Cluster
+
+```sh
+# 查看当前的集群上下文
+kubectl config current-context
+# 查看所有可用的集群上下文
+kubectl config get-contexts
+# 切换到指定的集群上下文
+kubectl config use-context <context-name>
+# 查看当前上下文的详细信息
+kubectl config view
+
+# 修改集群配置
+kubectl config set-context <context-name> --cluster=<cluster-name> --user=<user-name> --namespace=<namespace>
+# 添加新的集群上下文
+kubectl config set-cluster <cluster-name> --server=<api-server-url> --certificate-authority=<ca-cert-file>
+kubectl config set-credentials <user-name> --client-certificate=<client-cert-file> --client-key=<client-key-file>
+kubectl config set-context <context-name> --cluster=<cluster-name> --user=<user-name> --namespace=<namespace>
 ```
 
 ### Debug
@@ -354,7 +381,8 @@ metadata:
 
 ```
 
-设置默认的 ingressclass
+#### Ingress 设置默认的 ingressclass
+
 `kubectl -n ingress-nginx patch ingressclass nginx -p '{"metadata":{"annotations":{"ingressclass.kubernetes.io/is-default-class":"true"}}}'`
 
 ```json
@@ -380,6 +408,8 @@ metadata:
 }
 ```
 
+#### Ingress enable gzip
+
 nginx ingress enable gzip [ConfigMap - Ingress-Nginx Controller](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#use-gzip)
 
 example: [Kubernetes Ingress Compression | James Joy's Blog](https://jamesjoy.site/posts/2023-06-12-kubernetes-ingress-compression)
@@ -403,6 +433,76 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 ```
+
+#### Ingress for service in different namespaces
+
+There is way to achieve ingress in one namespace and service in another namespace via externalName.Checkout [kubernetes-ingress/examples/ingress-resources/externalname-services at main · nginx/kubernetes-ingress](https://github.com/nginx/kubernetes-ingress/tree/main/examples/ingress-resources/externalname-services)
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+spec:
+  type: ExternalName
+  externalName: test-service.namespacename.svc.cluster.local
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: example-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-service
+          servicePort: 80
+```
+
+#### Ingress 转发请求时去掉 sub path
+
+当请求路径为 `http://yourdomain.com/subpath` 或 `http://yourdomain.com/subpath/` 时，请求会被转发到后端服务 `my-service` 的根路径 `/`
+
+例子 `example.com/subpath/query` 改写成 `localhost/query`
+
+```sh
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  namespace: default
+  annotations:
+    # 这个注解用于定义路径重写规则。/$2 表示将匹配到的路径部分替换为目标路径。在正则表达式中，$2 是捕获组的第二个部分，即 (.*) 匹配的内容。
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      # path: /subpath(/|$)(.*) 使用正则表达式匹配以 /subpath 开头的路径
+      # (/|$) 匹配 / 或者字符串的结尾。
+      # (.*) 捕获 /subpath 后面的任意字符。
+      - path: /subpath(/|$)(.*)
+        # ImplementationSpecific 允许路径匹配类型由具体的 Ingress 控制器实现决定。在 Nginx 中，这通常表示使用最长前缀匹配。
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: my-service
+            port:
+              number: 80
+```
+
+#### Ingress monitor
+
+1. Enabling Metrics：[Prometheus | NGINX Ingress Controller](https://docs.nginx.com/nginx-ingress-controller/logging-and-monitoring/prometheus/)
+2. [nginx-prometheus-exporter](https://github.com/nginx/nginx-prometheus-exporter)
 
 ### ConfigMap
 
@@ -445,6 +545,16 @@ data:
   file2.txt: |
     $(cat file2.txt)
 EOF
+```
+
+### cronjob
+
+```sh
+# trigger a Kubernetes Scheduled Job manually
+kubectl create job --from=cronjob/<cronjob-name> <job-name> -n <namespace-name>
+
+# delete job execution at any time
+kubectl delete job <job-name> -n <namespace>
 ```
 
 ### System
@@ -707,25 +817,13 @@ The task of running your containers is up to the components running on each work
 - The Kubernetes Service Proxy (kube-proxy)
 - The Container Runtime (Docker, rkt, or others)
 
-## Useful image
-
-`kubectl run -it --rm --restart=Never --image=mysql:8.0.28 mysql-client -- mysql`
-`kubectl run -it --rm --restart=Never --image=redis:6.0.9 redis-client -- bash`
-`kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils`
-`kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils -- dig SRV kubia.default.svc.cluster.local`
-`kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools`
-`kubectl run -it --rm --restart=Never --image=tutum/curl curl`
-`kubectl run -it --rm --image=nicolaka/netshoot netshoot`
-`kubectl run -it --rm --image=nginx nginx`
-`kubectl run -it --rm --image=busybox busybox`  busybox: BusyBox combines tiny versions of many common UNIX utilities
-`kubectl run -it --rm --image=alpine alpine`  alpine: A minimal Docker image based on Alpine Linux
-`apk add curl` install curl
-
 ## helm
 
 [Helm | Installing Helm](https://helm.sh/docs/intro/install/)
 
 [Harbor docs | Managing Helm Charts](https://goharbor.io/docs/2.7.0/working-with-projects/working-with-images/managing-helm-charts/)
+
+[What are your best practices deploying helm charts? : r/kubernetes](https://www.reddit.com/r/kubernetes/comments/1jn7lwo/what_are_your_best_practices_deploying_helm_charts)
 
 ### helm Chart Management
 
@@ -1006,6 +1104,94 @@ done
 # pull_and_push_images
 ```
 
+### 镜像加速脚本 修改镜像仓库地址
+
+核心代码
+
+```sh
+# 自动化镜像地址替换脚本 demo
+find ./ -type f -name "*.yaml" -exec sed -i \
+    -e 's|registry.k8s.io|m.daocloud.io/registry.k8s.io|g' \
+    -e 's|quay.io|m.daocloud.io/quay.io|g' \
+    -e 's|docker.io|m.daocloud.io/docker.io|g' {} \;
+```
+
+镜像加速脚本 完整代码
+
+```sh
+#!/bin/bash
+
+# 检测操作系统类型
+if [[ "$(uname)" == "Darwin" ]]; then
+# macOS
+  SED_CMD="sed -i ''"
+else
+# Linux 和其他
+  SED_CMD="sed -i"
+fi
+
+# 查找当前目录及子目录下的所有 YAML 文件
+find . -type f -name "values.yaml" -o -name "values.yml" | whileread yaml_file; do
+echo"处理文件: $yaml_file"
+
+# 使用 awk 处理整个文件，以处理隔行的 registry 和 repository
+  awk -v file="$yaml_file" -v sed_cmd="$SED_CMD"'
+  BEGIN { registry = ""; in_block = 0; }
+
+  /registry:/ {
+    # 提取 registry 值
+    for (i=1; i<=NF; i++) {
+      if ($i == "registry:") {
+        registry = $(i+1);
+        gsub(/[",]/, "", registry);  # 移除可能的引号和逗号
+        in_block = 1;
+        print "找到 registry:", registry, "在文件", file;
+      }
+    }
+  }
+
+  /repository:/ {
+    if (in_block && registry != "") {
+      # 提取 repository 值
+      for (i=1; i<=NF; i++) {
+        if ($i == "repository:") {
+          repo = $(i+1);
+          gsub(/[",]/, "", repo);  # 移除可能的引号和逗号
+          print "找到匹配的 repository:", repo, "在文件", file;
+
+          # 构建并执行 sed 命令
+          cmd = sed_cmd " '\''s|repository: " repo "|repository: " registry "/" repo "|g'\'' " file;
+          system(cmd);
+
+          # 重置状态
+          in_block = 0;
+          registry = "";
+        }
+      }
+    }
+  }
+
+  # 如果遇到新的块开始，重置状态
+  /^[^ ]/ {
+    if ($1 != "registry:" && $1 != "repository:") {
+      in_block = 0;
+      registry = "";
+    }
+  }
+  '"$yaml_file"
+
+# 然后替换所有 registry 地址
+$SED_CMD's|registry: docker.io|registry: m.daocloud.io|g'"$yaml_file"
+$SED_CMD's|registry: registry.k8s.io|registry: m.daocloud.io|g'"$yaml_file"
+$SED_CMD's|registry: quay.io|registry: m.daocloud.io|g'"$yaml_file"
+$SED_CMD's|registry: ghcr.io|registry: m.daocloud.io|g'"$yaml_file"
+
+echo"完成处理: $yaml_file"
+done
+
+echo "所有 YAML 文件处理完成！"
+```
+
 ## Setup Cluster
 
 ```sh
@@ -1023,6 +1209,159 @@ error: taint "node-role.kubernetes.io/master" not found
 Taints:    <none>
 ```
 
+### kubelet 配置
+
+[Reconfiguring a kubeadm cluster | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-reconfigure/)
+
+[通过配置文件设置 kubelet 参数 | Kubernetes](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/kubelet-config-file/)
+
+查看最终生效的配置，参考 [Set Kubelet Parameters Via A Configuration File | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubelet-config-file/#viewing-the-kubelet-configuration)
+
+```sh
+# 在终端中使用 kubectl proxy 启动代理服务器
+kubectl proxy
+# 其输出如下：
+# Starting to serve on 127.0.0.1:8001
+
+# 使用 curl 来获取 kubelet 配置。 将 <node-name> 替换为节点的实际名称：
+curl -X GET http://127.0.0.1:8001/api/v1/nodes/<node-name>/proxy/configz | jq .
+```
+
+查看使用的配置文件
+
+```sh
+# kubelet status
+systemctl status kubelet.service
+
+# kubectl 启动的配置文件
+less /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf
+
+# 确认上面的内容，使用的 --config=/var/lib/kubelet/config.yaml
+ps aux | grep kubectl
+# /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf --kubeconfig=/etc/kubernetes/kubelet.conf --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.9
+
+# 查看配置文件内容
+less /var/lib/kubelet/config.yaml
+```
+
+通过 kubeadm 修改配置，参考[Reconfiguring a kubeadm cluster | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-reconfigure/#applying-kubelet-configuration-changes)
+
+```sh
+# Updating the KubeletConfiguration
+# document [Kubelet Configuration (v1beta1) | Kubernetes](https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration)
+kubectl edit cm -n kube-system kubelet-config
+
+# Reflecting the kubelet changes
+kubeadm upgrade node phase kubelet-config
+# [upgrade] Reading configuration from the cluster...
+# [upgrade] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+# [upgrade] Backing up kubelet config file to /etc/kubernetes/tmp/kubeadm-kubelet-config3426306141/config.yaml
+# [kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+# [upgrade] The configuration for this node was successfully updated!
+# [upgrade] Now you should go ahead and upgrade the kubelet package using your package manager.
+
+systemctl restart kubelet
+```
+
+### 清理不再用的镜像
+
+Kubernetes 会自动清理无用的镜像，参考[垃圾收集 | Kubernetes](https://kubernetes.io/zh-cn/docs/concepts/architecture/garbage-collection/#containers-images)
+
+通过 kubeadm 修改配置，参考[Reconfiguring a kubeadm cluster | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-reconfigure/#applying-kubelet-configuration-changes)
+
+```sh
+# Updating the KubeletConfiguration
+# document [Kubelet Configuration (v1beta1) | Kubernetes](https://kubernetes.io/docs/reference/config-api/kubelet-config.v1beta1/#kubelet-config-k8s-io-v1beta1-KubeletConfiguration)
+kubectl edit cm -n kube-system kubelet-config
+
+# 修改内容 服务器磁盘告警阈值是 80%，这里设置成 79% 开始清理，避免告警
+    imageGCHighThresholdPercent: 79
+    imageGCLowThresholdPercent: 74
+
+# 登录每一台 node，Reflecting the kubelet changes
+kubeadm upgrade node phase kubelet-config
+# [upgrade] Reading configuration from the cluster...
+# [upgrade] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
+# [upgrade] Backing up kubelet config file to /etc/kubernetes/tmp/kubeadm-kubelet-config3426306141/config.yaml
+# [kubelet-start] Writing kubelet configuration to file "/var/lib/kubelet/config.yaml"
+# [upgrade] The configuration for this node was successfully updated!
+# [upgrade] Now you should go ahead and upgrade the kubelet package using your package manager.
+
+systemctl restart kubelet
+```
+
+手动使用脚本清理镜像
+
+```sh
+# 查询所有在用的镜像
+kubectl get pods --all-namespaces --output=jsonpath='{..image}' |less
+```
+
+ctr 清理无用镜像
+
+```sh
+#!/bin/bash
+# 获取所有镜像的列表
+images=$(ctr -n=k8s.io images ls -q)
+
+# 遍历镜像列表
+for image in $images; do
+  # 检查是否有容器正在使用该镜像
+  if ! ctr -n=k8s.io containers ls | grep -q "$image"; then
+    echo "Deleting unused image: $image"
+    ctr -n=k8s.io images rm "$image"
+  fi
+done
+```
+
+### Kubernetes 迁移节点 Kubelet 数据存储目录
+
+默认位置是 /var/lib/kubelet 建议使用 symlink 软连接或 mount，不建议迁移到其他位置
+
+```sh
+# 确认当前 kubelet 数据目录
+df -h | grep kubelet
+[root@qj-master01 user]# df -h | grep /var/lib/kubelet
+tmpfs  7.6G   12K  7.6G   1% /var/lib/kubelet/pods/0f8fef47-20da-49b7-baa3-39e817bab9af/volumes/kubernetes.io~projected/kube-api-access-4lwqv
+tmpfs  170M   12K  170M   1% /var/lib/kubelet/pods/0e3316be-0886-41fe-ade5-2480e48228a8/volumes/kubernetes.io~projected/kube-api-access-bf2zg
+
+# 1 驱逐在该节点上运行的Pod
+kubectl drain <node-to-drain> --ignore-daemonsets
+
+# 2 停止节点Kubelet和Docker服务
+systemctl stop kubelet
+service stop containerd
+# systemctl stop docker
+
+# 3 目录卸载
+umount /var/lib/kubelet
+# umount /var/lib/kubelet/pods/*/volumes/kubernetes.io~*/*
+
+# 4 数据备份
+mkdir -p /data/lib/
+sudo rsync -Pavz /var/lib/containerd /data/lib/containerd
+# sudo rsync -Pavz /var/lib/kubelet /data/lib/kubelet
+sudo mv /data/lib/kubelet /data/lib/kubelet.bak
+sudo ln -s /data/lib/kubelet /var/lib/kubelet
+
+# 5 修改节点Kubelet数据盘目录
+# kubelet 配置文件路径通过 systemctl status kubelet.service 查看
+# 在Kubelet的配置文件中设置 --data-dir 参数来指定所需的目录路径，修改配置文件 /usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf 。
+Environment="KUBELET_EXTRA_ARGS=--root-dir=/data/lib/kubelet --node-ip=xxx --hostname-override=master3 "
+
+# 6 创建kubelet数据目录并重启节点Kubelet和Docker服务
+systemctl daemon-reload
+systemctl restart containerd
+# systemctl restart docker
+systemctl restart kubelet
+
+# 7 检查kubelet数据目录是否修改成功
+df -h | grep kubelet
+
+# 8 取消节点污点
+kubectl uncordon <node-to-uncordon>
+```
+
 ### Kubernetes Gateway API
 
 Gateway API v1.0: GA Release October 31, 2023
@@ -1034,23 +1373,7 @@ Gateway API v1.0: GA Release October 31, 2023
 [Gateway API | Kubernetes](https://kubernetes.io/docs/concepts/services-networking/gateway/)
 [Getting started - Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/guides/)
 
-### Setup cli
-
-[Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
-[kube-ps1](https://github.com/jonmosco/kube-ps1)
-`brew install kube-ps1 stern`
-kube-shell `pip install kube-shell --user -U`
-`brew install kubectx`
-[Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
-
-终极工具k9s
-
-切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
-git clone https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
-
 ### Setup prometheus + grafana
-
 
 [Alerts firing right after setting up kube-prometheus-stack](https://groups.google.com/g/prometheus-users/c/_aI-HySJ-xM/m/kqrL1FYVCQAJ?pli=1)
 [KubeControllerManagerDown & kubeSchedulerDown firing on kubeadm 1.18 cluster · Issue #718 · prometheus-operator/kube-prometheus](https://github.com/prometheus-operator/kube-prometheus/issues/718)
@@ -1071,7 +1394,97 @@ sed -e "s#- --listen-metrics-urls=http://127.0.0.1:2381#- --listen-metrics-urls=
 
 ```
 
+### Setup PostgreSQL
+
+[Can I host Postgres on k8s myself? : r/kubernetes](https://www.reddit.com/r/kubernetes/comments/1j854ze/can_i_host_postgres_on_k8s_myself/?share_id=3JOfzJdVHRh_sLHXd4w9Y&utm_content=1&utm_medium=ios_app&utm_name=iossmf&utm_source=share&utm_term=22)
+
+[Postgres databases in Kubernetes · Stonegarden](https://blog.stonegarden.dev/articles/2024/10/k8s-postgres/)
+
+[Why would you run PostgreSQL in Kubernetes, and how?](https://www.cloudraft.io/blog/why-would-you-run-postgresql-on-kubernetes)
+
+Can I host Postgres on k8s myself?
+
+1. Zalando Postgres Operator
+2. CloudNativePG
+3. [stackgres](https://stackgres.io/)：for sharding
+4. [bitnami postgresql helm chart](https://hub.docker.com/r/bitnami/postgresql)
+5. KubeDB
+
 ## Best Practice
+
+### Setup cli
+
+[Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
+
+[Kubernetes prompt info for bash and zsh kube-ps1](https://github.com/jonmosco/kube-ps1)
+
+`brew install kube-ps1 stern`
+kube-shell `pip install kube-shell --user -U`
+
+终极工具k9s
+
+切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
+git clone https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
+```sh
+# [Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
+# KREW="krew-linux_amd64"
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+
+#  |  | To list krew commands and to get help, run:
+#  |  |   $ kubectl krew
+#  |  | For a full list of available plugins, run:
+#  |  |   $ kubectl krew search
+#  |  |
+#  |  | You can find documentation at
+#  |  |   https://krew.sigs.k8s.io/docs/user-guide/quickstart/.
+
+kubectl krew install ctx
+kubectl krew install ns
+
+# the tools will be available as kubectl ctx and kubectl ns
+kubectl ctx
+kubectl ns
+```
+
+bash 配置 kube-ps1.sh
+
+```sh
+# kubectl {
+    source <(kubectl completion bash)
+    complete -o default -F __start_kubectl k
+
+    # [kube-ps1: Kubernetes prompt info for bash and zsh](https://github.com/jonmosco/kube-ps1)
+    [ -d "/data/software/kube-ps1.sh" ] && source /data/software/kube-ps1.sh
+    #PS1='[\u@\h \W $(kube_ps1)]\$ '
+    PS1="$(kube_ps1) $PS1"
+# } end kubectl
+```
+
+### Useful image
+
+```sh
+kubectl run -it --rm --restart=Never --image=mysql:8.0.28 mysql-client -- mysql
+kubectl run -it --rm --restart=Never --image=redis:6.0.9 redis-client -- bash
+kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils
+kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils -- dig SRV kubia.default.svc.cluster.local
+kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools
+kubectl run -it --rm --restart=Never --image=tutum/curl curl
+kubectl run -it --rm --image=nicolaka/netshoot netshoot
+kubectl run -it --rm --image=nginx nginx
+kubectl run -it --rm --image=busybox busybox  # busybox: BusyBox combines tiny versions of many common UNIX utilities
+kubectl run -it --rm --image=alpine alpine  # alpine: A minimal Docker image based on Alpine Linux
+apk add curl
+```
 
 ### 声明每个Pod的resource
 
@@ -1167,7 +1580,6 @@ kubecost 是目前较优秀的开源 Kubernetes 成本分析工具。kubecost �
 [容器服务 如何选择 Containerd 和 Docker-常见问题-文档中心-腾讯云](https://cloud.tencent.com/document/product/457/35747)
 [如何选择Docker、Containerd及安全沙箱运行时_容器服务 Kubernetes 版 ACK(ACK)-阿里云帮助中心](https://help.aliyun.com/zh/ack/ack-managed-and-ack-dedicated/user-guide/comparison-of-docker-containerd-and-sandboxed-container)
 
-
 Containerd：调用链更短，组件更少，更稳定，占用节点资源更少。建议选择 Containerd。
 
 作为 K8S 容器运行时，部署结构对比
@@ -1179,7 +1591,45 @@ Containerd 和 Docker 组件常用命令是什么？
 
 Containerd 不支持 docker API 和 docker CLI，但是可以通过 cri-tool 命令实现类似的功能。
 
-ctr 是 containerd 的一个客户端工具。 crictl 是 CRI 兼容的容器运行时命令行接口，可以使用它来检查和调试 k8s 节点上的容器运行时和应用程序。 ctr -v 输出的是 containerd 的版本，crictl -v 输出的是当前 k8s 的版本，从结果显而易见你可以认为 crictl 是用于 k8s 的。
+### containerd 命令
+
+ctr 是 containerd 的一个客户端工具。
+crictl 是 CRI 兼容的容器运行时命令行接口，可以使用它来检查和调试 k8s 节点上的容器运行时和应用程序。
+
+```sh
+# 输出当前 k8s 的版本，从结果可以认为 crictl 是用于 k8s 的。
+crictl -v
+
+# 输出 containerd 的版本
+ctr -v
+
+
+# Save the Image as a Tar File
+ctr image export dashboard.tar dashboard
+ctr -n=k8s.io image export dashboard.tar dashboard
+
+# 使用ctr导入镜像
+ctr image import dashboard.tar
+
+# ctr是containerd自带的工具，有命名空间的概念，若是k8s相关的镜像，都默认在k8s.io这个命名空间，所以导入镜像时需要指定命令空间为 k8s.io
+# 使用ctr命令指定命名空间导入镜像
+ctr -n=k8s.io image import dashboard.tar
+
+#查询镜像
+ctr -n=k8s.io images ls
+crictl images
+
+# pull image
+# kubeadm config images list --kubernetes-version=v1.15.2
+ctr image pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
+crictl pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
+
+# 创建 k8s.io 命名空间
+ctr ns create k8s.io
+
+# 查看命名空间
+ctr ns ls
+```
 
 |           | docker                  | ctr（containerd）              | crictl（kubernetes）       |
 |-----------|-------------------------|------------------------------|--------------------------|
@@ -1208,27 +1658,38 @@ ctr 是 containerd 的一个客户端工具。 crictl 是 CRI 兼容的容器运
 [How to pull docker image from a insecure private registry with latest Kubernetes - Stack Overflow](https://stackoverflow.com/questions/72419513/how-to-pull-docker-image-from-a-insecure-private-registry-with-latest-kubernetes)
 
 ```sh
+# [containerd/docs/cri/registry.md at main · containerd/containerd](https://github.com/containerd/containerd/blob/main/docs/cri/registry.md)
 # vi /etc/containerd/config.toml
+
+# data
+# root = "/var/lib/containerd"
+root = "/data/lib/containerd"
+
       [plugins."io.containerd.grpc.v1.cri".registry.configs]
-
-        [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081"] # edited line
-
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081".auth] # edited line
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."docker.io"] # edited line
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."docker.io".auth] # edited line
             username = "USERNAME"
             password = "PASSWORD"
-
-          [plugins."io.containerd.grpc.v1.cri".registry.configs."172.28.48.107:8081".tls] # edited line
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."docker.io".tls] # edited line
             ca_file = "" # edited line
             cert_file = "" # edited line
             insecure_skip_verify = true # edited line
             key_file = "" # edited line
-
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."gcr.io"] # edited line
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."gcr.io".auth] # edited line
+            username = "USERNAME"
+            password = "PASSWORD"
       [plugins."io.containerd.grpc.v1.cri".registry.headers]
-
       [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"] # edited line
+          endpoint = ["http://registry-1.docker.io"] # edited line
+        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."gcr.io"] # edited line
+          endpoint = ["https://gcr.io"] # edited line
 
-        [plugins."io.containerd.grpc.v1.cri".registry.mirrors."172.28.48.107:8081"] # edited line
-          endpoint = ["http://172.28.48.107:8081"] # edited line
+
+# Restart containerd:
+service containerd restart
+sudo crictl pull gcr.io/your-gcp-project-id/busybox
 ```
 
 ### 客户端工具 nerdctl

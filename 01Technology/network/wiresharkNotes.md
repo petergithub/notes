@@ -21,7 +21,7 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 
 `tcpdump -i eth0 -nn -X 'port 53' -c 1`
 `tcpdump -i eth0 -vvv -nnnn host 172.25.4.80 and port 2381`
-`tcpdump -i eth1 -s 0 -w /tmp/1.pcapng port 3306` 对 3306 端口进行抓包
+`tcpdump -i eth0 -s 0 -w /tmp/1.pcapng port 3306` 对 3306 端口进行抓包
 
 ### tcpdump 常用选项
 
@@ -66,6 +66,7 @@ Common usage:
 * 去除特定流量 `tcpdump not icmp` 不抓 ICMP 的流量。
 * 去除特定流量 `tcpdump dst 192.168.0.2 and src net and not icmp` 显示所有到 192.168.0.2 的 非 ICMP 的流量。
 * 去掉非指定端口的流量 `tcpdump -vv src mars and not dst port 22` 显示来自不是 port 22 流量的主机的所有流量。
+* 抓起 ICMP ping 包 `tcpdump dst 192.168.0.2 and src net and icmp`
 * 抓取HTTP包 `tcpdump -i eth0 -lXvvennSs 0 tcp[20:2]=0x4745 or tcp[20:2]=0x4854` 0x4745 为"GET"前两个字母"GE",0x4854 为"HTTP"前两个字母"HT"
 * 抓HTTP GET数据 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x47455420'`, GET的十六进制是47455420
 * 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为"MAIL"的包，"MAIL"的十六进制为 0x4d41494c
