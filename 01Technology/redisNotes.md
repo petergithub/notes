@@ -234,10 +234,15 @@ SCAN return value is an array of two values
 1. the first value is the new cursor to use in the next call
 2. the second value is an array of elements.
 
-`SCAN cursor [MATCH pattern] [COUNT count]`
-eg: `SCAN 0 MATCH "*:foo:bar:*" COUNT 10`
-`redis-cli --scan | head -10`
-`redis-cli -h host -p 6379 -n 2 --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli -h host -p 6379 -n 2  DEL` 批量删除
+```sh
+# SCAN cursor [MATCH pattern] [COUNT count]
+SCAN 0 MATCH "*:foo:bar:*" COUNT 10
+
+redis-cli --scan | head -10`
+# 批量删除
+redis-cli -h host -p 6379 -n 2 --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli -h host -p 6379 -n 2 DEL
+redis-cli -h host -p 6379 -n 4 -a $PWD --scan --pattern "*timeUnit: d*" | xargs -I {} redis-cli -h host -p 6379 -a $PWD -n 4 ttl {}
+```
 
 #### SCAN命令时，不会漏key，但可能会得到重复的key
 
