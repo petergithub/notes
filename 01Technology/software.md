@@ -23,24 +23,25 @@ set java_home=C:\ProgramFiles\Java\jdk1.6.0_45
 set java_home=C:\ProgramFiles\Java\jdk1.7.0_21
 
 1. read BUILDING.txt (it needs Patch for version tomcat 8.0)
-	1.1 (2.1) Checkout or obtain the source code for Tomcat 6.0
-	1.2 set base.path=C:/ProgramFiles/Apache/usr/share/java in file build.properties.default
-	1.3 (2.2) Building: ant download then ant
+    1.1 (2.1) Checkout or obtain the source code for Tomcat 6.0
+    1.2 set base.path=C:/ProgramFiles/Apache/usr/share/java in file build.properties.default
+    1.3 (2.2) Building: ant download then ant
 2. read RUNNING.txt
-	2.1 (3) Start Up Tomcat
-	2.2 change to folder output\build\bin, comment line
-		"if not "%CATALINA_HOME%" == "" goto gotHome" in files startup.bat and catalina.bat
-	2.3 (3.1)run bat startup.bat
+    2.1 (3) Start Up Tomcat
+    2.2 change to folder output\build\bin, comment line
+        "if not "%CATALINA_HOME%" == "" goto gotHome" in files startup.bat and catalina.bat
+    2.3 (3.1)run bat startup.bat
 3. log configuration
-	3.1 apache-tomcat-6.0.36\conf\logging.properties
-	```
-	############################################################
-	# Added by Peter
-	# refer to http://www.student.lu.se/docs/logging.html
-	############################################################
-	#The default logging.properties specifies a ConsoleHandler for routing logging to stdout and also a FileHandler. A handler's log level threshold can be set using SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You can also target specific packages to collect logging from and specify a level. Here is how you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging documentation for the complete details.
-	#org.apache.catalina.level=FINE
-	```
+    3.1 apache-tomcat-6.0.36\conf\logging.properties
+
+    ```sh
+    ############################################################
+    # Added by Peter
+    # refer to http://www.student.lu.se/docs/logging.html
+    ############################################################
+    #The default logging.properties specifies a ConsoleHandler for routing logging to stdout and also a FileHandler. A handler's log level threshold can be set using SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You can also target specific packages to collect logging from and specify a level. Here is how you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging documentation for the complete details.
+    #org.apache.catalina.level=FINE
+    ```
 
 #### Configuration
 
@@ -115,51 +116,13 @@ set GRADLE_OPTS= %GRADLE_OPTS%
 gradlew eclipse
 gradlew build
 
-## Operating System
-
-### Windows
-
-#### Misc
-
-replace one line in notepad++ which contain REPLEACH_THIS_LINE `^.*REPLEACH_THIS_LINE.*$\r\n`
-F4 重复上一步操作，比如，插入行、设置格式等等频繁的操作, 公式里面切换绝对引用，直接点选目标，按F4轮流切换
-Alt+Shift+D    - Current date;
-Alt+Shift+T    - Current time.
-start cmd /k
-type: Windows Displays the contents of a text file or files.
-nslookup http://wsyc.lqwang.com/
-tracert http://haijia.bjxueche.net/
-
-## Network tools
-
-### putty显示中文
-
-在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.
-如果经常使用,把这些设置保存在session里面.
-
-### Proxy
-
-[mitmproxy](https://docs.mitmproxy.org/stable/)
-
-#### Proxy configuration
-
-file://path
-	On Windows, you have to use that syntax: file://C:/proxy.pac
-	On Unix, you have to use that syntax: file:///path/to/proxy.pac
-
-https://pac.itzmx.com/abc.pac
-
-## Editor
-
-* Meta 学术文档OCR神器 [Nougat](https://facebookresearch.github.io/nougat/)
-
 ## Data Security
 
 ### Encrypt
 
 #### veracrypt
 
-https://veracrypt.codeplex.com
+[veracrypt](https://veracrypt.codeplex.com)
 
 ### clamAV 杀毒软件
 
@@ -175,15 +138,15 @@ https://veracrypt.codeplex.com
 
 1. vi /etc/yum.repos.d/dag.repo
 
-```sh
-#Dag RPM Repository Start
-[dag]
-name=Dag RPM Repository for RHEL4
-baseurl=http://ftp.riken.jp/Linux/dag/redhat/el4/en/$basearch/dag/
-enabled=1
-gpgcheck=1
-#Dag RPM Repository End
-```
+    ```sh
+    #Dag RPM Repository Start
+    [dag]
+    name=Dag RPM Repository for RHEL4
+    baseurl=http://ftp.riken.jp/Linux/dag/redhat/el4/en/$basearch/dag/
+    enabled=1
+    gpgcheck=1
+    #Dag RPM Repository End
+    ```
 
 2. `yum -y install clamd`
 3. `service clamd start`
@@ -205,11 +168,13 @@ develop, test, staging, production environment
 
 [Penpot: The open-source design tool for design and code collaboration](https://github.com/penpot/penpot)
 
+#### database
+
+[drawdb-io/drawdb: Free, simple, and intuitive online database diagram editor and SQL generator.](https://github.com/drawdb-io/drawdb)
+
 #### swagger
 
-http://swagger.io
-A Powerful Interface to your API
-https://github.com/swagger-api/swagger-ui
+[A Powerful Interface to your API](https://github.com/swagger-api/swagger-ui)
 
 ### 04 Build
 
@@ -224,15 +189,15 @@ java $JAVA_OPTS -Xms1024m -Xmx1024m -XX:+UseParallelOldGC -XX:MaxPermSize=256m -
 
 ##### options
 
-* -p <num> 监听的TCP端口 (缺省: 11211)
-* -d 以守护进程方式运行Memcached
-* -u <username> 运行Memcached的账户，非root用户
-* -m <num> 最大的内存使用, 单位是MB，缺省是 64 MB
-* -c <num> 软连接数量, 缺省是 1024
-* -v 输出警告和错误信息
-* -vv 打印客户端的请求和返回信息
-* -h 打印帮助信息
-* -i 打印memcached和libevent的版权信息
+- -p portNum 监听的TCP端口 (缺省: 11211)
+- -d 以守护进程方式运行Memcached
+- -u username 运行Memcached的账户，非root用户
+- -m portNum 最大的内存使用, 单位是MB，缺省是 64 MB
+- -c portNum 软连接数量, 缺省是 1024
+- -v 输出警告和错误信息
+- -vv 打印客户端的请求和返回信息
+- -h 打印帮助信息
+- -i 打印memcached和libevent的版权信息
 
 运行 Memcached 目标：使用11211端口、最大占用512M内存、1024个软连接, 不监听UDP `-U 0`，输出客户端请求，以守护进程方式运行
 
@@ -249,15 +214,15 @@ UAT: User Acceptance Test
 
 应用生命周期管理
 
-* 完整的 CI 流水线，代码编译，测试，安全扫描，镜像打包。
-  * Jenkins, Prow, Tekton;
-  * Maven, Sonar, jacoco;
-  * Kaniko, Helm, Docker;
-* 多阶段的测试流程。
-* 完整的 CD 流程，多集群部署，多阶段部署。
-* ArgoCD, Harbor, Kubernetes.
-* 从train mode 变成特续选代模式，在bug 修复之后快速上线。
-* 基于不同的CI软件，DevOps提供可配置的CI/CD 流水线。
+- 完整的 CI 流水线，代码编译，测试，安全扫描，镜像打包。
+  - Jenkins, Prow, Tekton;
+  - Maven, Sonar, jacoco;
+  - Kaniko, Helm, Docker;
+- 多阶段的测试流程。
+- 完整的 CD 流程，多集群部署，多阶段部署。
+- ArgoCD, Harbor, Kubernetes.
+- 从train mode 变成特续选代模式，在bug 修复之后快速上线。
+- 基于不同的CI软件，DevOps提供可配置的CI/CD 流水线。
 
 #### Data security 数据安全工具DRBD
 
@@ -280,11 +245,11 @@ UAT: User Acceptance Test
 
 #### Distributed Configuration Management Platform(分布式配置管理平台)
 
-https://github.com/knightliao/disconf
+[disconf](https://github.com/knightliao/disconf)
 
 #### Commons Configuration
 
-http://commons.apache.org/proper/commons-configuration/
+[commons-configuration](http://commons.apache.org/proper/commons-configuration/)
 配置管理和部署使用chef/puppet/ansible，密码放在加密的data bag里（如chef）
 密码管理通用服务vault和keywhiz, vault是用golang写的，github上的like比java写的keywhiz多些，同时它又是consul的东家hashicorp做
 
@@ -304,19 +269,19 @@ pm2 delete id
 
 #### Monitor
 
-* [UptimeRobot: Free Website Monitoring Service](https://uptimerobot.com/)
-* [louislam/uptime-kuma: A fancy self-hosted monitoring tool](https://github.com/louislam/uptime-kuma)
-* [Home | 哪吒监控](https://nezha.wiki/)
-* Zabbix is an open source monitoring software
-* [Munin Monitoring](https://munin-monitoring.org/)
-* Ganglia
-* 基于 nagios 的分布式监控平台 centreon
+- [UptimeRobot: Free Website Monitoring Service](https://uptimerobot.com/)
+- [louislam/uptime-kuma: A fancy self-hosted monitoring tool](https://github.com/louislam/uptime-kuma)
+- [Home | 哪吒监控](https://nezha.wiki/)
+- Zabbix is an open source monitoring software
+- [Munin Monitoring](https://munin-monitoring.org/)
+- Ganglia
+- 基于 nagios 的分布式监控平台 centreon
 
 多维度告警 Prometheus + alertmgr
 
 ##### Java HeartBeat
 
-https://www.oschina.net/news/62034/java-heartbeat-0-4
+[java-heartbeat oschina](https://www.oschina.net/news/62034/java-heartbeat-0-4)
 [git.oschina](http://git.oschina.net/mkk/HeartBeat)
 [下载链接](http://git.oschina.net/mkk/HeartBeat/raw/V-0.4/dist/HeartBeat-0.4.zip)
 [在线测试](http://andaily.com/hb)
@@ -331,13 +296,11 @@ https://www.oschina.net/news/62034/java-heartbeat-0-4
 [分享个自用的小工具~ 给你的 iPhone 发自定义推送 - V2EX](https://www.v2ex.com/t/467407)
 [Bark服务端部署文档 | Fin](https://day.app/2018/06/bark-server-document/)
 
-AppStore 连接
-https://itunes.apple.com/cn/app/bark-customed-notifications/id1403753865
+[AppStore 连接](https://itunes.apple.com/cn/app/bark-customed-notifications/id1403753865)
 
-App 源码
-https://github.com/Finb/Bark
-后端源码
-https://github.com/Finb/go-tools/blob/master/Bark.go
+[App 源码](https://github.com/Finb/Bark)
+
+[后端源码](https://github.com/Finb/go-tools/blob/master/Bark.go)
 
 #### 运维工具组合的进化
 
