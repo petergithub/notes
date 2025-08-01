@@ -48,7 +48,12 @@ validate your planned changes carefully with a tool such as pt-upgrade
 ### Connection
 
 连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock
-`mysql -h110.110.110.110 -u root -p123;`（注:p与密码之间可以不用加空格，其它必须加）
+`mysql -h 110.110.110.110 -u root -p123 -D dbname`（注:p与密码之间可以不用加空格，其它必须加）
+
+```sql
+-- 连接后设置字符集
+SET NAMES utf8mb4;
+```
 
 ### Database/Schema
 
@@ -605,6 +610,12 @@ Examples:
 ## Charset 查看三种MySQL字符集
 
 MySQL 5.5.3+ UTF8mb4支持emoji
+
+```sql
+-- 连接后设置字符集
+SET NAMES utf8mb4;
+```
+
 查看支持的字符集和排序方式: `show character set`, `show collation` or `show variables like '%char%'`
 查看数据库字符集`select * from SCHEMATA where SCHEMA_NAME='ttlsa';`
 查看表字符集 `select TABLE_SCHEMA,TABLE_NAME,TABLE_COLLATION from information_schema.TABLES;` or `show table status from databaseName like 'tableName'`
@@ -623,29 +634,28 @@ MySQL 5.5.3+ UTF8mb4支持emoji
 
 [Better Unicode support for MySQL (including emoji)](http://tonyshowoff.com/articles/better-unicode-support-for-mysql-including-emoji/)
 
-``` config
+```ini
+[client]
+default-character-set = utf8mb4
 
-  [client]
-  default-character-set = utf8mb4
+[mysql]
+default-character-set = utf8mb4
 
-  [mysql]
-  default-character-set = utf8mb4
-
-  [mysqld]
-  character-set-client-handshake = FALSE
-  character-set-server = utf8mb4
-  collation-server = utf8mb4_unicode_ci
+[mysqld]
+character-set-client-handshake = FALSE
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
 ```
 
 ### 创建表的时候指定CHARSET为utf8mb4
 
 ``` sql
-  CREATE TABLE IF NOT EXISTS mb4 (
-  id INT(3) NOT NULL AUTO_INCREMENT,
-    name varchar(32) CHARACTER SET utf8mb4 DEFAULT NULL,
-  comment VARCHAR(50) DEFAULT 'test',
-    PRIMARY KEY (`id`)
-  ) ENGINE=MyIsam DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
+CREATE TABLE IF NOT EXISTS mb4 (
+id INT(3) NOT NULL AUTO_INCREMENT,
+  name varchar(32) CHARACTER SET utf8mb4 DEFAULT NULL,
+comment VARCHAR(50) DEFAULT 'test',
+  PRIMARY KEY (`id`)
+) ENGINE=MyIsam DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
 ```
 
 update database character: `ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;`
@@ -658,43 +668,43 @@ update column character: `ALTER TABLE table_name CHANGE column_name column_name 
 
 ### 查看MySQL数据库服务器和数据库MySQL字符集
 
-  ```sql
-  mysql> show variables like '%char%';
-  +--------------------------+-----------------------------------------------+
-  | Variable_name            | Value                                         |
-  +--------------------------+-----------------------------------------------+
-  | character_set_client     | latin1                                        |
-  | character_set_connection | latin1                                        |
-  | character_set_database   | utf8                                          |
-  | character_set_filesystem | binary                                        |
-  | character_set_results    | latin1                                        |
-  | character_set_server     | utf8mb4                                       |
-  | character_set_system     | utf8                                          |
-  | character_sets_dir       | /data/softwares/mysql-percona/share/charsets/ |
-  +--------------------------+-----------------------------------------------+
-  8 rows in set (0.00 sec)
-  ```
+```sql
+mysql> show variables like '%char%';
++--------------------------+-----------------------------------------------+
+| Variable_name            | Value                                         |
++--------------------------+-----------------------------------------------+
+| character_set_client     | latin1                                        |
+| character_set_connection | latin1                                        |
+| character_set_database   | utf8                                          |
+| character_set_filesystem | binary                                        |
+| character_set_results    | latin1                                        |
+| character_set_server     | utf8mb4                                       |
+| character_set_system     | utf8                                          |
+| character_sets_dir       | /data/softwares/mysql-percona/share/charsets/ |
++--------------------------+-----------------------------------------------+
+8 rows in set (0.00 sec)
+```
 
 ### 查看MySQL数据表（table）的MySQL字符集
 
-  ``` sql
-  mysql> show table status from settlement like 'tableName' \G
-  *************************** 1. row ***************************
-             Name: tableName
-           Engine: InnoDB
-          Version: 10
-       Row_format: Compact
-             Rows: 33
-   Avg_row_length: 496
-      Data_length: 16384
-  Max_data_length: 0
-     Index_length: 16384
-        Data_free: 0
-   Auto_increment: 48
-      Create_time: 2015-10-09 18:46:57
-        Collation: utf8_general_ci
-  1 row in set (0.00 sec)
-  ```
+``` sql
+mysql> show table status from settlement like 'tableName' \G
+*************************** 1. row ***************************
+            Name: tableName
+          Engine: InnoDB
+        Version: 10
+      Row_format: Compact
+            Rows: 33
+  Avg_row_length: 496
+    Data_length: 16384
+Max_data_length: 0
+    Index_length: 16384
+      Data_free: 0
+  Auto_increment: 48
+    Create_time: 2015-10-09 18:46:57
+      Collation: utf8_general_ci
+1 row in set (0.00 sec)
+```
 
 ### 查看MySQL数据列（column）的MySQL字符集
 

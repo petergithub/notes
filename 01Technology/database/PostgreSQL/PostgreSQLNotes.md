@@ -4,6 +4,7 @@
 [PostgreSQL 15.7 手册](http://www.postgres.cn/docs/current/index.html)
 [PostgreSQL 中文社区 15.7 手册](http://www.postgres.cn/docs/15/index.html)
 [PostgreSQL 教程 | 菜鸟教程](https://www.runoob.com/postgresql/postgresql-tutorial.html)
+[PostgreSQL新手入门 - 阮一峰的网络日志](https://www.ruanyifeng.com/blog/2013/12/getting_started_with_postgresql.html)
 
 ## Research
 
@@ -23,16 +24,20 @@
 psql --help
 
 # 连接数据库 -U 指定用户，-d 指定数据库，-h 指定服务器，-p 指定端口
-psql -h localhost -p 5432 -U postgres --password
+psql -h localhost -p 5432 -U postgres --password -c select 1;
 
 # 直接输入密码
 PGPASSWORD=<password> psql -h localhost -p 5432 -U <username>
+
+psql -d "host=localhost port=5432 dbname=postgres connect_timeout=10"
+psql -d "postgres://postgres:password@localhost:5432/dbname"
+psql postgres://postgres:password@localhost:5432/dbname
 
 Connection options:
   -h, --host=HOSTNAME      database server host or socket directory (default: "local socket")
   -p, --port=PORT          database server port (default: "5432")
   -U, --username=USERNAME  database user name (default: "root")
-  -d, dbname --dbname=dbname
+  -d, dbname --dbname=dbname The dbname can be a connection string. If so, connection string parameters will override any conflicting command line options.
   -e, --echo-queries Copy all SQL commands sent to the server to standard output as well. This is equivalent to setting the variable ECHO to queries.
 
 
@@ -97,8 +102,17 @@ SHOW data_directory;
 IS_STANDBY=$(sudo -u postgres psql -U postgres -tAc "SELECT pg_is_in_recovery()")
 
 # 建库
-createdb -T template0 newdb
+createdb -T template0 newdb --owner OWNER
+# 删库
+dropdb newdb
+```
 
+POSTGRES_URI [PostgreSQL: Documentation: 17: 32.1. Database Connection Control Functions](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS)
+
+```sh
+postgres://username:password@localhost:5432/dbname?sslmode=disable
+postgres://<user>:<password>@localhost:5432/<database_name_1>?host=<hostname_1>
+postgresql://[userspec@][hostspec][/dbname][?paramspec]
 ```
 
 ## SQL 命令
@@ -174,13 +188,15 @@ DROP TABLE IF EXISTS backup_tbl;
 
 -- 创建数据库
 create database 数据库名 owner 所属用户 encoding UTF8;
+
 -- 注意：删库前需要关闭所有会话，不然会提示：
 -- ERROR:  database "mydb" is being accessed by other users
 -- DETAIL:  There are 8 other sessions using the database.
 drop database 数据库名;
 
--- 关闭数据库所有会话
+-- 查询数据库所有会话
 SELECT * FROM pg_stat_activity WHERE datname='test_replication_restore' AND pid<>pg_backend_pid();
+-- 关闭数据库所有会话
 SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='test_replication_restore' AND pid<>pg_backend_pid();
 
 -- 查看view 定义
@@ -276,27 +292,35 @@ GRANT ALL PRIVILEGES ON DATABASE exampledb to dbuser;
 -- Change to the target database
 -- Grant CREATE on 'public' schema to the target user
 GRANT CREATE ON SCHEMA public TO dbuser;
-grant all privileges on all tables in schema public to dbuser;
-grant all privileges on all sequences in schema public to dbuser;
-grant all privileges on all functions in schema public to dbuser;
+-- 授予用户对数据库中已经存在的所有表的查询权限
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dbuser;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dbuser;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO dbuser;
+-- 确保对新表自动授予所有权限
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO dbuser;
+
 -- 只读权限
-grant select on all tables in schema public to dbuser;
+-- 授予用户对数据库中已经存在的所有表的查询权限
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO dbuser;
+-- 确保对新表自动授予查询权限
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO dbuser;
+
 -- 修改用户只读事务属性
 ALTER USER dbuser SET default_transaction_read_only=on;
 -- 注意：其中public是指定的SCHEMA，可以根据实际情况更改。
 -- 在对应的数据库中，授予权限，如select
-GRANT USAGE, SELECT ON SCHEMA public to dbuser;
+GRANT USAGE, SELECT ON SCHEMA public TO dbuser;
 -- 指定表名只读
 GRANT SELECT ON table_name TO username;
 -- 所有表只读
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO dbuser;
 --将pgadmin模式的所有权限授权给pgadmin
-grant create,usage on schema pgadmin to pgadmin;
+GRANT CREATE,USAGE ON SCHEMA pgadmin TO pgadmin;
 
-revoke create on schema public from dbuser;
-revoke all privileges on all tables in schema public from dbuser;
-revoke all privileges on all functions in schema public from dbuser;
-revoke all privileges on all sequences in schema public from dbuser;
+REVOKE CREATE ON SCHEMA public FROM dbuser;
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM dbuser;
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public FROM dbuser;
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM dbuser;
 
 -- [PostgreSQL: Documentation: 8.0: ALTER USER](https://www.postgresql.org/docs/8.0/sql-alteruser.html)
 -- 设置超级用户
@@ -310,6 +334,7 @@ alter role dbuser valid until '2022-12-31 23:59:59';
 alter role dbuser PASSWORD 'password';
 
 -- 将 owner 转移给其他角色
+ALTER DATABASE db_name OWNER TO new_owner;
 ALTER TABLE table_name OWNER TO new_owner;
 ALTER SEQUENCE sequence_name OWNER TO new_owner;
 ALTER FUNCTION function_name OWNER TO new_owner;
@@ -340,7 +365,11 @@ revoke all on database 数据库名 from dbuser;
 drop user dbuser;
 
 SELECT * FROM pg_roles;
+```
 
+#### 检查权限
+
+```sql
 -- Check Database-Level Privileges
 SELECT datname, has_database_privilege('dbuser', datname, 'CONNECT') AS connect,
        has_database_privilege('dbuser', datname, 'CREATE') AS create,
@@ -377,23 +406,15 @@ WHERE sequence_schema NOT IN ('pg_catalog', 'information_schema');
 -- WHERE routine_schema NOT IN ('pg_catalog', 'information_schema');
 
 -- list all privileges of a role (grantee)
-SELECT table_catalog, table_schema, table_name, privilege_type
-   FROM   information_schema.table_privileges
-   WHERE  grantee = 'dbuser';
+SELECT table_catalog, table_schema, table_name, privilege_type FROM information_schema.table_privileges WHERE  grantee = 'dbuser';
 
 -- list all privileges of all roles (grantee) except someone (pg_monitor, PUBLIC)
-SELECT grantee,table_catalog, table_schema, table_name, privilege_type
-   FROM   information_schema.table_privileges
-   WHERE  grantee not in ('pg_monitor','PUBLIC');
+SELECT grantee,table_catalog, table_schema, table_name, privilege_type FROM information_schema.table_privileges WHERE grantee not in ('pg_monitor','PUBLIC');
 
 -- Table permissions:
-SELECT *
-   FROM information_schema.role_table_grants
-   WHERE grantee = 'dbuser';
+SELECT * FROM information_schema.role_table_grants WHERE grantee = 'dbuser';
 -- Ownership
-SELECT *
-   FROM pg_tables
-   WHERE tableowner = 'dbuser';
+SELECT * FROM pg_tables WHERE tableowner = 'dbuser';
 
 -- Schema permissions
 SELECT r.usename AS grantor,
@@ -427,21 +448,82 @@ mail=# select grantee, privilege_type from information_schema.role_table_grants 
  mailreader   |  REFERENCES
  mailreader   |  TRIGGER
 (7 rows)
+
+-- 查询特定模式的默认权限
+SELECT
+    n.nspname AS schema_name,
+    pg_get_userbyid(d.defaclrole) AS role_name,
+    d.defaclacl AS default_privileges
+FROM
+    pg_default_acl d
+JOIN
+    pg_namespace n ON d.defaclnamespace = n.oid
+WHERE
+    n.nspname = 'public';
+
+ schema_name | default_privileges
+-------------+--------------------
+ public      | {dbuser=r/postgres}
+(1 row)
+
+-- 默认权限存储在 defaclacl 列中，格式为 ACL 字符串。ACL 字符串的格式如下：
+-- role_name=privileges/grantor
+-- role_name：角色名称（用户或组）。
+-- privileges：权限字符串，如 r 表示 SELECT，w 表示 UPDATE 等。
+-- grantor：授予权限的角色名称。
+-- 例如：
+-- user_read=r/user_admin 表示用户 user_read 被授予了 SELECT 权限，由 user_admin 授予。
+
+-- 查询特定模式 public 和 指定用户 dbuser 的默认权限
+SELECT
+    n.nspname AS schema_name,
+    pg_get_userbyid(d.defaclrole) AS role_name,
+    d.defaclacl AS default_privileges
+FROM
+    pg_default_acl d
+JOIN
+    pg_namespace n ON d.defaclnamespace = n.oid
+WHERE
+    n.nspname = 'public' and EXISTS (
+        SELECT 1
+        FROM unnest(d.defaclacl) AS acl
+        WHERE acl::text LIKE '%dbuser%'
+    );
 ```
 
 #### 创建只读账号
 
 ```sql
--- 创建一个用户名为<readonlyuser>，密码为<your_password>的用户
-CREATE USER <readonlyuser> WITH ENCRYPTED PASSWORD '<your_password>';
+-- 创建一个用户名为 readonly_user，密码为<your_password>的用户
+CREATE USER readonly_user WITH ENCRYPTED PASSWORD '<your_password>';
 -- 修改用户只读事务属性
-ALTER USER <readonlyuser> SET default_transaction_read_only=on;
--- 设置USAGE权限给到<readonlyuser>
-GRANT USAGE ON SCHEMA public to <readonlyuser>;
+ALTER USER readonly_user SET default_transaction_read_only=on;
+-- 设置USAGE权限给到readonly_user
+GRANT USAGE ON SCHEMA public TO readonly_user;
+
 -- 注意：其中public是指定的SCHEMA，可以根据实际情况更改。
 -- 4、在对应的数据库中，授予权限，如select
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO <readonlyuser>;
+-- 切换到指定数据库
+\c mydatabase
+-- 授予用户对数据库中已经存在的所有表的查询权限
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly_user;
+-- 确保对新表自动授予查询权限
+-- 切换到数据库的 owner 执行
+SET ROLE owner_of_db;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly_user;
+
+-- 使用其他 role 身份
+SET ROLE readonly_user;
+
+-- 删除只读账号前先回收所有权限
+REVOKE ALL on DATABASE tmp_ems_test FROM readonly_user;
+REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM readonly_user;
+-- 删除只读账号
+DROP USER readonly_user;
 ```
+
+Postgres 默认用户能看到所有数据库名称，参考 [postgresql - Postgres Server access restricted to only one database from list of databases - Database Administrators Stack Exchange](https://dba.stackexchange.com/questions/7637/postgres-server-access-restricted-to-only-one-database-from-list-of-databases)
+可以通过配置 `pg_hba.conf` 来限制用户看到的列表。
 
 ### 字符串操作
 
@@ -1283,6 +1365,12 @@ cmax, 删除该元组的命令在事务中的命令序列号.
 
 死锁检测的触发实现在 ProcSleep() 函数中。这是进程被阻塞而进入睡眠时的函数：
 
+## 分表
+
+[PostgreSQL分表实践 - 张驰的博客 | Leasy Blog](https://leasyzhang.github.io/2019/12/20/postgres-table-partition/)
+
+[纯干货！一文学会 PostgreSQL 实现表分区的方法\_\_纯干货！一文学会 PostgreSQL 实现表分区的方法: 世界上功能最强大的开源数据库...](http://www.postgres.cn/v2/news/viewone/1/712)
+
 ## 安装和配置管理
 
 [PostgreSQL 数据库日志与日常巡检](https://cloud.tencent.com/developer/article/2315309)
@@ -1470,7 +1558,7 @@ SET enable_seqscan = 'off';
 [PostgreSQL: Documentation: 16: pg_dump](https://www.postgresql.org/docs/16/app-pgdump.html)
 
 ```sh
-pg_dump -h localhost -p 5432 -U postgres --clean --if-exists --create --column-inserts -d database_name -t table_name -f save_sql.sql
+pg_dump -h localhost -p 5432 -U postgres --clean --if-exists --create --column-inserts -d database_name -t table_name1 -t table_name2 -f save_sql.sql
 -- 备份postgres库并tar打包
 pg_dump -h 127.0.0.1 -p 5432 -U postgres -d database_name -Ft -f postgres.sql.tar
 
@@ -1485,7 +1573,7 @@ pg_dump -U username database_name | gzip > /tmp/backup.gz
 ```
 
 1. `--column-inserts` 以带有列名的 `INSERT` 命令形式转储数据。This will **make restoration very slow**; it is mainly useful for making dumps that can be loaded into non-PostgreSQL databases
-2. `-t` --只转储指定名称的表
+2. `-t, --table=table` --只转储指定名称的表, Multiple tables can be selected by writing multiple -t switches.
 3. `-f` --指定输出文件或目录名
 4. `-F` format, --format=format Selects the format of the output. format can be one of the following:
     1. `p`, plain: Output a plain-text SQL script file (the default).
@@ -1494,7 +1582,7 @@ pg_dump -U username database_name | gzip > /tmp/backup.gz
 5. `-c, --clean` Output commands to DROP all the dumped database objects prior to outputting the commands for creating them.
 6. `--if-exists` Use `DROP ... IF EXISTS` commands to drop objects in `--clean` mode
 7. `-C, --create` create the database itself and reconnect to the created database
-8. `-t pattern, --table=pattern` Dump only tables with names matching pattern. 可以使用多个-t选项匹配多个表。
+8. `-t pattern, --table=pattern` Dump only tables with names matching pattern. 可以使用多个-t选项匹配多个表。`-t 'detroit.emp*'`
 9. `-T pattern, --exclude-table=pattern` Do not dump any tables matching pattern.
 10. `-O, --no-owner` Do not output commands to set ownership of objects to match the original database.
 11. `--data-only`: Backs up only the data, excluding the database schema.
@@ -1567,8 +1655,8 @@ pg_restore -v -l -f /tmp/list1 /tmp/test_replication.dump
 # 恢复 日志输出到 /tmp/restore.log
 pg_restore -h localhost -p 5432 -U postgres -d dbname --clean --if-exists -v pg.dump > /tmp/restore.log 2>&1
 
-# 管道恢复
-pg_dump -h localhost -p 5432 -U postgres -Fc -d test_replication | pg_restore -h localhost -p 5432 -U postgres --clean --if-exists -v -d test_replication_restore
+# 管道恢复 过滤表
+pg_dump -h localhost -p 5432 -U postgres -Fc -d test_replication --table='sys*' --exclude-table='sys_job*' | pg_restore -h localhost -p 5432 -U postgres --clean --if-exists -v --single-transaction -d test_replication_restore
 
 # 使用并行作业恢复
 pg_restore -U username -j 4 -d target_database backup_file
@@ -1577,6 +1665,7 @@ pg_restore -U username -j 4 -d target_database backup_file
 - `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
 - `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
 - `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
+                  **When this option is used, the database named with -d is used only to issue the initial DROP DATABASE and CREATE DATABASE commands. All data is restored into the database name that appears in the archive.**
 - `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
 - `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
 - `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
@@ -1602,10 +1691,14 @@ pg_dump -d old_db -t table_name | gzip > /tmp/backup.gz
 # 逻辑恢复 先恢复全局对象
 psql -c globals.backup.sql
 # pg_restore 恢复数据库
-pg_restore -h localhost -p 5432 -U postgres -d old_db -v /path/to/old_db.dump
+pg_restore -h localhost -p 5432 -U postgres -d old_db -v --single-transaction /path/to/old_db.dump
 
 # To reload an archive file into the same database it was dumped from, discarding the current contents of that database
-pg_restore -d newDb --clean --create old_db.dump
+pg_restore -d old_db --clean --create old_db.dump
+
+# 恢复到新库
+createdb new_db --owner=OWNER
+pg_restore -d new_db old_db.dump
 ```
 
 #### 物理备份与恢复
@@ -1791,7 +1884,7 @@ sudo systemctl status postgresql
 
 ```
 
-#### 安装 pg_stat_statements 模块开启慢查询统计
+#### slow sql monitor 安装 pg_stat_statements 模块开启慢查询统计
 
 [PostgreSQL 16: F.32. pg_stat_statements — track statistics of SQL planning and execution](https://www.postgresql.org/docs/16/pgstatstatements.html#PGSTATSTATEMENTS-CONFIG-PARAMS)
 [PostgreSQL安装pg_stat_statements模块开启慢查询统计 | BoobooWei](https://www.toberoot.com/news/2020/04/23/tec-pg-md/index.html)
@@ -1822,14 +1915,15 @@ su - postgres
 pg_ctl -D $PGDATA reload
 
 
-# 创建 extension
+# 创建 extension：需要 superuser 权限的用户
 # 由于pg_stat_statements针对的是数据库级别，所以需要首先进入指定数据库
 psql
 \l
 \c test01
 create extension pg_stat_statements;
 
-psql -c -d dbName "create extension pg_stat_statements;"
+psql -d dbName -c "create extension pg_stat_statements;"
+psql -d dbName -c "GRANT pg_read_all_stats TO username WITH INHERIT TRUE;"
 
 \df
 ```
@@ -2623,6 +2717,19 @@ slot_name             |
 sender_host           | db01
 sender_port           | 5432
 conninfo              | user=replica password=******** channel_binding=disable dbname=replication host=db01 port=5432 fallback_application_name=walreceiver sslmode=disable sslcompression=0 sslcertmode=disable sslsni=1 ssl_min_protocol_version=TLSv1.2 gssencmode=disable krbsrvname=postgres gssdelegation=0 target_session_attrs=any load_balance_hosts=disable
+
+
+# 查看复制槽信息
+SELECT slot_name, active, restart_lsn, confirmed_flush_lsn FROM pg_replication_slots;
+select pg_current_wal_lsn();
+
+select * from pg_stat_replication;
+
+# 查看当前正在写的文件
+select pg_walfile_name(pg_current_wal_lsn());
+
+# 查看未归档的 WAL 文件：
+SELECT * FROM pg_stat_archiver;
 ```
 
 #### PostgreSQL Replication Switchover
@@ -3006,6 +3113,18 @@ Patroni 是一个基于 Python 的高可用解决方案，利用 etcd、Consul �
 - 没有实现对VIP的管理，如果要实现VIP的管理，需要自己写脚本来实现
 - 复杂性：需要配置和管理多个组件（如 etcd、Consul 或 ZooKeeper）。
 - 资源消耗：额外的组件会增加系统资源消耗和运维复杂度。
+
+## PostgresSQL monitor
+
+### Prometheus 和 Grafana
+
+[PostgreSQL 教程: PostgreSQL 监控 - Redrock Postgres](https://www.rockdata.net/zh-cn/tutorial/postgres-monitoring/)
+
+[PostgreSQL 教程: 使用 Prometheus 和 Grafana 监控 PostgreSQL - Redrock Postgres](https://www.rockdata.net/zh-cn/tutorial/monitor-with-prometheus-and-grafana/)
+
+### Zabbix
+
+[Setting up Zabbix Agent 2 for PostgreSQL monitoring and revealing how it works - Zabbix Blog](https://blog.zabbix.com/setting-up-zabbix-agent-2-for-postgresql-monitoring-and-revealing-how-it-works/13208/)
 
 ## MySQL 与 PostgreSQL 之间的区别
 
