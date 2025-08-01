@@ -3,7 +3,7 @@
 version kafka_2.13-3.8.0
 
 [Apache Kafka quickstart](https://kafka.apache.org/quickstart)
-[Apache Kafka documentation](https://kafka.apache.org/documentation/)
+[Apache Kafka documentation 3.8](https://kafka.apache.org/38/documentation.html)
 [Apache Kafka downloads](https://kafka.apache.org/downloads)
 
 [使用kafka kraft模式安装kafka集群，不再依赖 zookeeper 集群 - 哈喽哈喽111111 - 博客园](https://www.cnblogs.com/hahaha111122222/p/17611504.html)
@@ -191,14 +191,28 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --gro
 
 --reset-offsets also has the following scenarios to choose from (at least one scenario must be selected):
 
-* --to-datetime <String: datetime> : Reset offsets to offsets from datetime. Format: 'YYYY-MM-DDTHH:mm:SS.sss'
-* --to-earliest : Reset offsets to earliest offset.
-* --to-latest : Reset offsets to latest offset.
-* --shift-by <Long: number-of-offsets> : Reset offsets shifting current offset by 'n', where 'n' can be positive or negative.
-* --from-file : Reset offsets to values defined in CSV file.
-* --to-current : Resets offsets to current offset.
-* --by-duration <String: duration> : Reset offsets to offset by duration from current timestamp. Format: 'PnDTnHnMnS'
-* --to-offset : Reset offsets to a specific offset.
+- --to-datetime <String: datetime> : Reset offsets to offsets from datetime. Format: 'YYYY-MM-DDTHH:mm:SS.sss'
+- --to-earliest : Reset offsets to earliest offset.
+- --to-latest : Reset offsets to latest offset.
+- --shift-by <Long: number-of-offsets> : Reset offsets shifting current offset by 'n', where 'n' can be positive or negative.
+- --from-file : Reset offsets to values defined in CSV file.
+- --to-current : Resets offsets to current offset.
+- --by-duration <String: duration> : Reset offsets to offset by duration from current timestamp. Format: 'PnDTnHnMnS'
+- --to-offset : Reset offsets to a specific offset.
+
+### Kafka 消息时间戳
+
+Kafka 消息时间戳与系统时间的关系
+
+- 事件时间（Event Time）：如果 Kafka 配置为使用事件时间（create.time），那么消息的时间戳将由生产者设置。生产者可以设置任意时间戳，因此消息的时间戳可能与 Kafka Broker 的系统时间不一致。配置项 `message.timestamp.type=CreateTime`,默认项
+- 时间记录（Log Append Time）：如果 Kafka 配置为使用记录时间（log.append.time），那么消息的时间戳将直接基于 Kafka Broker 的系统时间。在这种情况下，消息的时间戳与 Broker 的系统时间是一致的。配置项 `message.timestamp.type=LogAppendTime`
+
+在 server.properties 文件中设置 `message.timestamp.type`, 通过命令行查看当前配置
+
+```sh
+# ./kafka-configs.sh --bootstrap-server <broker-host>:<port> --entity-type brokers --entity-name <broker-id> --all --describe
+kafka-configs.sh --bootstrap-server localhost:9092 --entity-type brokers --entity-name 0 --all --describe | grep message.timestamp.type
+```
 
 ## kafka Java client
 
