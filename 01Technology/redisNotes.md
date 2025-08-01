@@ -72,7 +72,6 @@ Redis高并发架构设计与源码剖析课程内容：
 `db3:keys=52,expires=52,avg_ttl=1735032446`
 EvictedKeys 因内存满而淘汰的key总数
 
-`redis-cli -h host -p 6379 -n 2 --raw` 展示中文
 
 ## Performance
 
@@ -199,8 +198,15 @@ get all config `config get *`
 [Redis CLI | Docs](https://redis.io/docs/latest/develop/tools/cli)
 
 ```sh
-src/redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>
+redis-cli -h 127.0.0.1 -p 6379 -a <password> -n <dbNumber>
 redis-cli -h <host> -p <port> -a <pwd> -n <db>
+redis-cli -h localhost -p 6379
+AUTH default YOUR_ACTUAL_PLAIN_TEXT_PASSWORD
+
+redis-cli -h localhost -p 6379 -a "YOUR_ACTUAL_PLAIN_TEXT_PASSWORD"
+
+# password is: p@ssword, escape @ with %40
+redis-cli -u "redis://default:p%40ssword@localhost:6379/4"
 ```
 
 * `-r 4`: repeat 4 times
@@ -208,6 +214,20 @@ redis-cli -h <host> -p <port> -a <pwd> -n <db>
 * `--raw`：输出原始格式，不进行格式化。存储中文后，get之后显示16进制的字符串 `\xe4\xb8\xad\xe5\x9b\xbd`，加上 `--raw` ，汉字即可显示正常。
 * `--scan`：使用 SCAN 命令来迭代数据库中的键。
 * `--eval`：在 Redis 服务器上执行 Lua 脚本。
+
+`redis-cli -h host -p 6379 -n 2 --raw` 展示中文
+
+Redis connection URI:
+
+```sh
+# default user is: default
+redis://[username:]password@<hostname_1>:<port>/1
+
+# [Redis URI and connection details · redis/lettuce Wiki](https://github.com/redis/lettuce/wiki/Redis-URI-and-connection-details)
+redis :// [[username :] password@] host [:port][/database]
+          [?[timeout=timeout[d|h|m|s|ms|us|ns]] [&clientName=clientName]
+          [&libraryName=libraryName] [&libraryVersion=libraryVersion] ]
+```
 
 ### 常规操作命令
 
