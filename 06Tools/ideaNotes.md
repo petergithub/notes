@@ -108,32 +108,32 @@ PARAMS groovyScript("_1.collect{it}.join(',')", methodParameters())
 
 ## Plugins
 
-* [Maven Helper](https://plugins.jetbrains.com/plugin/7179-maven-helper)
-* [MyBatisX Plugin](https://plugins.jetbrains.com/plugin/10119-mybatisx)
-* [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
-* [Smart Tomcat](https://plugins.jetbrains.com/plugin/9492-smart-tomcat)
-* [IdeaVimExtension](https://plugins.jetbrains.com/plugin/9615-ideavimextension): switch to English input method in normal mode and restore input method in insert mode.
-* [GsonFormatPlus : 把json格式的内容转成Object](https://plugins.jetbrains.com/plugin/14949-gsonformatplus)
-* [Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
-* [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\` `Command+back slash`
-* [RestfulToolkit-fix](https://plugins.jetbrains.com/plugin/16788-restfultoolkit-fix)
-* [Rainbow Brackets Lite](https://plugins.jetbrains.com/plugin/20710-rainbow-brackets-lite--free-and-opensource)
-* [HighlightBracketPair](https://plugins.jetbrains.com/plugin/17320-highlightbracketpair)
-* [Grep Console: highlight the editor - nice for analyzing logs](https://plugins.jetbrains.com/plugin/7125-grep-console)
-* [String Manipulation](https://plugins.jetbrains.com/plugin/2162-string-manipulation)
-* [GenerateO2O](https://plugins.jetbrains.com/plugin/7171-generateo2o)
-* GenerateAllSetter
-* JRebel and XRebel: 热部署插件
-* [JRebel and XRebel](https://plugins.jetbrains.com/plugin/4441-jrebel-and-xrebel)
-* .env files support: 把.env文件中的内容给放到项目运行的环境变量中去
-* SequenceDiagram: 梳理代码逻辑，绘制时序图
-* Tabnine: AI code assistant
-* Codeium: Tab 键接受; 使用 ⌥ + ] 和 ⌥ + 来切换备选建议
-* [Continue](https://plugins.jetbrains.com/plugin/22707-continue)
-* Spring Assistant
-* [Spring Boot Assistant](https://plugins.jetbrains.com/plugin/17747-spring-boot-assistant)
-* [SonarQube for IDE](https://plugins.jetbrains.com/plugin/7973-sonarqube-for-ide)
-* [jclasslib bytecode viewer 查看字节码](https://plugins.jetbrains.com/plugin/9248-jclasslib)
+- [Maven Helper](https://plugins.jetbrains.com/plugin/7179-maven-helper)
+- [MyBatisX Plugin](https://plugins.jetbrains.com/plugin/10119-mybatisx)
+- [Key Promoter X](https://plugins.jetbrains.com/plugin/9792-key-promoter-x)
+- [Smart Tomcat](https://plugins.jetbrains.com/plugin/9492-smart-tomcat)
+- [IdeaVimExtension](https://plugins.jetbrains.com/plugin/9615-ideavimextension): switch to English input method in normal mode and restore input method in insert mode.
+- [GsonFormatPlus : 把json格式的内容转成Object](https://plugins.jetbrains.com/plugin/14949-gsonformatplus)
+- [Request mapper](https://plugins.jetbrains.com/plugin/9567-request-mapper): `Command+Shift+Back slash` quick navigation to url mapping declaration
+- [RestfulToolkit](https://plugins.jetbrains.com/plugin/10292-restfultoolkit) `Command+\` `Command+back slash`
+- [RestfulToolkit-fix](https://plugins.jetbrains.com/plugin/16788-restfultoolkit-fix)
+- [Rainbow Brackets Lite](https://plugins.jetbrains.com/plugin/20710-rainbow-brackets-lite--free-and-opensource)
+- [HighlightBracketPair](https://plugins.jetbrains.com/plugin/17320-highlightbracketpair)
+- [Grep Console: highlight the editor - nice for analyzing logs](https://plugins.jetbrains.com/plugin/7125-grep-console)
+- [String Manipulation](https://plugins.jetbrains.com/plugin/2162-string-manipulation)
+- [GenerateO2O](https://plugins.jetbrains.com/plugin/7171-generateo2o)
+- GenerateAllSetter
+- JRebel and XRebel: 热部署插件
+- [JRebel and XRebel](https://plugins.jetbrains.com/plugin/4441-jrebel-and-xrebel)
+- .env files support: 把.env文件中的内容给放到项目运行的环境变量中去
+- SequenceDiagram: 梳理代码逻辑，绘制时序图
+- Tabnine: AI code assistant
+- Codeium: Tab 键接受; 使用 ⌥ + ] 和 ⌥ + 来切换备选建议
+- [Continue](https://plugins.jetbrains.com/plugin/22707-continue)
+- Spring Assistant
+- [Spring Boot Assistant](https://plugins.jetbrains.com/plugin/17747-spring-boot-assistant)
+- [SonarQube for IDE](https://plugins.jetbrains.com/plugin/7973-sonarqube-for-ide)
+- [jclasslib bytecode viewer 查看字节码](https://plugins.jetbrains.com/plugin/9248-jclasslib)
 
 ### Vim
 
