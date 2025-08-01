@@ -95,21 +95,26 @@ done
 
 #### tag
 
-`git tag <tagName> -m "comment"`
-`git tag -a <tagName> <commit-id>`
-`git tag -d <tagname>`    刪除Tag
-`git show <tagName>`    查看相应标签的版本信息，并连同显示打标签时的提交对象
-`git tag -n9` list all the tags along with annotations & 9 lines of message for every tag
+```sh
+git tag <tagName> -m "comment"
+git tag -a <tagName> <commit-id>
+git tag -d <tagname>    # 刪除Tag
+git show <tagName>    # 查看相应标签的版本信息，并连同显示打标签时的提交对象
+git tag -n9    # list all the tags along with annotations & 9 lines of message for every tag
 
-`git checkout -b <branchName> <tagName>`
+git checkout -b <branchName> <tagName>
 
-`git push origin tagName`
-`git push origin --tags`: 推送refs/tags/* 一次性推送很多标签
-`git push origin :refs/tags/<tagName>`    刪除Tag from remote Git repositories
+git push origin tagName
+git push origin --tags # 推送refs/tags/* 一次性推送很多标签
+git push origin :refs/tags/<tagName>  # 刪除 Tag from remote Git repositories
 
-Remove local git tags that are no longer on the remote repository
-    `git fetch --prune --prune-tags`
-    `git fetch --prune origin "+refs/tags/*:refs/tags/*"`
+# 批量推送删除本地已删除的 Tag
+git push origin --delete tagName1 tagName2
+
+# Remove local git tags that are no longer on the remote repository
+git fetch --prune --prune-tags
+git fetch --prune origin "+refs/tags/*:refs/tags/*"
+```
 
 通过 tagopt 配置若依仓库不拉取tag，本地仓库拉取tag，
 通过 prune 和 pruneTags 随时更新删除掉的tag
@@ -221,7 +226,7 @@ Multiple Points
 Triple Dot
 `git log master...experiment` which specifies all the commits that are reachable by either of two references but not by both of them
 
-## Skills
+## Usage examples
 
 ### restore flies
 
