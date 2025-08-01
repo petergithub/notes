@@ -86,6 +86,70 @@ ssh -p port root@server2
 
 ssh-agent的工作是依赖于环境变量 `SSH_AUTH_SOCK` 和 `SSH_AGENT_PID`
 
+## ssh config
+
+OpenSSH 配置解析器会忽略重复的指令；只有第一个这样的指令才会生效。
+the OpenSSH configuration parser ignores duplicate directives; only the first such directive has any effect
+
+### Jumphost
+
+Bastion host 堡垒机 跳板机
+
+[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/ )
+
+Jumphosts are used as intermediate hops between your actual SSH target and yourself. Instead of using something like "unsecure" SSH agent forwarding, you can use ProxyCommand to proxy all your commands through your jumphost.
+You want to connect to HOST B and have to go through HOST A, because of firewalling, routing, access privileges
+
+```text
++---+       +---+       +---+
+|You|   ->  | A |   ->  | B |
++---+       +---+       +---+
+```
+
+Classic SSH Jumphost configuration
+
+### ProxyCommand
+
+A configuration like this will allow you to proxy through HOST A.
+
+```sh
+# $ cat .ssh/config
+Host host-a
+    Hostname 10.0.0.5
+    User your_username
+
+Host host_b
+    Hostname 192.168.0.1
+    User your_username
+    Port 22
+    ProxyCommand ssh -q -W %h:%p host-a
+```
+
+Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that is the `ProxyCommand` being executed) and start the SSH session to your actual target.
+
+SSH Jumphost configuration with netcat (nc)
+Alternatively, if you can't/don't want to use ssh to tunnel your connections, you can also use nc (netcat).
+configure it in ./ssh/config with `ProxyCommand`
+`ProxyCommand ssh host-a nc -w 120 %h %p`
+
+If netcat is not available to you as a regular user, because permissions are limited, you can prefix it with sudo
+`ProxyCommand ssh host-a sudo nc -w 120 %h %p`
+
+### ProxyJump
+
+Starting from OpenSSH 7.3, released August 2016, ssh support ProxyJump
+
+`ssh -J host1,host2,host3 user@host4.internal` A key thing to understand here is that this is not the same as ssh host1 then user@host1:~$ ssh host2, the -J jump parameter uses forwarding trickery so that the localhost is establishing the session with the next host in the chain.
+
+``` bash
+Host host2
+    HostName 172.17.1.172
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+    #ProxyCommand ssh -q -W %h:%p jump
+    ProxyJump jump
+```
+
 ## Troubleshooting sshd
 
 [OpenSSH Configuring](https://help.ubuntu.com/community/SSH/OpenSSH/Configuring)
@@ -145,11 +209,28 @@ vim .ssh/config 打开SSH的配置文件,添加下面两行到其中
 - 反向代理（-R）：相当于 frp 或者 ngrok
 - socks5 代理（-D）：相当于 ss/ssr
 
+AutoSSH 能让 SSH 隧道一直保持执行，他会启动一个 SSH 进程，并监控该进程的健康状况
+
+```sh
+apt-get install autossh
+
+# ssh 换成了 autossh, 并且少了 -f 参数，原因是 autossh 默认会转入后台运行
+autossh -N -R 8080:127.0.0.1:8080 username@12.34.56.78
+```
+
 ### 动态转发
 
 - `ssh -D <local port> <SSH Server>`    动态转发 如果SSH Server是境外服务器, 则该SOCKS代理实际上具备了翻墙功能
 - `ssh -D 7070 remoteServer -gfNT` Dynamic forward all the connection by SOCKS
 - `ssh -D 7070 -l username proxy.remotehost.com -gfNT -o ProxyCommand="connect -H web-proxy.oa.com:8080 %h %p "` 给ssh连接增加http代理, 如果你的PC无法直接访问到ssh服务器上，但是有http代理可以访问，那么可以为建立这个socks5的动态端口转发加上一个代理. 其中ProxyCommand指定了使用`connect`程序(`sudo apt-get install connect-proxy`)来进行代理。通常还可以使用corkscrew来达到相同的效果。
+
+```sh
+# 设置个 function 来配置动态转发
+portFowardDynamic () {
+  kill $(ps -ef | grep 'ssh -fNT -D 7070' | grep -v grep | awk '{print $2}') 2> /dev/null
+  ssh -fNT -D 7070 $1
+}
+```
 
 ### 本地端口转发
 
@@ -168,7 +249,7 @@ example 1: 通过 host3 的端口转发, ssh通过连接 localhost 登录 host2
 example 2: 通过 host3 的端口转发, local 通过连接 localhost:9001 访问 host2:80
 
 1. `ssh -gfNTL 9001:host2:80 host3` 在本机执行(建议使用参数 `ssh -gfNTL`)
-2. `curl localhost:9001` ssh登录本机的9001端口, 相当于连接host2的22端口
+2. `curl localhost:9001` curl 本机的9001端口, 相当于连接host2的9001端口
 
 ### 远程端口转发
 
@@ -180,65 +261,6 @@ localhost与remoteSecret之间无法连通, 必须借助remoteHost转发, 不过
 2. `ssh -p localPort localhost`    #在localhost上SSH本机localPort, 即连接上了remoteSecret
 
 `ssh -R <localhost>:<local port>:<remote host>:<remote port> <SSH hostname>`    #远程端口转发remote forwarding
-
-## Jumphost
-
-Bastion host 堡垒机 跳板机
-
-[How To Use A Jumphost in your SSH Client Configurations](https://ma.ttias.be/use-jumphost-ssh-client-configurations/ )
-
-Jumphosts are used as intermediate hops between your actual SSH target and yourself. Instead of using something like "unsecure" SSH agent forwarding, you can use ProxyCommand to proxy all your commands through your jumphost.
-You want to connect to HOST B and have to go through HOST A, because of firewalling, routing, access privileges
-
-```text
-+---+       +---+       +---+
-|You|   ->  | A |   ->  | B |
-+---+       +---+       +---+
-```
-
-Classic SSH Jumphost configuration
-
-### ProxyCommand
-
-A configuration like this will allow you to proxy through HOST A.
-
-```sh
-# $ cat .ssh/config
-Host host-a
-    Hostname 10.0.0.5
-    User your_username
-
-Host host_b
-    Hostname 192.168.0.1
-    User your_username
-    Port 22
-    ProxyCommand ssh -q -W %h:%p host-a
-```
-
-Now if you want to connect to your HOST B, all you have to type is `ssh host_b`, which will first connect to `host-a` in the background (that is the `ProxyCommand` being executed) and start the SSH session to your actual target.
-
-SSH Jumphost configuration with netcat (nc)
-Alternatively, if you can't/don't want to use ssh to tunnel your connections, you can also use nc (netcat).
-configure it in ./ssh/config with `ProxyCommand`
-`ProxyCommand ssh host-a nc -w 120 %h %p`
-
-If netcat is not available to you as a regular user, because permissions are limited, you can prefix it with sudo
-`ProxyCommand ssh host-a sudo nc -w 120 %h %p`
-
-### ProxyJump
-
-Starting from OpenSSH 7.3, released August 2016, ssh support ProxyJump
-
-`ssh -J host1,host2,host3 user@host4.internal` A key thing to understand here is that this is not the same as ssh host1 then user@host1:~$ ssh host2, the -J jump parameter uses forwarding trickery so that the localhost is establishing the session with the next host in the chain.
-
-``` bash
-Host host2
-    HostName 172.17.1.172
-    Port 22
-    IdentityFile ~/.ssh/id_rsa
-    #ProxyCommand ssh -q -W %h:%p jump
-    ProxyJump jump
-```
 
 ## 创建Kerberos的keytab文件
 
@@ -258,38 +280,6 @@ trace kinit with `KRB5_TRACE=/dev/stdout kinit username`
 
 - `yes | pv | ssh $host "cat > /dev/null"`    实时SSH网络吞吐量测试 通过SSH连接到主机, 显示实时的传输速度, 将所有传输数据指向/dev/null, 需要先安装pv.Debian(apt-get install pv) Fedora(yum install pv)
 - `yes | pv | cat > /dev/null`
-
-## pssh pscp.pssh prsync 批量操作
-
-[How to use parallel ssh (PSSH) for executing commands in parallel on a number of Linux/Unix/BSD servers - nixCraft](https://www.cyberciti.biz/cloud-computing/how-to-use-pssh-parallel-ssh-program-on-linux-unix/)
-
-pssh is a program for executing ssh in parallel on a number of hosts.
-
-- `pssh -ih /path/to/host.txt date` Pass list of hosts using a file
-- `pssh -iH "host1 host2" date` Pass list of hosts manually
-- `pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
-
-- `pscp -H "worker01 worker02" /etc/containerd/config.toml  /etc/containerd/`
-- `prsync -h ~/.pssh_hosts_files *.html /var/www/html/` use the prsync command for efficient copy
-- `pnuke -h .pssh_hosts_files process_name` kill processes in parallel
-- `pslurp -h my-hosts.txt -L /tmp/output/ /etc/hosts hosts` Using parallel-slurp for downloading files in parallel. This command would copy the file /etc/hosts from each host listed in the my-hosts.txt file to the directory /tmp/output/. The files would be renamed to `hosts` on the machine stated in the my-hosts.txt file.
-
-```sh
-# pssh_hosts_files 文件格式
-cat ~/.pssh_hosts_files
-vivek@dellm6700
-root@192.168.2.30
-root@192.168.2.45
-root@192.168.2.46
-```
-
-options
-
-- Using `-o` or `--outdir` you can save standard output to files
-- Using `-e` or `--errdir` you can save standard error to files
-- `-i, --inline` Display standard output and standard error as each host completes.
-- `-h host_file, --hosts host_file` Read hosts from the given host_file.
-- `-H, --host "[user@]host[:port] [ [user@]host[:port ] ... ]"` Add the given host strings to the list of hosts.
 
 ## scp
 
@@ -322,3 +312,64 @@ Windows的控制台会把两个双引号之间的字符串作为一个参数传�
 所以错误命令`C:\>plink 192.168.6.200 ls "-l"`
 Windows控制台不认得单引号, 所以上面那个命令的正确用法应该是:
 `c:\>plink 192.168.6.200 ls '-l'`
+
+## Xshell
+
+问题：Alt + . shortcut doesn't work in xshell
+解决1：`Alt + . (alt + dot)` Alt key is used for opening the File menu by default. To use the Alt key as meta key, you have to enable the Use Alt key as Meta key option in the Properties > Keyboard page.
+解决2：`Esc + . (escape + dot)`
+
+问题：xshell right click paste
+
+To configure xterm-like copy and paste:
+
+Tools > Options > Termial tab > Mouse > Right button > Paste the clipboard contents
+Tools > Options > Termial tab > Selection > Copy selected text to the clipboard automatically.
+
+Note
+
+The xterm program copies text to the clipboard automatically when the user selects text, and it pastes the clipboard contents to the terminal on mid-click.
+
+## pssh pscp.pssh prsync 批量操作
+
+[How to use parallel ssh (PSSH) for executing commands in parallel on a number of Linux/Unix/BSD servers - nixCraft](https://www.cyberciti.biz/cloud-computing/how-to-use-pssh-parallel-ssh-program-on-linux-unix/)
+
+```sh
+sudo apt install pssh
+# he command names may be different between Linux distro version. Here is how it looks on the Ubuntu
+dpkg -L pssh | grep bin
+# /usr/bin
+# /usr/bin/parallel-nuke
+# /usr/bin/parallel-rsync
+# /usr/bin/parallel-scp
+# /usr/bin/parallel-slurp
+# /usr/bin/parallel-ssh
+```
+
+options
+
+- Using `-o` or `--outdir` you can save standard output to files
+- Using `-e` or `--errdir` you can save standard error to files
+- `-i, --inline` Display standard output and standard error as each host completes.
+- `-h host_file, --hosts host_file` Read hosts from the given host_file.
+- `-H, --host "[user@]host[:port] [ [user@]host[:port ] ... ]"` Add the given host strings to the list of hosts.
+
+pssh is a program for executing ssh in parallel on a number of hosts.
+
+- `pssh -ih /path/to/host.txt date` Pass list of hosts using a file
+- `pssh -iH "host1 host2" date` Pass list of hosts manually
+- `pssh -i -o /tmp/out/ -H "10.43.138.2 10.43.138.3 10.43.138.9" -l root date` Storing the STDOUT
+
+- `pscp -H "worker01 worker02" /etc/containerd/config.toml  /etc/containerd/`
+- `prsync -h ~/.pssh_hosts_files *.html /var/www/html/` use the prsync command for efficient copy
+- `pnuke -h .pssh_hosts_files process_name` kill processes in parallel
+- `pslurp -h my-hosts.txt -L /tmp/output/ /etc/hosts hosts` Using parallel-slurp for downloading files in parallel. This command would copy the file /etc/hosts from each host listed in the my-hosts.txt file to the directory /tmp/output/. The files would be renamed to `hosts` on the machine stated in the my-hosts.txt file.
+
+```sh
+# pssh_hosts_files 文件格式
+cat ~/.pssh_hosts_files
+vivek@dellm6700
+root@192.168.2.30
+root@192.168.2.45
+root@192.168.2.46
+```

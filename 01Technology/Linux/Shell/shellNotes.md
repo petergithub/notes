@@ -1,10 +1,17 @@
 # shell
 
 [Advanced Bash-Scripting Guide](http://tldp.org/LDP/abs/html/index.html)
+[Shell Command Language](https://pubs.opengroup.org/onlinepubs/007908775/xcu/chap2.html)
 [Shell 教程](https://www.runoob.com/linux/linux-shell.html)
 
-`cat /etc/shells` get all available shells
-`xargs echo`
+```sh
+# stderr > stdout
+/data/apps/shell/monitor.sh >> /data/logs/scripts/monitor.log 2>&1
+
+# get all available shells
+cat /etc/shells
+xargs echo
+```
 
 在bash 脚本中, subshells (写在圆括号里的) 是一个很方便的方式来组合一些命令. 一个常用的例子是临时地到另一个目录中
 
@@ -166,6 +173,8 @@ output_file=${2:-logfile}
 
 ### Shell 字符串
 
+[Shell Command Language - Parameter Expansion](https://pubs.opengroup.org/onlinepubs/007908775/xcu/chap2.html#tag_001_006_002)
+
 字符串可以用单引号，也可以用双引号，也可以不用引号。
 
 单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的；
@@ -182,7 +191,9 @@ Numerical position in $string of first character in $substring that matches.
 `expr index $string $substring`
 
 ```bash
-# 截断字符串
+# [Shell Command Language - Parameter Expansion](https://pubs.opengroup.org/onlinepubs/007908775/xcu/chap2.html#tag_001_006_002)
+#
+# 截断字符串 % 删除 suffix, # 删除 prifix
 ${var%suffix}
 ${var#prefix}
 # 例如，假设
@@ -192,8 +203,10 @@ echo ${var%.pdf}.txt # 将输出 foo.txt
 # 字符串截取（界定字符本身也会被删除）
 str="www.runoob.com/linux/linux-shell-variable.html"
 echo "str    : ${str}"
+echo "# 从 字符串开头 删除"
 echo "str#*/    : ${str#*/}"   # 从 字符串开头 删除到 左数第一个'/'
 echo "str##*/    : ${str##*/}"  # 从 字符串开头 删除到 左数最后一个'/'
+echo "% 从 字符串末尾 删除"
 echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个'/'
 echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
 
@@ -208,6 +221,16 @@ $ echo "str%/*    : ${str%/*}"   # 从 字符串末尾 删除到 右数第一个
 str%/*    : www.runoob.com/linux
 $ echo "str%%/*    : ${str%%/*}"  # 从 字符串末尾 删除到 右数最后一个'/'
 str%%/*    : www.runoob.com
+
+MR_URL="ssh://git@gitlab.com:8022/operation/server-config.git"
+echo ${MR_URL/ssh:\/\/git@gitlab.com:8022/https://gitlab.com/}
+MR_URL=${MR_URL/ssh:\/\/git@gitlab.com:8022/https://gitlab.com/}
+echo ${MR_URL/.git/}
+MR_URL=${MR_URL/.git/}
+echo ${MR_URL##*/}
+PNAME=${MR_URL##*/}
+PNAME=${PNAME#.git#}
+echo ${PNAME}
 ```
 
 #### 字符串拼接
@@ -300,7 +323,11 @@ EOF
 
 ### test
 
+[Test Constructs](https://tldp.org/LDP/abs/html/testconstructs.html#DBLBRACKETS)
+
 #### Common Bash comparisons
+
+[Other Comparison Operators](https://tldp.org/LDP/abs/html/comparison-ops.html)
 
 ```sh
 Operator    Meaning    Example
@@ -323,6 +350,12 @@ Operator    Meaning    Example
 [ -n "$var" ] : 判断$var变量是否有值
 [ "$a" = "$b" ] : 判断$a和$b是否相等
 [[ $a == z* ]]   # True if $a starts with a "z" (wildcard matching).
+
+substr=ab
+[[ abc == *"$substr"* ]] && echo yes || echo no    # yes
+[[ bcd == *"$substr"* ]] && echo yes || echo no    # no
+
+if [[ "$a" != *z ]]; then echo "not end with z"; fi  # True if $a end with "z"
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
 -e file   Check if file exists. Is true even if file is a directory but exists.   [ -e $file ] is true.
@@ -534,13 +567,15 @@ done
 ```sh
 # Use Built-in Commands
 # Whenever possible, leverage built-in shell commands rather than external binaries. Built-in commands execute faster because they don’t require loading an external process. For example, use [[ ]] for conditionals instead of [ ] or test.
+# [[ 是 Bash Shell 的扩展语法，不是所有 Shell 都支持
+# [ 是 POSIX 兼容的语法
 
-# Inefficient
+# #!/bin/sh Inefficient
 if [ "$var" -eq 1 ]; then
     echo "Equal to 1"
 fi
 
-# Efficient
+# #!/bin/bash Efficient
 if [[ "$var" -eq 1 ]]; then
     echo "Equal to 1"
 fi
@@ -549,7 +584,7 @@ fi
 ``` bash
 if condition
 then
-        do something
+    do something
 elif condition
 then
     do something
@@ -574,6 +609,12 @@ fi
  The right side of == is a shell pattern. If you need a regular expression, use =~ then.
 if [[ xaa.zip = *.zip ]]; then echo zip; else echo not zip; fi;
 
+# ${my_string%"$suffix"} removes the shortest matching $suffix from the end of $my_string. If the original string is equal to the string after attempting to remove the suffix, it means the suffix was not present. This method is also POSIX compliant.
+if [ "$my_string" = "${my_string%"$suffix"}" ]; then
+    echo "String does not end with suffix"
+else
+    echo "String ends with suffix"
+fi
 ```
 
 ``` bash
@@ -583,6 +624,31 @@ elif ....; then
 　 ....
 else
 　 ....
+fi
+
+# 获取当前镜像 CURRENT_TAG，如果镜像 IMAGE_TAG 为空或者和 CURRENT_TAG 相同，则滚动重启 Pod，实现更新 configMap
+CURRENT_TAG=$(kubectl -n ${NAMESPACE} get deployment -o json ${NAME} -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}')
+
+# if IMAGE_TAG is not empty and not end with "RELEASE", then create tag in harbor
+if [ -n "${IMAGE_TAG}" ] && [ "${IMAGE_TAG}" = "${IMAGE_TAG%_RELEASE}" ]; then
+    IMAGE_TAG_RELEASE="${IMAGE_TAG}_RELEASE"
+    curl -X 'POST' \
+        "https://harbor.com/api/v2.0/projects/aiot/repositories/${IMAGE_NAME}/artifacts/${IMAGE_TAG}/tags" \
+        -H 'accept: application/json' \
+        -u "${HARBOR_USERNAME}:${HARBOR_PASSWORD}" \
+        -H 'Content-Type: application/json' \
+        -H 'X-Harbor-CSRF-Token: qL5==' \
+        -d '{ "name": "'"${IMAGE_TAG_RELEASE}"'" }'
+fi
+
+if [[ -z "${IMAGE_TAG}" ]] || [ "${CURRENT_TAG}" = "${IMAGE_TAG}" ]; then
+    kubectl -n ${NAMESPACE} rollout restart deployment/${NAME}
+fi
+
+if [[ -n "${IMAGE_TAG}" ]]; then
+    # IMAGE_TAG 不为空时，替换k8s文件中的 <IMAGE_TAG> <NAMESPACE> <NAME>
+    sed -i "s/<IMAGE_TAG>/${IMAGE_TAG}/; s/<NAMESPACE>/${NAMESPACE}/g; s/<NAME>/${NAME}/g" ${CURRENT_PROJECT}/k8s.yml
+    kubectl -n ${NAMESPACE} apply -f ${CURRENT_PROJECT}/k8s.yml --record
 fi
 ```
 
@@ -770,6 +836,127 @@ DATE=`date -d now "+%Y-%m-%d %H:%M:%S"`
 RESPONSE_TIME=`curl -o /dev/null -s -w '%{time_connect} %{time_starttransfer} %{time_total}\n' -I "https://www.baidu.com"`
 
 echo ${DATE} ${RESPONSE_TIME} >> curl.log
+```
+
+### 批量检查网络是否联通
+
+使用 nc 检查网络是否联通
+
+```sh
+#!/bin/bash
+# checking network connectivity
+
+# 输出结果如下，必须用bash执行写入。
+# local host
+# 127.0.0.1               22    UP
+# 127.0.0.1               21  DOWN
+# well known sites
+# www.google.com          80    UP
+# www.baidu.com           80    UP
+
+# IPs and ports to check
+# Ignore blank lines and treat hash sign as comments
+# comments will be kept as a comment of result
+IP_PORT="
+# local host
+127.0.0.1 22
+127.0.0.1 21
+# well known sites
+www.google.com 80
+www.baidu.com 80
+"
+
+# checking
+echo "$IP_PORT" | grep -Ev "^$" |
+while read line;do
+  # simply print comment line
+  echo "$line" | grep -qE "^#"
+  if [ $? -eq 0 ];then
+      echo "$line"
+      continue
+  fi
+
+  # normal line with ip and port
+  connectFlag="DOWN"
+  # -w 用于控制最大探测超时时间为1秒
+  # -v 直接输出探测信息，适合单次手工查验
+  nc -z -w 1 $line
+  if [ $? -eq 0 ];then
+      connectFlag="UP"
+  fi
+
+  printf "%-20s %5s %5s\n" $line $connectFlag
+done
+```
+
+上述脚本输出最后一列UP表示联通，否则DOWN为不通。
+
+通过写入设备文件的方式检测：
+
+由于Linux里，一切都是文件，网络连接也对应一个文件。因此可以通过直接写入文件判断端口是否联通。
+
+这种方法有点awkward，但是最兼容的方法。如果所在的服务器中没有安装nc甚至telnet命令（比如某些docker容器中），用法如下：
+
+```sh
+echo > /dev/tcp/$host/$port
+判断上述命令的退出码：
+
+maoshuai@ms:/dev$ echo > /dev/tcp/127.0.0.1/22
+maoshuai@ms:/dev$ echo $?
+0
+maoshuai@ms:/dev$ echo > /dev/tcp/127.0.0.1/222
+bash: connect: Connection refused
+bash: /dev/tcp/127.0.0.1/222: Connection refused
+maoshuai@ms:/dev$ echo $?
+1
+```
+
+```bash
+#!/bin/bash
+# checking network connectivity
+
+# 输出结果和使用 nc 一样，如下，必须用bash执行写入。
+# local host
+# 127.0.0.1               22    UP
+# 127.0.0.1               21  DOWN
+# well known sites
+# www.google.com          80    UP
+# www.baidu.com           80    UP
+
+# IPs and ports to check
+# Ignore blank lines and treat hash sign as comments
+# comments will be kept as a comment of result
+IP_PORT="
+# local host
+127.0.0.1 22
+127.0.0.1 21
+
+# well known sites
+www.google.com 80
+www.baidu.com 80
+"
+
+# checking
+echo "$IP_PORT" | grep -Ev "^$" |
+while read line;do
+  # simply print comment line
+  echo "$line" | grep -qE "^#"
+  if [ $? -eq 0 ];then
+      echo "$line"
+      continue
+  fi
+
+  # normal line with ip and port
+  connectFlag="DOWN"
+  ip=$(echo $line | awk '{print $1}')
+  port=$(echo $line | awk '{print $2}')
+  (echo > /dev/tcp/$ip/$port) >/dev/null 2>&1
+  if [ $? -eq 0 ];then
+    connectFlag="UP"
+  fi
+
+  printf "%-20s %5s %5s\n" $line $connectFlag
+done
 ```
 
 ### batch execute sql

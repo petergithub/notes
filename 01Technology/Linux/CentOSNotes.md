@@ -363,6 +363,10 @@ Enable: `setenforce enforcing`
 ### Setup ntp 同步时间
 
 ```sh
+# NTP (Network Time Protocol) servers typically use UDP port 123
+# iburst 参数：在一个标准的轮询间隔内没有应答，客户端会发送4个包给 NTP 服务器，以便在客户端首次快速同步时间
+rpm -qa | grep ntp  #确认NTP是否安装，若只有ntpdate而未见ntp，则需删除原有ntpdate。
+
 vi /etc/ntp.conf
 server 172.25.4.133
 
@@ -376,14 +380,30 @@ ntpdate 172.25.4.133
 systemctl start ntpd
 systemctl restart ntpd
 
+# 查看是否连通上层NTP
+ntpstat
 # verify everything
 ntpq -p
+```
 
-# systemctl status chronyd
-# systemctl enable chronyd
-# systemctl start chronyd
-# systemctl restart chronyd
-# chronyd -q 'server 172.25.4.133 iburst'
+chronyd
+
+```sh
+# chronyd
+systemctl status chronyd
+systemctl enable chronyd
+systemctl start chronyd
+systemctl restart chronyd
+systemctl disable chronyd
+chronyd -q 'server 172.25.4.133 iburst'
+
+# check chrony tracking
+chronyc tracking
+# displays information about the current time sources
+chronyc sources
+
+# To step the system clock immediately, bypassing any adjustments in progress by slewing
+chronyc makestep
 ```
 
 ## 关机
@@ -704,6 +724,9 @@ CentOS防火墙的关闭，关闭其服务即可：
 ## Install
 
 [Windows 7 下硬盘安装 CentOS 7](https://segmentfault.com/a/1190000017744754)
+
+[Index of /Linux/centos-vault/7.9.2009/isos/x86\_64](https://ftp.riken.jp/Linux/centos-vault/7.9.2009/isos/x86_64/)
+[Index of /pub/centos/7.9.2009/isos/x86\_64](https://ftp.unicamp.br/pub/centos/7.9.2009/isos/x86_64/)
 
 hostnamectl set-hostname new-hostname
 
