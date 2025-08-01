@@ -867,7 +867,7 @@ Delete lines that begin with specified character `sed '/^u/d' file`
 
 #### 不替换某些行
 
-```properties
+```ini
 # filename message_en.properties
 key1">value1
 key2=value2
@@ -1371,17 +1371,24 @@ crontab特殊的符号说明
 
 Graphically:
 
-    ┌────────── minute (0 - 59)
-    │ ┌──────── hour (0 - 23)
-    │ │ ┌────── day of month (1 - 31)
-    │ │ │ ┌──── month (1 - 12)
-    │ │ │ │ ┌── day of week (0 - 6 => Sunday - Saturday, or
-    │ │ │ │ │                1 - 7 => Monday - Sunday)
-    ↓ ↓ ↓ ↓ ↓
-    * * * * * command to be executed
+┌────────── minute (0 - 59)
+│ ┌──────── hour (0 - 23)
+│ │ ┌────── day of month (1 - 31)
+│ │ │ ┌──── month (1 - 12)
+│ │ │ │ ┌── day of week (0 - 6 => Sunday - Saturday, or
+│ │ │ │ │                1 - 7 => Monday - Sunday)
+↓ ↓ ↓ ↓ ↓
+* * * * * command to be executed
 
 MAILTO=username@example.org
+# 如果不能发送邮件，设置邮箱为空, 避免 /var/spool/postfix/ldrop 下面有很多文件
+MAILTO='"'
 5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
+# 查找并删除 30 天前的文件
+0 2 * * * find /data/backup/postgresql.temp -type f -mtime +3 | xargs gzip
+0 3 * * * /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
+
+1 1 1 * * /usr/bin/docker exec jenkins-docker sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')" >> /var/log/docker_image_cleanup.log 2>&1
 ```
 
 log path: `/var/log/messages` or `/var/log/cron*`, `/var/mail/$USER` on Mac
@@ -1820,13 +1827,12 @@ configuration for mail
 /etc/mail/sendmail.mc
 
 ``` bash
+sendmail username@gmail.com < /tmp/email.txt
+# cat /tmp/email.txt
+Subject: Terminal Email Send
 
-    sendmail username@gmail.com < /tmp/email.txt
-    # cat /tmp/email.txt
-    Subject: Terminal Email Send
-
-    Email Content line 1
-    Email Content line 2
+Email Content line 1
+Email Content line 2
 ```
 
 ### help
@@ -3591,6 +3597,19 @@ check your Ubuntu version using any of the following methods:
 2. Use the `/etc/lsb-release` or `/etc/os-release` command.
 3. Check the `/etc/issue` file.
 4. Use the `hostnamectl` command.
+
+### ubuntu shortcut
+
+Terminal Use keyboard shortcuts
+
+Ctrl + PgUp: Go to the next tab
+Ctrl + PgDn: Go to the previous tab
+Ctrl + Shift + PgUp: Reorder tabs by moving the current tab up
+Ctrl + Shift + PgDn: Reorder tabs by moving the current tab down
+Alt + 1: Go to the first tab
+Alt + 2: Go to the second tab
+Alt + 3: Go to the third tab
+Shift + Ctrl + w: Close the current tab
 
 ### Main directories
 
