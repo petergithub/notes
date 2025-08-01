@@ -9,22 +9,10 @@ kubelet summary API `http://localhost:8001/api/v1/nodes/node-name/proxy/stats/su
 
 install arthas: `kubectl exec -it podName -- /bin/bash -c "wget https://arthas.aliyun.com/arthas-boot.jar && java -jar arthas-boot.jar"`
 
-### 获取信息 排查问题
+GitOps 项目结构
 
-kubectl get events -A -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message |less
-
-查看指定 pod 的 events
-kubectl get events --watch -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod, involvedObject.name=pod-test-78b7567ccc-b96kb
-
-kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod --sort-by=.metadata.creationTimestamp |less
-kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --sort-by=.metadata.creationTimestamp |less
-
-kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
-
-```sh
-# get pod image
-kubectl get deployment -o json ems-backend -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}'
-```
+1. [a GitOps repository structure standard using ArgoCD. - TheCodingSheikh/kubecodex](https://github.com/TheCodingSheikh/kubecodex)
+2. [fluxcd/flux2-kustomize-helm-example: A GitOps workflow example for multi-env deployments with Flux, Kustomize and Helm.](https://github.com/fluxcd/flux2-kustomize-helm-example)
 
 ## kubectl
 
@@ -113,11 +101,6 @@ EOF
 `kubectl edit deploy piggy-mongo` open the YAML definition in your default text editor 修改
 `kubectl patch svc nodeport -p '{"spec":{"externalTrafficPolicy":"Local"}}'` 添加
 
-`docker logs <container id>`
-`kubectl logs kubia-manual` retrieving a pod’s log with kubectl logs
-`kubectl logs kubia-manual -c <container name>` specifying the container name when getting logs of a multi-container pod
-    `--previous` figure out why the previous container
-
 `kubectl exec -it <pod name> -- /bin/sh`  进入pod内部
 `kubectl exec -it [POD_NAME] -c [CONTAINER_NAME] -- /bin/sh -c "kill 1"` restart the specific container
 
@@ -128,10 +111,6 @@ kubectl port-forward pod-name 8888:8080
 kubectl port-forward --address 0.0.0.0 svc/[service-name] -n [namespace] [external-port]:[internal-port]
 ```
 
-`k top node` node 资源使用情况
-`k top pod` pod 资源使用情况
-`k top pod --containers` container 资源使用情况
-
 COMMUNICATING WITH PODS THROUGH THE API SERVER
 `kubectl proxy`
 use localhost:8001 rather than the actual API server host and port. You’ll send a request to the kubia-0 pod like this:
@@ -140,25 +119,6 @@ use localhost:8001 rather than the actual API server host and port. You’ll sen
 `kubectl autoscale deployment kubia --cpu-percent=30 --min=1 --max=5` creates the HorizontalPodAutoscaler(HPA) object for you and sets the Deployment called kubia as the scaling target
 `kubectl get hpa` HorizontalPodAutoscaler
 a container’s CPU utilization is the container’s actual CPU usage divided by its requested CPU
-`kubectl cordon <node>` marks the node as unschedulable (but doesn’t do anything with pods running on that node).
-`kubectl drain <node>` marks the node as unschedulable and then evicts all the pods from the node.
-
-### Common
-
-`kubectl logs -f --tail=10 pod-name`
-  `-o custom-columns` option an
-  `--sort-by=<jsonpath_exp>` sort the resource list, `--sort-by=.metadata.name`
-[Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
-
-[JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
-`kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
-
-```sh
-# get name cpu
-kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
-# get the pod's IP address
-kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
-```
 
 ### Cluster
 
@@ -178,24 +138,72 @@ kubectl config set-context <context-name> --cluster=<cluster-name> --user=<user-
 kubectl config set-cluster <cluster-name> --server=<api-server-url> --certificate-authority=<ca-cert-file>
 kubectl config set-credentials <user-name> --client-certificate=<client-cert-file> --client-key=<client-key-file>
 kubectl config set-context <context-name> --cluster=<cluster-name> --user=<user-name> --namespace=<namespace>
+
+kubectl cluster-info dump
 ```
 
 ### Debug
 
 排查问题
-`kubectl get events`
-`kubectl -n namespace top pods --containers`
-`kubectl top pod --all-namespaces | sort --reverse --key 4 --numeric | grep -v system | less` sort by memory
-`kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb`
-`kubectl get events --sort-by=.metadata.creationTimestamp`
-`kubectl get events -o yaml|less`
 
-jsonpath 查询申请的内存
-`kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145`
+[Resource types](https://kubernetes.io/docs/reference/kubectl/overview/#resource-types)
 
-go-template `kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'`
+[JSONPath Support](https://kubernetes.io/docs/reference/kubectl/jsonpath/)
+`kubectl get pods -A -o=jsonpath='{range .items[*]}{.status.hostIP}{"\t"}{.spec.containers[].resources.requests.cpu}{"\t"}{.spec.containers[].resources.requests.memory}{"\t"}{.metadata.name}{"\n"}{end}' --sort-by='.status.hostIP'`
 
-`kubectl cluster-info dump`
+```sh
+kubectl cluster-info dump
+
+# retrieving a pod’s log with kubectl logs
+kubectl logs kubia-manual
+kubectl logs -f --tail=10 pod-name
+# `-o custom-columns`
+# `--sort-by=<jsonpath_exp>` sort the resource list,
+# --sort-by=.metadata.name
+#  specifying the container name when getting logs of a multi-container pod
+# `--previous` figure out why the previous container
+kubectl logs kubia-manual -c <container name>
+
+# jsonpath 查询申请的内存
+kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
+# get name cpu
+kubectl get pods -o custom-columns=NAME:.metadata.name,CPU:.spec.containers
+# get the pod's IP address
+kubectl get pod multi-container-pod -o jsonpath={.status.podIP}
+
+# go-template
+kubectl get pods -o go-template='{{range .items}}{{.status.podIP}}{{"\n"}}{{end}}'
+
+# 获取 CPU 和内存使用情况
+kubectl top nodes
+# pod 资源使用情况
+kubectl top pods
+# container 资源使用情况
+kubectl top pods --containers
+# sort by memory
+kubectl top pod --all-namespaces | sort --reverse --key 4 --numeric | grep -v system | less
+
+# 创建临时调试容器（Kubernetes 1.23+）
+kubectl debug my-pod -it --image=busybox --target=my-container
+
+# 获取资源事件
+kubectl get events
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod,involvedObject.name=mysql-test-78b7567ccc-b96kb
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl get events --sort-by=.metadata.creationTimestamp
+kubectl get events --field-selector involvedObject.name=my-pod
+kubectl get events -A -o custom-columns=FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message |less
+# 查看指定 pod 的 events
+kubectl get events --watch -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod, involvedObject.name=pod-test-78b7567ccc-b96kb
+
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --field-selector involvedObject.kind=Pod --sort-by=.metadata.creationTimestamp |less
+kubectl get events -o custom-columns=Created:.metadata.creationTimestamp,FirstSeen:.firstTimestamp,LastSeen:.lastTimestamp,Count:.count,From:.source.component,Type:.type,Reason:.reason,Message:.message --sort-by=.metadata.creationTimestamp |less
+
+kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.requests.memory}{"\t"}{.status.hostIP}{"\t"}{.metadata.name}{"\n"}{end}' | grep 145
+
+# get pod image
+kubectl get deployment -o json ems-backend -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}'
+```
 
 ## Concept
 
@@ -266,7 +274,6 @@ get all pods along with cpu and memory requirements in kubernetes `kubectl get p
 ```yaml
 nodeSelector:
   svrtype: web
-
 ```
 
 ### Service
@@ -598,6 +605,32 @@ Three possible effects exist:
 - `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can’t schedule it somewhere else.
 - `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don’t tolerate the NoExecute taint will be evicted from the node.
 
+```sh
+# Remove the taint
+# -: The crucial hyphen at the end signals to kubectl that you want to remove this specific taint.
+kubectl taint node node1.k8s node-type=production:NoSchedule-
+
+# 设置 Taint 为节点添加不同类型的污点：
+# 禁止调度新 Pod
+kubectl taint nodes node1 key1=value1:NoSchedule
+# 驱逐现有 Pod 并禁止调度新 Pod
+kubectl taint nodes node1 key1=value1:NoExecute
+# 尽量避免调度（软限制）
+kubectl taint nodes node1 key2=value2:PreferNoSchedule
+
+# 删除 Taint 通过在键名后添加减号来删除污点：
+kubectl taint nodes node1 key1:NoSchedule-
+kubectl taint nodes node1 key1:NoExecute-
+kubectl taint nodes node1 key2:PreferNoSchedule-
+
+# 节点管理
+kubectl get nodes
+kubectl describe node my-node
+kubectl cordon my-node                      # 标记不可调度
+kubectl drain my-node --ignore-daemonsets   # 驱逐Pod进行维护
+kubectl uncordon my-node                    # 恢复调度
+```
+
 ### Deploy process
 
 1. build image `docker build -t registry.cn-beijing.aliyuncs.com/namespace/image-name:image-version . -f deploy/Dockerfile`
@@ -821,7 +854,7 @@ The task of running your containers is up to the components running on each work
 
 [Helm | Installing Helm](https://helm.sh/docs/intro/install/)
 
-[Harbor docs | Managing Helm Charts](https://goharbor.io/docs/2.7.0/working-with-projects/working-with-images/managing-helm-charts/)
+[Harbor docs | Working with OCI Helm Charts](https://goharbor.io/docs/2.12.0/working-with-projects/working-with-oci/working-with-helm-oci-charts/)
 
 [What are your best practices deploying helm charts? : r/kubernetes](https://www.reddit.com/r/kubernetes/comments/1jn7lwo/what_are_your_best_practices_deploying_helm_charts)
 
@@ -854,6 +887,10 @@ helm push --ca-file=ca.crt --username=admin --password=passw0rd chart_repo/hello
 
 # if your helm version is >= v3.7.0, please use the following command
 helm cm-push --ca-file=ca.crt --username=admin --password=passw0rd chart_repo/hello-helm-0.1.0.tgz myrepo
+
+helm registry login https://harbor.com/harbor -u 'robot' -p '3wfBwWv'
+
+helm push nfs-subdir-external-provisioner-4.0.18.tgz oci://harbor.com/k8s
 ```
 
 ### Install and Uninstall Apps
@@ -952,6 +989,12 @@ helm plugin install <path/url1>     # Install plugins
 helm plugin list                    # View a list of all installed plugins
 helm plugin update <plugin>         # Update plugins
 helm plugin uninstall <plugin>      # Uninstall a plugin
+
+
+# 通过插件获取 image list
+helm plugin install https://github.com/nikhilsbhat/helm-images
+helm images get <release>  # get image
+helm images get /path/to/your/helm-chart -f /path/to/your/helm-chart/values.yaml
 ```
 
 ### helm 使用例子
@@ -1192,23 +1235,6 @@ done
 echo "所有 YAML 文件处理完成！"
 ```
 
-## Setup Cluster
-
-```sh
-# 默认master节点是不参与pod的调配的，如果需要请执行以下命令
-
-#查看污点
-[root@master1 ~]# kubectl describe node k8s-master | grep Taints
-Taints: node-role.kubernetes.io/master:NoSchedule
-#去除污点，允许 master 部署 pod ,这里报错不用管
-[root@master1 ~]# kubectl taint nodes --all node-role.kubernetes.io/master-
-node/master1 untainted
-error: taint "node-role.kubernetes.io/master" not found
-#再次查看，无显示，说明污点去除成功
-[root@master1 ~]# kubectl describe node master1 | grep Taints
-Taints:    <none>
-```
-
 ### kubelet 配置
 
 [Reconfiguring a kubeadm cluster | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-reconfigure/)
@@ -1325,8 +1351,9 @@ df -h | grep kubelet
 tmpfs  7.6G   12K  7.6G   1% /var/lib/kubelet/pods/0f8fef47-20da-49b7-baa3-39e817bab9af/volumes/kubernetes.io~projected/kube-api-access-4lwqv
 tmpfs  170M   12K  170M   1% /var/lib/kubelet/pods/0e3316be-0886-41fe-ade5-2480e48228a8/volumes/kubernetes.io~projected/kube-api-access-bf2zg
 
+kubectl cordon node_name
 # 1 驱逐在该节点上运行的Pod
-kubectl drain <node-to-drain> --ignore-daemonsets
+kubectl drain node_name --ignore-daemonsets
 
 # 2 停止节点Kubelet和Docker服务
 systemctl stop kubelet
@@ -1359,8 +1386,12 @@ systemctl restart kubelet
 df -h | grep kubelet
 
 # 8 取消节点污点
-kubectl uncordon <node-to-uncordon>
+kubectl uncordon node_name
 ```
+
+### 手动更新证书
+
+[手动更新证书 使用 kubeadm 进行证书管理 | Kubernetes](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#manual-certificate-renewal)
 
 ### Kubernetes Gateway API
 
@@ -1411,80 +1442,6 @@ Can I host Postgres on k8s myself?
 5. KubeDB
 
 ## Best Practice
-
-### Setup cli
-
-[Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
-
-[Kubernetes prompt info for bash and zsh kube-ps1](https://github.com/jonmosco/kube-ps1)
-
-`brew install kube-ps1 stern`
-kube-shell `pip install kube-shell --user -U`
-
-终极工具k9s
-
-切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
-git clone https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
-
-```sh
-# [Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
-# KREW="krew-linux_amd64"
-(
-  set -x; cd "$(mktemp -d)" &&
-  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
-  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
-  KREW="krew-${OS}_${ARCH}" &&
-  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
-  tar zxvf "${KREW}.tar.gz" &&
-  ./"${KREW}" install krew
-)
-
-#  |  | To list krew commands and to get help, run:
-#  |  |   $ kubectl krew
-#  |  | For a full list of available plugins, run:
-#  |  |   $ kubectl krew search
-#  |  |
-#  |  | You can find documentation at
-#  |  |   https://krew.sigs.k8s.io/docs/user-guide/quickstart/.
-
-kubectl krew install ctx
-kubectl krew install ns
-
-# the tools will be available as kubectl ctx and kubectl ns
-kubectl ctx
-kubectl ns
-```
-
-bash 配置 kube-ps1.sh
-
-```sh
-# kubectl {
-    source <(kubectl completion bash)
-    complete -o default -F __start_kubectl k
-
-    # [kube-ps1: Kubernetes prompt info for bash and zsh](https://github.com/jonmosco/kube-ps1)
-    [ -d "/data/software/kube-ps1.sh" ] && source /data/software/kube-ps1.sh
-    #PS1='[\u@\h \W $(kube_ps1)]\$ '
-    PS1="$(kube_ps1) $PS1"
-# } end kubectl
-```
-
-### Useful image
-
-```sh
-kubectl run -it --rm --restart=Never --image=mysql:8.0.28 mysql-client -- mysql
-kubectl run -it --rm --restart=Never --image=redis:6.0.9 redis-client -- bash
-kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils
-kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils -- dig SRV kubia.default.svc.cluster.local
-kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools
-kubectl run -it --rm --restart=Never --image=tutum/curl curl
-kubectl run -it --rm --image=nicolaka/netshoot netshoot
-kubectl run -it --rm --image=nginx nginx
-kubectl run -it --rm --image=busybox busybox  # busybox: BusyBox combines tiny versions of many common UNIX utilities
-kubectl run -it --rm --image=alpine alpine  # alpine: A minimal Docker image based on Alpine Linux
-apk add curl
-```
 
 ### 声明每个Pod的resource
 
@@ -1595,6 +1552,8 @@ Containerd 不支持 docker API 和 docker CLI，但是可以通过 cri-tool 命
 
 ctr 是 containerd 的一个客户端工具。
 crictl 是 CRI 兼容的容器运行时命令行接口，可以使用它来检查和调试 k8s 节点上的容器运行时和应用程序。
+
+the debug tool "ctr" does not parse or use the cri config (/etc/containerd/config.toml) in any way.. the cri config is for crictl, rancher, kubernernetes, ... You can pass your username and password at the ctr command line.
 
 ```sh
 # 输出当前 k8s 的版本，从结果可以认为 crictl 是用于 k8s 的。
