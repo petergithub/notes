@@ -36,11 +36,18 @@ taskkill //PID 13588
 @REM open current folder in Explorer
 start .
 
+start cmd /k
+
 @REM 启动 WPS 文档
 start /B "C:\Programs\WPSOffice\WPS Office\12.2.0.19805\office6\wps.exe" "D:\文档.docx"
 
 @REM startup vscode with workspace
-start /B code "D:\Dropbox\work\vscode.workspace.common.code-win11.code-workspace"
+start /B code "D:\Dropbox\work\vscode.document.code-workspace"
+
+@REM keep the cmd console opening
+start "" d:\myscripts\pinger.bat
+@REM auto close the cmd console
+start "" cmd /c d:\myscripts\pinger.bat
 
 @REM 访问网址
 explorer http://www.baidu.com
@@ -131,17 +138,54 @@ attrib +/-h
 
 @REM 更新DNS缓存
 ipconfig /flushdns
+
+@REM Windows Displays the contents of a text file or files.
+type fileName
 ```
 
-## power shell
+## PowerShell
 
 在 PowerShell 中，Write-Host 和 Write-Output 都可以用来输出内容到控制台，但 Write-Host 通常用于输出信息给用户，而 Write-Output 则用于输出数据流。
 
-### power shell 环境变量
+some basic cmdlets and its CMD equivalents
+
+| Task                       | CMD Command | PowerShell Cmdlet       |
+|----------------------------|-------------|-------------------------|
+| List directory contents    | dir         | Get-ChildItem           |
+| Copy a file                | copy        | Copy-Item               |
+| Move a file                | move        | Move-Item               |
+| Delete a file              | del         | Remove-Item             |
+| View network configuration | ipconfig    | Get-NetIPConfiguration  |
+| Change current directory   | cd          | Set-Location            |
+| Ping a server              | ping        | Test-Connection         |
+
+```ps1
+# get alias
+Get-Alias
+Get-Alias -Name list
+# [Set-Alias - PowerShell | Microsoft Learn](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-alias?view=powershell-7.5)
+Set-Alias -Name list -Value Get-ChildItem
+Set-Alias -Name o -Value ollama
+
+# $profile = %userprofile%\OneDrive\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1
+echo "Set-Alias -Name o -Value ollama" >> $profile
+# refresh the current session profile
+. $profile
+
+# 展示文件内容
+Get-Content .wslconfig
+# alias cat = Get-Content
+cat .wslconfig
+
+# 调用和执行打开文件
+Invoke-Item "C:\Programs\WPSOffice\WPS Office\ksolaunch.exe"
+```
+
+### PowerShell 环境变量
 
 查看
 
-```powershell
+```ps1
 # 查看当前用户的PATH环境变量
 $env:PATH
 # 查看所有环境变量
@@ -161,7 +205,7 @@ Write-Host $env:PATH
 
 设置
 
-```powershell
+```ps1
 # 设置或修改环境变量
 # 在当前会话中有效，一旦会话结束，变量就会被清除。
 $env:MY_VARIABLE = "some_value"
@@ -179,7 +223,7 @@ $env:PATH | ForEach-Object { $_.GetType() }
 
 假设您想使用 PATH 环境变量来查找特定文件的路径，可以这样做：
 
-```powershell
+```ps1
 # 这段脚本会在 PATH 环境变量指定的所有目录中查找 notepad.exe 文件，并输出其完整路径。
 
 $file = "notepad.exe"
@@ -197,7 +241,7 @@ foreach ($p in $path) {
 
 在 PowerShell 中，您可以使用 `Invoke-WebRequest` 命令来执行类似于 Unix/Linux 中 `curl` 命令的操作。`Invoke-WebRequest` 是 PowerShell 中用于向 web 服务器发送 HTTP 请求的命令。
 
-```powershell
+```ps1
 # 获取帮助文档
 Get-Help Invoke-WebRequest -Full
 ```
@@ -206,14 +250,14 @@ Get-Help Invoke-WebRequest -Full
 
 #### 发送 GET 请求
 
-```powershell
+```ps1
 # 发送 GET 请求并获取响应内容
 Invoke-WebRequest -Uri "http://example.com/api/data"
 ```
 
 #### 获取网页内容
 
-```powershell
+```ps1
 # 获取网页内容并将其存储在变量中
 $content = Invoke-WebRequest -Uri "http://example.com"
 
@@ -223,14 +267,14 @@ $content.Content
 
 #### 发送 POST 请求
 
-```powershell
+```ps1
 # 发送 POST 请求
 Invoke-WebRequest -Uri "http://example.com/api/post" -Method POST -Body $body -ContentType "application/json"
 ```
 
 其中 `$body` 是一个包含 POST 数据的对象，例如：
 
-```powershell
+```ps1
 $body = @{
     param1 = "value1"
     param2 = "value2"
@@ -239,7 +283,7 @@ $body = @{
 
 #### 发送带有表单数据的 POST 请求
 
-```powershell
+```ps1
 # 创建表单数据哈希表
 $form = @{
     "username" = "user1"
@@ -252,7 +296,7 @@ Invoke-WebRequest -Uri "http://example.com/login" -Method POST -Form $form
 
 #### 发送带有身份验证的请求
 
-```powershell
+```ps1
 # 创建基本身份验证的凭据
 $cred = Get-Credential
 
@@ -262,21 +306,21 @@ Invoke-WebRequest -Uri "http://example.com/secure" -Credential $cred
 
 #### 发送带有超时设置的请求
 
-```powershell
+```ps1
 # 发送带有超时设置的请求
 Invoke-WebRequest -Uri "http://example.com" -TimeoutSec 20
 ```
 
 #### 下载文件
 
-```powershell
+```ps1
 # 下载文件并保存到指定路径
 Invoke-WebRequest -Uri "http://example.com/file.zip" -OutFile "C:\Downloads\file.zip"
 ```
 
 #### 使用代理服务器
 
-```powershell
+```ps1
 # 设置代理服务器
 [System.Net.WebRequest]::DefaultWebProxy = New-Object System.Net.WebProxy("http://myproxyserver:8080")
 
@@ -354,6 +398,27 @@ reg.exe delete "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a
 taskkill /f /im explorer.exe & start explorer.exe
 ```
 
+右键打开 WSL `wsl.exe --cd "%V"`
+
+### 语言设置
+
+[How to Change Language of Windows 11 Single Language Without Format - Super User](https://superuser.com/questions/1725144/how-to-change-language-of-windows-11-single-language-without-format?answertab=scoredesc#tab-top)
+
+for those seeking to switch to en-us, i've been able to do it without downloading anything, as it seems preinstalled. in powershell:
+
+```bat
+reg add HKLM\SYSTEM\CurrentControlSet\Control\Nls\Language /v InstallLanguage /t REG_SZ /d 0409 /f
+reg add HKLM\SYSTEM\CurrentControlSet\Control\Nls\Language /v Default /t REG_SZ /d 1033 /f
+```
+
+List was generated from ["Language Identifier Constants and Strings"](http://msdn.microsoft.com/en-us/library/windows/desktop/dd318693(v=vs.85).aspx) in MSDN
+
+| Hex  | Dec  | Country code | Meaning                         |
+|------|------|--------------|---------------------------------|
+| 0004 | 4    | zh-CHS       | Chinese - Simplified            |
+| 0404 | 1028 | zh-TW        | Chinese (Traditional) - Taiwan  |
+| 0409 | 1033 | en-US        | English - United States         |
+
 ## tool
 
 - [QuickLook](https://github.com/QL-Win/QuickLook/releases)
@@ -371,17 +436,26 @@ taskkill /f /im explorer.exe & start explorer.exe
 ### shortcut
 
 Ditto - 剪贴板管理工具 Ctrl+`
-Windows Terminal
-    Comment out Copy/Paste shortcut in setings.json, which are conflict with vim block selection
+
 PowerToy
     将窗口最大化至全屏    Control+Command+F    WindowsKey+Up
     保存屏幕（截图）    Command+Shift+3    WindowsKey+Shift+S
 
-MobaXterm
-XShell Esc+. (escape+dot) == Alt+.
-
 git config --list --show-origin
 git config path C:\Program Files\Git\etc\gitconfig
+
+### Windows Terminal
+
+1. Comment out Copy/Paste shortcut in setings.json, which are conflict with vim block selection
+2. defaultProfile 定义启动Windows Terminal时用作默认配置文件的GUID。
+   1. 将 copyOnSelect 设置为 true 可将选定的文本自动复制到剪贴板，而无需按 Ctrl + Shift +C。
+   2. 将 copyFormatting 设置为 false 即可仅复制纯文本而无需任何样式(颜色，字体)。
+
+```json
+"copyFormatting": false,
+"copyOnSelect": true,
+
+```
 
 ### Virtualbox
 
@@ -566,11 +640,37 @@ yum -y install lrzsz
 
 ## GPU
 
-```powershell
+```ps1
 nvidia-smi
 ```
 
 ## network
+
+```bat
+REM 本地的DSN信息
+ipconfig /displaydns
+
+REM 清除Windows 的 DNS 缓存
+ipconfig /flushdns
+```
+
+### 排查网络
+
+按Windows键 + R打开“运行”窗口，输入cmd并按Enter或单击“确定”来打开命令提示符，分别执行下面两个命令，并截图发回。
+
+ipconfig
+tracert -d example.com
+
+### port
+
+```bat
+REM REM 是 "Remark" 的缩写，用于添加注释。
+REM 查找端口占用
+netstat -ano | findstr :8080
+
+REM 查找进程号
+tasklist | findstr 4476
+```
 
 ### tracert
 
@@ -585,7 +685,7 @@ tracert [-d] [-h maximum_hops] [-j computer-list] [-w timeout] target_name
 - -w 选项：说明等待每一个ICMP响应报文的时间，默认4s，如果接收超时，则显示星号*。跳数和等待时间，使用默认值即可，所以平时一般都不需要添加这两个选项。
 - -j 选项：说明ICMP报文要使用IP头中的松散源路由选项，后面是经过的中间节点的地址或主机名字,最多9个，各个中间节点用空格隔开。
 
-这里说明下松散源路由和严格源路由，严格源路由是指，相邻路由器之间不得有中间路由器，并且所经过路由器的顺序不可更改。而松散源路由，则相反，相邻路由器之间可以有中间路由器。一般的路由追踪，也用不到-j这个选项。除非是针对大的网络故障，需要检测几条路径到达同一个目的地址，才需要使用-j选项。所以，通常情况下，我们使用tracert–d这种格式就可以了。我们以追踪百度网站为例。
+这里说明下松散源路由和严格源路由，严格源路由是指，相邻路由器之间不得有中间路由器，并且所经过路由器的顺序不可更改。而松散源路由，则相反，相邻路由器之间可以有中间路由器。一般的路由追踪，也用不到-j这个选项。除非是针对大的网络故障，需要检测几条路径到达同一个目的地址，才需要使用-j选项。所以，通常情况下，我们使用tracert –d这种格式就可以了。我们以追踪百度网站为例。
 
 ```batch
 tracert -d www.baidu.com
@@ -635,6 +735,8 @@ PATHPING -n www.baidu.com
 
 ## WSL
 
+Windows Subsystem for Linux
+
 [Basic commands for WSL | Microsoft Learn](https://learn.microsoft.com/en-us/windows/wsl/basic-commands#install)
 
 ```sh
@@ -662,7 +764,7 @@ wsl --unregister //注销或卸载 Linux 发行版
 
 ### wsl -update 慢解决办法
 
-Windows Subsystem for Linux——解决WSL更新速度慢的方案，在https://github.com/microsoft/WSL/releases中，有提供WSL 离线包，可以下载安装
+解决WSL更新速度慢的方案，下载安装WSL 离线包，地址 `https://github.com/microsoft/WSL/releases`
 
 ### Windows 子系统实例已终止
 
@@ -691,7 +793,7 @@ taskkill /f /pid 1234 /PID 1241
 
 [Ubuntu2404-240425 download link](https://wslstorestorage.blob.core.windows.net/wslblob/Ubuntu2404-240425.AppxBundle)
 
-```powershell
+```ps1
 Add-AppxPackage .\Ubuntu2404-240425.AppxBundle
 wsl --list --online
 wsl --install -d Ubuntu-24.04
@@ -766,7 +868,41 @@ git pull origin work
 
 ### wsl config
 
-[Rename tab title not working for WSL and Bash · Issue #5333 · microsoft/terminal · GitHub](https://github.com/microsoft/terminal/issues/5333)
+- .wslconfig to configure global settings across all installed distributions running on WSL 2.
+- wsl.conf to configure local settings per-distribution for each Linux distribution running on WSL 1 or WSL 2.
+
+#### 通过 镜像模式 共享 Windows 代理
+
+镜像模式需要 Windows 11 22H2 或更高版本
+
+打开或创建WSL配置文件 `%userprofile%\.wslconfig`，设置使用镜像模式（mirrored），默认是 NAT 模式
+
+mirrored 模式下，wsl
+
+1. 可以使用系统代理
+2. 不能使用 Host only 网络
+
+nat 模式下，wsl
+
+1. 不能使用系统代理
+2. 可以使用 Host only 网络
+3. 会提示信息：wsl: 检测到 localhost 代理配置，但未镜像到 WSL。NAT 模式下的 WSL 不支持 localhost 代理。
+
+```ini
+[wsl2]
+# default nat
+#networkingMode=nat
+networkingMode=mirrored
+autoProxy=true
+```
+
+重启 WSL
+
+```bat
+wsl --shutdown
+```
+
+#### [Rename tab title not working for WSL and Bash · Issue #5333 · microsoft/terminal · GitHub](https://github.com/microsoft/terminal/issues/5333)
 
 `"suppressApplicationTitle": true,`
 
@@ -811,11 +947,17 @@ sudo bash -c 'echo "[network]" > /etc/wsl.conf'
 sudo bash -c 'echo "generateResolvConf = false" >> /etc/wsl.conf'
 sudo chattr +i /etc/resolv.conf
 
-### Move to other drive from C drive
+### Move WSL to other drive from C drive
+
+change in Docker desktop
 
 [Move WSL to another drive. WSL (Windows Subsystem for Linux) is a… | by Hafiz Azhar | Medium](https://medium.com/@rahmanazhar/move-wsl-to-another-drive-ab8002152cf2)
 
+%USERPROFILE%\AppData\Local\Docker\wsl
+
 ```sh
+# superceded by changing in Docker desktop
+#
 # wsl.exe --export <DistroName> <Tar-FileName>
 # wsl --export Ubuntu-22.04 D:\WSL\Ubuntu-22.04\Ubuntu-22.04.tar
 wsl --export Ubuntu E:\WSL\Ubuntu-20.04\Ubuntu-20.04.tar
@@ -911,7 +1053,7 @@ all available locale with `locale -a`
 sudo apt-get install language-pack-id
 sudo dpkg-reconfigure locales
 
-### Node
+### Node.js
 
 [Set up Node.js on native Windows | Microsoft Learn](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows)
 

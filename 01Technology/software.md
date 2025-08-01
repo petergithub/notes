@@ -3,6 +3,10 @@
 
 ## Project
 
+版本号管理 [Semantic Versioning 2.0.0 | Semantic Versioning](https://semver.org/spec/v2.0.0.html)
+
+[log format: Logfmt](https://brandur.org/logfmt)
+
 ### Design
 
 #### API
