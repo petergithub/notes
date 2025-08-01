@@ -39,24 +39,39 @@ make altinstall
 python3.6 -V
 ```
 
-### [pip](https://pip.pypa.io/en/stable/user_guide/)
+### pip 镜像源
 
-Python 3.6 以后安装 Python 会同时安装 pip
-use proxy `pip install -i http://pypi.douban.com/simple  --proxy http://localhost:1087 numpy`
-推荐清华大学一个镜像网址站点：`http://e.pypi.python.org`
+[pip](https://pip.pypa.io/en/stable/user_guide/)
 
-pip install flask docx -i http://mirrors.aliyun.com/pypi/simple/
+```sh
+# 临时使用镜像源
+pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple some-package
+pip install -i http://mirrors.aliyun.com/pypi/simple/ flask docx
+
+# use proxy
+pip install -i http://pypi.douban.com/simple  --proxy http://localhost:1087 numpy
+```
 
 [configuration](https://pip.pypa.io/en/stable/user_guide/#configuration)
 
-`vi ~/.config/pip/pip.conf //linux or MacOS`
-
 ```sh
+# [pypi | 镜像站使用帮助 | 清华大学开源软件镜像站 | Tsinghua Open Source Mirror](https://mirrors.tuna.tsinghua.edu.cn/help/pypi/)
+# 命令设置镜像源
+pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+# 配置多个镜像源
+pip config set global.extra-index-url "<url1> <url2>..."
+
+# 修改文件设置镜像源 linux or MacOS
+mkdir -p ~/.config/pip
+tee ~/.config/pip/pip.conf <<EOF
 [global]
 timeout = 6000
-index-url = http://mirrors.aliyun.com/pypi/simple/
+index-url = https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+# index-url = http://mirrors.aliyun.com/pypi/simple/
+log = /var/log/pip_install.log
 [install]
 trusted-host=mirrors.aliyun.com
+EOF
 ```
 
 windows系统下：
@@ -139,7 +154,7 @@ Create a new virtual environment by choosing a Python interpreter and making a .
 And to exit virtualenv later:
 `deactivate  # don't exit until you're done using python`
 
-### requirement.txt
+#### requirement.txt
 
 ``` bash
 # [Pipenv & Virtual Environments — The Hitchhiker's Guide to Python](https://docs.python-guide.org/dev/virtualenvs/#other-notes)
@@ -190,7 +205,7 @@ requirements
 ├── [ 80] local.txt
 └── [ 28] production.txt
 
-### permission issue
+#### permission issue
 
 `Could not install packages due to an EnvironmentError: [Errno 13] Permission denied`
 [Permission denied How i solve this problem](https://github.com/googlesamples/assistant-sdk-python/issues/236)
@@ -204,18 +219,74 @@ You have three options(use only one of them):
 
 ### [Conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html)
 
+[conda-forge/miniforge: A conda-forge distribution.](https://github.com/conda-forge/miniforge)
+[miniforge mirrors.tsinghua](https://mirrors.tuna.tsinghua.edu.cn/github-release/conda-forge/miniforge/LatestRelease/)
+
+[conda-forge | community-driven packaging for conda | conda-forge | community-driven packaging for conda](https://conda-forge.org/download/)
+[Installing Miniconda - Anaconda](https://www.anaconda.com/docs/getting-started/miniconda/install)
+
 [Command reference](https://conda.io/projects/conda/en/latest/commands.html)
 
-`conda init <SHELL_NAME>` `conda init zsh`
-`conda --version` Conda displays the number of the version
-`conda update conda` update
-`conda create --name environmentName` Create a new environment
-`conda create python=3.10 --name environmentName` Create a new environment with package
-`conda activate environmentName` To use, or "activate" the new environment
-`conda info --envs` list of all your environments
-`conda activate` Change your current environment back to the default (base)
-`conda deactivate` deactive conda
-`conda remove --name ENVNAME --all` Delete an entire environment
+```sh
+# Miniforge3 install
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh
+# To activate this environment, use:
+
+#     micromamba activate /ssddata/dsdata/software/miniforge3
+
+# Or to execute a single command in this environment, use:
+
+#     micromamba run -p /ssddata/dsdata/software/miniforge3 mycommand
+
+# installation finished.
+# Do you wish to update your shell profile to automatically initialize conda?
+# This will activate conda on startup and change the command prompt when activated.
+# If you'd prefer that conda's base environment not be activated on startup,
+#    run the following command when conda is activated:
+
+# conda config --set auto_activate_base false
+
+# You can undo this by running `conda init --reverse $SHELL`? [yes|no]
+# [no] >>> yes
+
+# 查看下载源
+conda config --show channels
+
+# 为了让 conda 从国内的镜像源下载依赖包以获得更好的下载速度，我们可以添加清华镜像源。在命令行中输入：
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+
+# 如果 channels 里有名为 default 的源，用下面的命令去掉，因为这是 anaconda 官方源，可能存在商用协议方面的争议。
+conda config --remove channels defaults
+
+source ~/miniconda3/bin/activate
+# conda init <SHELL_NAME>
+conda init zsh
+conda --version  # Conda displays the number of the version
+conda update conda  # update
+
+# environment
+conda create --name environmentName  # Create a new environment
+conda create python=3.10 --name environmentName  # Create a new environment with package
+conda activate environmentName  # To use, or "activate" the new environment
+conda info --envs  # list of all your environments
+conda activate  # Change your current environment back to the default (base)
+conda deactivate  # deactive conda
+conda remove --name ENVNAME --all  # Delete an entire environment
+
+# config
+# [Using the .condarc conda configuration file — conda 25.3.1.dev6 documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/configuration/use-condarc.html)
+# show channels
+conda config --show channels
+# To create or modify a ~/.condarc file, open a terminal and enter the conda config command
+# One does not need to purchase a license if they use conda package manager only with conda-forge channel.
+conda config --add channels conda-forge
+# To show all the configuration file sources and their contents:
+conda config --show-sources
+```
 
 #### Manage packages
 
