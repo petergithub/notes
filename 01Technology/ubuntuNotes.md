@@ -358,21 +358,21 @@ You need to select to the next matching parenthesis.
 `i` 命令可以理解为 inside，即选中匹配符号之间不包含匹配符号的内容。而 `a` 则选中包含匹配项的内容。
 
 ``` bash
-    'a)' 或 'ab'  :  一对()
-    'a}' 或 'aB'  :  一对{}
-    a]  :  一对[]
-    a>  :  一对<>
-    a"  :  一对""
-    at  :  一对xml标签
+'a)' 或 'ab'  :  一对()
+'a}' 或 'aB'  :  一对{}
+a]  :  一对[]
+a>  :  一对<>
+a"  :  一对""
+at  :  一对xml标签
 
-    iw  :  当前单词
-    aw  :  当前单词及一个空格
-    iW  :  当前字符串
-    aW  :  当前字符串及一个空格
-    is  :  当前句子
-    as  :  当前句子及一个空格
-    ip  :  当前段落
-    ap  :  当前段落及一个空行
+iw  :  当前单词
+aw  :  当前单词及一个空格
+iW  :  当前字符串
+aW  :  当前字符串及一个空格
+is  :  当前句子
+as  :  当前句子及一个空格
+ip  :  当前段落
+ap  :  当前段落及一个空行
 ```
 
 #### mark and registers
@@ -448,14 +448,28 @@ To playback your keystrokes, press `@` followed by the letter previously chosen.
 
 #### 文件对比 合并 多窗口
 
-`diff -u`
-`diffstat` 查看变更总览数据
-`diff -r` 对整个文件夹有效。使用 `diff -r tree1 tree2 | diffstat` 查看变更的统计数据
-`vimdiff  FILE_LEFT  FILE_RIGHT`
-`:qa` (quit all)同时退出两个文件
-`:wa` (write all)
-`:wqa` (write, then quit all)
-`:qa!` (force to quit all)
+```sh
+diff -u
+# 查看变更总览数据
+diffstat
+# 对整个文件夹有效。使用 `diff -r tree1 tree2 | diffstat` 查看变更的统计数据
+diff -r
+# 查看变更的统计数据
+diff -r tree1 tree2 | diffstat
+
+vimdiff  FILE_LEFT  FILE_RIGHT
+# quit all 同时退出两个文件
+:qa
+# write all
+:wa
+# write, then quit all
+:wqa
+# force to quit all
+:wqa
+
+# execute set wrap on every window (windo stands for "window do").
+:windo set wrap
+```
 
 跳转到下一个差异点 `]c`. 反向跳转是: `[c`
 `dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
