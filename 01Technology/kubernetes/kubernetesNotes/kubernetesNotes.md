@@ -205,6 +205,95 @@ kubectl get pods -A -o=jsonpath='{range .items[*]}{.spec.containers[].resources.
 kubectl get deployment -o json ems-backend -o=jsonpath='{.spec.template.spec.containers[0].image}' | awk -F : '{print $NF}'
 ```
 
+### Useful image
+
+```sh
+kubectl run -it --rm --restart=Never --image=mysql:8.0.28 mysql-client -- mysql
+kubectl run -it --rm --restart=Never --image=redis:6.0.9 redis-client -- bash
+kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils
+kubectl run -it --rm --restart=Never --image=tutum/dnsutils dnsutils -- dig SRV kubia.default.svc.cluster.local
+kubectl run -it --rm --restart=Never --image=infoblox/dnstools:latest dnstools
+kubectl run -it --rm --restart=Never --image=tutum/curl curl
+kubectl run -it --rm --image=nicolaka/netshoot netshoot
+kubectl run -it --rm --image=nginx nginx
+kubectl run -it --rm --image=busybox busybox  # busybox: BusyBox combines tiny versions of many common UNIX utilities
+kubectl run -it --rm --image=alpine alpine  # alpine: A minimal Docker image based on Alpine Linux
+apk add curl
+```
+
+### Setup cli
+
+[Supercharge your Kubernetes setup with OhMyZSH 🚀🚀🚀 + awesome command line tools](https://agrimprasad.com/post/supercharge-kubernetes-setup/)
+
+[Kubernetes prompt info for bash and zsh kube-ps1](https://github.com/jonmosco/kube-ps1)
+
+```sh
+# Kubectl autocomplete
+# BASH
+source <(kubectl completion bash) # set up autocomplete in bash into the current shell, bash-completion package should be installed first.
+echo "source <(kubectl completion bash)" >> ~/.bashrc # add autocomplete perma
+
+# You can also use a shorthand alias for kubectl that also works with completion:
+alias k=kubectl
+complete -o default -F __start_kubectl k
+# ZSH
+source <(kubectl completion zsh)  # set up autocomplete in zsh into the current shell
+echo '[[ $commands[kubectl] ]] && source <(kubectl completion zsh)' >> ~/.zshrc # a
+```
+
+`brew install kube-ps1 stern`
+kube-shell `pip install kube-shell --user -U`
+
+终极工具k9s
+
+切换集群用的命令 [kubectx + kubens: Power tools for kubectl](https://github.com/ahmetb/kubectx)
+git clone https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
+```sh
+# [Krew is a tool that makes it easy to use kubectl plugins](https://krew.sigs.k8s.io/docs/user-guide/setup/install/)
+# KREW="krew-linux_amd64"
+(
+  set -x; cd "$(mktemp -d)" &&
+  OS="$(uname | tr '[:upper:]' '[:lower:]')" &&
+  ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/')" &&
+  KREW="krew-${OS}_${ARCH}" &&
+  curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" &&
+  tar zxvf "${KREW}.tar.gz" &&
+  ./"${KREW}" install krew
+)
+
+#  |  | To list krew commands and to get help, run:
+#  |  |   $ kubectl krew
+#  |  | For a full list of available plugins, run:
+#  |  |   $ kubectl krew search
+#  |  |
+#  |  | You can find documentation at
+#  |  |   https://krew.sigs.k8s.io/docs/user-guide/quickstart/.
+
+kubectl krew install ctx
+kubectl krew install ns
+
+# the tools will be available as kubectl ctx and kubectl ns
+kubectl ctx
+kubectl ns
+
+```
+
+bash 配置 kube-ps1.sh
+
+```sh
+# kubectl {
+    source <(kubectl completion bash)
+    complete -o default -F __start_kubectl k
+
+    # [kube-ps1: Kubernetes prompt info for bash and zsh](https://github.com/jonmosco/kube-ps1)
+    [ -d "/data/software/kube-ps1.sh" ] && source /data/software/kube-ps1.sh
+    #PS1='[\u@\h \W $(kube_ps1)]\$ '
+    PS1="$(kube_ps1) $PS1"
+# } end kubectl
+```
+
 ## Concept
 
 OCI: Open Container Initiative
