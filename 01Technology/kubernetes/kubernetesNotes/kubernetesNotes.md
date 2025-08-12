@@ -1235,6 +1235,8 @@ done
 echo "所有 YAML 文件处理完成！"
 ```
 
+## 集群配置
+
 ### kubelet 配置
 
 [Reconfiguring a kubeadm cluster | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-reconfigure/)
@@ -1392,6 +1394,39 @@ kubectl uncordon node_name
 ### 手动更新证书
 
 [手动更新证书 使用 kubeadm 进行证书管理 | Kubernetes](https://kubernetes.io/zh-cn/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#manual-certificate-renewal)
+
+假如你通过 kubeadm 安装 Kubernetes，大多数证书会被存储在 /etc/kubernetes/pki 中。 本文档中的所有路径都是相对于该目录的，但用户账号证书除外，kubeadm 将其放在 /etc/kubernetes 中。
+
+```sh
+# 检查证书何时过期
+kubeadm certs check-expiration
+# Reading configuration from the cluster, check config file
+kubectl -n kube-system get cm kubeadm-config -o yaml
+
+# kubeadm renews all the certificates during control plane upgrade.
+# 手动更新证书 这个命令需要在所有控制面板节点上执行。
+kubeadm certs renew all
+
+# certificate embedded in the kubeconfig file for the admin to use and for kubeadm itself renewed
+# certificate for serving the Kubernetes API renewed
+# certificate the apiserver uses to access etcd renewed
+# certificate for the API server to connect to kubelet renewed
+# certificate embedded in the kubeconfig file for the controller manager to use renewed
+# certificate for liveness probes to healthcheck etcd renewed
+# certificate for etcd nodes to communicate with each other renewed
+# certificate for serving etcd renewed
+# certificate for the front proxy client renewed
+# certificate embedded in the kubeconfig file for the scheduler manager to use renewed
+# certificate embedded in the kubeconfig file for the super-admin renewed
+
+# Done renewing certificates. You must restart the kube-apiserver, kube-controller-manager, kube-scheduler and etcd, so that they can use the new certificates.
+
+mv /etc/kubernetes/manifests /etc/kubernetes/manifests.bak
+# 等待20秒钟，pod (kube-apiserver, kube-controller-manager, kube-scheduler and etcd) 关闭后 移回文件
+mv /etc/kubernetes/manifests.bak /etc/kubernetes/manifests
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
 
 ### Kubernetes Gateway API
 
