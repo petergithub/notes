@@ -61,6 +61,10 @@ pip config set global.index-url https://mirrors.tuna.tsinghua.edu.cn/pypi/web/si
 # 配置多个镜像源
 pip config set global.extra-index-url "<url1> <url2>..."
 
+#
+export PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+export PIP_EXTRA_INDEX_URL=https://my.private.repo/simple
+
 # 修改文件设置镜像源 linux or MacOS
 mkdir -p ~/.config/pip
 tee ~/.config/pip/pip.conf <<EOF
