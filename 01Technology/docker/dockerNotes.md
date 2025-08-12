@@ -34,6 +34,7 @@ docker run --name redis --detach redis:6-alpine
 - `-p` [host:]port:dockerPort
 - `-d, --detach` 后台运行
 - `-e` 设置环境变量，与在dockerfile env设置相同效果 `-e TZ=Asia/Shanghai`, `-e MYSQL_ROOT_PASSWORD=root`
+- `--env-file .env` 可以多次使用 --env-file 标志来加载多个 .env 文件。如果同一个变量在不同的文件中被定义，后加载的文件会覆盖先加载的文件中的值。
 - `--rm` 在容器终止运行后自动删除容器文件
 - `-v, --volume "/path/to/host/machine:/path/to/container`
 - `--restart always` [Start containers automatically](https://docs.docker.com/config/containers/start-containers-automatically/)
@@ -314,6 +315,20 @@ docker build 时不能进行内部域名解析的解决办法
 docker run -it --dns 8.8.8.8 --dns 8.8.4.4 alpine
 docker run -it --add-host internal.example.com:10.10.8.8
 docker run -it --network=host
+```
+
+### docker context
+
+[Docker contexts | Docker Docs](https://docs.docker.com/engine/manage-resources/contexts/)
+
+```sh
+docker context create my-remote-context --docker "host=ssh://user@remote-server-ip"
+# 切换到新的上下文
+docker context use my-remote-context
+# 像操作本地 Docker 一样操作远程服务器
+docker ps
+# 切换回本地上下文
+docker context use default
 ```
 
 ## build image with Dockerfile
