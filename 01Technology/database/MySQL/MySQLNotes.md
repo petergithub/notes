@@ -62,6 +62,14 @@ SET NAMES utf8mb4;
 建立数据库: `CREATE DATABASE 库名;`
 删除数据库: `DROP DATABASE 库名 IF EXISTS 库名;`
 
+CREATE DATABASE `xxl_job` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */
+
+```sql
+ALTER DATABASE `xxl_job`
+DEFAULT CHARACTER SET utf8mb4
+DEFAULT COLLATE utf8mb4_unicode_ci;
+```
+
 ### Table
 
 显示数据库中的数据表: `SHOW TABLES;`

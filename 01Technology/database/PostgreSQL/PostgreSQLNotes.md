@@ -23,6 +23,8 @@
 ```sh
 psql --help
 
+docker run -d -it --name postgres -e POSTGRES_PASSWORD=password postgres:16.3
+
 # 连接数据库 -U 指定用户，-d 指定数据库，-h 指定服务器，-p 指定端口
 psql -h localhost -p 5432 -U postgres --password -c select 1;
 
@@ -1570,6 +1572,9 @@ pg_dumpall -h localhost -p 5432 -U postgres -f /tmp/pg_dumpall.sql
 pg_dump -U username -F t -j 4 -f backup.tar database_name
 # 压缩备份
 pg_dump -U username database_name | gzip > /tmp/backup.gz
+
+# 属于 DB URI
+pg_dump --dbname=postgresql://username:password@127.0.0.1:5432/mydatabase
 ```
 
 1. `--column-inserts` 以带有列名的 `INSERT` 命令形式转储数据。This will **make restoration very slow**; it is mainly useful for making dumps that can be loaded into non-PostgreSQL databases
@@ -1664,8 +1669,7 @@ pg_restore -U username -j 4 -d target_database backup_file
 
 - `-c, --clean` Before restoring database objects, issue commands to DROP all the objects that will be restored. This option is useful for overwriting an existing database. If any of the objects do not exist in the destination database, ignorable error messages will be reported, unless --if-exists is also specified
 - `--if-exists` Use DROP ... IF EXISTS commands to drop objects in --clean mode.
-- `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it.
-                  **When this option is used, the database named with -d is used only to issue the initial DROP DATABASE and CREATE DATABASE commands. All data is restored into the database name that appears in the archive.**
+- `-C, --create` Create the database before restoring into it. If --clean is also specified, drop and recreate the target database before connecting to it. **When this option is used, the database named with -d is used only to issue the initial DROP DATABASE and CREATE DATABASE commands. All data is restored into the database name that appears in the archive.**
 - `-d dbname, --dbname=dbname` Connect to database dbname and restore directly into the database.
 - `-e, --exit-on-error` Exit if an error is encountered while sending SQL commands to the database.
 - `-f, filename, --file=filename` Specify output file for generated script, or for the listing when used with -l. Use - for stdout.
