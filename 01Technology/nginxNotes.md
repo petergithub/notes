@@ -50,6 +50,8 @@ Where signal may be one of the following:
 `nginx -t` Test your configuration file for syntax errors
 `sudo systemctl reload nginx` reload Nginx
 
+[Restricting Access with HTTP Basic Authentication | NGINX Documentation](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/)
+
 ## Location正则写法
 
 ### 规则[doc](http://nginx.org/en/docs/http/ngx_http_core_module.html#location)

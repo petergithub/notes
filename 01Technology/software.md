@@ -332,4 +332,8 @@ Jenkins, 国内Coding.net, GitCafe，Git@OSC的兴起, GitLab的进步与稳定
 
 ## Low code
 
+[yangzongzhuan/RuoYi:(RuoYi)官方仓库 基于SpringBoot的权限管理系统 易读易懂、界面简洁美观。 核心技术采用Spring、MyBatis、Shiro没有任何其它重度依赖。直接运行即可用](https://github.com/yangzongzhuan/RuoYi)
+
 [NocoBase 一个极易扩展的开源无代码开发平台](https://docs-cn.nocobase.com/welcome/introduction)
+
+[crmeb Java商城 免费 开源 CRMEB商城JAVA版，SpringBoot + Maven + Swagger + Mybatis Plus + Redis + Uniapp +Vue+elementUI 包含移动端、小程序、PC后台、Api接口；有产品、用户、购物车、订单、积分、优惠券、营销、余额、权限、角色、系统设置、组合数据、可拖拉拽的form表单等模块，大量的减少了二开的成本。](https://github.com/crmeb/crmeb_java)

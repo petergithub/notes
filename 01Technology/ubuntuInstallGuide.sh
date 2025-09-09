@@ -183,7 +183,7 @@ cheat -v && cd .. && rm -r cheat
 # Reference: https://ubuntuforums.org/showthread.php?t=1501339
 (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep enforce) && sudo apt-get -y install apparmor-utils && sudo aa-complain /usr/sbin/tcpdump && (sudo grep tcpdump /sys/kernel/security/apparmor/profiles | grep complain) && echo setup for tcpdump
 
-sudo pip install shadowsocks
+# sudo pip install shadowsocks
 
 ########## development tools END ##########
 

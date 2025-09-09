@@ -70,6 +70,8 @@ ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 
 [10 VS Code Extensions I Can't Live Without](https://www.howtogeek.com/vs-code-extensions-i-cant-live-without/)
 
+[wanniwa/EditorJumper: EditorJumper is a JetBrains IDE plugin that allows you to seamlessly jump between JetBrains IDE and other popular code editors (such as VS Code, Cursor, Trae, and Windsurf). It maintains your cursor position and editing context, greatly improving development efficiency in multi-editor environments.](https://github.com/wanniwa/EditorJumper)
+
 ### VS Code Windows
 
 `Shift+Delete` Delete line

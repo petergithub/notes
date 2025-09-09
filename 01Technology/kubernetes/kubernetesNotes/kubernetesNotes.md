@@ -1574,6 +1574,14 @@ Kubernetes采用静态资源调度方式，对于每个节点上的剩余资源�
 
 另外所有Pod上都要声明resources。对于没有声明resources的Pod，它被调度到某个节点后，Kubernetes也不会在对应节点上扣掉这个Pod使用的资源。可能会导致节点上调度过去太多的Pod。
 
+how to find the requests and limits?
+
+[Does anyone actually have a good way to deal with OOMKilled pods in Kubernetes? : r/kubernetes](https://www.reddit.com/r/kubernetes/comments/1mphmvl/does_anyone_actually_have_a_good_way_to_deal_with/)
+
+Use Goldilocks or VPA in recommendation mode and let it run for a month and take the suggested requests and limits. Stress test and performance test your applications and isolate whether you have issues like memory leaks, or at the very least understand the failure modes of your system.
+
+[FairwindsOps/goldilocks: Get your resource requests "Just Right"](https://github.com/FairwindsOps/goldilocks)
+
 ## Troubleshooting
 
 ### Pod exit code

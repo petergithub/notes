@@ -612,7 +612,16 @@ git config --global user.email "email@gmail.com"
 
 I just want to clone this repository
 If you want to simply clone this empty repository then run this command in your terminal.
-it clone `http://username@host/project.git`
+it clone `http://username@host/project.git
+
+```bash
+# clone config 项目到当前目录
+git init .
+git remote add origin https://gitee.com/configuration.git
+git pull origin work
+# 修改 URL
+# url = git@gitee.com/configuration.git
+```
 
 #### My code is ready to be pushed
 

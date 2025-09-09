@@ -437,6 +437,7 @@ docker run --rm --name redis -p 6379:6379 -d redis:6-alpine
 docker run --rm --name mongo -d mongo:4.2.7
 
 docker run -it --rm --name postgres postgres:16.3 psql
+docker run -d -it --name postgres -e POSTGRES_PASSWORD=password postgres:16.3
 
 # Jenkins with blue ocean
 docker run -d -p 8081:8080 -p 50000:50000 -v /data/docker/jenkins/jenkins_home:/var/jenkins_home -v /usr/share/apache-maven:/usr/local/maven -v /etc/localtime:/etc/localtime --name jenkins jenkinsci/blueocean:1.25.5
