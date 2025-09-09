@@ -282,6 +282,31 @@ The fields, required in CSR are listed below:
 |/OU=   |Organizational Unit |IT Department
 |/CN=   |Common Name         |example.com (the domain name the Certificate will be issued for, e.g. *.example.com)
 
+## SpringBoot 项目 localhost 证书
+
+目标：通过 `https://localhost:8080` 访问项目
+
+```sh
+# 给 localhost 生成证书
+keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore /tmp/localhost.p12 -validity 3650 -dname "CN=localhost,OU=IT,O=MyCompany,L=MyCity,S=MyState,C=MyCountry" -keypass mypassword -storepass mypassword
+```
+
+Springboot 项目配置 application.yml 的 ssl 配置
+
+```yaml
+server:
+  # 服务器的HTTP端口，默认为 8080
+  port: 8080
+  ssl:
+    # 证书文件绝对路径
+    key-store: file:///tmp/localhost.p12
+    # 证书文件classpath: 指向 src/main/resources 目录
+    # key-store: classpath:localhost.p12
+    key-store-password: mypassword
+    key-store-type: PKCS12
+    key-alias: localhost
+```
+
 ## [acme 生成证书](https://github.com/acmesh-official/acme.sh/wiki/说明)
 
 ```sh
