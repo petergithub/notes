@@ -7,6 +7,7 @@
 ```sh
 # stderr > stdout
 /data/apps/shell/monitor.sh >> /data/logs/scripts/monitor.log 2>&1
+/data/apps/shell/monitor.sh &>> /data/logs/scripts/monitor.log
 
 # get all available shells
 cat /etc/shells
@@ -73,10 +74,10 @@ cp somefile{,.bak} #（会被扩展成 cp somefile somefile.bak）
 mkdir -p test-{a,b,c}/subtest-{1,2,3} #（会被扩展成所有可能的组合，并创建一个目录树）。
 
 # 在 Bash 中，同时重定向标准输出和标准错误：
-通常，为了保证命令不会在标准输入里残留一个未关闭的文件句柄捆绑在你当前所在的终端上，在命令后添加 `</dev/null` 是一个好习惯。
+# 通常，为了保证命令不会在标准输入里残留一个未关闭的文件句柄捆绑在你当前所在的终端上，在命令后添加 `</dev/null` 是一个好习惯。
 some-command >logfile 2>&1
 # 或者
-some-command &>logfile
+some-command &> logfile
 ```
 
 ### stdin, stdout, stderr, <, >, >>, <<, <<<
@@ -96,6 +97,23 @@ The redirection operators `<` and `>` let you read and write files instead of co
 `>>` If you double the `>` in an output redirect, it appends to the file instead of clobbering it.
 `<<` it creates a "[here document](https://tldp.org/LDP/abs/html/here-docs.html)", temporarily redirecting the input of the command from the source containing the command itself. It's not actually that useful interactively, because commands read from the terminal by default without any redirection, and you can always press control-D to send end-of-file to them. But it's very handy for shell scripts, since you can effectively embed an input file in the script without having to ship (or create in the script) a second file.
 `<<<` here-strings, which allow you to do one-line heredocs by tripling the < and putting the text right after those instead of on following lines delimited by a sentinel. `cat <<<'this is some text'`
+
+```sh
+# use `2>` to redirect to stderr
+foo > stdout.txt 2> stderr.txt
+# all output redirect to the same file
+foo > allout.txt 2>&1
+
+# `2>&1` 是将标准出错重定向到标准输出
+ls /fake/directory > peanuts.txt 2>&1
+# redirect both stdout and stderr to a file with more recent version
+ls /fake/directory &> peanuts.txt
+
+# redirect both stdout and stderr to /dev/null
+ls /fake/directory > /dev/null 2>&1
+
+# log4j.appender.console.target=System.err
+```
 
 ```sh
 #!/usr/bin/env bash
@@ -399,8 +417,17 @@ echo -e "\n\nCheck permission"
 - `set -o pipefail` 管道命令中， 只要一个子命令失败，整个管道命令就失败，脚本就会终止执行
 - `set -o nounset` 在默认情况下，遇到不存在的变量，会忽略并继续执行，而这往往不符合预期，加入该选项，可以避免恶果扩大，终止脚本的执行。
 - `bash -n scriptname`  # don't run commands; check for syntax errors only
+- `set +H`      # Disable history expansion
+- `set -H`      # Re-enable history expansion
 
 有些Linux命令，例如rm的-f参数可以强制忽略错误，此时脚本便无法捕捉到errexit，这样的参数在脚本里是不推荐使用的。
+
+```sh
+# Example
+set +H      # Disable history expansion
+echo !$     # This will output !$ literally, not the last argument
+set -H      # Re-enable history expansion
+```
 
 #### `dirname $0`
 
