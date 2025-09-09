@@ -5,8 +5,6 @@
 学习系统结构的最好方法是自己做一个linux系统, 再也没有什么能比自己做一个linux系统更能学习系统结构的了. LFS (linux from scratch)可以教你从源代码自己编译一个系统. 通过自己编译一个系统, 你就可以了结linux系统结构, 知道哪些文件是干什么用的, 以及他们如何协调 工作.
 Linux内核设计与实现 Linux Kernel Development(Third Edition)-Robort Love
 
-## TODO
-
 ## Recent
 
 emacs save and quit: `Ctrl+x, Ctrl+c`
@@ -35,7 +33,13 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 当shell接收到sigspec指定的信号时，arg参数（命令）将会被读取，并被执行。
 例如：`trap "exit 1" HUP INT PIPE QUIT TERM` 表示当`shell`收到`HUP INT PIPE QUIT TERM`这几个命令时，当前执行的程序会读取参数`exit 1`，并将它作为命令执行
 
+```sh
+# To list only hidden files
+ls -d .[\!.]*
+```
+
 `ls -S` —— 按文件大小排序
+
 `mv {short,very_long}.txt` will move short.txt to very_long.txt
 `CTRL+h`: show hidden files
 `nautilus`: open your home folder
@@ -52,12 +56,6 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 
 execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
 `$((1 + RANDOM % 1000))` random number between 1 and 1000
-
-`foo > stdout.txt 2> stderr.txt` use `2>` to redirect to stderr
-`foo > allout.txt 2>&1` all output redirect to the same file
-`log4j.appender.console.target=System.err`
-`ls /fake/directory > peanuts.txt 2>&1` `2>&1` 是将标准出错重定向到标准输出
-redirect both stdout and stderr to a file: `$ ls /fake/directory &> peanuts.txt`
 
 get the MD5 hash `echo -n Welcome | md5sum`
 
@@ -501,8 +499,11 @@ endif
 
 #### Mutiple tab
 
-`:n` next file `:p` previous file
-`:bn` 和 `:bp` `:n` 使用这两个命令来切换下一个或上一个文件. （陈皓注: 我喜欢使用:n到下一个文件）
+`:n` next file `:N` previous file
+`:bn` 和 `:bp` 使用这两个命令来切换下一个或上一个文件
+`buffers` 和 `:ls` 列出所有打开的文件
+`:bNUMBER` 切换到指定的文件
+`:e` 和 `:split` 打开文件, `:vsplit` 垂直打开文件
 
 #### vim folder
 
@@ -718,7 +719,8 @@ lesskey
 `find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
 `find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
 `find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
-`find /root/logs/user_center/* -mtime +2 -type f | xargs gzip`  File’s data was last modified n*24 hours ago
+`find /root/logs/user_center/* -mtime +2 -type f -not -name "*.gz" | xargs gzip`  File's data was last modified n*24 hours ago
+`find . -name "test*" \! -name "*.txt"` start with test and not end with .txt
 `find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
 `find . -type l -ls` To list all of the symlinks or symbolic links or soft links in a Linux system, run
 
@@ -1397,6 +1399,7 @@ Graphically:
 MAILTO=username@example.org
 # 如果不能发送邮件，设置邮箱为空, 避免 /var/spool/postfix/ldrop 下面有很多文件
 MAILTO='"'
+PATH=/data/software/pgsql-16.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
 5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
 # 查找并删除 30 天前的文件
 0 2 * * * find /data/backup/postgresql.temp -type f -mtime +3 | xargs gzip
@@ -2919,6 +2922,12 @@ Tcp: 1 200 120000 -1 25169661 1267603036 5792926 11509899 84 16782050531 1826867
     查看路由过程中哪些节点是瓶颈
     查看带宽的使用情况
 
+##### nslookup
+
+```sh
+nslookup google.com 172.28.7.70
+```
+
 ##### ip route 配置静态路由
 
 ```sh
@@ -3572,15 +3581,6 @@ Defaults        env_reset
 `hostname newname`
 `vi /etc/hostname`
 `vi /etc/hosts`
-
-### update hosts
-
-redirect it to ustc:lug.ustc.edu.cn
-var url = request.url.replace('googleapis.com', 'lug.ustc.edu.cn');
-refer to [ReplaceGoogleCDN](https://github.com/justjavac/ReplaceGoogleCDN)
-vi /etc/hosts
-202.141.162.123 www.ajax.googleapis.com
-202.141.162.123 ajax.googleapis.com
 
 ### 设置 DNS
 
