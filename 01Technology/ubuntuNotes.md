@@ -36,22 +36,22 @@ ubuntu reset menu bar: restart unity `sudo killall unity-panel-service` or `alt 
 ```sh
 # To list only hidden files
 ls -d .[\!.]*
+ls -S # 按文件大小排序
+
+mv {short,very_long}.txt # will move short.txt to very_long.txt
+CTRL+h # show hidden files
+nautilus # open your home folder
+location # make a command can be call anywhere
+ln -sfn # update a symbolic link
+ps -A -opid,stime,etime,args # 查看进程的启动时间
+pstack # Linux命令查看某个进程的当前线程栈运行情况
+ps huH p <PID_OF_U_PROCESS> | wc -l # monitor the active thread count of a process (jvm)
+last # To find out when a particular user last logged in to the Linux or Unix server.
+
+fuser # command (short for "file user"), this will show you information about the process that is using the file or the file user.
+sudo service network-manager start
 ```
 
-`ls -S` —— 按文件大小排序
-
-`mv {short,very_long}.txt` will move short.txt to very_long.txt
-`CTRL+h`: show hidden files
-`nautilus`: open your home folder
-`location`: make a command can be call anywhere
-`ln -sfn` update a symbolic link
-`ps -A -opid,stime,etime,args` 查看进程的启动时间
-`pstack` Linux命令查看某个进程的当前线程栈运行情况
-`ps huH p <PID_OF_U_PROCESS> | wc -l` monitor the active thread count of a process (jvm)
-`last`    To find out when a particular user last logged in to the Linux or Unix server.
-
-`fuser` command (short for "file user"), this will show you information about the process that is using the file or the file user.
-`sudo service network-manager start`
 [network-manager](http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb)
 
 execute `echo 2` 5 times: `seq 5 | xargs -I@ -n1 echo 2`
@@ -469,21 +469,25 @@ vimdiff  FILE_LEFT  FILE_RIGHT
 :windo set wrap
 ```
 
-跳转到下一个差异点 `]c`. 反向跳转是: `[c`
-`dp` (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
-`do` (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
-`:diffu[pdate]` #更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
-`zo` (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
-`zc` (folding close)重新折叠
+```sh
+]c # 跳转到下一个差异点.
+[c # 反向跳转
+dp # (diff "put") 把一个差异点中当前文件的内容复制到另一个文件里
+do # (diff "get", 之所以不用dg, 是因为dg已经被另一个命令占用了)把另一个文件的内容复制到当前行
+:diffu[pdate] # 更新diff 修改文件后, vimdiff会试图自动来重新比较文件, 来实时反映比较结果. 但是也会有处理失败的情况, 这个时候需要手工来刷新比较结果:
+zo # (folding open, 之所以用z这个字母, 是因为它看上去比较像折叠着的纸) 展开被折叠的相同的文本行
+zc # (folding close)重新折叠
 
-`CTRL+w, w` 在两个文件之间来回跳转
-`CTRL+w K`(把当前窗口移到最上边)
-`CTRL+w H`(把当前窗口移到最左边)
-`CTRL+w J`(把当前窗口移到最下边)
-`CTRL+w L`(把当前窗口移到最右边)
-`CTRL+w,r` 交换上/下、左/右两个分隔窗口的位置
-其中2和4两个操作会把窗口改成垂直分割方式.
-`> -`, `> +` 调整窗口大小
+CTRL+w, w # 在两个文件之间来回跳转
+CTRL+w K # (把当前窗口移到最上边)
+CTRL+w H # (把当前窗口移到最左边)
+CTRL+w J # (把当前窗口移到最下边)
+CTRL+w L # (把当前窗口移到最右边)
+CTRL+w,r # 交换上/下、左/右两个分隔窗口的位置
+# 其中2和4两个操作会把窗口改成垂直分割方式.
+> - # 调整窗口大小
+> + # 调整窗口大小
+```
 
 ```sh
 # 设置对比色彩模板 如 evening, darkblue.vim, torte.vim
@@ -494,16 +498,21 @@ vimdiff  FILE_LEFT  FILE_RIGHT
 if &diff
     colorscheme evening
 endif
-
 ```
 
 #### Mutiple tab
 
-`:n` next file `:N` previous file
-`:bn` 和 `:bp` 使用这两个命令来切换下一个或上一个文件
-`buffers` 和 `:ls` 列出所有打开的文件
-`:bNUMBER` 切换到指定的文件
-`:e` 和 `:split` 打开文件, `:vsplit` 垂直打开文件
+```sh
+:n # next file
+:N # previous file
+:bn # 和 :bp 使用这两个命令来切换下一个或上一个文件
+:buffers # 列出所有打开的文件
+:ls # 列出所有打开的文件
+:bNUMBER # 切换到指定的文件
+:e # 打开文件
+:split # 打开文件
+:vsplit # 垂直打开文件
+```
 
 #### vim folder
 
@@ -707,89 +716,86 @@ lesskey
 
 ### find
 
-`find -L "$HOME/MySymlinkedPath" -name "run*.sh"`  traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
-`find . -name '*.htm' | xargs  perl -pi -e 's|old|new|g'`
-`find . -type f -name "*.log" | xargs grep "ERROR"` : 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
-`find . -name '*.xml' -o -name '*.java'` matches multiple patterns
-`Operators`  Operators join together the other items within the expression.
-`-o` (meaning logical OR) and `-a` (meaning logical AND).  Where an operator is missing, `-a` is assumed
-
-`find * -type f | grep fileName`    查找文件并列出相对路径
-`ls -R | grep fileName` 只是列出文件名
-`find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08` To find all files modified on the 7th of June, 2007
-`find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30` To find all files accessed on the 29th of september, 2008
-`find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30` files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
-`find /root/logs/user_center/* -mtime +2 -type f -not -name "*.gz" | xargs gzip`  File's data was last modified n*24 hours ago
-`find . -name "test*" \! -name "*.txt"` start with test and not end with .txt
-`find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20` List size top 20 files recursively
-`find . -type l -ls` To list all of the symlinks or symbolic links or soft links in a Linux system, run
-
-`find /home/admin -size +250000k` 超过250000k的文件，当然+改成-就是小于了
-
-- `find /home/admin -atime -1`  1天内访问过的文件
-- `find /home/admin -ctime -1`  1天内状态改变过的文件
-- `find /home/admin -mtime -1`  1天内修改过的文件
-- `find /home/admin -amin -1`  1分钟内访问过的文件
-- `find /home/admin -cmin -1`  1分钟内状态改变过的文件
-- `find /home/admin -mmin -1`  1分钟内修改过的文件
-
-- `+n`     for greater than n,
-- `-n`     for less than n,
-- `n`      for exactly n.
-
 ```sh
-# 查找并删除 30 天前的文件
-find /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
+find -L "$HOME/MySymlinkedPath" -name "run*.sh" # traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
+find . -type f -name "*.log" | xargs grep "ERROR" # 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
+find . -name '*.xml' -o -name '*.java' # matches multiple patterns
+# Operators  Operators join together the other items within the expression.
+# -o (meaning logical OR)
+# -a (meaning logical AND).  Where an operator is missing, -a is assumed
+find /data -type f -exec stat -c "%s %n" {} \; | sort -nr | head -n 20 # List size top 20 files recursively
+find . -type l -ls # To list all of the symlinks or symbolic links or soft links in a Linux system, run
+
+find /home/admin -size +250000k # 超过250000k的文件，当然+改成-就是小于了
+
+find /home/admin -atime -1  # 1天内访问过的文件
+find /home/admin -ctime -1  # 1天内状态改变过的文件
+find /home/admin -mtime -1  # 1天内修改过的文件
+find /home/admin -amin -1  # 1分钟内访问过的文件
+find /home/admin -cmin -1  # 1分钟内状态改变过的文件
+find /home/admin -mmin -1  # 1分钟内修改过的文件
+
++n     # for greater than n,
+-n     # for less than n,
+n      # for exactly n.
 ```
 
-#### 删除时排除文件
-
-delete file except notDelete.txt: `find . -type f -not -name notDelete.txt | xargs rm`
-`rm !(foo|bar)` 删除时排除文件, 当前目录下其他文件全部删除
-
-`ls | grep -v notDelete.log | xargs rm -r`
-
-#### 文件个数 count files in directory recursively
-
-`find . -type f | wc -l`
-`la -lR | grep "^-" | wc -l`
-
-#### 文件夹个数 count directories in directory recursively
-
-`find -mindepth 1 -type d | wc -l`
-`ls -lR | grep ^d | wc -l`
-
-#### 删除.svn文件夹
-
-`find . -type d -name ".svn" | xargs rm -rf`
-`find . -name "*.svn"  | xargs rm -rf`  或
-`find . -type d -iname ".svn" -exec rm -rf {} \;`
-
-#### 多目录重命名文件
-
-`for file in $(find . -name sync1.properties) do echo $file; done`
-`for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done`
-
-#### 文件内多字符串替换
+examples:
 
 ```sh
+# 查找固定日期的文件
+find . -type f -newermt 2007-06-07 ! -newermt 2007-06-08 # To find all files modified on the 7th of June, 2007
+find . -type f -newerat 2008-09-29 ! -newerat 2008-09-30 # To find all files accessed on the 29th of september, 2008
+find . -type f -newerct 2008-09-29 ! -newerct 2008-09-30 # files which had their permission changed on the same day, If permissions was not change on the file, 'c' would normally correspond to the creation date
+
+# 查找并删除 30 天前的文件
+find /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
+find /root/logs/user_center/* -mtime +2 -type f -not -name "*.gz" | xargs gzip # File's data was last modified n*24 hours ago
+find . -name "test*" \! -name "*.txt" # start with test and not end with .txt
+
+# 删除.svn文件夹
+find . -type d -name ".svn" | xargs rm -rf
+find . -name "*.svn" | xargs rm -rf
+find . -type d -iname ".svn" -exec rm -rf {} \;
+
+# 删除时排除文件
+# delete file except notDelete.txt:
+find . -type f -not -name notDelete.txt | xargs rm
+ls | grep -v notDelete.txt | xargs rm -r
+
+# 删除时排除文件, 当前目录下其他文件全部删除
+rm !(foo|bar)
+
+# 文件个数 count files in directory recursively
+find . -type f | wc -l
+la -lR | grep "^-" | wc -l
+
+# 文件夹个数 count directories in directory recursively
+find -mindepth 1 -type d | wc -l
+ls -lR | grep ^d | wc -l
+
+# 多目录重命名文件
+for file in $(find . -name sync1.properties) do echo $file; done
+for i in $(find . -name sync1.properties); do mv $i $(echo $i | sed 's/sync1.properties$/sync.properties/'); done
+
+# 文件内多字符串替换
 # xml 文件格式的内容替换成 properties 的等号格式
 # sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'
 find . -name '*.xml' -exec sed -i 's#\"><!\[CDATA\[#=#g; s#\t<entry key=\"##g; s#]]></entry>##g; s#</entry>##g; /<?xml version="1.0" encoding="UTF-8"?>/d; /DOCTYPE properties SYSTEM "http:\/\/java.sun.com\/dtd\/properties.dtd"/d; /<properties>/d; /<\/properties>/d' {} \;
+
+# 查找包含class的jar文件
+find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done
+find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done
+
+# 文件及文件名乱码处理 删除文件名乱码文件 重命名 rename
+# print the index number of each file(文件的i节点) 12345
+ls -i
+# rm
+find . -inum 12345 -print -exec rm {} -r \;
+# mv
+find . -inum 12345 -exec mv {} NewName \;
+# 命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 ```
-
-#### 查找包含class的jar文件
-
-`find . -iname \*.jar | while read JARF; do jar tvf $JARF | grep CaraCustomActionsFacade.class && echo $JARF ; done`
-`find . -iname \*.jar | while read JARF; do /app/java/jdk1.6.0_35/bin/jar tvf $JARF | grep FunctionName.class && echo $JARF ; done`
-
-#### 文件及文件名乱码处理 删除文件名乱码文件 重命名 rename
-
-1. `ls -i` print the index number of each file(文件的i节点) 12345
-2. `find . -inum 12345 -print -exec rm {} -r \;` rm
-3. `find . -inum 23244066 -exec mv {} NewName \;` mv
-
-命令中的"{}"表示find命令找到的文件, 在-exec选项执行mv命令的时候, 会利用按i节点号找到的文件名替换掉"{}"
 
 ### grep
 
@@ -831,44 +837,72 @@ pgrep -l apache2
 [Linux Sed命令详解](https://qianngchn.github.io/wiki/4.html)
 
 ```sh
-# 注释行
-# If BBB is at the beginning of the line:
-sed -i 's/^BBB/#&/' file
+# 多个模式
+sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d' file
+# 删除行
+sed -i '/DELETE_LINE/d' file
 
-# If BBB is in the middle of the line:
+# 注释行
+# If BBB is at the beginning of the line
+sed -i 's/^BBB/#&/' file
+# If BBB is in the middle of the line
 sed-i  's/^[^#]*BBB/#&/' file
 
 # 从文本内的第一个包含start内容的部分截取直到end为止；
 sed -n '/start/,/end/p' file
 # 设置为时间，可以用于截取一定时间范围内的日志
 sed -n '/2021:09:20:10/,/2021:09:20:39/p' access.log
+
+# 删除行尾空格:
+sed -i 's/\s+$//g' filename
+# 删除行首多余空格:
+sed -i 's/^\s*//g' filename
+# 或者
+sed -i 's/^ *//g' filename
+# 删除沒有內容的空行:
+sed -i 's/^$//g' filename
+# 删除包含有空格组成的空行:
+sed -i 's/^\s*$//g' filename
+# 删除以空格或TAB开头到结尾的空行:
+sed -i 's/^[ |\t]*$//g' filename
+# 替换变量:在正则式中以`\(`和`\)`括起来的正则表达式, 在后面使用的时候可以用`\1`、`\2`等变量来访问`\(`和`\)`中的内容.
+# 把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法
+sed -i 's/abc\(.*\)xyz/xyz\1abc/g' filename
+# or
+sed -i 's/\(abc\)\(.*\)\(xyz\)/\3\2\1/g' filename
+# 把ABC转换为小写
+echo "ABC" | sed 's/[A-Z]*/\L&\E/'
+# 或
+echo "ABC" | sed 's/[A-Z]/\l&/g'
+# 把abc转换为大写
+echo "abc" | sed 's/[a-z]*/\U&\E/'
+# 或
+echo "abc" | sed 's/[a-z]/\u&/g'
+echo "ab_c" | sed 's/_[a-z]/\u&/g'
+echo "ab_c" | sed 's/_[a-z]/\U&\E/g'
+# 删除一个以上空格, 用一个空格代替
+sed -i 's/[ ] [ ] [ ] */[ ]/g' filename
+# 删除行首空格
+sed -i 's/^[ ][ ] *//g' filename
+# 删除句点后跟两个或更多空格, 代之以一个空格
+sed -i 's/\ .[ ][ ] */[ ]/g' filename
+# 删除以句点结尾行
+sed -i 's/\ . $//g' filename
+# 删除包含a b c d的行
+sed -i '/abcd/d' filename
+# 删除第一个字符
+sed -i 's/^ .//g' filename
+# 删除紧跟C O L的后三个字母
+sed -i 's/COL \ ( . . . \ )//g' filename
+# 从路径中删除第一个`\`
+sed -i 's/^ \///g' filename
+# 删除所有空格并用tab键替代
+sed -i 's/[ ]/\t/g' filename
+# 删除行首所有tab键
+sed -i 's/^\t//g' filename
+# 删除所有tab键
+sed -i 's/\t//g' filename
 ```
-
-多个模式 `sed -i 's/OLD1/NEW1/g; s/OLD2/NEW2/g; /DOCTYPE properties SYSTEM/d'`
-删除行 `sed -i '/DELETE_LINE/d'`
-
-删除行尾空格: `%s/\s+$//g`
-删除行首多余空格: `%s/^\s*// 或者 %s/^ *//`
-删除沒有內容的空行: `%s/^$//`
-删除包含有空格组成的空行: `%s/^\s*$//`
-删除以空格或TAB开头到结尾的空行: `%s/^[ |\t]*$//`
-替换变量:在正则式中以`\(`和`\)`括起来的正则表达式, 在后面使用的时候可以用`\1`、`\2`等变量来访问`\(`和`\)`中的内容.
-把文中的所有字符串"abc……xyz"替换为"xyz……abc"可以有下列写法 `:%s/abc\(.*\)xyz/xyz\1abc/g` or `:%s/\(abc\)\(.*\)\(xyz\)/\3\2\1/g`
-把ABC转换为小写 `echo "ABC" | sed 's/[A-Z]*/\L&\E/'` 或 `echo "ABC" | sed 's/[A-Z]/\l&/g'`
-把abc转换为大写 `echo "abc" | sed 's/[a-z]*/\U&\E/'` 或 `echo "abc" | sed 's/[a-z]/\u&/g'`
-    `echo "ab_c" | sed 's/_[a-z]/\u&/g'`
-    `echo "ab_c" | sed 's/_[a-z]/\U&\E/g'`
-删除一个以上空格, 用一个空格代替    `s/[ ] [ ] [ ] */[ ]/g`
-删除行首空格 `s/^[ ][ ] *//g`
-删除句点后跟两个或更多空格, 代之以一个空格 `s/\ .[ ][ ] */[ ]/g`
-删除以句点结尾行  `s/\ . $//g`
-删除包含a b c d的行  `-e/abcd/d`
-删除第一个字符 `s/^ .//g`
-删除紧跟C O L的后三个字母 `s/COL \ ( . . . \ )//g`
-从路径中删除第一个`\` `s/^ \///g`
-删除所有空格并用tab键替代 `s/[ ]/[TAB]//g`
-删除行首所有tab键 `s/^ [TAB]//g`
-删除所有tab键 `s/[TAB] *//g`
 
 #### 删除行
 
@@ -1319,29 +1353,36 @@ kill -9 $PID
 
 ### date
 
-`date --help`
+```sh
+date --help
 
-`date +%s`  Get Unix time stamp `1477998994`
-`date -d @1685455706` Convert Unix timestamp to Date `Tue May 30 22:08:26 CST 2023`
-`date -d 'Tue May 30 22:08:26 CST 2023' +%s` Convert Date to Unix timestamp `1685455706`
-`date -d '2023-05-30 22:08:26' +%s` Convert Date to Unix timestamp `1685455706`
+# Get Unix time stamp 1685455706
+date +%s
+# Convert Unix timestamp to Date Tue May 30 22:08:26 CST 2023
+date -d @1685455706
+# Convert Date to Unix timestamp 1685455706
+date -d 'Tue May 30 22:08:26 CST 2023' +%s
+date -d '2023-05-30 22:08:26' +%s
 
-`date -d '1 hours ago' "+%Y%m%d_%H"` 20161031_19
-`date -d '1 days ago' "+%F"` 2016-11-01
-`date -d now "+%Y%m%d %H:%M:%S"`
-`date +%Y%m%d%H%M%S.%N` 20161101191653.792204176
+# 20161031_19
+date -d '1 hours ago' "+%Y%m%d_%H"
+# 2016-11-01
+date -d '1 days ago' "+%F"
+date -d now "+%Y%m%d %H:%M:%S"
+# 20161031191653.792204176
+date +%Y%m%d%H%M%S.%N
 
-`date -R` for `--rfc-2822` format which displays correct offset
+# for --rfc-2822 format which displays correct offset
+date -R
 
-```bash
 TZ=Asia/Shanghai date -R
-> Wed, 30 Aug 2017 13:58:05 +0800
+# > Wed, 30 Aug 2017 13:58:05 +0800
 TZ=UTC-8 date -R
-> Wed, 30 Aug 2017 13:58:32 +0800
+# > Wed, 30 Aug 2017 13:58:32 +0800
 TZ=UTC date -R
-> Wed, 30 Aug 2017 05:58:36 +0000
+# > Wed, 30 Aug 2017 05:58:36 +0000
 TZ=UTC+8 date -R
-> Tue, 29 Aug 2017 21:58:33 -0800
+# > Tue, 29 Aug 2017 21:58:33 -0800
 ```
 
 设置时区
