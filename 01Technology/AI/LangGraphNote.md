@@ -79,7 +79,7 @@ pip install langgraph-cli
 # Builds a Docker image for the LangGraph API server that can be directly deployed.
 langgraph build
     -t, --tag TEXT # Required. Tag for the Docker image. Example: langgraph build -t my-image
-
+    -c, --config FILE langgraph.json # Path to configuration file declaring dependencies, graphs and environment variables.
 # Starts a lightweight development server that requires no Docker installation. This server is ideal for rapid development and testing. This is available in version 0.1.55 and up.
 langgraph dev
 

@@ -44,6 +44,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   - [AudioPen](https://audiopen.ai/demo)
 - 文本转音视频
   - 音频生成用 voice.ai 或 Eleven Labs，连字幕都可以用自己通过AI“训练”的个性专属字体。
+  - [AI Video Editor | Create viral videos with AI - Topview.ai](https://www.topview.ai/)
 - 视频处理
   - 把画出来的人物，喂文案让他变成频视的是D-ID；
   - 视频制作用 Descript 或 Runway
@@ -77,6 +78,8 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   - [Dify github](https://github.com/langgenius/dify)
   - [TEN Agent is a conversational AI](https://github.com/TEN-framework/TEN-Agent)
   - [RAG七十二式：2024年度RAG清单](https://mp.weixin.qq.com/s/_pnezCv-sKmzhho7Xw3D2g)
+- UI 设计工具
+  - [Stitch - Design with AI](https://stitch.withgoogle.com/?pli=1)
 
 [AI 工具列表 飞书文档](https://zl49so8lbq.feishu.cn/wiki/wikcn6YTN3CrZTS8RhrEca8c8Eg)
 [极客时间 AIGC 知识库](https://gp477l8icq.feishu.cn/wiki/JUXnwzSuviL5E9kh6jUc8FRinHe)
@@ -96,6 +99,28 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 | [bard.google.com](https://bard.google.com) | custom / search |
 | [bing.com/chat](https://bing.com/chat) | GPT-4/3.5 |
 | [italygpt.it](https://italygpt.it) | GPT-3.5 |
+
+[分享一下我现在每天最常用的AI产品](https://mp.weixin.qq.com/s/ES-9RTkiwIk99hphoUbfyg)
+
+1. AI知识问答： OpenAI-o3，豆包（国内）
+2. 写作和写内容： GPT-4.5（其他都是垃圾）
+3. 长文本处理： Gemini 2.5 Pro（其他都是垃圾）
+4. 深度研究： ChatGPT DeepResearch，秘塔AI（国内）
+5. 图片生成： Midjourney，即梦（国内），Flux（开源）
+6. 中文海报生成： 即梦3.0（国内，海外都是垃圾）
+7. 图片修改： Flux Context、豆包（国内）
+8. AI通用Agent： MiniMax Agent（国内）
+9. AI设计Agent： Lovart，星流（国内）
+10. AI编程Agent： Claude code
+11. AI编程IDE： Cursor，Trae（国内）
+12. AI音乐生成： Suno 4.5+、Mureka v7（国内）
+13. AI视频生成（带台词）： Veo3，即梦对口型大师版（国内）
+14. AI视频生成（无台词）： Veo3，其他的都是国内的。即梦（最常用，做各种风格化），可灵（做高质量运动），hailuo（动作表演、高速打斗）
+15. AI语音生成： 11Labs，Minimax（国内）
+16. AI 3D生成： Tripo
+17. AI工作流： 飞书多维表格
+18. AI翻译插件： 沉浸式翻译
+19. AI笔记和知识库： Get笔记
 
 ## AI 在研发场景落地的现状
 
@@ -154,6 +179,12 @@ Cline 使用 GitHub Copilot：API Provider > vscode lm api > Language Model > gi
 
 [Gemini Code Assist for business | Google Cloud](https://codeassist.google/products/business)
 [google-gemini/gemini-cli: An open-source AI agent that brings the power of Gemini directly into your terminal.](https://github.com/google-gemini/gemini-cli)
+
+Toggle integration: After the one-time setup, you can easily manage the integration:
+[Gemini CLI + VS Code: Native diffing and context-aware workflows - Google Developers Blog](https://developers.googleblog.com/en/gemini-cli-vs-code-native-diffing-context-aware-workflows/)
+
+To activate it: /ide enable
+To deactivate it: /ide disable
 
 ## AI 使用思路
 
