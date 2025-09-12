@@ -400,24 +400,21 @@ deployment strategies:
 
 ### Label
 
-`kubectl label pod kubia-manual creation_method=manual` Modifying labels of existing pods
-    `--overwrite`
-`kubectl get pod -l creation_method=manual` Listing pods using a label selector
-`kubectl get pod -l env` To list all pods that include the env label
-`kubectl get po -l '!env'` To list all pods that don’t have the env label
+```sh
+# option: --overwrite
+kubectl label pod kubia-manual creation_method=manual # Modifying labels of existing pods
+kubectl get pod -l creation_method=manual # Listing pods using a label selector
+kubectl get pod -l env # To list all pods that include the env label
+kubectl get po -l '!env' # To list all pods that don't have the env label
+```
 
 ### Namespaces
 
-`kubectl create ns name`
-`kubectl get ns`
-`kubectl get pod --namespace kube-system`
-
-`kubectl config set-context --current --namespace=piggy` change namespace
-`alias kcn='kubectl config set-context $(kubectl config current-context) --namespace '`
-
-`kubectl create -f dev.json`
-
-```json
+```sh
+kubectl create ns name
+kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+# create a namespace from a file
+cat <<EOF > dev.json
 {
   "apiVersion": "v1",
   "kind": "Namespace",
@@ -428,11 +425,20 @@ deployment strategies:
     }
   }
 }
-```
+EOF
+kubectl create -f dev.json
 
-`kubectl delete ns custom-namespace` delete the whole namespace (the pods will be deleted along with the namespace automatically)
-`kubectl delete po --all` Deleting all pods in a namespace, while keeping the namespace
-`kubectl delete all --all` Deleting (almost) all resources in a namespace
+kubectl get ns
+kubectl get pod --namespace kube-system
+
+# change namespace
+kubectl config set-context --current --namespace=piggy
+alias kcn='kubectl config set-context $(kubectl config current-context) --namespace '
+
+kubectl delete po --all # Deleting all pods in a namespace, while keeping the namespace
+kubectl delete all --all # Deleting (almost) all resources in a namespace
+kubectl delete ns custom-namespace # delete the whole namespace (the pods will be deleted along with the namespace automatically)
+```
 
 ### Ingress
 
