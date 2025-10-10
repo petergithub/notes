@@ -50,6 +50,18 @@ last # To find out when a particular user last logged in to the Linux or Unix se
 
 fuser # command (short for "file user"), this will show you information about the process that is using the file or the file user.
 sudo service network-manager start
+
+# Table 4-2: Commonly Used Character Classes
+
+whatis # Display a very brief description of a command
+info # Display a command's info entry
+apropos # Display a list of appropriate commands
+
+# Recent versions of bash provide a second, more streamlined method for performing combined redirection
+ls -1 /bin/usr &> ls-output.txt
+# This will work cor-rectly with most hidden files (though it still won't include filenames with multiple leading periods). The ls command with the -A option ("almost all") will provide a correct listing of hidden files:
+ls-A
+echo [!]*
 ```
 
 [network-manager](http://archive.ubuntu.com/ubuntu/pool/main/n/network-manager/network-manager_0.9.8.8-0ubuntu7.3_amd64.deb)
@@ -287,19 +299,38 @@ Jump back:  Type `CTRL-T` or `CTRL-O` (repeat to go further back)
 
 #### Set option Configuration
 
-`:set nu` / `:set nonu`    (不)列出行号 (nu为行数)
-`:set ic` / `:set noic`    vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`
-ignore case for just one search command, use  `\c` in the phrase:  `/ignore\c <ENTER>`
-`:set ru` / `:set noru`    Show the line and column number of the cursor position
-`:set list` / `:set nolist`   To display non-printable characters, such as control characters `$` is Newline, `^|` is Tab
-`:set listchars=nbsp:☠,tab:▸,eol:$,tab:>-,trail:~,extends:>,precedes:<` customized specified symbols to display.
+```sh
+:syntax on
 
-Typing ":set xxx" sets the option "xxx".  Some options are:
-        'ic' 'ignorecase'       ignore upper/lower case when searching
-        'is' 'incsearch'        show partial matches for a search phrase
-        'hls' 'hlsearch'        highlight all matching phrases
-     You can either use the long or the short option name.
-  Prepend "no" to switch an option off:   :set noic
+# sets the option "xxx"
+:set xxx
+# Some options are:
+# 'ic' 'ignorecase'       ignore upper/lower case when searching
+# 'is' 'incsearch'        show partial matches for a search phrase
+# 'hls' 'hlsearch'        highlight all matching phrases
+# You can either use the long or the short option name.
+#   Prepend "no" to switch an option off:   :set noic
+
+# (不)列出行号 (nu为行数)
+:set nu
+:set nonu
+# vi在查找过程中(不)区分大小写 `:set ignorecase` / `:set noignorecase`
+:set ic
+:set noic
+# Show the line and column number of the cursor position
+:set ru
+:set noru
+# To display non-printable characters, such as control characters `$` is Newline, `^|` is Tab
+:set list
+# customized specified symbols to display.
+:set listchars=nbsp:☠,tab:▸,eol:$,tab:>-,trail:~,extends:>,precedes:<
+# (不)自动换行
+:set wrap
+:set nowrap
+# (不)高亮搜索结果
+:set hls
+:set nohls
+```
 
 #### custom keyboard shortcut
 
@@ -3496,7 +3527,7 @@ EXAMPLES:
 `sudo service network-manager restart`
 网卡的启动与关闭 `ifconfig en0 up/down`
 
-#### vi /etc/sysconfig/network-scripts/ifcfg-eth0
+#### network interface /etc/sysconfig/network-scripts/ifcfg-eth0
 
 DEVICE   =   eth0
 ONBOOT   =   yes
@@ -3552,25 +3583,47 @@ Finally, to remove manual/automatic proxy setting, and revert to no-proxy settin
 
 ### User
 
-`groupadd <groupName>`    Add a new group
-`gpasswd --delete username groupName`  remove a user from a group groupName `/etc/group`
-`groups username`    To find group memebership for username
+```sh
+# Add a new group
+groupadd <groupName>
+# remove a user from a group groupName /etc/group
+gpasswd --delete username groupName
+# To find group memebership for username
+groups username
 
-`useradd -g <groupName> --create-home --comment "Account for running Confluence" --shell /bin/zsh confluence`
-`useradd -g <groupName> <username>`    Add a new user to primary group
-`useradd -G <groupName> <username>`    Add a new user to secondary group
-`usermod -G {groupname1,groupname2,...} <username>`    Remove user from group which is not list in the command
-`usermod -aG sudoGroupName username` add the user to the sudo group `/etc/sudoers`, edit it by `visudo`.
-    sudo group: `wheel` in CentOS, `sudo` in Ubuntu
-configure sudo to never ask for your password. add the following line: `username ALL=(ALL) NOPASSWD: ALL` in the bottom of the file.
+# Add a new user to primary group
+useradd -g <groupName> --create-home --comment "Account for running Confluence" --shell /bin/zsh confluence
+useradd -g <groupName> <username>
+# Add a new user to secondary group
+useradd -G <groupName> <username>
+# Remove user from group which is not list in the command
+usermod -G {groupname1,groupname2,...} <username>
 
-`passwd <username>`    update password
-`vipw` 管理所有用户
-`id <username>`    get the user
-`id -nG <username>`    Find out user group identity
-`less /etc/group` or `groups`    Get all groups in system
+# add the user to the sudo group /etc/sudoers, edit it by visudo.
+# sudo group: wheel in CentOS, sudo in Ubuntu
+usermod -aG sudoGroupName username
+# configure sudo to never ask for your password. add the following line in the bottom of the file.
+username ALL=(ALL) NOPASSWD: ALL
+# ubuntu
+%sudo ALL=(ALL) NOPASSWD: ALL
 
-#### visudo
+# update password
+passwd <username>
+# 管理所有用户
+vipw
+# get the user
+id <username>
+# Find out user group identity
+id -nG <username>
+# Get all groups in system
+less /etc/group
+# or
+getent group
+# To list groups the current user belong to
+groups
+```
+
+#### sudo
 
 ```sh
 # 默认不使用用户的环境变量，使用最小权限去执行
