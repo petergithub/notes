@@ -402,25 +402,34 @@ docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}}')
 docker exec -it container_name sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')"
 
 # prunes images, containers, and networks. Volumes are not pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
-docker system prune
+docker system prune --filter "until=24h"
 
 # crontab
-1 1 1 * * /usr/bin/docker exec jenkins-docker sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')" >> /var/log/docker_image_cleanup.log 2>&1
+1 1 1 * * /usr/bin/docker exec jenkins-docker sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')" && /usr/bin/docker exec jenkins-docker sh -c "docker system prune -f --filter "until=24h"" >> /var/log/docker_image_cleanup.log 2>&1
 ```
 
 查到docker 目录大小后，通过可写层目录(diff的子目录)反查容器id:
 
 ```sh
-# du -sh /data/lib/docker/overlay2/8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
-6.8G    /data/lib/docker/overlay2/8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
+du -sh /data/lib/docker/overlay2/8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
+# 6.8G    /data/lib/docker/overlay2/8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
 
 # 根据开头字母 8dee7bf9d3e 查询挂载的容器 id
-# grep 8dee7bf9d3e /data/lib/docker/image/overlay2/layerdb/mounts/*/mount-id
-/data/lib/docker/image/overlay2/layerdb/mounts/8b98194a4ce7304cc04860ba3457a9538d7c4ed52bdb44a010c56a6deb85f87f/mount-id:8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
+grep 8dee7bf9d3e /data/lib/docker/image/overlay2/layerdb/mounts/*/mount-id
+# /data/lib/docker/image/overlay2/layerdb/mounts/8b98194a4ce7304cc04860ba3457a9538d7c4ed52bdb44a010c56a6deb85f87f/mount-id:8dee7bf9d3ecca8c90c791498521509a1962bf2a334574cfe2688dd585353b7a
 
 # 根据容器id 开头字母 8b98194a 查询容器名称
-# docker ps | grep 8b98194a
-8b98194a4ce7   infiniflow/ragflow:v0.18.0-slim  "./entrypoint.sh"  37 hours ago   Up 37 hours  0.0.0.0:8080->80/tcp,   ragflow-server
+docker ps | grep 8b98194a
+# 8b98194a4ce7   infiniflow/ragflow:v0.18.0-slim  "./entrypoint.sh"  37 hours ago   Up 37 hours  0.0.0.0:8080->80/tcp,   ragflow-server
+```
+
+根据 Docker volume id 查找挂载的容器
+
+```sh
+# /data/lib/docker/volumes/e60b5b4e95839637715849fecf13de5dc92851daca7e9963ae4bc2450e01a3f2
+
+docker ps -a --format "{{.ID}}\t{{.Names}}\t{{.Mounts}}" | grep e60b5b4e
+# aa3da2bbc3b6    jenkins-docker  /data/docker/j…,/home/jasolar/…,/data/docker/j…,e60b5b4e958396…,jenkins-docker…
 ```
 
 ## Useful image
