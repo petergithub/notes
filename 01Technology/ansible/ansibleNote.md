@@ -269,6 +269,12 @@ ansible all -m ansible.builtin.setup
 ansible all -m ansible.builtin.setup -a 'filter=ansible_ens*'
 # Only collect the default minimum amount of facts:
 ansible all -m ansible.builtin.setup -a 'gather_subset=!all'
+# Only collect IPv4 facts:
+ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
+# To get all network interfaces:
+ansible all -m ansible.builtin.setup -a 'filter=ansible_interfaces'
+# To get specific details about a particular interface:
+ansible all -m ansible.builtin.setup -a 'filter=ansible_eth0'
 ```
 
 ## ansible-playbook
