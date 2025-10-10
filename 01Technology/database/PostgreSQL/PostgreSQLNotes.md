@@ -117,6 +117,22 @@ postgres://<user>:<password>@localhost:5432/<database_name_1>?host=<hostname_1>
 postgresql://[userspec@][hostspec][/dbname][?paramspec]
 ```
 
+A .pgpass file in PostgreSQL is a secure way to store passwords for connections, preventing the need to type them manually or store them in less secure environment variables or scripts
+
+Create the .pgpass File
+
+```sh
+tee ~/.pgpass <<EOF
+# hostname:port:database:username:password
+
+# Match any connection to localhost on port 5432 for any database, using user 'postgres'
+localhost:5432:*:postgres:password
+EOF
+
+# Set the file permissions to 0600 (read/write only for the owner)
+chmod 0600 ~/.pgpass
+```
+
 ## SQL 命令
 
 ```sql
@@ -731,6 +747,7 @@ pg_stat_statements
 -- [PostgreSQL 16: F.32. pg_stat_statements — track statistics of SQL planning and execution](https://www.postgresql.org/docs/16/pgstatstatements.html)
 -- 查询最耗时的5个sql  需要开启 pg_stat_statements
 select * from pg_stat_statements order by total_exec_time desc limit 5;
+SELECT query, dbid, userid, total_exec_time, calls FROM pg_stat_statements ORDER BY total_exec_time DESC LIMIT 10;
 
 -- 获取执行时间最慢的3条SQL，并给出CPU占用比例
 SELECT substring(query, 1, 1000) AS short_query,
@@ -802,6 +819,7 @@ SELECT * FROM pg_stat_activity WHERE state = 'blocked';
 
 -- 返回全部信息
 SELECT * FROM pg_stat_activity where cardinality(pg_blocking_pids(pid)) > 0;
+SELECT pid, state, wait_event_type, wait_event, query_start, now() - query_start AS duration, query FROM pg_stat_activity WHERE state <> 'idle' ORDER BY duration DESC;
 
 -- list details about blocked sessions:
 -- Since 9.6 this is a lot easier as it introduced the function pg_blocking_pids() to find the sessions that are blocking another session.
@@ -840,6 +858,37 @@ select * from pg_catalog.pg_locks pl where pl.pid in (<pid>);
 select pid, locktype , relation , mode, granted from pg_catalog.pg_locks pl where pl.relation = <relation-from-sql-above>;
 select * from pg_catalog.pg_locks pl where pl.relation = <relation-from-sql-above>;
 ```
+
+根据 PostgreSQL 的 `pg_stat_activity` 视图中的 `wait_event_type` 和 `wait_event` 字段，我们可以总结出一个表格，用于快速诊断后端进程（Backend）正在等待什么资源。
+
+#### PostgreSQL 常见等待事件类型 (Wait Event Types) 总结
+
+`wait_event_type` 将等待事件分为几个大类，而 `wait_event` 则提供该大类下的具体原因。了解这些是诊断性能瓶颈的关键。
+
+| Wait Event Type (等待事件类型) | 常见 Wait Event (具体事件) | 瓶颈位置 | 诊断和影响 |
+| :--- | :--- | :--- | :--- |
+| **Client** | `ClientRead` | **Client/网络** | **服务器已完成工作，正在等待客户端发送下一个查询**，或等待客户端发送 `COPY` 数据。如果状态是 `idle in transaction`，则表示事务被长时间开放，是严重问题。 |
+| **Lock** | `tuple`、`relation`、`transactionid` | **PostgreSQL 执行端 (并发/事务)** | 进程正在等待获取锁，最常见是等待其他事务释放**行锁** (`tuple`) 或**表锁** (`relation`)。这是典型的**阻塞**问题。 |
+| **IO** | `DataFileRead`、`DataFileWrite` | **PostgreSQL 执行端 (磁盘 I/O)** | 进程正在等待从磁盘读写数据文件（如表或索引）。这通常是**磁盘I/O性能不足**或**缓存效率低**的信号。 |
+| **IPC** | `BufferPin`、`LWLocks` | **PostgreSQL 执行端 (内部同步)** | 进程正在等待访问共享内存中的资源，例如等待另一个进程释放对某个数据块（Buffer）的**引用锁** (`BufferPin`) 或**轻量级锁** (`LWLocks`)。这通常是高并发或内部系统瓶颈的信号。 |
+| **Timeout** | `Activity`、`DurableCommit` | **PostgreSQL 执行端 (配置/延迟)** | 进程正在等待一个配置的时间到期。例如，`DurableCommit` 表示进程在 `synchronous_commit` 模式下等待 WAL 数据被同步到持久存储。 |
+| **Activity** | `BgWriterMain`、`CheckpointerMain` | **PostgreSQL 内部进程** | 进程处于其主循环中，等待内部触发的活动（如后台写入、检查点）。这不是 Client 进程的等待事件。 |
+| **Extension** | (取决于扩展) | **扩展/插件** | 进程正在等待某个已安装的 PostgreSQL 扩展特定的资源。 |
+| **(NULL)** | (NULL) | **PostgreSQL 执行端 (CPU)** | 进程当前**没有等待**任何资源。这意味着它正在 CPU 上积极执行其任务（例如计算、解析、规划），或者它只是处于空闲状态 (`state: idle`)。 |
+
+---
+
+#### 进一步诊断建议
+
+当你发现一个查询的 `duration` 很长时，结合 `wait_event_type` 就可以快速定位问题：
+
+1.  **如果类型是 `Client`:**
+    * **关注状态：** 如果 `state` 是 **`idle in transaction`**，立即通知应用程序开发者解决事务管理问题，或者设置 `idle_in_transaction_session_timeout` 来自动终止它们。
+2.  **如果类型是 `Lock`:**
+    * **查找源头：** 使用 `pg_locks` 视图来确定是**哪个 PID** 持有锁，并阻塞了当前的慢查询。一旦找到阻塞进程，就可以分析它的事务内容并解决锁冲突。
+3.  **如果类型是 `IO` 或 `NULL` (但 `state` 是 `active`)：**
+    * **分析 I/O：** 检查 `pg_stat_statements` 的 I/O 统计信息。这通常意味着你需要优化查询，创建索引，或者升级你的存储系统。
+    * **分析 CPU：** 如果是 `NULL` 且耗时长，说明查询本身计算量大（如全表扫描、复杂聚合、触发器）。使用 `EXPLAIN ANALYZE` 来分析查询计划。
 
 #### 查找阻塞的 SQL
 
