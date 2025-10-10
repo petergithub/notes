@@ -19,6 +19,16 @@
 tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网卡适配器（NIC）置于混杂模式（promiscuous）来获取传输在网络中的信息包
 一般计算机网卡都工作在非混杂模式下，此时网卡只接受来自网络端口的目的地址指向自己的数据。当网卡工作在混杂模式下时，网卡将来自接口的所有数据都捕获并交给相应的驱动程序。网卡的混杂模式一般在网络管理员分析网络数据作为网络故障诊断手段时用到，同时这个模式也被网络黑客利用来作为网络数据窃听的入口。在Linux操作系统中设置网卡混杂模式时需要管理员权限。在Windows操作系统和Linux操作系统中都有使用混杂模式的抓包工具，比如著名的开源软件Wireshark
 
+tcpdump在网络栈中的位置inbound在iptables之前，outbound在iptables之后。如果tcpdump能够抓到发出的包，那么说明是真的发出了。如果inbound没有抓到接受的包，那么就说明这个包没有到达网卡。
+
+[networking - Does tcpdump bypass iptables? - Super User](https://superuser.com/questions/925286/does-tcpdump-bypass-iptables/925332#925332)
+
+As a matter of fact, tcpdump is the first software found after the wire (and the NIC, if you will) on the way IN, and the last one on the way OUT.
+
+IN: Wire -> NIC -> tcpdump -> netfilter/iptables
+
+OUT: iptables -> tcpdump -> NIC -> Wire
+
 ### tcpdump 常用选项
 
 * `-i` 是interface的含义，告诉tcpdump去监听哪一个网卡, any 抓所有网卡
@@ -50,7 +60,7 @@ tcpdump是一种嗅探器（sniffer），利用以太网的特性，通过将网
 
 Common usage:
 
-* `ssh target "sudo tcpdump -s 0 -U -n -i eth0 not port 22 -w -" | wireshark -k -i -` 在远端调用tcpdump抓包，通过管道传回本地，然后让wireshark抓包
+* ``
 * `tcpdump -l > dump.log & tail -f dump.log`
 * 在屏幕上显示dump内容，并把内容输出到dump.log中 `tcpdump -l | tee dump.log`
 * 抓取所有经过eth1，目的地址是192.168.1.254或192.168.1.200端口是80的TCP数据
@@ -78,6 +88,8 @@ tcpdump -i eth0 -lXvvenns host 172.25.4.80 and port 2381
 tcpdump -i eth0 -vvv -nnnn host 172.25.4.80 and port 2381
 #  对 3306 端口进行抓包
 tcpdump -i eth0 -s 0 -w /tmp/1.pcapng port 3306
+# 在远端调用tcpdump抓包，通过管道传回本地，然后让wireshark抓包
+ssh target "sudo tcpdump -s 0 -U -n -i eth0 not port 22 -w -" | wireshark -k -i -
 ```
 
 ### 过滤表达式
