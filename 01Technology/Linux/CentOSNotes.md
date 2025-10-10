@@ -1069,6 +1069,16 @@ sed -i 's/# DISABLE_AUTO_TITLE="true"/DISABLE_AUTO_TITLE="true"/' ~/.zshrc
 `systemctl poweroff` 关闭系统，切断电源
 `systemctl list-units` 命令可以查看当前系统的所有 Unit
 
+```sh
+sudo journalctl --list-boots
+# IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
+#  -4 cad64b2d39074f15871591f091776e91 Mon 2025-04-07 20:26:41 CST Mon 2025-04-07 21:16:42 CST
+#  -3 63f68fc4e2344a0496dbb9e0414579fa Mon 2025-04-07 21:16:57 CST Mon 2025-04-07 21:42:53 CST
+sudo last reboot
+# reboot   system boot  6.8.0-41-generic Wed Apr  9 07:14   still running
+# reboot   system boot  6.8.0-41-generic Tue Apr  8 13:56 - 18:06  (04:10)
+```
+
 命令格式 `systemctl [command] [unit]`
 `start/stop` 立刻启动/关闭后面接的 unit。
 `restart` 立刻关闭后启动后面接的 unit，亦即执行 stop 再 start 的意思。
@@ -1112,7 +1122,7 @@ $ timedatectl
 $ timedatectl list-timezones
 
 # 设置当前时区
-$ sudo timedatectl set-timezone America/New_York
+$ sudo timedatectl set-timezone Asia/Shanghai
 $ sudo timedatectl set-time YYYY-MM-DD
 $ sudo timedatectl set-time HH:MM:SS
 ```
