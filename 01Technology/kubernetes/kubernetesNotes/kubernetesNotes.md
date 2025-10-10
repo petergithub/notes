@@ -690,6 +690,141 @@ Memory: When a process tries to allocate memory over its limit, the process is k
 
 First in line to get killed are pods in the BestEffort class, followed by Burstable pods, and finally Guaranteed pods, which only get killed if system processes need memory.
 
+#### 查找配置 request 和 limit
+
+查找没有设置Resources Limits的Pod
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+{{- if eq .status.phase "Running" -}}
+{{ $pod := .metadata.name -}}
+{{ $ns := .metadata.namespace -}}
+{{- range .spec.containers }}
+{{- if or (not .resources) (not .resources.limits) }}
+NAMESPACE: {{ $ns }} POD: {{ $pod }}
+  Container: {{ .name }}
+  Resources: {{ .resources }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+{{ end }}'
+```
+
+查找没有设置CPU Limits的Pod
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+{{- if eq .status.phase "Running" -}}
+{{ $pod := .metadata.name -}}
+{{ $ns := .metadata.namespace -}}
+{{- range .spec.containers }}
+{{- if or (not .resources) (not .resources.limits) (not .resources.limits.cpu) }}
+NAMESPACE: {{ $ns }} POD: {{ $pod }}
+  Container: {{ .name }}
+  Resources: {{ .resources }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+{{ end }}'
+```
+
+查找没有设置Memory Limits的Pod
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+{{- if eq .status.phase "Running" -}}
+{{ $pod := .metadata.name -}}
+{{ $ns := .metadata.namespace -}}
+{{- range .spec.containers }}
+{{- if or (not .resources) (not .resources.limits) (not .resources.limits.memory) }}
+NAMESPACE: {{ $ns }} POD: {{ $pod }}
+  Container: {{ .name }}
+  Resources: {{ .resources }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+{{ end }}'
+```
+
+查找设置了Requests CPU的Pod
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+{{- if eq .status.phase "Running" -}}
+{{ $pod := .metadata.name -}}
+{{ $ns := .metadata.namespace -}}
+{{- range .spec.containers }}
+{{- if and (.resources) (.resources.requests) (.resources.requests.cpu) }}
+NAMESPACE: {{ $ns }} POD: {{ $pod }}
+  Container: {{ .name }}
+  Resources: {{ .resources }}
+{{ end -}}
+{{- end -}}
+{{- end -}}
+{{ end }}'
+```
+
+查找没有设置CPU Limits、Memory Limits、Memory Requests的Pod
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+  {{- if eq .status.phase "Running" -}}
+    {{- $pod := .metadata.name -}}
+    {{- $ns := .metadata.namespace -}}
+    {{- range .spec.containers }}
+      {{- if or (not .resources) (not .resources.limits) (not .resources.limits.cpu) (not .resources.limits.memory) (not .resources.requests) (not .resources.requests.cpu) (not .resources.requests.memory) }}
+NAMESPACE: {{ $ns }}
+  POD: {{ $pod }}
+  Container: {{ .name }}
+        {{- if not .resources }}
+  Problem: resources not set
+        {{- else -}}
+          {{- if not .resources.limits }}
+  Problem: resources.limits not set
+          {{- else if not .resources.limits.cpu }}
+  Problem: resources.limits.cpu not set
+          {{- else if not .resources.limits.memory }}
+  Problem: resources.limits.memory not set
+          {{- end -}}
+          {{- if not .resources.requests }}
+  Problem: resources.requests not set
+          {{- else if not .resources.requests.cpu }}
+  Problem: resources.requests.cpu not set
+          {{- else if not .resources.requests.memory }}
+  Problem: resources.requests.memory not set
+          {{- end -}}
+        {{- end }}
+      {{ end -}}
+    {{ end }}
+  {{- end -}}
+{{ end }}'
+```
+
+查找运行在某个Host上的Pod
+替换下面脚本的IP：
+
+```sh
+kubectl get --all-namespaces pods -o go-template='
+{{ range .items -}}
+{{ $pod := .metadata.name -}}
+{{ $ns := .metadata.namespace -}}
+{{- if eq .status.hostIP "IP" }}
+NAMESPACE: {{ $ns }} POD: {{ $pod }}
+{{- end }}
+{{- end }}'
+```
+
+查找运行在某个Node上的pod
+
+```sh
+kubectl get --all-namespaces pods --field-selector=spec.nodeName=<node name>
+```
+
 ### Advanced Scheduling
 
 `kubectl taint node node1.k8s node-type=production:NoSchedule` adds a taint with key node-type, value production and the NoSchedule
@@ -864,6 +999,23 @@ kubectl -n kube-system delete pod -l k8s-app=kube-proxy
 # bridge fdb show flannel.1 |awk '$3=="flannel.1"{print $0}'
 26:22:89:97:04:e8 dev flannel.1 dst 192.168.102.103 self permanent    # 转发至k8s-node2节点
 76:7d:9c:b5:29:9d dev flannel.1 dst 192.168.102.101 self permanent    # 转发至k8s-master节点
+```
+
+修改 flannel 端口为 8475，参考 [flannel configuration](https://github.com/flannel-io/flannel/blob/master/Documentation/configuration.md)
+
+[记一次K8S VXLAN Overlay网络8472端口冲突问题的排查 - 颇忒脱的技术博客](https://chanjarster.github.io/post/k8s/vxlan-8472-port-conflict/)
+
+```yaml
+# kubectl -n kube-flannel get configmap kube-flannel-cfg -o yaml
+net-conf.json: |
+  {
+    "Network": "10.244.0.0/16",
+    "EnableNFTables": false,
+    "Backend": {
+      "Type": "vxlan",
+      "Port": 8475
+    }
+  }
 ```
 
 #### kubectl netshoot
