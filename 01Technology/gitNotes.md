@@ -7,8 +7,6 @@
 1. 特定业务开发需要单独拉分支的，一般不要做merge master操作；需要同步master代码的时候，从master新拉分支，再从新分支merge之前的开发分支。
 2. 本地commit之后在push 之前，必须执行pull --rebase，尽量确保提交commit树简单清晰，不要把冲突留到merge时大量爆发，在本地rebase时处理掉自己的代码冲突。
 
-git merge --squash --no-ff
-
 ### Git commit message convention
 
 [Git commit message convention that you can follow! - DEV Community 👩‍💻👨‍💻](https://dev.to/i5han3/git-commit-message-convention-that-you-can-follow-1709)
@@ -43,57 +41,16 @@ Scope must be noun and it represents the section of the section of the codebase
 
 ## Commands
 
-### Most recent
+```sh
+git rev-list --all | xargs git grep <string>
+ssh -Tv git@gitlab.com  # get `Welcome to GitLab, Anonymous!`
 
-`git checkout -b hotfix upstream/master` create a new branch from upstream
-`git rev-list --all | xargs git grep <string>`
-`ssh -Tv git@gitlab.com` get `Welcome to GitLab, Anonymous!`
-
-Final release version
-`git merge --no-ff <branchName>`    使得合并操作总是产生一次新的提交
-`git merge --squash <branchName>`    把branchName上所有提交合并为一次提交到当前分支上再commit
-
-`git show <commit-id>` show difference for a commit
-`git show --pretty="format:" --name-only efbf363` List all the files for a commit in Git
-`git log -g branchName` show Git branch created time just for local fetch/create time
-`git log -p [file]`    显示指定文件相关的每一次diff
-`git log -m --name-only` List all modified files in git merge commit
-`git log -S<string> -- *.php` show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
-`git log --name-only` show changed file name only
-`git log --follow [file]`    显示某个文件的版本历史，包括文件改名
-`git log --all --full-history -- filename`  find a deleted file in commit history
-`git log --all --full-history -- "**/thefile.*"` find a deleted file in commit history if you do not know the exact path you may use
-`git checkout <SHA>^ -- <path-to-file>`  restore it into your working copy
-
-`git whatchanged [file]`    显示某个文件的版本历史，包括文件改名
-`git blame [file]`    显示指定文件是什么人在什么时间修改过
-`git commit -v`
-
-`git ls-files` List all tracked files
-
-```bash
-# Replace master branch entirely from another latestBranch:
-
-git checkout latestBranch
-git merge -s ours master --allow-unrelated-histories
-git checkout master
-git merge latestBranch
+# Final release version
+git merge --no-ff <branchName>  # 使得合并操作总是产生一次新的提交
+git merge --squash <branchName>  # 把branchName上所有提交合并为一次提交到当前分支上再commit
 ```
 
-git pull all the projects in the folder
-
-```bash
-
-for project in $(ls -1 .)
-do
-    cd $project
-    pwd
-    git pull
-    cd -
-done
-```
-
-#### tag
+### tag
 
 ```sh
 git tag <tagName> -m "comment"
@@ -124,81 +81,83 @@ git fetch --prune origin "+refs/tags/*:refs/tags/*"
 # 通过 prune 和 pruneTags 随时更新删除掉的tag
 $cat .git/config
 [remote "ry"]
-        url = git@gitee.com:y_project/RuoYi-Vue.git
-        fetch = +refs/heads/*:refs/remotes/ry/*
-        tagopt = --no-tags
+    url = git@gitee.com:y_project/RuoYi-Vue.git
+    fetch = +refs/heads/*:refs/remotes/ry/*
+    tagopt = --no-tags
 [remote "origin"]
-        url = ssh://git@gitlab.com/RuoYi-Backend.git
-        fetch = +refs/heads/*:refs/remotes/origin/*
-        tagopt = --tags
-        prune = true
-        pruneTags = true
+    url = ssh://git@gitlab.com/RuoYi-Backend.git
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    tagopt = --tags
+    prune = true
+    pruneTags = true
 [branch "master"]
-        remote = origin
-        merge = refs/heads/master
+    remote = origin
+    merge = refs/heads/master
+```
+
+### git log
+
+```sh
+git cat-file -p [SHA-1]  # 输出数据内容
+git cat-file -t [SHA-1]  # 输出数据对象的类型
+
+git log --stat -2  # 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
+git log --oneline
+
+git show <commit-id>  # show difference for a commit
+git show --pretty="format:" --name-only efbf363  # List all the files for a commit in Git
+git log -g branchName  # show Git branch created time just for local fetch/create time
+git log -p [file]  # 显示指定文件相关的每一次diff
+git log -m --name-only  # List all modified files in git merge commit
+git log -S<string> -- *.php  # show a list of commits where the relevant_string was either added or removed in any PHP file in the project.
+git log --name-only  # show changed file name only
+git log --follow [file]  # 显示某个文件的版本历史，包括文件改名
+git log --all --full-history -- filename  # find a deleted file in commit history
+git log --all --full-history -- "**/thefile.*"  # find a deleted file in commit history if you do not know the exact path you may use
 ```
 
 ### Basic commands
 
 HEAD指向最后一次commit的信息
-`git cat-file -p [SHA-1]` 输出数据内容
-`git cat-file -t [SHA-1]` 输出数据对象的类型
 
-`git log --stat -2` 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
-`git log --oneline`
+```sh
+git ls-files  # List all tracked files
+git checkout <SHA>^ -- <path-to-file>  # restore it into your working copy
 
-`git commit --amend -m "New Comment"` 使用 New Commit 覆盖原来的 message
-`git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
-`git rebase -i HEAD~3` 重写历史
-`git rebase --onto master commitId` 在非master分支上执行,在master上重复commitId之后的提交,开区间
-`git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
-`git cherry-pick` 使用cherry pick在各个分支间同步代码
-`git cherry-pick r1..r2` cherry pick commit (r1, r2] exclude r1. See `man gitrevisions`
-`git clean` clean untracked files
-`git branch -m <oldname> <newname>`
-`git branch -a`: show all branch (remote and local)
-`git checkout -b feature/portal3.0 origin/feature/portal3.0`: Branch feature/portal3.0 set up to track remote branch feature/portal3.0 from origin.
+git whatchanged [file]  # 显示某个文件的版本历史，包括文件改名
+git blame [file]  # 显示指定文件是什么人在什么时间修改过
+git commit -v
 
-`git stash`
-Do the merge, and then pull the stash:
-`git stash pop`
+git commit --amend -m "New Comment"  # 使用 New Commit 覆盖原来的 message
+git pull --rebase origin master  # 合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
+git rebase -i HEAD~3  # 重写历史
+git rebase --onto master commitId  # 在非master分支上执行,在master上重复commitId之后的提交,开区间
+git rebase A B  # 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
+git cherry-pick  # 使用cherry pick在各个分支间同步代码
+git cherry-pick r1..r2  # cherry pick commit (r1, r2] exclude r1. See `man gitrevisions`
 
-通过 `git remote set-url` 变更远程仓库地址 `git remote set-url origin ssh://git@host:port/os/developer-platform.git`
+git clean  # clean untracked files
+git branch -m <oldname> <newname>
+git branch -a  # show all branch (remote and local)
+git checkout -b feature/portal3.0 origin/feature/portal3.0  # Branch feature/portal3.0 set up to track remote branch feature/portal3.0 from origin.
+git checkout --orphan <new_branch_name> # create a new branch without any commits
 
-批量修改为ssh协议 `find . -name config | grep .git | xargs sed -i 's#http://username@host:7990/scm#ssh://git@host:port#g'`
+git stash
+# Do the merge, and then pull the stash:
+git stash pop
+```
 
-`git remote add origin <server>` 将仓库连接到某个远程服务器
+```sh
+# (1) current status
+# (2) After modified local files
+# (3) After git add
+git diff  # 得到的是从(2)到(1)的变化
+git diff --cached  # 得到的是从(3)到(2)的变化
+git diff HEAD  # 得到的是从(3)到(1)的变化
+git diff global origin/global  # fetch后对比文件
 
-添加另一个仓库存储分支
-
-1. `git remote add anotherRepository URL`
-2. `git push anotherRepository remoteRepository`
-
-删除远程仓库 `git remote rm remoteRepository`
-查看远程仓库信息 `git remote show origin`
-
-`git push remoteMachine localBranch:remoteBranch`
-`git push origin global:global`
-`git push --set-upstream origin develop1.0`
-
-`git push -u origin master` 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
-
-`git pull <远程主机名> <远程分支名>:<本地分支名>`
-`git push <远程主机名> <本地分支名>:<远程分支名>`
-`git branch --set-upstream master origin/next` 指定master分支追踪origin/next分支
-
-(1) current status
-(2) After modified local files
-(3) After git add
-`git diff`得到的是从(2)到(1)的变化
-`git diff --cached`得到的是从(3)到(2)的变化
-`git diff HEAD`得到的是从(3)到(1)的变化
-`git diff global origin/global`: fetch后对比文件
-`gitk`: view commite graph
-
-`git pull --rebase origin master`合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
-`git rebase --onto master <commitId>` 在非master分支上执行,在master上重复commitId之后的提交,开区间
-`git rebase A B` 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
+gitk  # view commite graph
+```
 
 [Git - Revision Selection Example history for range selection](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#double_dot)
 
@@ -225,85 +184,6 @@ Multiple Points
 
 Triple Dot
 `git log master...experiment` which specifies all the commits that are reachable by either of two references but not by both of them
-
-## Usage examples
-
-### restore flies
-
-撤销工作区操作 `git checkout <file_name>`
-这个命令有2种情况需要考虑
-
-1. file_name自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
-2. file_name已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态  。
-    总之，就是让这个文件回到最近一次git commit或git add时的状态。
-
-回退总结
-
-1. 新增的文件还没有添加到暂存区，`git clean` clean untracked files. 或者先 add 然后 reset
-2. 当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
-3. 当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
-4. 已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
-5. 恢复 `git reset --hard` 删除的文件 通过`git reflog` or `git log -g` 找到commitID,然后`git reset --hard commitID`
-
-### stage part of a new file, but not the whole file
-
-> [Flight rules for Git](https://github.com/k88hudson/git-flight-rules/#i-want-to-stage-part-of-a-new-file-but-not-the-whole-file)
-`git add --patch filename` This will open interactive mode. You would be able to use the s option to split the commit - however, if the file is new, you will not have this option. To add a new file, do this:
-`git add -N filename`
-Then, you will need to use the e option to manually choose which lines to add. Running git diff --cached or git diff --staged will show you which lines you have staged compared to which are still saved locally
-
-### Untrack files
-
-删掉已经track的文件  This will tell git you want to start ignoring the changes to the file
-`git update-index --assume-unchanged path/to/file`
-When you want to start keeping track again
-`git update-index --no-assume-unchanged path/to/file`
-停止追踪一个文件 `git rm --cached path/to/file`
-
-### [Get rid of large files](https://help.github.com/articles/remove-sensitive-data)
-
-`git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty`
-`git gc --aggressive --prune`
-`git push origin --force --all`
-
-### 查看其他分支的文件内容
-
-```sh
-# 列出指定分支或提交中的文件和目录
-git ls-tree -r feature-branch --name-only
-
-# 查看特定提交、标签、树或文件的内容。通过指定另一个分支的文件路径来查看其内容。
-git show <branch_name>:<file_path>
-# 显示feature-branch分支中src/app.js文件的内容。
-git show feature-branch:src/app.js
-
-# 使用git cat-file命令
-# git cat-file命令是一个低级别的Git命令，用于查看Git对象的内容。你可以通过它来查看另一个分支的文件内容。
-git cat-file -p <branch_name>:<file_path>
-# 显示feature-branch分支中src/app.js文件的内容。
-git cat-file -p feature-branch:src/app.js
-
-# Copy file from another branch
-git checkout anotherBranch -- path/to/file
-```
-
-### .gitignore文件的例子 [git ignore](https://www.gitignore.io/api/intellij,linux,windows,eclipse,java,scala,osx,maven,gradle,sbt,svn)
-
-``` bash
-#此为注释 – 将被 Git 忽略
-*.a                          #忽略所有 .a 结尾的文件
-!lib.a                       #但 lib.a 除外
-/TODO                   #仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO
-build/                      #忽略 build/ 目录下的所有文件
-doc/*.txt                  #会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
-```
-
-### git hooks
-
-Add hooks for `git merge` and `git checkout`
-
-1. create `.git/hooks/post-checkout` and `.git/hooks/post-merge` (for `git pull` also)
-2. `chmod ug+x .git/hooks/post-checkout .git/hooks/post-merge`
 
 ## [Git - Submodules 子模块](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 
@@ -465,11 +345,14 @@ git filter-branch --subdirectory-filter lib/plugins/myown
 
 ## Git configuration
 
-Show config and its origin
-`git config --show-origin user.email`
-`git config --show-origin user.name`
+```sh
+# Show config and its origin
+git config --show-origin user.email
+git config --show-origin user.name
 
-Show all config and its origin: `git config --list --show-origin`
+# Show all config and its origin:
+git config --list --show-origin
+```
 
 ### git auto complete　自动补全
 
@@ -680,3 +563,133 @@ git filter-branch -f --env-filter "
 `git log -L 15,+1:'path/to/your/file.txt'` Trace the evolution of the line [15, 15+1] in file.txt
 
 `-L <start>,<end>:<file>` Trace the evolution of the line range given by `<start>,<end>`
+
+### restore flies
+
+撤销工作区操作 `git checkout <file_name>`
+这个命令有2种情况需要考虑
+
+1. file_name自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+2. file_name已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态  。
+    总之，就是让这个文件回到最近一次git commit或git add时的状态。
+
+回退总结
+
+1. 新增的文件还没有添加到暂存区，`git clean` clean untracked files. 或者先 add 然后 reset
+2. 当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令`git checkout <file_name>`
+3. 当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令`git reset HEAD <file_name>`，就回到了场景1，第二步按场景1操作。
+4. 已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(`git reset --hard HEAD^`)，不过前提是没有推送到远程库。
+5. 恢复 `git reset --hard` 删除的文件 通过`git reflog` or `git log -g` 找到commitID,然后`git reset --hard commitID`
+
+### stage part of a new file, but not the whole file
+
+> [Flight rules for Git](https://github.com/k88hudson/git-flight-rules/#i-want-to-stage-part-of-a-new-file-but-not-the-whole-file)
+`git add --patch filename` This will open interactive mode. You would be able to use the s option to split the commit - however, if the file is new, you will not have this option. To add a new file, do this:
+`git add -N filename`
+Then, you will need to use the e option to manually choose which lines to add. Running git diff --cached or git diff --staged will show you which lines you have staged compared to which are still saved locally
+
+### Untrack files
+
+```sh
+# 删掉已经track的文件  This will tell git you want to start ignoring the changes to the file
+git update-index --assume-unchanged path/to/file
+
+# When you want to start keeping track again
+git update-index --no-assume-unchanged path/to/file
+
+# 停止追踪一个文件
+git rm --cached path/to/file
+```
+
+### [Get rid of large files](https://help.github.com/articles/remove-sensitive-data)
+
+```sh
+git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
+git gc --aggressive --prune
+git push origin --force --all
+```
+
+### 远程分支
+
+```sh
+# 通过 git remote set-url 变更远程仓库地址
+git remote set-url origin ssh://git@host:port/os/developer-platform.git
+
+# 批量修改为ssh协议
+find . -name config | grep .git | xargs sed -i 's#http://username@host:7990/scm#ssh://git@host:port#g'
+
+# 添加另一个仓库存储分支
+git remote add anotherRepository URL
+git push anotherRepository remoteRepository
+git remote add origin <server>  # 将仓库连接到某个远程服务器
+
+git remote rm remoteRepository  # 删除远程仓库
+git remote show origin  # 查看远程仓库信息
+
+git push remoteMachine localBranch:remoteBranch
+git push -u origin master  # 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
+
+git pull <远程主机名> <远程分支名>:<本地分支名>
+git push <远程主机名> <本地分支名>:<远程分支名>
+git branch --set-upstream master origin/next  # 指定master分支追踪origin/next分支
+```
+
+### 查看其他分支的文件内容
+
+```sh
+# 列出指定分支或提交中的文件和目录
+git ls-tree -r feature-branch --name-only
+
+# 查看特定提交、标签、树或文件的内容。通过指定另一个分支的文件路径来查看其内容。
+git show <branch_name>:<file_path>
+# 显示feature-branch分支中src/app.js文件的内容。
+git show feature-branch:src/app.js
+
+# 使用git cat-file命令
+# git cat-file命令是一个低级别的Git命令，用于查看Git对象的内容。你可以通过它来查看另一个分支的文件内容。
+git cat-file -p <branch_name>:<file_path>
+# 显示feature-branch分支中src/app.js文件的内容。
+git cat-file -p feature-branch:src/app.js
+
+# Copy file from another branch
+git checkout anotherBranch -- path/to/file
+```
+
+### Replace master branch entirely from another latestBranch:
+
+```bash
+git checkout latestBranch
+git merge -s ours master --allow-unrelated-histories
+git checkout master
+git merge latestBranch
+```
+
+### git pull all the projects in the folder
+
+```bash
+for project in $(ls -1 .)
+do
+    cd $project
+    pwd
+    git pull
+    cd -
+done
+```
+
+### .gitignore文件的例子 [git ignore](https://www.gitignore.io/api/intellij,linux,windows,eclipse,java,scala,osx,maven,gradle,sbt,svn)
+
+``` bash
+#此为注释 – 将被 Git 忽略
+*.a                          #忽略所有 .a 结尾的文件
+!lib.a                       #但 lib.a 除外
+/TODO                   #仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO
+build/                      #忽略 build/ 目录下的所有文件
+doc/*.txt                  #会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
+```
+
+### git hooks
+
+Add hooks for `git merge` and `git checkout`
+
+1. create `.git/hooks/post-checkout` and `.git/hooks/post-merge` (for `git pull` also)
+2. `chmod ug+x .git/hooks/post-checkout .git/hooks/post-merge`
