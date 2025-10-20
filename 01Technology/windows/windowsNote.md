@@ -953,7 +953,14 @@ change in Docker desktop
 
 [Move WSL to another drive. WSL (Windows Subsystem for Linux) is a… | by Hafiz Azhar | Medium](https://medium.com/@rahmanazhar/move-wsl-to-another-drive-ab8002152cf2)
 
+The default path is: %LOCALAPPDATA%\Packages\<DistroName>\LocalState\ext4.vhdx
+
+Replace `<DistroName>` with your specific distribution's name (e.g., CanonicalGroupLimited.Ubuntu24.04LTS_79rhkp1fndgsc)
+
+%USERPROFILE%\AppData\Local\wsl\{edb1bc3d-bf77-4206-98cc-844f9c202f83}
+
 %USERPROFILE%\AppData\Local\Docker\wsl
+
 
 ```sh
 # superceded by changing in Docker desktop
