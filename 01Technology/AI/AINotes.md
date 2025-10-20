@@ -122,6 +122,15 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 18. AI翻译插件： 沉浸式翻译
 19. AI笔记和知识库： Get笔记
 
+### prompt 提示词
+
+提示词分为系统提示词和用户提示词，用户提示词就是我们的问题。系统提示词，是agent的背景/角色，设置了agent需要完成什么类型的任务。系统提示词主要包括：身份（Role）+ 上下文（Context）+  例子（Examples） + 输出规范（Output Format）。
+
+现在已经有了很多帮助我们生产提示词的工具，如：
+https://prompt.always200.com/
+https://prompts.chat/
+我们可以使用工具简单生成初版，再进行后续优化。
+
 ## AI 在研发场景落地的现状
 
 - **智能研发插件**：以 Github Copilot/ 通义灵码 /Comate 为代表，主要以 JetBrains、VSCode 为插件形式为用户提供代码补全为主的智能编码服务
@@ -174,6 +183,12 @@ Cline 使用 GitHub Copilot：API Provider > vscode lm api > Language Model > gi
 [[Poweruser Guide] Level Up Your RooCode: Become a Roo Poweruser! [Memory Bank] : r/RooCode](https://www.reddit.com/r/RooCode/comments/1jfx9mk/poweruser_guide_level_up_your_roocode_become_a/)
 
 [GreatScottyMac/RooFlow: RooFlow - Enhanced Memory Bank System with ☢️Footgun Power☢️ Next-gen Memory Bank system with five integrated modes and system-level customization. Uses Roo Code's experimental "Footgun" feature for deep AI assistant customization while maintaining efficient token usage!](https://github.com/GreatScottyMac/RooFlow/tree/main)
+
+Available Keyboard Commands:
+
+- roo-cline.focusInput: ctrl+alt+r
+- Add to Context: ctrl+alt+c
+- roo.acceptInput: ctrl+enter
 
 ### Google Gemini Code Assist
 
@@ -1389,6 +1404,10 @@ vLLM：适合企业级 + 服务器部署 + 高性能扩展
 [对接本地大模型时，选择 Ollma 还是 vLLM？ - OSCHINA - 中文开源技术交流社区](https://www.oschina.net/news/321572)
 [大模型工具对比：SGLang, Ollama, VLLM, LLaMA.cpp如何选择？](https://stable-learn.com/zh/ai-model-tools-comparison/)
 
+[Integrate Local Models Deployed by Xinference | Dify](https://docs.dify.ai/development/models-integration/xinference)
+[Integrate Local Models Deployed by OpenLLM | Dify](https://docs.dify.ai/development/models-integration/openllm)
+[Integrate Local Models Deployed by LocalAI | Dify](https://docs.dify.ai/development/models-integration/localai)
+
 | 工具名称        | 性能表现                                                     | 易用性                                 | 适用场景                                 | 硬件需求                       | 模型支持                      | 部署方式                       |
 |-------------|----------------------------------------------------------|-------------------------------------|--------------------------------------|----------------------------|---------------------------|----------------------------|
 | SGLang v0.4 | 零开销批处理提升1.1倍吞吐量，缓存感知负载均衡提升1.9倍，结构化输出提速10倍                | 需一定技术基础，但提供完整API和示例                 | 企业级推理服务、高并发场景、需要结构化输出的应用             | 推荐A100/H100，支持多GPU部署       | 全面支持主流大模型，特别优化DeepSeek等模型 | Docker、Python包             |
@@ -1642,6 +1661,32 @@ xinference registrations -t rerank
 
 [sgl-project/sglang: SGLang is a fast serving framework for large language models and vision language models.](https://github.com/sgl-project/sglang)
 
+### Embedding model
+
+[Embedding models · Ollama Blog](https://ollama.com/blog/embedding-models)
+
+[MTEB Leaderboard - a Hugging Face Space by mteb](https://huggingface.co/spaces/mteb/leaderboard)
+MTEB（Massive Text Embedding Benchmark）是一个用于评估文本嵌入（Embedding）模型的综合性基准测试平台。通过多任务和多数据集的组合，MTEB可以全面衡量不同Embedding模型在各种自然语言处理（NLP）任务中的表现，如文本分类、语义检索、文本聚类等。
+
+```sh
+ollama pull mxbai-embed-large
+```
+
+### reranking models
+
+Ollama rerank model [linux6200/bge-reranker-v2-m3](https://ollama.com/linux6200/bge-reranker-v2-m3)
+
+deploy local embedding/reranking models using xinference/LocalAI/OpenLLM.
+
+[Using Xinference — Xinference](https://inference.readthedocs.io/en/latest/getting_started/using_xinference.html#using-xinference-with-docker)
+
+```sh
+docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 --gpus all xprobe/xinference:<your_version> xinference-local -H 0.0.0.0 --log-level debug
+
+# 1024 维度  最大 token 数 8192
+jina-embeddings-v3
+```
+
 ## 本地知识库搭建
 
 [chatchat-space/Langchain-Chatchat: Langchain-Chatchat（原Langchain-ChatGLM）基于 Langchain 与 ChatGLM 等语言模型的本地知识库问答 | Langchain-Chatchat (formerly langchain-ChatGLM), local knowledge based LLM (like ChatGLM) QA app with langchain](https://github.com/chatchat-space/Langchain-Chatchat)
@@ -1870,41 +1915,6 @@ docker exec -it docker-api-1 flask reset-password
 ### dify 钉钉
 
 [将 Dify 应用与钉钉机器人集成 | Dify](https://docs.dify.ai/zh-hans/learn-more/use-cases/dify-on-dingtalk)
-
-### 部署模型
-
-[Integrate Local Models Deployed by Xinference | Dify](https://docs.dify.ai/development/models-integration/xinference)
-[Integrate Local Models Deployed by OpenLLM | Dify](https://docs.dify.ai/development/models-integration/openllm)
-[Integrate Local Models Deployed by LocalAI | Dify](https://docs.dify.ai/development/models-integration/localai)
-
-wget https://huggingface.co/skeskinen/ggml/resolve/main/all-MiniLM-L6-v2/ggml-model-q4_0.bin -O bert
-wget https://gpt4all.io/models/ggml-gpt4all-j.bin -O models/ggml-gpt4all-j
-
-### Embedding model
-
-[Embedding models · Ollama Blog](https://ollama.com/blog/embedding-models)
-
-[MTEB Leaderboard - a Hugging Face Space by mteb](https://huggingface.co/spaces/mteb/leaderboard)
-MTEB（Massive Text Embedding Benchmark）是一个用于评估文本嵌入（Embedding）模型的综合性基准测试平台。通过多任务和多数据集的组合，MTEB可以全面衡量不同Embedding模型在各种自然语言处理（NLP）任务中的表现，如文本分类、语义检索、文本聚类等。
-
-```sh
-ollama pull mxbai-embed-large
-```
-
-### reranking models
-
-Ollama rerank model [linux6200/bge-reranker-v2-m3](https://ollama.com/linux6200/bge-reranker-v2-m3)
-
-deploy local embedding/reranking models using xinference/LocalAI/OpenLLM.
-
-[Using Xinference — Xinference](https://inference.readthedocs.io/en/latest/getting_started/using_xinference.html#using-xinference-with-docker)
-
-```sh
-docker run -e XINFERENCE_MODEL_SRC=modelscope -p 9998:9997 --gpus all xprobe/xinference:<your_version> xinference-local -H 0.0.0.0 --log-level debug
-
-# 1024 维度  最大 token 数 8192
-jina-embeddings-v3
-```
 
 ### dify database
 
