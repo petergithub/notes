@@ -405,7 +405,7 @@ docker exec -it container_name sh -c "docker image rm \$(docker image ls --forma
 docker system prune --filter "until=24h"
 
 # crontab
-1 1 1 * * /usr/bin/docker exec jenkins-docker sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')" && /usr/bin/docker exec jenkins-docker sh -c "docker system prune -f --filter "until=24h"" >> /var/log/docker_image_cleanup.log 2>&1
+1 1 1,15 * * docker exec jenkins-docker sh -c 'echo "--- Cleanup Start: $(date) ---" && docker system prune -a -f --filter "until=24h" && echo "--- Cleanup End: $(    date) ---"' >> /tmp/docker_image_cleanup.log 2>&1
 ```
 
 查到docker 目录大小后，通过可写层目录(diff的子目录)反查容器id:
