@@ -96,7 +96,10 @@ kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic 
 kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic second_topic --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true --from-beginning
 ```
 
-### delete messages from Kafka
+### Delete messages from Kafka
+
+消息删除的机制：位点截断（Log Truncation）
+kafka-delete-records.sh 脚本执行的操作，是将一个 Topic 分区的 Log Start Offset 提升到您指定的新偏移量。只能删除分区最老的消息，即从分区起始到某个指定位点的所有消息。
 
 ```sh
 # specified that for the partition 0 of the topic “my_topic” we want to delete all the records from the beginning until offset 3. (exlusive 开区间)
@@ -152,22 +155,35 @@ kafka-consumer-groups.sh --help
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
 
 # view offsets
+# 返回结果中 如果 CONSUMER-ID、HOST 或 CLIENT-ID 字段有值（如上例中分区 0），则表示该分区目前有一个活跃的消费者正在消费
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my_group
+# 结果示例
+# GROUP     TOPIC  PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID                  HOST        CLIENT-ID
+# group-iot topic1  1          41882           41882           0   consumer-group-iot-3-9748  /10.2.8.67  consumer-group-iot-3
+# group-iot topic2  2          10523895        10523895        0   -                            -           -
+
+# view members
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group group1 --describe --members
 
 # To manually delete one or multiple consumer groups, the "--delete" option can be used:
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --delete --group my_group --group my_other_group
 
-# To reset offsets of a consumer group：to display
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic topic1 --to-latest
-# To reset the offsets back by 20 positions, use the following command: to execute
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --reset-offsets --group consumergroup1 --topic test-metrics --shift-by -20 -execute
+# To reset offsets of a consumer group to latest, default --dry-run
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-latest
+# To reset the offsets back by 20 positions
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --shift-by -20 -execute
+
+# 重置偏移量 dry-run
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000 --dry-run
+# 重置偏移量 execute 到指定时间
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000 --execute
 
 
 # --reset-offsets has 3 execution options:
 
-# * (default) to display which offsets to reset.
-# * --execute : to execute --reset-offsets process.
-# * --export : to export the results to a CSV format.
+# * --dry-run: default, to display which offsets to reset.
+# * --execute: to execute --reset-offsets process.
+# * --export: to export the results to a CSV format.
 
 # --reset-offsets also has the following scenarios to choose from (at least one scenario must be selected):
 
