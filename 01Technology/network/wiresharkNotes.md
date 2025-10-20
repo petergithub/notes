@@ -78,16 +78,16 @@ Common usage:
 * 抓 SMTP 数据 `tcpdump -i eth1 '((port 25) and (tcp[(tcp[12]>>2):4] = 0x4d41494c))'`，抓取数据区开始为"MAIL"的包，"MAIL"的十六进制为 0x4d41494c
 * 抓SSH返回 `tcpdump -i eth1 'tcp[(tcp[12]>>2):4] = 0x5353482D'` SSH-的十六进制是0x5353482D
 * 抓包并保存,重放
-    `tcpdump -i eth0 -lXvvenns 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.pcapng &`
-    `tcpdump -r tcpdump.pcapng`
-    `tcpdump -i eno16780032 -lXvvennNs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.pcapng`
+    `tcpdump -i eth0 -lXvvenns 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -w tcpdump.pcap &`
+    `tcpdump -r tcpdump.pcap`
+    `tcpdump -i eno16780032 -lXvvennNs 1500 \( host 172.27.35.150 or host 172.27.33.222 \) -r tcpdump.pcap`
 
 ```sh
 tcpdump -i eth0 -nn -X 'port 53' -c 1
 tcpdump -i eth0 -lXvvenns host 172.25.4.80 and port 2381
 tcpdump -i eth0 -vvv -nnnn host 172.25.4.80 and port 2381
 #  对 3306 端口进行抓包
-tcpdump -i eth0 -s 0 -w /tmp/1.pcapng port 3306
+tcpdump -i eth0 -s 0 -w /tmp/1.pcap port 3306
 # 在远端调用tcpdump抓包，通过管道传回本地，然后让wireshark抓包
 ssh target "sudo tcpdump -s 0 -U -n -i eth0 not port 22 -w -" | wireshark -k -i -
 ```
