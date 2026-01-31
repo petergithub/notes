@@ -1,5 +1,18 @@
 # CentOS
 
+## Rocky Linux 8.10
+
+```sh
+docker pull rockylinux/rockylinux:8.10
+
+docker run -itd --name rockylinux -v /data/rockylinux/package:/data/package rockylinux/rockylinux:8.10
+
+dnf install dnf-plugins-core
+
+dnf download --resolve htop ncdu tig --destdir /data/package
+dnf install htop ncdu tig
+```
+
 ## CentOS7调优实践
 
 [The Linux Kernel documentation — The Linux Kernel documentation](https://www.kernel.org/doc/html/latest/index.html)
@@ -416,6 +429,16 @@ centos关机命令：
 4. `shutdown -h now` 立刻关机(root用户使用)
 
 如果是通过shutdown命令设置关机的话，可以用`shutdown -c`命令取消重启
+
+```sh
+sudo journalctl --list-boots
+# IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
+#  -4 cad64b2d39074f15871591f091776e91 Mon 2025-04-07 20:26:41 CST Mon 2025-04-07 21:16:42 CST
+#  -3 63f68fc4e2344a0496dbb9e0414579fa Mon 2025-04-07 21:16:57 CST Mon 2025-04-07 21:42:53 CST
+sudo last reboot
+# reboot   system boot  6.8.0-41-generic Wed Apr  9 07:14   still running
+# reboot   system boot  6.8.0-41-generic Tue Apr  8 13:56 - 18:06  (04:10)
+```
 
 ## 自动启动
 
@@ -1069,16 +1092,6 @@ sed -i 's/# DISABLE_AUTO_TITLE="true"/DISABLE_AUTO_TITLE="true"/' ~/.zshrc
 `systemctl poweroff` 关闭系统，切断电源
 `systemctl list-units` 命令可以查看当前系统的所有 Unit
 
-```sh
-sudo journalctl --list-boots
-# IDX BOOT ID                          FIRST ENTRY                 LAST ENTRY
-#  -4 cad64b2d39074f15871591f091776e91 Mon 2025-04-07 20:26:41 CST Mon 2025-04-07 21:16:42 CST
-#  -3 63f68fc4e2344a0496dbb9e0414579fa Mon 2025-04-07 21:16:57 CST Mon 2025-04-07 21:42:53 CST
-sudo last reboot
-# reboot   system boot  6.8.0-41-generic Wed Apr  9 07:14   still running
-# reboot   system boot  6.8.0-41-generic Tue Apr  8 13:56 - 18:06  (04:10)
-```
-
 命令格式 `systemctl [command] [unit]`
 `start/stop` 立刻启动/关闭后面接的 unit。
 `restart` 立刻关闭后启动后面接的 unit，亦即执行 stop 再 start 的意思。
@@ -1093,6 +1106,49 @@ sudo last reboot
 
 `systemctl list-dependencies nginx.service` 列出一个 Unit 的所有依赖
 `systemctl list-dependencies --all nginx.service` 上面命令的输出结果之中，有些依赖是 Target（就是 Unit 组） 类型，默认不会展开显示。如果要展开 Target，就需要使用`--all`参数
+
+#### systemctl 的配置文件
+
+```sh
+cat > /etc/systemd/system/kafka.service << EOF
+[Unit]
+[Unit]
+Description=Apache Kafka server (broker)
+After=network.target
+
+[Service]
+Type=forking
+User=root
+Group=root
+
+LimitNOFILE=65536
+
+Environment="PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/java/openjdk-21.0.2/bin:/root/.local/bin:/root/bin"
+Environment="KAFKA_HEAP_OPTS=-Xmx8G -Xms8G"
+Environment="KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=9096 -Dcom.sun.management.jmxremote.rmi.port=9096 -javaagent:/data/software/kafka_2.13-3.8.0-ja/jmx_prometheus_javaagent/jmx_prometheus_javaagent-1.0.1.jar=9095:/data/software/kafka_2.13-3.8.0-ja/jmx_prometheus_javaagent/jmx_prometheus_javaagent_config.yaml"
+
+ExecStart=/data/software/kafka_2.13-3.8.0-ja/bin/kafka-server-start.sh -daemon /data/software/kafka_2.13-3.8.0-ja/config/kraft/server.properties
+ExecStop=/data/software/kafka_2.13-3.8.0-ja/bin/kafka-server-stop.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+Enable "Foreground" Logging
+
+1. Change Type=forking to Type=simple.
+2. Remove the -daemon flag from the ExecStart line.
+
+Apply and Check Logs
+
+```sh
+systemctl daemon-reload
+systemctl restart kafka
+# Wait 5 seconds
+journalctl -u kafka -n 50 --no-pager
+```
 
 #### systemd-analyze 查看系统启动
 
@@ -1157,18 +1213,18 @@ $ loginctl show-user ruanyf
 
 #### journalctl 日志管理
 
-日志的配置文件是`/etc/systemd/journald.conf`
+查看所有日志（内核日志和应用日志）, 日志的配置文件是`/etc/systemd/journald.conf`
 
 ```sh
-# 查看所有日志（内核日志和应用日志）
-journalctl
+# --since "2015-01-10" --until "2015-01-11 03:00"  # 查看指定时间的日志
 journalctl -xeu kubelet 查看指定 unit kubelet 的日志
-journalctl -n 20  # 显示尾部指定行数的日志
-journalctl -f  # 实时滚动显示最新日志
-journalctl --since "2015-01-10" --until "2015-01-11 03:00"  # 查看指定时间的日志
 
-journalctl -b  # 查看系统本次启动的日志
-journalctl -b -1  # 查看上一次启动的日志（需更改设置）
+-b  # 查看系统本次启动的日志
+-b -1  # 查看上一次启动的日志（需更改设置）
+-f, --follow # Show only the most recent journal entries, and continuously print new entries as they are appended to the journal.
+-n, --lines=N # default 10. Show the most recent journal events and limit the number of events shown.
+-u, --unit=UNIT|PATTERN # can be specified multiple times
+-S, --since=, -U, --until= # Start showing entries on or newer than the specified date, or on or older than the specified date, respectively. Date specifications should be of the format "2012-10-30 18:17:16".
 ```
 
 ## CentOS Stream 8
