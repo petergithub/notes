@@ -92,7 +92,7 @@ docker logs -f containerID
 docker logs --details --since 60m --until 1m -t -f containerID
 
 # Multi-Container Logging
-docker-compose logs
+docker compose logs
 
 # export Docker logs to a file
 docker logs container_name > container_log.log 2>&1
@@ -158,16 +158,16 @@ EOF
 ### Docker Compose
 
 [Install](https://docs.docker.com/compose/install/)
-[Get started with Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+[docker compose | Docker Docs](https://docs.docker.com/reference/cli/docker/compose/)
 [Command-line completion](https://docs.docker.com/compose/completion/)
 
 Create a file called docker-compose.yml
 
 ```sh
-docker compose up  # start up your application
-docker compose down  # Stop the application
-docker compose up -d  # run your services in the background
 docker compose --help  # see other available commands
+docker compose up  # start up your application
+docker compose up -d --force-recreate  # run your services in the background
+docker compose down  # Stop the application
 docker compose down --volumes  # bring everything down, removing the containers entirely
 
 # [docker compose | Docker Docs](https://docs.docker.com/reference/cli/docker/compose/)
@@ -177,7 +177,39 @@ docker compose down --volumes  # bring everything down, removing the containers 
 --dry-run    # Execute command in dry run mode
 --project-directory    # Specify an alternate working directory (default: the path of the, first specified, Compose file)
 
-docker-compose logs -f
+docker compose logs -f
+```
+
+```sh
+docker run -d --name db \
+  -p 5432:5432 \
+  -v pgdata:/var/lib/postgresql/data \
+  -e POSTGRES_PASSWORD=devpassword \
+  -e POSTGRES_DB=mydb \
+  --restart unless-stopped \
+  postgres:16
+
+# 转换成docker compose的配置文件，便得到了如下结果：
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
 ```
 
 ### Docker management
@@ -288,7 +320,6 @@ docker load -i filename # Load an image from a tar archive or STDIN
 
 docker export <container-id> # 将 container 创建一个`tar`文件，并且移除了元数据和不必要的层，将多个层整合成了一个层，只保存了当前统一视角看到的内容（译者注：expoxt后的容器再import到Docker中，通过`docker images –tree`命令只能看到一个镜像；而save后的镜像则不同，它能够看到这个镜像的历史镜像）
 docker import
-
 ```
 
 ### docker network 命令
@@ -391,6 +422,16 @@ UID        PID  PPID  C STIME TTY          TIME CMD
 root      7477  7161  0 Jul10 ?        00:00:38 node index.js
 ```
 
+### image diff
+
+```sh
+# install
+curl -LO https://storage.googleapis.com/container-diff/latest/container-diff-linux-amd64 && \
+sudo install container-diff-linux-amd64 /usr/local/bin/container-diff
+# compare two images
+container-diff diff image1 image2 --type=history
+```
+
 ## Disk clean
 
 [Prune unused Docker objects | Docker Documentation](https://docs.docker.com/config/pruning/)
@@ -403,6 +444,9 @@ docker exec -it container_name sh -c "docker image rm \$(docker image ls --forma
 
 # prunes images, containers, and networks. Volumes are not pruned by default, and you must specify the --volumes flag for docker system prune to prune volumes.
 docker system prune --filter "until=24h"
+
+# Clean up Docker (this is aggressive, so use with caution)
+docker system prune -a
 
 # crontab
 1 1 1,15 * * docker exec jenkins-docker sh -c 'echo "--- Cleanup Start: $(date) ---" && docker system prune -a -f --filter "until=24h" && echo "--- Cleanup End: $(    date) ---"' >> /tmp/docker_image_cleanup.log 2>&1
