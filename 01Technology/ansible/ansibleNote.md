@@ -282,10 +282,17 @@ ansible all -m ansible.builtin.setup -a 'filter=ansible_eth0'
 [Creating a playbook — Ansible Community Documentation](https://docs.ansible.com/ansible/latest/getting_started/get_started_playbook.html)
 
 ```sh
-# syntax-check
+# --check, --diff, --list-hosts, --list-tasks, syntax-check
 ansible-playbook playbook.yaml --syntax-check
+ansible-lint verify-apache.yml
+
 # run
 ansible-playbook playbook.yaml --verbose
+# To start executing a particular task
+ansible-playbook playbook.yml --start-at-task="install packages"
+
+# To execute a playbook interactively, use --step.
+ansible-playbook playbook.yml --step
 
 # exclude with !
 ansible-playbook -vv kubernetes/playbook_containerd.yaml --list-hosts --limit='qj:!qj_2506'
