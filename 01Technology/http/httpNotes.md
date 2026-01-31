@@ -124,8 +124,8 @@ server {
 减少 CPU 运算量
 SSL 的运行计算需要消耗额外的 CPU 资源，一般多核处理器系统会运行多个工作进程(worker processes )，进程的数量不会少于可用的 CPU 核数。SSL 通讯过程中『握手』阶段的运算最占用 CPU 资源，有两个方法可以减少每台客户端的运算量：
 
-* 激活 keepalive 长连接，一个连接发送更多个请求
-* 复用 SSL 会话参数，在并行并发的连接数中避免进行多次 SSL『握手』
+- 激活 keepalive 长连接，一个连接发送更多个请求
+- 复用 SSL 会话参数，在并行并发的连接数中避免进行多次 SSL『握手』
 
 这些会话会存储在一个 SSL 会话缓存里面，通过命令 ssl_session_cache 配置，可以使缓存在机器间共享，然后利用客戶端在『握手』阶段使用的 seesion id 去查询服务端的 session cathe(如果服务端设置有的话)，简化『握手』阶段。
 
@@ -139,10 +139,10 @@ HSTS -- HTTP Strict Transport Security，HTTP严格传输安全。它允许一�
 add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;preload" always;
 ```
 
-* `max-age`: 设置单位时间内強制使用 HTTPS 连接
-* `includeSubDomains`: 可选，所有子域同时生效
-* `preload`: 可选，非规范值，用于定义使用『HSTS 预加载列表』
-* `always`: 可选，保证所有响应都发送此响应头，包括各种內置错误响应
+- `max-age`: 设置单位时间内強制使用 HTTPS 连接
+- `includeSubDomains`: 可选，所有子域同时生效
+- `preload`: 可选，非规范值，用于定义使用『HSTS 预加载列表』
+- `always`: 可选，保证所有响应都发送此响应头，包括各种內置错误响应
 
 浏览器在获取该响应头后，在 max-age 的时间内，如果遇到 HTTP 连接，就会通过 307 跳转強制使用 HTTPS 进行连接，并忽略其它的跳转设置（如 301 重定向跳转）
 
@@ -156,9 +156,8 @@ CSR (Certificate Signing Request)
 cer 格式 等价于 PEM 格式，使用 vi 打开 copy 到的内容是一样的
 
 格式介绍：
-
-* cer 格式
-* PEM 格式
+- cer 格式
+- PEM 格式
 
 filename extensions, such as .crt, .cer, .pem, or .der generally map to two major encoding schemes for X.509 certificates and keys: PEM (Base64 ASCII), and DER (binary).
 
@@ -225,17 +224,17 @@ Alternately, if you have a PKCS1 key and want PKCS8: `openssl pkcs8 -topk8 -nocr
 
 [The Most Common OpenSSL Commands](https://www.sslshopper.com/article-most-common-openssl-commands.html)
 
-* Check a Certificate Signing Request (CSR) `openssl req -noout -text -in example.com.csr`
-* Check a private key `openssl rsa -check -in privateKey.key`
-* Check a certificate `openssl x509 -text -noout -in certificate.crt`
-* Check a PKCS#12 file (.pfx or .p12) `openssl pkcs12 -info -in keyStore.p12`
-* Connect to 443 `openssl s_client -connect www.example.com:443`
-* Extract the certificate from the .p12 file to a .pem file `openssl pkcs12 -in certificate.p12 -out certificate.pem -nodes`
-* Extract the certificate from the .cer file to a .pem file `openssl x509 -in certificate.cer -out certificate.pem -outform PEM`
-* Get expired date from URL `openssl s_client -connect example.com:443 -servername example.com 2>/dev/null | openssl x509 -noout -dates`
-* Get expired date `openssl x509 -noout -enddate -in certificate.pem`
-* Get expired date `openssl x509 -noout -dates -in nginx/05/ssl/example.com.crt`
-* Get expired date `openssl pkcs12 -in certificate.p12 -nodes | openssl x509 -noout -enddate`
+- Check a Certificate Signing Request (CSR) `openssl req -noout -text -in example.com.csr`
+- Check a private key `openssl rsa -check -in privateKey.key`
+- Check a certificate `openssl x509 -text -noout -in certificate.crt`
+- Check a PKCS#12 file (.pfx or .p12) `openssl pkcs12 -info -in keyStore.p12`
+- Connect to 443 `openssl s_client -connect www.example.com:443`
+- Extract the certificate from the .p12 file to a .pem file `openssl pkcs12 -in certificate.p12 -out certificate.pem -nodes`
+- Extract the certificate from the .cer file to a .pem file `openssl x509 -in certificate.cer -out certificate.pem -outform PEM`
+- Get expired date from URL `openssl s_client -connect example.com:443 -servername example.com 2>/dev/null | openssl x509 -noout -dates`
+- Get expired date `openssl x509 -noout -enddate -in certificate.pem`
+- Get expired date `openssl x509 -noout -dates -in nginx/05/ssl/example.com.crt`
+- Get expired date `openssl pkcs12 -in certificate.p12 -nodes | openssl x509 -noout -enddate`
 
 openssl s_client -connect example.com:443 -showcerts -servername example.com
 openssl s_client -connect example.com:443 -servername example.com 2>/dev/null
@@ -322,3 +321,21 @@ acme.sh --issue  -d www.example.com --webroot  /data/www/acme
 # 获取过期时间
 openssl x509 -noout -enddate -in www.example.com.cer
 ```
+
+## Http Header
+
+[HTTP Header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+
+### vary
+
+The Vary HTTP response header is a crucial instruction used by web servers to tell caches (browsers, CDNs, and proxies) how to handle Content Negotiation.
+
+In short, it tells the cache: "Don't just look at the URL to decide if this cached file matches. You also need to look at these specific headers in the user's request."
+
+Web servers often serve different versions of the same content (same URL) based on the capabilities or preferences of the client.
+
+Example:
+- User A asks for homepage.html and their browser supports GZIP compression. The server sends a compressed file (50KB).
+- User B asks for homepage.html but uses an old system that does not support compression. The server must send the uncompressed file (150KB).
+
+If there is a Cache (like a CDN) in the middle, it needs to know that it cannot serve User A's compressed file to User B, even though they are accessing the exact same URL.
