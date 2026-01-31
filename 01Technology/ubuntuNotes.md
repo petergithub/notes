@@ -43,6 +43,9 @@ CTRL+h # show hidden files
 nautilus # open your home folder
 location # make a command can be call anywhere
 ln -sfn # update a symbolic link
+# Search for Links by Inode, includes the original file, all its hard links, and all symbolic links
+find /data/ -inum $(ls -i /path/to/your/realfile | awk '{print $1}') -print 2>/dev/null
+
 ps -A -opid,stime,etime,args # 查看进程的启动时间
 pstack # Linux命令查看某个进程的当前线程栈运行情况
 ps huH p <PID_OF_U_PROCESS> | wc -l # monitor the active thread count of a process (jvm)
@@ -748,6 +751,8 @@ lesskey
 ### find
 
 ```sh
+# Search for Links by Inode, includes the original file, all its hard links, and all symbolic links
+find /data/ -inum $(ls -i /path/to/your/realfile | awk '{print $1}') -print 2>/dev/null
 find -L "$HOME/MySymlinkedPath" -name "run*.sh" # traverse symbolic links to find the file [find does not work on symlinked path?](https://unix.stackexchange.com/questions/93857/find-does-not-work-on-symlinked-path)
 find . -type f -name "*.log" | xargs grep "ERROR" # 从当前目录开始查找所有扩展名为.log的文本文件, 并找出包含"ERROR"的行
 find . -name '*.xml' -o -name '*.java' # matches multiple patterns
@@ -866,6 +871,10 @@ pgrep -l apache2
 [Regular Expressions - sed, a stream editor](https://www.gnu.org/software/sed/manual/html_node/Regular-Expressions.html)
 
 [Linux Sed命令详解](https://qianngchn.github.io/wiki/4.html)
+
+- None, Default,Prints every line after applying any changes.
+- -n, Silent,   Prints nothing unless a p command is triggered.
+- -i, In-place, Saves changes directly to the file (careful with this one!).
 
 ```sh
 # 多个模式
@@ -3003,7 +3012,9 @@ nslookup google.com 172.28.7.70
 ##### ip route 配置静态路由
 
 ```sh
-ip addr show enp0s3
+ip addr show ens192
+# 删除网卡 ens192 下其中一个IP
+ip address del 172.17.175.106/32 dev ens192
 
 ip route add [network/prefix] via [gateway] dev [interface]
 # 其中，network/prefix 指目标网络和掩码位数，即网络前缀长度，via 指路由数据包的下一跳网关的IP地址，dev interface 指数据包从哪个网络接口出去。如果只想查看路由表，则不需要在命令中添加 add 参数，而是直接输入 ip route
@@ -3044,8 +3055,18 @@ while true;do netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}
 
 ##### traceroute
 
-`Hop #     RTT 1     RTT 2     RTT 3     Name/IP Address`
-`10     81 ms     74 ms     74 ms     205.134.225.38`
+```sh
+# Try ICMP-based trace: uses Echo Requests instead of UDP, which sometimes bypasses basic filters.
+traceroute -I target_ip
+
+# Try TCP-based trace (best for web servers)
+traceroute -T -p target_port target_ip
+```
+
+```sh
+Hop #     RTT 1     RTT 2     RTT 3     Name/IP Address
+10     81 ms     74 ms     74 ms     205.134.225.38
+```
 
 `Hop Number` - This is the first column and is simply the number of the hop along the route. In this case, it is the tenth hop.
 
@@ -3596,6 +3617,8 @@ useradd -g <groupName> --create-home --comment "Account for running Confluence" 
 useradd -g <groupName> <username>
 # Add a new user to secondary group
 useradd -G <groupName> <username>
+# Add a existing user to multiple groups
+usermod -aG <groupName> <username>
 # Remove user from group which is not list in the command
 usermod -G {groupname1,groupname2,...} <username>
 
