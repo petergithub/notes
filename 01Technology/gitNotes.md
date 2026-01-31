@@ -10,6 +10,7 @@
 ### Git commit message convention
 
 [Git commit message convention that you can follow! - DEV Community 👩‍💻👨‍💻](https://dev.to/i5han3/git-commit-message-convention-that-you-can-follow-1709)
+[约定式提交](https://www.conventionalcommits.org/zh-hans/v1.0.0/)
 
 A typical git commit message will look like
 
@@ -184,6 +185,17 @@ Multiple Points
 
 Triple Dot
 `git log master...experiment` which specifies all the commits that are reachable by either of two references but not by both of them
+
+## [Git - git-worktree Documentation](https://git-scm.com/docs/git-worktree)
+
+```sh
+git worktree add ../temp -b emergency-fix master
+pushd ../temp
+# ... hack hack hack ...
+git commit -a -m 'emergency fix for boss'
+popd
+git worktree remove ../temp
+```
 
 ## [Git - Submodules 子模块](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 
