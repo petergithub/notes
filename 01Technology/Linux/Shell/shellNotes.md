@@ -167,6 +167,34 @@ ${name:-default}
 # 如果你要在之前的例子中再加一个（可选的）参数，可以使用类似这样的代码
 # 如果省略了 $2，它的值就为空，于是 output_file 就会被设为 logfile。
 output_file=${2:-logfile}
+
+# If a variable is unset or empty, you can fall back to a default value with ":-":
+echo "${NAME:-value}"
+# With a simple "-" (no colon), you can fall back to a default value if the variable was never declared (unset):
+echo "${NAME-value}"
+
+# The ":+" operator is the opposite of ":-": Fall back if "NAME" is set and not empty:
+export NAME="foo"
+echo "${NAME:+value}"
+# For "+," "NAME" must be set or empty before it falls back to the default value:
+echo "${NAME+value}"
+
+# The "=" operator is a little different, because it does two things: sets and returns the value. For ":=", Bash does this if "NAME" is unset or empty:
+                       # "NAME" is unset at this point.
+echo "${NAME:=value}"  # Expands to "value", but also sets "NAME" to "value".
+echo "$NAME"           # "NAME" is now set to "value"
+# When we exclude the colon ("="), it means set and return the value when "NAME" is unset:
+echo "${NAME=value}"
+echo "$NAME"
+
+# Since these rules are confusing, here's a summary:
+# Fallback to the default if "NAME"...
+echo "${NAME:-value}"  # Is unset or empty.
+echo "${NAME-value}"   # Is unset.
+echo "${NAME:+value}"  # Is set and not empty.
+echo "${NAME+value}"   # Is set or empty.
+echo "${NAME:=value}"  # Is unset or empty.   (Also, assign to "NAME.")
+echo "${NAME=value}"   # Is unset.            (Also, assign to "NAME.")
 ```
 
 ### 引号
@@ -249,6 +277,23 @@ echo ${MR_URL##*/}
 PNAME=${MR_URL##*/}
 PNAME=${PNAME#.git#}
 echo ${PNAME}
+
+## Changing case
+name="Hello, World!"
+# Change an entire string into uppercase using "^^":
+echo "${name^^}"
+# Change the first character into uppercase using "^":
+echo "${name^}"
+
+# Change the entire string to lowercase using ",,":
+echo "${name,,}"
+# Change the first letter into lowercase using ",":
+echo "${name,}"
+
+# batch rename to lowercase
+for file in IMG_*.jpg; do
+    mv "$file" "${file,,}"
+done
 ```
 
 #### 字符串拼接
