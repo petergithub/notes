@@ -94,9 +94,9 @@ ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 
 ## DBeaver
 
-Database > Driver Manager > MySQL > Edit > Libraries > 展开 mysql-connector > double click jar file to open Driver location
-
-Driver location:  %USERPROFILE%\AppData\Roaming\DBeaverData
+1. Database Navigator Font: Window > Preferences > User Interface > Appearance > Colors and Fonts > DBeaver Fonts > Main font > Edit... > Adjust Size > OK > Apply and Close.
+2. Database Driver: Database > Driver Manager > MySQL > Edit > Libraries > 展开 mysql-connector > double click jar file to open Driver location
+  Driver location:  %USERPROFILE%\AppData\Roaming\DBeaverData
 
 ## Chrome
 
@@ -112,6 +112,9 @@ Alt+U or click the icon to copy URL without encoding from address bar
 
 1. [Bypass Paywalls web browser extension for Chrome and Firefox.](https://github.com/iamadamdev/bypass-paywalls-chrome)
 2. ARC: chrome extension to run APKs
+3. [xifangczy/cat-catch: 猫抓 浏览器资源嗅探扩展 / cat-catch Browser Resource Sniffing Extension](https://github.com/xifangczy/cat-catch) 源码
+4. [copy-unicode-urls](https://github.com/ilyaigpetrov/copy-unicode-urls)
+5. [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
 
 ### 油猴脚本
 
@@ -217,6 +220,8 @@ HTML or Markdown syntax
 ## Network
 
 MagicDNS automatically registers DNS names for devices in your network. [MagicDNS · Tailscale Docs](https://tailscale.com/kb/1081/magicdns)
+
+[nashaofu/shell360: Shell360 is a cross-platform SSH and SFTP client.](https://github.com/nashaofu/shell360)
 
 ### putty显示中文
 
