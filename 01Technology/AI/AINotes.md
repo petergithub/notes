@@ -7,6 +7,8 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 
 ## GPT 分类
 
+[Leaderboard | LMArena](https://lmarena.ai/leaderboard/)
+
 [高盛发布中国AI报告：全面剖析BAT三巨头以及26个核心玩家](https://36kr.com/p/5091725.html)
 
 - 用 [Perplexity](http://Perplexity.ai) 代替 Google；
@@ -19,32 +21,33 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   - [Poe](https://poe.com/sage)
   - Slack Claude
   - [文心一言 百度](https://yiyan.baidu.com/)
-  - [通义千问 阿里](https://qianwen.aliyun.com/)
+  - [通义千问 阿里](https://qianwen.com)
   - [Google AI Studio](https://aistudio.google.com/app/prompts/new_chat)
-  - [Poe](https://poe.com/sage)
   - [Kimi.ai - 帮你看更大的世界](https://kimi.moonshot.cn/)
   - [DeepSeek](https://platform.deepseek.com)
-  - 腾讯混元助手 微信小程序
-  - Copy ai，
-  - [Writesonic](https://app.writesonic.com，
-  - Character AI，
-  - [Jasper](https://www.jasper.ai/)
-  - [Forefront Chat](https://chat.forefront.ai/)
+  - [lfnovo/open-notebook: An Open Source implementation of Notebook LM with more flexibility and features](https://github.com/lfnovo/open-notebook)
 - 图像处理
+  - [Nano-Banana Pro Google 最强教程 - 知乎](https://zhuanlan.zhihu.com/p/1978348406347961544) [Google AI Studio on X: "The Complete Guide to Nano Banana Pro: 10 Tips for Professional Asset Production" / X](https://x.com/GoogleAIStudio/status/1994480371061469306?t=c0LkdHNU0nYucaO2788Odg&s=09)
   - [文心一格 百度](https://yige.baidu.com/)
   - [通义万相 阿里](https://wanxiang.aliyun.com/creation)
   - Midjourney Discord 或 Getimg.ai，stable diffusion，dall-e
   - [OmniParser 图片解析](https://microsoft.github.io/OmniParser/)：OmniParser is a comprehensive method for parsing user interface screenshots into structured and easy-to-understand elements
   - [生成插画、漫画 Infinite AI Artboard - Recraft](https://www.recraft.ai/)
+  - [FLUX.1 Kontext | Black Forest Labs](https://bfl.ai/models/flux-kontext)
+  - [black-forest-labs/FLUX.1-Kontext-dev · Hugging Face](https://huggingface.co/black-forest-labs/FLUX.1-Kontext-dev)
+  - [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
+  - [DeepSeek-OCR: Contexts Optical Compression](https://github.com/deepseek-ai/DeepSeek-OCR)
 - 音视频转文本
   - [通义听悟 - 阿里](https://tingwu.aliyun.com)
   - [Aiko — Sindre Sorhus 语音转文字](https://sindresorhus.com/aiko)
   - [MacWhisper](https://goodsnooze.gumroad.com/l/macwhisper) [MacWhisper](https://app.gumroad.com/d/29e33b796f6ce9bb186f87cdf2fadb16)
   - Buzz transcribes and translates audio offline on your personal computer. [Buzz](https://github.com/chidiwilliams/buzz)
   - [AudioPen](https://audiopen.ai/demo)
+  - [alphacep/vosk-api: Offline speech recognition API for Android, iOS, Raspberry Pi and servers with Python, Java, C# and Node](https://github.com/alphacep/vosk-api)
 - 文本转音视频
   - 音频生成用 voice.ai 或 Eleven Labs，连字幕都可以用自己通过AI“训练”的个性专属字体。
   - [AI Video Editor | Create viral videos with AI - Topview.ai](https://www.topview.ai/)
+  -
 - 视频处理
   - 把画出来的人物，喂文案让他变成频视的是D-ID；
   - 视频制作用 Descript 或 Runway
@@ -65,15 +68,22 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
   - [Diffblue Cover write Java unit tests](https://docs.diffblue.com/get-started/get-started/get-started-cover-plugin)
 - 把真人变成虚拟人的是 Meta human，想更简单变虚拟人的是Ready player me；
 - PPT:
+  - [NotebookLM](https://notebooklm.google.com)
+  - [AIPPT-图片转 PPT](https://aippt.wps.cn/aippt/convert-ppt/home)
   - chatgpt生成的markdown语法内容导入[MindShow](https://www.mindshow.fun/#/home)
   - [AI PPT Maker - Best Online Free (No Sign up)](https://aipptmaker.ai/en)
   - [快速做PPT Gamma - Presentations and Slide Decks with AI | Gamma](https://gamma.app/)
+  - [Anionex/banana-slides: 一个基于nano banana pro🍌的原生AI PPT生成应用，迈向真正的＂Vibe PPT＂; 支持上传任意模板图片；上传任意素材&智能解析；一句话/大纲/页面描述自动生成PPT；口头修改指定区域、一键导出 - An AI-native PPT generator based on nano banana pro🍌](https://github.com/Anionex/banana-slides)
+- 手机自动化
+  - [智谱开源模型 Open-AutoGLM](https://github.com/zai-org/Open-AutoGLM) Phone Agent 是一个基于 AutoGLM 构建的手机端智能助理框架，它能够以多模态方式理解手机屏幕内容，并通过自动化操作帮助用户完成任务。
 - 第三方社群，civitai
 - 数学 [MathGPT 学而思](https://www.mathgpt.com/)
 - 医疗问题回答[MediSearch](https://medisearch.io/zh)
 - 查找法律案例、条文 [MetaLaw 类案检索，一键直达，让你的法律研究效率快人10倍](https://meta.law/)
 - 办公小浣熊:制作excel表格。
-- Scribe AI chrome 插件：自动生成可视化操作指南, 创建逐步指南的场景，包括操作说明、标准操作规程、培训手册等。
+- 浏览器自动化
+  - Scribe AI chrome 插件：自动生成可视化操作指南, 创建逐步指南的场景，包括操作说明、标准操作规程、培训手册等。
+  - [Skyvern-AI/skyvern: Automate browser based workflows with AI](https://github.com/Skyvern-AI/skyvern)
 - 编排
   - [Dify github](https://github.com/langgenius/dify)
   - [TEN Agent is a conversational AI](https://github.com/TEN-framework/TEN-Agent)
@@ -81,6 +91,7 @@ AI干不了你干不了的事，因为你干不了你就看不出来它是胡干
 - UI 设计工具
   - [Stitch - Design with AI](https://stitch.withgoogle.com/?pli=1)
 
+[claude-code-proxy: Run Claude Code on OpenAI models](https://github.com/1rgs/claude-code-proxy)
 [AI 工具列表 飞书文档](https://zl49so8lbq.feishu.cn/wiki/wikcn6YTN3CrZTS8RhrEca8c8Eg)
 [极客时间 AIGC 知识库](https://gp477l8icq.feishu.cn/wiki/JUXnwzSuviL5E9kh6jUc8FRinHe)
 [ModelScope魔搭社区 旨在打造下一代开源的模型即服务共享平台，为泛AI开发者提供灵活、易用、低成本的一站式模型服务产品，让模型应用更简单。](https://community.modelscope.cn/)
@@ -131,6 +142,75 @@ https://prompt.always200.com/
 https://prompts.chat/
 我们可以使用工具简单生成初版，再进行后续优化。
 
+#### [常用的Prompt心法](https://mp.weixin.qq.com/s/a_-EMSjN0ldsrKCIk6nxuQ)
+
+1. 让AI选定角色后再回答
+
+在你对你要提问的问题非常清楚的情况下，可以直接设定角色，而且这个角色越具体越真实，其实效果就越好，比如你设定乔布斯的角色，很多时候，就比一个10年的产品经理这种角色，来的更加有奇效。
+
+```sh
+我想探讨【领域】里的【问题类型/场景】。先别回答。
+请你先选一位最适合的领域顶尖名人专家来思考它。可以是活人或历史人物，名字可以小众，但必须在该细分领域很专业。如果你不确定该选谁，可以先反问我2个定位问题再选。
+先输出1.你选谁，他对应的细分领域2.为啥选他，三句话然后再让我描述详细的问题。
+```
+
+2. 给答案前先让AI追问
+
+```sh
+【你的问题/需求】请你在回答前，先问我问题。要求：一次只问一个问题。根据我的回答，继续追问。直到你有95%的信心理解我的真实需求和目标。然后才给出方案
+```
+
+3. 与AI辩论
+
+```sh
+我马上要参加一场辩论赛，会有很多人来挑战我的观点。我的观点是【观点】我希望这个理论必须变得无懈可击。如果你是一个学者，你需要用尽一切论据、细节和逻辑，来挑战我、反驳我。你的唯一目标，就是证明我是错的。你会怎么反驳呢？
+```
+
+当然思路都差不多，这玩意不需要背下来，简化版的也行。
+
+```sh
+【我的想法/观点】请你现在扮演一个"反对者角色"，从不同角度攻击我的想法，帮我完善我的观点。要求：不用客气，直接指出漏洞。
+```
+
+4. 让AI提前预演失败
+
+我们人做计划的时候就很容易热血，AI做计划的时候也容易乐观。这俩凑一块，经常会很容易搞出那种听起来很燃但是落地全靠命的方案。所以呢，我自己很喜欢在一些计划或者方案开始前，先做一次“预演失败”。
+
+```sh
+【我的项目/想法】
+请假设这个项目到时候失败了拉了大跨。
+然后回答：
+什么时间点开始出现衰退信号？
+最致命的决策错误是什么？
+你忽视的核心风险是什么？
+如果能重来，第一个应该改的是什么？
+要求：写一篇"失败复盘文章"，要基于真实的类似项目失败案例。
+```
+
+5. 反向提示
+
+就是有些时候，你根本不知道怎么问，你只知道你想要什么样的结果。比如你看到一篇很牛的文案，或者很牛逼的图，你想要同样的结构和节奏，可你说不出来。那就把成品给它，让它倒推提示词。
+```sh
+这是我想要的成品范例。
+请你倒推一个提示词，让我用它能稳定生成同风格的内容。
+并说明这个提示词里每一句的作用。
+```
+
+6. 双层解释法
+
+就是我们平时用AI了解一些我们不熟悉的领域，或者不太懂的名词，很多时候，大家都会用我是一个六年级小学生，请用我听得懂的方式来给我解释。这个方法当然有用，能让你最快速度了解大概是个啥，但是其实并不是特别利于后续的学习。
+
+所以我一般，会让他直接出两个版本，
+一个版本就是初学者版本，能用最快的类比当我没有基础，也能通俗易懂的理解。
+另一个版本就是更为专业的版本，跟初学者版本进行对照学习，如果中间有不懂的地方，继续用双层解释法向下挖掘。
+
+```sh
+请帮我解释一下【你的问题】。
+请用两种方式进行回答：
+1. 初学者版本：面向对象是洗脚城的大爷，用大爷也能听得懂的话语为他进行详细解释。
+2. 深度专业版本： 面向对象是专业人群，一定不能出现事实错误。
+```
+
 ## AI 在研发场景落地的现状
 
 - **智能研发插件**：以 Github Copilot/ 通义灵码 /Comate 为代表，主要以 JetBrains、VSCode 为插件形式为用户提供代码补全为主的智能编码服务
@@ -140,6 +220,19 @@ https://prompts.chat/
 - **其他的场景**：例如智能解决代码冲突，自动解决编译问题等也都在阿里内部平台早已上线，智能诊断，智能监控等均有人在调研中
 - **局部智能化的 Agent**：以 Gru.ai 等产品为代表帮助用户生成单元测试，以 readme-ai 为代表帮助开发者生成 Readme，以 RepoAgent 为代表帮用户补充注释等等，而阿里在内部也还实现了帮助用户按整个仓库生成注释，生成单元测试的 Agent ，这类 Agent 的特点是场景比较比较垂直简单，问题不发散，成功率比较高
 - **广泛自动化的 Agent**：以 Devin、OpenDevin 为代表，以 SWE-bench 为主要评测集的方式，利用大模型生成实现一个任务的 plan，并调用工具，在一个独立的容器内执行，并且能和用户交互的方式来实现一些简单的 issue 或者需求
+
+[一个非常详细的Vibe Coding指南](https://mp.weixin.qq.com/s/qNiAym5a70mWqXsBBLnitw)
+
+[面向 AI Coding的研发体系](https://mp.weixin.qq.com/s/sQ8zVNuaL7UxqGep_nCvjg)
+
+AI 辅助开发环境 —— MCP 驱动的高效编码这是研发的主战场。
+
+开发者使用支持 MCP 的 IDE（如 TRAE）。
+
+- 后端开发：IDE 通过ApiFox MCP读取已冻结的契约，AI 会自动生成精准的 Controller 骨架、入参校验逻辑和数据模型。开发者只需填充核心业务逻辑。
+- 前端开发：IDE 同时激活Figma MCP和ApiFox MCP。AI 左手拿着 UI 设计稿，右手拿着 API 数据结构，能够生成包含样式、交互和网络请求的全栈组件代码。
+
+这一步极大地减少了重复劳动，并确保了代码与需求、设计的高度一致性。
 
 ## AI 编码助手
 
@@ -202,6 +295,14 @@ To activate it: /ide enable
 To deactivate it: /ide disable
 
 ## AI 使用思路
+
+### Review code
+
+[GitLab AI Code Review 实践分享 · Issue #38 · hewking/blog](https://github.com/hewking/blog/issues/38)
+[GitLab - 利用生成式 AI 实现代码审核自动化](https://codelabs.developers.google.com/genai-for-dev-gitlab-code-review?hl=zh-cn)
+[sunmh207/AI-Codereview-Gitlab: 基于大模型(DeepSeek,OpenAI等)的 GitLab 自动代码审查工具；支持钉钉/企业微信/飞书推送消息和生成日报；支持Docker部署；可视化 Dashboard。](https://github.com/sunmh207/AI-Codereview-Gitlab)
+
+[AI Code Review Tools for GitLab Merge Requests (2025 Guide)](https://www.getpanto.ai/blog/ai-code-review-tools-gitlab-merge-requests)
 
 ### 把 AI 当工具的三种思路
 
@@ -267,6 +368,59 @@ To deactivate it: /ide disable
 
 [10分钟搭建一个拥有大模型能力以及专属知识库的钉钉机器人\_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/use-cases/add-an-ai-assistant-to-your-dingtalk-in-10-minutes)
 [10分钟让微信公众号成为智能客服\_大模型服务平台百炼(Model Studio)-阿里云帮助中心](https://help.aliyun.com/zh/model-studio/use-cases/add-an-ai-assistant-to-your-wechat-in-10-minutes)
+
+### 应用案例
+
+智能简历筛选 Agent 系统
+
+1. 设计 [实战案例：从 0 到 1 搭建 LLM 智能简历筛选 Agent 系统（设计+实现）](https://mp.weixin.qq.com/s/66zlftFwb2FmmkEddki1Xg)
+2. 实现思路[开源 LLM 智能简历筛选 Agent 系统（设计+实现）- code by claude code + kimi - 开发调优 - LINUX DO](https://linux.do/t/topic/861309)
+3. github 代码 [liangdabiao/LLM-Agent-Resume: 实战案例：从 0 到 1 搭建 LLM 智能简历筛选 Agent 系统（设计+实现）- code by claude code + kimi](https://github.com/liangdabiao/LLM-Agent-Resume)
+
+#### 知识库
+
+[NirDiamant/RAG\_Techniques: This repository showcases various advanced techniques for Retrieval-Augmented Generation (RAG) systems.](https://github.com/NirDiamant/RAG_Techniques)
+
+[hefeng6500/UltimateRAG: 一个按路线图逐步实现的 RAG 学习项目：从 Naive RAG → Advanced RAG → Agentic RAG → GraphRAG & Fine-tuning → RAGOps，在本地用 LangChain + 向量库把“文档问答”跑通，并逐步加入语义分块、混合检索、重排序、路由、自反思与工具调用等能力。 从最简单的 Demo 进化到企业级、甚至科研级的 RAG 系统。](https://github.com/hefeng6500/UltimateRAG)
+
+- **Stage 1：Naive RAG**
+    最小可用闭环：文档 → 分块 → 向量检索 → 问答
+    解决“到底在跑什么”
+- **Stage 2：Advanced RAG**
+    语义分块、混合检索、重排序、路由
+    解决“为什么效果不稳定”
+- **Stage 3：Agentic RAG**
+    多步推理、工具调用、自反思
+    解决“复杂问题怎么拆解”
+- **Stage 4：GraphRAG / Fine-tuning**
+    结构化知识、关系推理、模型适配
+    开始接近科研与复杂业务场景
+- **Stage 5：RAGOps**
+    评测、回归、监控、持续优化
+    面向长期运行的系统
+
+每一阶段都是**可运行、可单独理解、可继续扩展**的。
+
+[从工单、文档到结构化知识库：一套可复用的 Agent 知识采集方案](https://mp.weixin.qq.com/s/8iOvDIgOJlxi7LmcuuhCQQ)
+
+知识库直接召回效果差
+
+在实际使用中，向量召回经常会遇到一个现实问题：
+用户问的是口语化、多角度问题；
+知识库里存的是高度书面化、单一表达的文档描述；
+结果就是：语义距离算出来不够近，召回效果偏弱；
+
+我目前在用的两类解决思路：
+前置泛化(本文方案)：
+在知识入库前，让 AI 对每条知识做“问法泛化”，把用户可能使用的说法预先展开。
+这样知识库就不再是“一问一答”，而是“一答对应多问”，有效提升召回率。
+
+召回后质检：
+在 Agent 中单独设一个“知识质检节点”，负责：修改/重写用户问题，多次尝试召回；
+对召回知识进行相关性判断和“可信度打分”；
+必要时过滤掉相关性不够高的知识；
+
+这两层处理叠加后，实际 RAG 体验会好很多。
 
 ## 模型
 
@@ -517,6 +671,78 @@ Prompt: I want you to act as a travel guide. I will write you my location and yo
 1. Function Call:基于LLM的语言理解能力，通过理解语义，自主决策使用某项工具，并结构化调用
 2. RAG:通过句子或段落的语义相似度比较，检索相关资料，在资料支持下生成回复(Retrieval-Augmented Generation)
 
+### 问题
+
+面了个半调子后端转AI Agent方向 真的无语
+后端程序员转AI Agent本是优势组合——工程架构、分布式处理能力都是落地关键。但近期面试中，多数候选人的表现却差距明显，暴露出转岗的共性误区。
+
+📌 架构认知浮于表面，核心逻辑空白
+候选人多能复述“感知-决策-执行”架构，可追问“短期与长期记忆如何联动”“工具调用冲突怎么调度”时，便难以给出有效方案。实则这些问题可类比后端“缓存-数据库联动”“分布式任务优先级控制”，但多数人未建立知识迁移意识，架构认知仅停留在名词层面。
+
+📌 项目止于Demo级，工程属性缺失
+“用LangChain做过AI助手”是高频回答，但深究便露馅：API超时无重试机制、“整理纪要并发邮件”的任务拆分逻辑混乱、无与纯大模型的效果对比数据。后端擅长的容错设计、链路监控等能力，未在Agent项目中体现，项目仅完成工具调用的表层拼接。
+
+📌 工程思维未迁移，落地能力薄弱
+谈及1000用户并发，回答多为“直接扩容”，忽视Agent上下文状态管理与资源复用；提到上下文窗口不足，仅说“截断处理”，未考虑记忆丢失对决策的影响。更有候选人在多Agent协作项目中省略权限校验，违背后端安全开发基线。
+
+📌 后端转岗的核心成长路径
+1. 补AI基础：聚焦大模型函数调用、提示词工程，将其视为“AI版接口开发”，建立技术关联；
+2. 深研Agent核心：用后端逻辑理解记忆机制（短期=缓存、长期=持久化存储）、任务规划（类比分布式调度）；
+3. 小项目练落地：从“PDF解析+问答”切入，嵌入重试、日志监控等后端实践；
+4. 融合能力：将并发控制、权限管理等后端技能，迁移至多Agent协作场景。
+后端转AI Agent的关键，是让工程优势与AI认知形成合力。避开概念堆砌误区，才能真正实现高效转岗。
+
+
+很多人以为会调个OpenAI的接口、跑通Demo就是AI开发了，实际上连AI开发的门槛都没摸到
+
+总结 4 类典型“送命题”
+
+1. 概念背得滚瓜烂熟，落地细节一问三不知
+
+核心痛点：把LangChain文档背得挺熟，真到了业务场景就露馅。
+
+具体反例：问他RAG，自信说“这我熟”。深问一句：“你的文档切片策略是什么？怎么解决长下文截断丢失语义的问题？” 沉默..只跑过官方Demo，没处理过真实脏数据。
+
+2. 只有Demo思维，没有工程思维
+
+核心痛点：做出来的东西是个玩具，根本没法上线。
+
+反例： 做的Agent演示效果不错，我问他：“如果并发上来怎么控制Token成本？API响应超时怎么做降级熔断？模型出现幻觉怎么做后处理验证？” 他一脸茫然，仿佛这些是运维的事。但在开发里，稳定性比Feature更难做。
+
+3. 把Prompt Engineering当成“跟机器人聊天”
+
+核心痛点： 以为会打字就会写Prompt，完全不懂结构化指令。
+
+反例：设计处理复杂任务的Prompt，他用大白话跟AI谈心，不懂什么是CoT、Few-Shot，更不懂怎么约束输出格式。结果就是模型输出极不稳定，还要靠后端代码写一堆正则去修补。
+
+4. 拿着锤子找钉子，为了AI而AI
+
+核心痛点：技术选型由于缺乏场景感，导致方案极其低效。
+
+反例：字符串提取，明明写个正则表达式0.01秒就能搞定，他非要调用GPT-4去处理，他说“这样更智能”。这不叫智能，这叫烧钱且低效。
+
+面试官的真实感慨
+
+现在的市场上不缺会调用API的程序员，缺的是真正理解大模型边界、能把‘概率性模型’驯服成‘确定性产品’的工程师
+
+转型人助力按这个梯度去恶补：
+
+1、脱离API调包侠
+
+别光看LangChain，去手写一个简单的RAG流程。搞懂Embedding、向量数据库到底是怎么存、怎么查的。
+
+2、精通提示词工程
+
+掌握CoT、ReAct框架，学会让模型按你的逻辑去思考，用Prompt解决模型变笨的问题。
+
+3、掌握Agent编排架构
+
+学习Multi-Agent协作，理解规划、记忆、工具使用这三大件怎么在代码层流转。
+
+4、死磕落地与评测
+
+高薪分水岭。建立一套自动化评测集，关注Tracing，懂得在模型智商和推理成本之间做Trade-off。
+
 ### 量化
 
 [极简教程，大模型量化实践，1张4090跑QwQ？](https://mp.weixin.qq.com/s/27EsyfQNXk_A73I8FMz61A)
@@ -592,6 +818,8 @@ int4: (4/8)*671B = 335.5 GB 内存
 
 ## 学习教程
 
+Christopher M. Bishop的《模式识别与机器学习》（PRML: Pattern Recognition and Machine Learning）初版在2006年的，2025年被首次引进国内
+
 [Getting Started With MachineLearning (all in one)](https://pan.baidu.com/s/1tNXYQNadAsDGfPvuuj7_Tw)
 
 [microsoft/ML-For-Beginners: 12 weeks, 26 lessons, 52 quizzes, classic Machine Learning for all](https://github.com/microsoft/ML-For-Beginners)
@@ -646,6 +874,54 @@ int4: (4/8)*671B = 335.5 GB 内存
 文心大模型ERNIE是百度发布的产业级知识增强大模型，涵盖了NLP大模型和跨模态大模型。
 
 https://github.com/PaddlePaddle/ERNIE
+
+## AI Agent 基础设施
+
+[AI Agent 基础设施](https://mp.weixin.qq.com/s/xp1f1BistZxy9rES3We3sA)
+
+AI Agent是利用人工智能技术以实现特定目标并为用户完成任务的软件系统。它们展现出推理、规划、记忆以及一定程度的自主性，能够进行决策、学习和适应环境 。这些Agent能够同时处理包括文本、语音、视频、音频和代码在内的多模态信息，并具备对话、推理、学习和决策的能力 。
+
+**AI Agent的核心功能组件**
+AI Agent的强大功能源于其内部多个核心组件的协同工作。这些组件共同构成了Agent的感知、思考、决策和行动能力。
+
+1. 大脑：核心LLM、推理与规划
+2. 感知与行动模块：与环境交互
+   1. 环境感知模块：感知模块负载把需要的上下文、环境信息召回，传递给大模型。在感知模块中，语义搜索、NL2SQL等能力是基础，这些模块的能力把LLM感知环境的需求转换为具体的获取数据的操作
+   2. 行动模块 ：负责执行Agent的决策，这可能包括调用API、与外部工具交互、生成文本或代码，甚至在机器人技术中执行物理动作
+3. Memory：学习与维护上下文
+   1. 短期记忆 (Short-Term Memory)
+   2. 长期记忆 (Long-Term Memory)
+   3. 分层记忆系统：如工作记忆、短期记忆和长期记忆的组合，可以提高检索速度和上下文保真度 。
+4. 工具集成与使用：扩展Agent能力
+   1. 交互协议层: MCP, A2A
+   2. 工具发现和整合
+   3. 沙箱：沙箱是保障工具安全运行的前提
+5. 路由器/控制器：管理复杂工作流
+   1. 涉及多个工具或子Agent的多步骤任务时，一个有效的控制器对于协调这些组件变得至关重要
+
+**Agent系统运维基础设施**
+包括LLM API网关、缓存策略以及安全的工具执行环境。
+
+1. LLM API网关：统一访问、安全与可观测性
+2. LLM响应的缓存策略：性能与成本优化
+   1. 精确键缓存 (Exact Key Caching)
+   2. 语义缓存 (Semantic Caching)
+3. 安全的工具执行环境：沙箱与凭证管理
+
+**Agent编排与协作**
+Agent的智能不仅仅体现在其个体能力上，更在于它们如何组织自己的“思维”过程以及如何与其他Agent或系统进行协作。
+
+- 思维链 (Chain-of-Thought, CoT)：将任务分解为更小的步骤，以逐步求解。非常适合需要逻辑或多步骤推理的任务 。它帮助模型分解任务，使其思考过程更易于理解 。
+- ReAct (Reasoning and Acting, 推理与行动)：将CoT推理与外部工具使用相结合 。它涉及一个“思考 (Thought) -> 行动 (Action) -> 观察 (Observation)”的循环 。这使得Agent能够根据新信息或前一步骤的结果动态调整其方法 ，从而增强LLM在Agent工作流中处理复杂任务和决策的能力 。
+- Reflexion (反思)：利用反馈循环，使LLM能够反思过去的输出并迭代地改进其性能 。这种模式非常适用于需要多次尝试进行优化和复杂推理的任务
+
+**开源Agent框架**
+开源Agent框架旨在通过提供预构建的组件和抽象来简化Agent的开发过程
+
+- LangChain：采用模块化架构，适用于具有直接工作流的简单Agent。它支持向量数据库和记忆功能，其LangSmith平台可用于调试和监控 。然而，一些开发者认为它过度抽象，难以使用，甚至有些过度工程化 。
+- LangGraph：作为LangChain生态系统的一部分，LangGraph采用图架构（节点代表任务/动作，边代表转换），并包含一个状态组件来维护任务列表。它非常适合周期性、条件性或非线性工作流 。LangGraph提供了比其他框架更高的可控性，并有意保持其底层和集成无关性 。
+- AutoGen：由微软推出的多Agent AI框架，采用分层架构（核心层、AgentChat层、扩展层）。它支持异步消息传递和对话式AI助手的构建，并提供AutoGen Bench和AutoGen Studio用于开发和基准测试 。
+- CrewAI：一个用于多Agent解决方案的编排框架，采用基于角色的架构（Agent、任务、流程——顺序或分层）。它底层使用了LangChain ，但本身是一个独立的框架 。其局限性在于目前主要支持顺序编排，并且可能产生不完整的输出 。
 
 ## ollama
 
