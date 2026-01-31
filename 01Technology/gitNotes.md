@@ -1,7 +1,5 @@
 # Git Notes
 
-[TOC]
-
 ## 规范
 
 1. 特定业务开发需要单独拉分支的，一般不要做merge master操作；需要同步master代码的时候，从master新拉分支，再从新分支merge之前的开发分支。
