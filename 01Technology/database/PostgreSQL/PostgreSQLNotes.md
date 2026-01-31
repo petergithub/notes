@@ -107,6 +107,8 @@ IS_STANDBY=$(sudo -u postgres psql -U postgres -tAc "SELECT pg_is_in_recovery()"
 createdb -T template0 newdb --owner OWNER
 # 删库
 dropdb newdb
+
+SET ROLE readonly_user;
 ```
 
 POSTGRES_URI [PostgreSQL: Documentation: 17: 32.1. Database Connection Control Functions](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING-URIS)
@@ -604,19 +606,32 @@ SELECT * from pg_stat_activity where datname = 'dbname' and client_addr not in (
 -- 查看数据库表大小
 select pg_database_size('playboy');
 -- 1、查询执行数据库大小
-select pg_size_pretty (pg_database_size('dbname'));
+SELECT pg_size_pretty(pg_database_size(current_database()));
+select pg_size_pretty(pg_database_size('dbname'));
 -- 2、查询数据库实例当中各个数据库大小
-select datname, pg_size_pretty (pg_database_size(datname)) AS size from pg_database;
+SELECT datname AS db_name, pg_size_pretty(pg_database_size(datname)) AS db_size FROM pg_database ORDER BY pg_database_size(datname) DESC;
 -- 3、查询单表数据大小
-select pg_size_pretty(pg_relation_size('product')) as size;
+select pg_size_pretty(pg_relation_size('table_name')) as size;
 -- 4、查询数据库表包括索引的大小
 select pg_size_pretty(pg_total_relation_size('table_name')) as size;
 -- 5、查看表中索引大小
-select pg_size_pretty(pg_indexes_size('product'));
+select pg_size_pretty(pg_indexes_size('table_name'));
+-- Breakdown of Table vs. Index size
+SELECT pg_size_pretty(pg_relation_size('users')) AS data_size, pg_size_pretty(pg_indexes_size('users')) AS index_size, pg_size_pretty(pg_total_relation_size('users')) AS total_size;
 -- 6、获取各个表中的数据记录数
 select relname as TABLE_NAME, reltuples as rowCounts from pg_class where relkind = 'r' and relname not like 'pg%' order by rowCounts desc;
 -- 7、查看数据库表对应的数据文件
-select pg_relation_filepath('product');
+select pg_relation_filepath('table_name');
+
+-- Find the Top 10 Largest Tables
+SELECT relname AS table_name, pg_size_pretty(pg_total_relation_size(relid)) AS total_size FROM pg_catalog.pg_statio_user_tables
+ORDER BY pg_total_relation_size(relid) DESC LIMIT 10;
+
+-- Using psql Command Line
+\l+   List all databases with their sizes.
+\dt+  List all tables in the current database with their size (excluding indexes).
+\di+  List all indexes and their individual sizes.
+
 ```
 
 ### 一些特殊需求的 SQL
@@ -689,6 +704,7 @@ SELECT  name,"Name","NAME" from "NODE"; //查询正确返回值
 
 [PostgreSQL 16: Chapter 14. Performance Tips](https://www.postgresql.org/docs/16/performance-tips.html)
 [Introduction to PostgreSQL Performance Tuning | EDB](https://www.enterprisedb.com/postgres-tutorials/introduction-postgresql-performance-tuning-and-optimization)
+[PGTune - calculate configuration for PostgreSQL based on the maximum performance for a given hardware configuration](https://pgtune.leopard.in.ua/)
 
 ### 索引
 
@@ -882,11 +898,11 @@ select * from pg_catalog.pg_locks pl where pl.relation = <relation-from-sql-abov
 
 当你发现一个查询的 `duration` 很长时，结合 `wait_event_type` 就可以快速定位问题：
 
-1.  **如果类型是 `Client`:**
+1. **如果类型是 `Client`:**
     * **关注状态：** 如果 `state` 是 **`idle in transaction`**，立即通知应用程序开发者解决事务管理问题，或者设置 `idle_in_transaction_session_timeout` 来自动终止它们。
-2.  **如果类型是 `Lock`:**
+2. **如果类型是 `Lock`:**
     * **查找源头：** 使用 `pg_locks` 视图来确定是**哪个 PID** 持有锁，并阻塞了当前的慢查询。一旦找到阻塞进程，就可以分析它的事务内容并解决锁冲突。
-3.  **如果类型是 `IO` 或 `NULL` (但 `state` 是 `active`)：**
+3. **如果类型是 `IO` 或 `NULL` (但 `state` 是 `active`)：**
     * **分析 I/O：** 检查 `pg_stat_statements` 的 I/O 统计信息。这通常意味着你需要优化查询，创建索引，或者升级你的存储系统。
     * **分析 CPU：** 如果是 `NULL` 且耗时长，说明查询本身计算量大（如全表扫描、复杂聚合、触发器）。使用 `EXPLAIN ANALYZE` 来分析查询计划。
 
