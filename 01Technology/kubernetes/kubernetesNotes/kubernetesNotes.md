@@ -111,14 +111,125 @@ kubectl port-forward pod-name 8888:8080
 kubectl port-forward --address 0.0.0.0 svc/[service-name] -n [namespace] [external-port]:[internal-port]
 ```
 
-COMMUNICATING WITH PODS THROUGH THE API SERVER
-`kubectl proxy`
-use localhost:8001 rather than the actual API server host and port. You’ll send a request to the kubia-0 pod like this:
-`curl localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/`
-
 `kubectl autoscale deployment kubia --cpu-percent=30 --min=1 --max=5` creates the HorizontalPodAutoscaler(HPA) object for you and sets the Deployment called kubia as the scaling target
 `kubectl get hpa` HorizontalPodAutoscaler
-a container’s CPU utilization is the container’s actual CPU usage divided by its requested CPU
+a container's CPU utilization is the container's actual CPU usage divided by its requested CPU
+
+### Kubernetes REST API
+
+communicating with pods through the api server
+
+```sh
+kubectl proxy
+# You can then point your browser to
+curl http://localhost:8001/api/v1/namespaces/default/pods
+# use localhost:8001 rather than the actual API server host and port. You'll send a request to the kubia-0 pod like this:
+# curl http://localhost:8001/api/v1/namespaces/default/pods/kubia-0/proxy/
+```
+
+```sh
+# with yaml
+kubectl exec -n ai-test netshoot -- sh -c '
+  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+  NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+  API_SERVER="https://kubernetes.default.svc"
+
+  cat > /tmp/deployment.yml << EOF
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    namespace: ai-test
+    name: nginx-deployment
+    labels:
+      app: nginx
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: nginx
+    template:
+      metadata:
+        labels:
+          app: nginx
+      spec:
+        containers:
+        - name: nginx
+          image: docker.jasolar.com/base/nginx:1.27.0
+          ports:
+          - containerPort: 80
+  EOF
+
+  curl -k -X POST \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/yaml" \
+    --data-binary @/tmp/deployment.yml \
+    "$API_SERVER/apis/apps/v1/namespaces/$NAMESPACE/deployments"
+  ')
+
+# with json
+tee /tmp/deployment.json <<EOF
+{
+  "apiVersion": "apps/v1",
+  "kind": "Deployment",
+  "metadata": {
+    "name": "nginx-deployment",
+    "labels": {
+      "app": "nginx"
+    }
+  },
+  "spec": {
+    "replicas": 3,
+    "selector": {
+      "matchLabels": {
+        "app": "nginx"
+      }
+    },
+    "template": {
+      "metadata": {
+        "labels": {
+          "app": "nginx"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx:1.27.0",
+            "ports": [
+              {
+                "containerPort": 80
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+EOF
+
+kubectl proxy
+KUBE_API_SERVER_URL=http://localhost:8001
+
+# Replace <KUBE_API_SERVER_URL> and <NAMESPACE> with your cluster details.
+# Replace <SERVICE_ACCOUNT_TOKEN> with an actual token.
+# Assume the JSON body is saved in 'deployment.json'
+# -H "Authorization: Bearer <SERVICE_ACCOUNT_TOKEN>" \
+curl -X POST \
+-H "Content-Type: application/json" \
+--data @/tmp/deployment.json \
+"${KUBE_API_SERVER_URL}/apis/apps/v1/namespaces/default/deployments"
+
+# get pods
+kubectl exec -n ai-test netshoot -- sh -c 'TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); curl -s -k -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/namespaces/ai-test/pods'
+# get deployments
+kubectl exec -n ai-test netshoot -- sh -c 'TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); curl -s -k -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/apis/apps/v1/namespaces/ai-test/deployments' | head -20
+
+# create deployment
+kubectl exec -n ai-test netshoot -- sh -c 'TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); curl -X POST -k -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d @/tmp/deployment.json https://kubernetes.default.svc/apis/apps/v1/namespaces/ai-test/deployments'
+# create service
+kubectl exec -n ai-test netshoot -- sh -c 'TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); curl -X POST -k -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d @/tmp/service.json https://kubernetes.default.svc/api/v1/namespaces/ai-test/services'
+```
 
 ### Cluster
 
@@ -154,7 +265,7 @@ kubectl cluster-info dump
 ```sh
 kubectl cluster-info dump
 
-# retrieving a pod’s log with kubectl logs
+# retrieving a pod's log with kubectl logs
 kubectl logs kubia-manual
 kubectl logs -f --tail=10 pod-name
 # `-o custom-columns`
@@ -239,6 +350,9 @@ complete -o default -F __start_kubectl k
 # ZSH
 source <(kubectl completion zsh)  # set up autocomplete in zsh into the current shell
 echo '[[ $commands[kubectl] ]] && source <(kubectl completion zsh)' >> ~/.zshrc # a
+
+# Shortcut to change namespace
+alias kcn='kubectl config set-context --current --namespace'
 ```
 
 `brew install kube-ps1 stern`
@@ -385,7 +499,7 @@ kubectl rollout history deployment deployment-name
 kubectl set image deployment kubia nodejs=luksa/kubia:v3
 # the progress of the rollout
 kubectl rollout status deployment kubia
-# displaying a deployment’s rollout history
+# displaying a deployment's rollout history
 kubectl rollout history deployment kubia
 # undoing a rollout
 kubectl rollout undo deployment kubia
@@ -670,13 +784,13 @@ kubectl delete job <job-name> -n <namespace>
 
 #### Exceeding the limits
 
-CPU: when a CPU limit is set for a container, the process isn’t given more CPU time than the configured limit.
-Memory: When a process tries to allocate memory over its limit, the process is killed (it’s said the container is OOMKilled, where OOM stands for Out Of Memory)
+CPU: when a CPU limit is set for a container, the process isn't given more CPU time than the configured limit.
+Memory: When a process tries to allocate memory over its limit, the process is killed (it's said the container is OOMKilled, where OOM stands for Out Of Memory)
 
 #### pod QoS classes
 
 - BestEffort (the lowest priority)
-  1. It’s assigned to pods that don’t have any requests or limits set at all (in any of their containers)
+  1. It's assigned to pods that don't have any requests or limits set at all (in any of their containers)
   2. They will be the first ones killed when memory needs to be freed for other pods.
 - Burstable
   In between BestEffort and Guaranteed is the Burstable QoS class. All other pods fall into this class
@@ -831,9 +945,9 @@ kubectl get --all-namespaces pods --field-selector=spec.nodeName=<node name>
 
 Three possible effects exist:
 
-- `NoSchedule`, which means pods won’t be scheduled to the node if they don’t tol- erate the taint.
-- `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can’t schedule it somewhere else.
-- `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don’t tolerate the NoExecute taint will be evicted from the node.
+- `NoSchedule`, which means pods won't be scheduled to the node if they don't tol- erate the taint.
+- `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can't schedule it somewhere else.
+- `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don't tolerate the NoExecute taint will be evicted from the node.
 
 ```sh
 # Remove the taint
@@ -906,6 +1020,8 @@ kg VolumeAttachment | sort -k 3
 
 Kubernetes 对集群网络有以下要求：
 所有的 Pod 之间可以在不使用 NAT 网络地址转换的情况下相互通信；所有的 Node 之间可以在不使用 NAT 网络地址转换的情况下相互通信；每个 Pod 看到的自己的 IP 和其他 Pod 看到的一致。
+
+[kubeshark: The API traffic analyzer for Kubernetes providing real-time K8s protocol-level visibility, capturing and monitoring all traffic and payloads going in, out and across containers, pods, nodes and clusters. Inspired by Wireshark, purposely built for Kubernetes](https://github.com/kubeshark/kubeshark)
 
 #### Kubernetes CNI
 
@@ -1087,7 +1203,7 @@ for intf in /sys/devices/virtual/net/cni0/brif/*; do echo "$intf"; cat $intf/hai
 - The Scheduler
 - The Controller Manager
 
-These components store and manage the state of the cluster, but they aren’t what runs the application containers.
+These components store and manage the state of the cluster, but they aren't what runs the application containers.
 
 ### Components running on the worker nodes
 
@@ -1118,7 +1234,7 @@ helm pull <chart>                       # Download/pull chart
 helm pull <chart> --untar=true          # If set to true, will untar the chart after downloading it
 helm pull <chart> --verify              # Verify the package before using it
 helm pull <chart> --version <number>    # Default-latest is used, specify a version constraint for the chart version to use
-helm dependency list <chart>            # Display a list of a chart’s dependencies:
+helm dependency list <chart>            # Display a list of a chart's dependencies:
 ```
 
 ### helm push chart
@@ -1482,7 +1598,13 @@ done
 echo "所有 YAML 文件处理完成！"
 ```
 
-## 集群配置
+## 集群 setup
+
+[easzlab/kubeasz: 使用Ansible脚本安装K8S集群，介绍组件交互原理，方便直接，不受国内网络环境影响](https://github.com/easzlab/kubeasz)
+
+### Create user
+
+[Generating kubeconfig files for additional users](https://v1-30.docs.kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubeconfig-additional-users)
 
 ### kubelet 配置
 
@@ -1754,7 +1876,7 @@ Common exit codes (`128+x`) associated with docker containers are:
 
 - Exit Code 0: Absence of an attached foreground process
 - Exit Code 1: Indicates failure due to application error
-- Exit Code 137: `128+9` Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer’ [OUT-OF-MEMORY])
+- Exit Code 137: `128+9` Indicates failure as container received SIGKILL (Manual intervention or ‘oom-killer' [OUT-OF-MEMORY])
 - Exit Code 139: `128+11` Indicates failure as container received SIGSEGV
 - Exit Code 143: `128+15` Indicates failure as container received SIGTERM
 
@@ -1781,7 +1903,7 @@ Automated Certificate Management Environment (ACME).
 3. Check the issuer state
    1. `kubectl describe issuer <Issuer name>`
    2. `kubectl describe clusterissuer <ClusterIssuer name>`
-4. [Troubleshooting Issuing ACME Certificates | cert-manager](https://cert-manager.io/docs/faq/acme/): ACME(e.g. Let’s Encrypt)
+4. [Troubleshooting Issuing ACME Certificates | cert-manager](https://cert-manager.io/docs/faq/acme/): ACME(e.g. Let's Encrypt)
    1. Check Orders `kubectl describe order example-com-2745722290-439160286`. If the Order is not completing successfully, you can debug the challenges for the Order
    2. Check Challenges `kubectl describe challenge example-com-2745722290-4391602865-0`
       1. [HTTP01 troubleshooting](https://cert-manager.io/docs/faq/acme/#http01-troubleshooting)
@@ -1872,6 +1994,7 @@ crictl images
 # kubeadm config images list --kubernetes-version=v1.15.2
 ctr image pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
 crictl pull k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.9.1
+crictl --debug pull image_name
 
 # 创建 k8s.io 命名空间
 ctr ns create k8s.io
