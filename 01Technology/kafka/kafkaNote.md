@@ -174,9 +174,9 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --grou
 kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --shift-by -20 -execute
 
 # 重置偏移量 dry-run
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000 --dry-run
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000+08:00 --dry-run
 # 重置偏移量 execute 到指定时间
-kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000 --execute
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --topic topic1 --group group1 --reset-offsets --to-datetime 2025-10-16T06:00:00.000+08:00 --execute
 
 
 # --reset-offsets has 3 execution options:
@@ -238,14 +238,44 @@ kafka-configs.sh --bootstrap-server localhost:9092 --entity-type brokers --entit
 
 version kafka_2.13-3.8.0
 
+软件目录：/data/software/kafka_2.13-3.8.0
+数据目录：/data/kafka-data/kraft-combined-logs
+日志目录：/data/log/data
+启动命令：sudo systemctl start kafka.service
+停止命令：sudo systemctl stop kafka.service
+
+### ansible installation
+
+软件目录：/data/software/kafka_2.13-3.8.0
 数据目录：/data/kafka-data/kraft-combined-logs
 日志目录：/data/log/data
 启动命令：sudo systemctl start kafka.service
 停止命令：sudo systemctl stop kafka.service
 
 ```sh
+kafka-storage.sh info --config /data/software/kafka_2.13-3.8.0/config/kraft/server.properties
+
+# install kafka ansible role include java
+# ansible-playbook -vv java/playbook_java.yaml --limit=yzm_kafka
+ansible-playbook -vv kafka/playbook_kafka.yaml --limit=yzm_kafka
+
+# 清空数据，可以重装 kafka
+ansible yzm_kafka -m shell -a 'rm -rf /data/kafka-data/*'
+
+# other shell
+ansible yzm_kafka -m shell -a 'cat /data/kafka-data/kraft-combined-logs-0/meta.properties | grep cluster.id'
+ansible yzm_kafka -m shell -a 'systemctl is-active kafka'
+```
+
+todo
+
+1. task `Format Kafka storage on all nodes` and `Generate Kafka cluster ID` are not idempotent, need to fix, they should be in a block
+
+### manual installation
+
+```sh
 # install kafka
-tar xf /data/package/kafka_2.13-3.8.0.tgz -C /data/software
+tar xf /data/software/kafka_2.13-3.8.0.tgz -C /data/software
 ls /data/software/kafka_2.13-3.8.0
 mkdir -p /data/kafka-data/
 
@@ -262,18 +292,20 @@ KAFKA_CLUSTER_ID="$(bin/kafka-storage.sh random-uuid)"
 cd /data/software/kafka_2.13-3.8.0
 bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c config/kraft/server.properties
 
-cat > /data/software/kafka_2.13-3.8.0/kafka.service << EOF
-# cat > /etc/systemd/system/kafka.service << EOF
-# cat > /usr/lib/systemd/system/kafka.service << EOF
+cat > /etc/systemd/system/kafka.service << EOF
 [Unit]
 Description=Apache Kafka server (broker)
 After=network.target
 
 [Service]
 Type=forking
-User=root
-Group=root
-Environment="PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/data/software/openjdk-21.0.2/bin"
+User=jasolar
+Group=jasolar
+Environment="PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/data/software/openjdk-21.0.2/bin:/home/jasolar/.local/bin:/home/jasolar/bin"
+Environment="KAFKA_HEAP_OPTS=-Xmx8G -Xms8G"
+#Environment=JMX_EXPORTER_OPTS="-javaagent:/data/software/kafka_2.13-3.8.0/jmx_prometheus_javaagent/jmx_prometheus_javaagent-0.16.1.jar=9095:/data/software/kafka_2.13-3.8.0/jmx_prometheus_javaagent/jmx_prometheus_javaagent_config.yaml"
+#Environment=KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -javaagent:/data/software/kafka_2.13-3.8.0/jmx_prometheus_javaagent/jmx_prometheus_javaagent-0.16.1.jar=9095:/data/software/kafka_2.13-3.8.0/jmx_prometheus_javaagent/jmx_prometheus_javaagent_config.yaml
+Environment=JMX_PORT=9096
 
 ExecStart=/data/software/kafka_2.13-3.8.0/bin/kafka-server-start.sh -daemon /data/software/kafka_2.13-3.8.0/config/kraft/server.properties
 ExecStop=/data/software/kafka_2.13-3.8.0/bin/kafka-server-stop.sh
@@ -349,8 +381,8 @@ bin/kafka-metadata-quorum.sh --bootstrap-controller localhost:9093 describe --st
 # CurrentVoters:          [1,2,3]
 # CurrentObservers:       []
 
-kafka-broker-api-versions.sh  --bootstrap-server kafka01:9092,kafka02:9092,kafka03:9092  | awk '/id/{print $1}'
-kafka-broker-api-versions.sh  --bootstrap-server localhost:9092  | awk '/id/{print $1}'
+bin/kafka-broker-api-versions.sh  --bootstrap-server kafka01:9092,kafka02:9092,kafka03:9092  | awk '/id/{print $1}'
+bin/kafka-broker-api-versions.sh  --bootstrap-server localhost:9092  | awk '/id/{print $1}'
 kafka01:9092
 kafka02:9092
 
