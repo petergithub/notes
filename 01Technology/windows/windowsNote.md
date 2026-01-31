@@ -2,7 +2,9 @@
 
 Win+V 打开云剪贴板
 Win+Shift+S 随时随地截图,支持矩形、任意形状、窗口截图
-Windows 睡眠快捷键 Win+X U S 或者设置电源选项关盖即休眠
+Win+Shift+R​ 直接开始“视频截图”（录屏）
+Win+X U S 或者设置电源选项关盖即睡眠 Sleep
+Win+X U H 或者设置电源选项关盖即休眠 Hibernate
 
 查看电脑系统属性：dxdiag 命令
 
@@ -344,6 +346,19 @@ Set-ExecutionPolicy -ExecutionPolicy Bypass
 
 ## 系统设置
 
+```sh
+# Disable Hibernation
+powercfg.exe /hibernate off
+# By default, hiberfil.sys is about 40-75% of your installed RAM.
+# You can reduce it to about 20% of your RAM, which is enough for Fast Startup to work, but not enough for full Hibernation.
+powercfg /h /type reduced
+
+# Enable Hibernation
+powercfg.exe /hibernate on
+# This command will automatically re-increase the size of your hiberfil.sys file (usually to about 40% of your RAM) to support full hibernation.
+powercfg /h /type full
+```
+
 ### 创建本地用户
 
 方法1：通过网络邻居创建账号：win+R，打开运行，输入 netplwiz，添加账号
@@ -379,22 +394,15 @@ start /B code "D:\Dropbox\work\vscode.workspace.common.code-win11.code-workspace
 [JohanChane/easy-context-menu](https://github.com/JohanChane/easy-context-menu/tree/main)
 
 ```sh
-# Restore Classic Context Menu on Windows 11 with Cmd
-
+# Restore Classic Context Menu on Windows 10 with Cmd
 # 1. Open Cmd with Administrator privileges
 # 2. Copy and paste the below Code and press enter
-
 reg.exe add "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" /f
+# NOTE: Restart the file explorer after the above steps.
+taskkill /f /im explorer.exe & start explorer.exe
 
 # Restore Default Context Menu on Windows 11 with Cmd
-
-# 1. Open Cmd with Administrator privileges
-# 2. Copy and paste the below Code and press enter
-
 reg.exe delete "HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" /f
-
-# NOTE: Restart the file explorer after the above steps.
-
 taskkill /f /im explorer.exe & start explorer.exe
 ```
 
@@ -418,6 +426,14 @@ List was generated from ["Language Identifier Constants and Strings"](http://msd
 | 0004 | 4    | zh-CHS       | Chinese - Simplified            |
 | 0404 | 1028 | zh-TW        | Chinese (Traditional) - Taiwan  |
 | 0409 | 1033 | en-US        | English - United States         |
+
+### 让 Edge 标签不再出现在 Alt + Tab 切换器
+
+Windows 11 设置步骤
+- 按下 Win + I​ 打开设置，在顶部搜索框输入并选中：Alt + Tab（或“对齐或按 Alt+Tab 时显示应用中的标签页”）。
+- 将“对齐或按 Alt+Tab 时显示应用中的标签页”设置为：不显示选项卡。
+- 可选：若只想略微精简，也可选择“打开窗口和最近的 3/5/30 个标签”，但若要完全不显示 Edge 标签，请选“不显示选项卡”。
+- 关闭设置，按 Alt + Tab​ 测试效果
 
 ## tool
 
@@ -760,6 +776,31 @@ wsl --distribution <Distribution Name> --user <User Name>
 wsl -u , wsl --user //以特定用户的身份运行
 wsl config --default-user //更改发行版的默认用户
 wsl --unregister //注销或卸载 Linux 发行版
+
+--help # 显示使用情况信息。
+--manage <Distro> <Options...> # 更改发行版特定选项。
+  --move <Location> # 将分发移到新位置。
+--distribution, -d <DistroName> # 运行指定的分发版。
+--user, -u <UserName> # 以指定用户身份运行。
+--shutdown # 立即终止所有正在运行的分发版和 WSL 2 轻型实用工具虚拟机。
+--status # 显示适用于 Linux 的 Windows 子系统状态。
+--version, -v # 显示版本信息。
+
+--export <Distro> <FileName> [选项]  # 将分发版导出到 tar 文件。 文件名可以是 - for stdout。
+   选项:
+      --format <Format> # 指定导出格式。支持的值: tar、tar.gz、vhd。
+--import <Distro> <InstallLocation> <FileName> [选项] # 将指定的 tar 文件作为新分发版导入。 文件名可以是 - for stdin。
+   选项:
+      --version <Version> # 指定要用于新分发的版本。
+      --vhd # 指定所提供的文件是 .vhdx 文件，而不是 tar 文件。 此操作在指定的安装位置创建 .vhdx 文件的副本。
+
+--list, -l [选项] # 列出分发版。
+   选项:
+      --all # 列出所有分发版，包括当前正在安装或卸载的分发版。
+      --running # 仅列出当前正在运行的分发版。
+      --quiet, -q # 仅显示分发版名称。
+      --verbose, -v # 显示有关所有分发版的详细信息。
+      --online, -o # 显示适合通过 'wsl --install' 安装的可用分发版列表。
 ```
 
 ### wsl -update 慢解决办法
@@ -894,6 +935,10 @@ nat 模式下，wsl
 #networkingMode=nat
 networkingMode=mirrored
 autoProxy=true
+
+[ext4]
+# Set the maximum size of the virtual hard disk to 100GB
+size=100GB
 ```
 
 重启 WSL
@@ -960,23 +1005,47 @@ Replace `<DistroName>` with your specific distribution's name (e.g., CanonicalGr
 %USERPROFILE%\AppData\Local\wsl\{edb1bc3d-bf77-4206-98cc-844f9c202f83}
 
 %USERPROFILE%\AppData\Local\Docker\wsl
-
+%USERPROFILE%\AppData\Local\wsl
 
 ```sh
-# superceded by changing in Docker desktop
-#
+# [Move WSL (Bash on Windows) root filesystem to another hard drive? - Stack Overflow](https://stackoverflow.com/questions/38779801/move-wsl-bash-on-windows-root-filesystem-to-another-hard-drive)
+# get distro_name
+wsl --list --all
+wsl --shutdown
+# move
+wsl --manage <distro_name> --move <new_location>
+wsl -d <DistroName>
+
+wsl --manage Ubuntu-24.04 --move D:\wsl\ubuntu
+
 # wsl.exe --export <DistroName> <Tar-FileName>
 # wsl --export Ubuntu-22.04 D:\WSL\Ubuntu-22.04\Ubuntu-22.04.tar
-wsl --export Ubuntu E:\WSL\Ubuntu-20.04\Ubuntu-20.04.tar
-wsl --unregister Ubuntu
-# wsl.exe --import <DistroName> <Folder-To-Install> <Tar-FileName>
-wsl --import Ubuntu E:\WSL\Ubuntu2004\ E:\WSL\Ubuntu-20.04\Ubuntu-20.04.tar
-
-# Ubuntu 24.04
-wsl --export Ubuntu-24.04 E:\WSL\Ubuntu-24.04-export\Ubuntu-24.04.tar
+wsl --export Ubuntu-24.04 D:\wsl\ubuntu\Ubuntu-24.04.tar
 wsl --unregister Ubuntu-24.04
 # wsl.exe --import <DistroName> <Folder-To-Install> <Tar-FileName>
-wsl --import Ubuntu-24.04 E:\WSL\Ubuntu2404\ E:\WSL\Ubuntu-24.04-export\Ubuntu-24.04.tar
+wsl --import Ubuntu-24.04 D:\wsl\ubuntu D:\wsl\ubuntu\Ubuntu-24.04.tar
+```
+
+Compact the VHDX File (Recommended)
+Exporting and importing the distribution is an automatic way to compact the VHDX and is also useful for moving a distro to a different drive.
+
+```sh
+sudo apt-get autoremove && sudo apt-get autoclean
+# Clean up Docker (this is aggressive, so use with caution)
+docker system prune -a
+sudo fstrim -v /
+
+# Compact the VHDX
+wsl --shutdown
+
+# Use diskpart (Windows Home/Pro): Open PowerShell/Command Prompt as Administrator and run:
+diskpart
+select vdisk file="<PathToVHDXFile>"
+compact vdisk
+exit
+
+# OR, Use Optimize-VHD (Windows Pro/Enterprise with Hyper-V enabled): Open PowerShell as Administrator and run
+Optimize-VHD -Path "<PathToVHDXFile>" -Mode full
 ```
 
 ### MySQL
