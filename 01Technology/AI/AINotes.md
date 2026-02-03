@@ -588,86 +588,6 @@ Prompt: I want you to act as an English pronunciation assistant for Turkish spea
 
 Prompt: I want you to act as a travel guide. I will write you my location and you will suggest a place to visit near my location. In some cases, I will also give you the type of places I will visit. You will also suggest me places of similar type that are close to my first location. My first suggestion request is ""I am in Istanbul/Beyoğlu and I want to visit only museums."
 
-## 理论知识
-
-[Deepseek大模型推理算法其实很简单 | 陈经](https://mp.weixin.qq.com/s/SaK9mlj6NCKxEFig6KFGVQ)
-
-1. Function Call:基于LLM的语言理解能力，通过理解语义，自主决策使用某项工具，并结构化调用
-2. RAG:通过句子或段落的语义相似度比较，检索相关资料，在资料支持下生成回复(Retrieval-Augmented Generation)
-
-### 量化
-
-[极简教程，大模型量化实践，1张4090跑QwQ？](https://mp.weixin.qq.com/s/27EsyfQNXk_A73I8FMz61A)
-
-量化是一种将模型的浮点权重（通常是 32 位或 16 位）转换为低位整数（如 2 位、4 位、8 位等）的技术，目的是减少模型的存储空间和计算资源需求，同时尽可能保持模型的性能。
-
-最主流的有以下量化的方法：
-
-| 方法类型  | 代表技术      | 核心特征              | 适用场景      |
-|-------|-----------|-------------------|-----------|
-| 训练后量化 | GPTQ      | 4bit 权重量化，动态反量化推理 | GPU 加速推理  |
-| 感知量化  | AWQ       | 激活值引导的智能量化        | 精度敏感型任务   |
-| 混合推理  | GGUF/GGML | CPU-GPU 异构计算框架    | 边缘设备部署    |
-
-然后这里还设计不同的量化位宽，其实常见也就K-Quants 增强系列
-
-| 量化类型 | 位宽策略               | 存储效率   | 技术特点      |
-|------|--------------------|--------|-----------|
-| Q2_K | 2.56bit/权重         | 超高压缩率  | 16 块超块结构  |
-| Q3_K | 3.44bit/权重（type-0） | 性能优先   | 平衡压缩与精度   |
-| Q4_K | 4.5bit/权重（type-1）  | 通用型    | 主流部署方案    |
-| Q5_K | 5.5bit/权重          | 精度增强   | 关键层保护     |
-| Q6_K | 6.56bit/权重         | 准无损压缩  | 复杂任务保留    |
-| Q8_K | 8bit 中间结果量化        | 资源充足场景 | 梯度计算优化    |
-
-还有常见到的 IQ 系列量化方法
-
-- IQ4_NL：4 位量化，超块包含 256 个权重，权重 w 通过 super_block_scale 和 importance matrix 计算得到
-- IQ4_XS：4 位量化，超块包含 256 个权重，每个权重占用 4.25 位，通过 super_block_scale 和 importance matrix 计算得到
-
-目前最流行的是混合量化策略，主打一个动态精度分配
-
-- K_M 混合策略：对 attention.wv 等关键张量采用 Q6_K，其余使用 Q4_K
-- K_S 均质策略：全模型统一量化配置，所有张量均使用 Q4_K
-
-其中
-
-- K：表示 k-quants 量化方法
-- S (Small)：简单量化，所有张量均使用相同位数量化
-- M (Mixed)：混合量化，对关键张量使用更高精度的量化，其余使用标准精度
-
-在相同位数下，K_M 系列模型（比如今天我们要演示的 QwQ-32B-Q4_K_M）通常在模型大小和性能之间取得最佳平衡，是推荐的选择。
-
-### 常用数据类型
-
-[大模型量化技术（Quantization）可视化指南](https://mp.weixin.qq.com/s/L162LDMXXzAlTQhEcuOiMw)
-
-首先，我们对比分析常规数据类型与32位（即 全精度 或 FP32）表示方式的差异：
-
-- FP32 浮点格式 全精度
-- FP16 浮点格式 半精度
-- BF16：虽然与FP16占用相同的存储空间（16位），但其数值表示范围更广，因此被广泛应用于深度学习领域。
-- INT8：当我们将比特位数进一步降低时，便会进入基于整数的表示方法范畴，而不再使用浮点表示法。以FP32浮点格式转换为8比特的INT8为例，其比特位数将缩减至原始值的四分之一
-
-具体硬件条件下，基于整数的运算速度可能优于浮点运算，但这一优势并非绝对成立。然而，通常当使用较少比特位数时，计算速度会显著提升。
-
-实际上，我们无需将完整的FP32范围[-3.4e38, 3.4e38]映射到INT8，只需找到将模型参数的实际数据范围适配到INT8的方法即可。
-
-常见的压缩/映射方法包括 **对称量化** 和 **非对称量化** ，这些都属于 线性映射 的范畴。
-
-### 内存计算
-
-计算模型在给定数值时所需的内存空间: memory = nr_bits/8 * nr_params
-
-注意：实际应用中，推理过程所需的(V)RAM容量还需考虑其他因素，例如上下文长度和模型架构设计。
-
-大多数模型原生采用32位浮点数（常称为 全精度）表示, DeepSeek模型是 16位浮点数模型，对于70B（700亿）参数的模型，加载模型需要占用140GB内存空间。计算公式为
-
-fp16: (16/8)*70B ~= 140GB
-fp16: (16/8)*671B = 1342 GB 内存
-int8: (8/8)*671B = 671 GB 内存
-int4: (4/8)*671B = 335.5 GB 内存
-
 ## 学习教程
 
 Christopher M. Bishop的《模式识别与机器学习》（PRML: Pattern Recognition and Machine Learning）初版在2006年的，2025年被首次引进国内
@@ -723,9 +643,9 @@ Christopher M. Bishop的《模式识别与机器学习》（PRML: Pattern Recogn
 
 [Getting Started With Large Language Models - DZone Refcardz](https://dzone.com/refcardz/getting-started-with-large-language-models)
 
-文心大模型ERNIE是百度发布的产业级知识增强大模型，涵盖了NLP大模型和跨模态大模型。
-
-https://github.com/PaddlePaddle/ERNIE
+[Deepseek大模型推理算法其实很简单 | 陈经](https://mp.weixin.qq.com/s/SaK9mlj6NCKxEFig6KFGVQ)
+1. Function Call:基于LLM的语言理解能力，通过理解语义，自主决策使用某项工具，并结构化调用
+2. RAG:通过句子或段落的语义相似度比较，检索相关资料，在资料支持下生成回复(Retrieval-Augmented Generation)
 
 ## 本地知识库搭建
 
