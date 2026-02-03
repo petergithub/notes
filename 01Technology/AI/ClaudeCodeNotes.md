@@ -241,6 +241,8 @@ alias claude_ds='claude --settings $HOME/.claude/settings-deepseek.json'
 
 ### config
 
+file location
+
 ```sh
 # config file location
 ~/.claude/settings.json
@@ -251,6 +253,12 @@ alias claude_ds='claude --settings $HOME/.claude/settings-deepseek.json'
 # Skills for Claude Code
 ~/.claude/skills
 ```
+
+customize config
+
+1. /config Output style 中启用"Explanatory"或"Learning"输出风格，让 Claude 解释改动背后的原因
+2. /statusline 定制状态栏，始终显示 context usage 和当前 git branch
+
 
 Settings precedence: When multiple settings sources exist, they are applied in the following order (highest to lowest precedence):
 [Identity and Access Management - Claude Code Docs](https://code.claude.com/docs/en/iam)
@@ -311,13 +319,32 @@ claude-doubao --version
 
 settings.json
 
+### hooks
+
+[Another useful hook](https://anthropic.skilljar.com/claude-code-in-action/312427)
+
+a helper hook: write the input to this hook to the post-log.json file, which allows you to inspect exactly what would have been fed into your command! This makes it a lot easier for you to understand what data your command should inspect.
+
+```json
+"PostToolUse": [ // Or "PreToolUse" or "Stop", etc
+  {
+    "matcher": "*",
+    "hooks": [
+      {
+        "type": "command",
+        "command": "jq . > post-log.json"
+      }
+    ]
+  },
+]
+```
+
+stop hooks
+
 ```json
 // windows stop hooks
 {
   "alwaysThinkingEnabled": true,
-  "env": {
-    "ANTHROPIC_MODEL": "claude-sonnet-4-5-20250929",
-  },
   "hooks": {
     "Stop": [
       {
@@ -387,6 +414,8 @@ superpowers
 location:
 1. ~/.claude/skills
 2. .claude/skills
+
+[Apifox CLI + Claude Skills：将接口自动化测试融入研发工作流](https://mp.weixin.qq.com/s/hTIGlKLqoT9CiHLYXLJASA)
 
 ## MCP servers
 
@@ -478,6 +507,14 @@ npx @modelcontextprotocol/inspector --cli node build/index.js
 npx @modelcontextprotocol/inspector --cli https://my-mcp-server.example.com --transport http --method tools/list
 
 docker run --rm --network host -p 6274:6274 -p 6277:6277 ghcr.io/modelcontextprotocol/inspector:latest
+```
+
+### Playwright MCP server
+
+[microsoft/playwright-mcp: Playwright MCP server](https://github.com/microsoft/playwright-mcp)
+
+```sh
+claude mcp add playwright npx @playwright/mcp@latest
 ```
 
 ### serena
