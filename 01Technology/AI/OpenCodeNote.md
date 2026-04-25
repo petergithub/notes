@@ -24,3 +24,7 @@ npm i -g opencode-ai
 # npx oh-my-opencode install
 npm install oh-my-opencode-linux-x64
 ```
+
+## Config
+
+The credentials are stored in ~/.local/share/opencode/auth.json
