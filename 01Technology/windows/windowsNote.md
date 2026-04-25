@@ -8,7 +8,7 @@ Win+X U H 或者设置电源选项关盖即休眠 Hibernate
 
 查看电脑系统属性：dxdiag 命令
 
-软件安装目录 C:\Users\%username%\AppData\Local\
+软件安装目录 %USERPROFILE%\AppData\Local\
 
 hosts 文件路径 C:\Windows\System32\drivers\etc\hosts
 
@@ -188,6 +188,9 @@ Invoke-Item "C:\Programs\WPSOffice\WPS Office\ksolaunch.exe"
 查看
 
 ```ps1
+# 列出所有环境变量
+ls env:
+
 # 查看当前用户的PATH环境变量
 $env:PATH
 # 查看所有环境变量
@@ -410,30 +413,23 @@ taskkill /f /im explorer.exe & start explorer.exe
 
 ### 语言设置
 
-[How to Change Language of Windows 11 Single Language Without Format - Super User](https://superuser.com/questions/1725144/how-to-change-language-of-windows-11-single-language-without-format?answertab=scoredesc#tab-top)
+按这个方法没有改成功 [How to Change Language of Windows 11 Single Language Without Format - Super User](https://superuser.com/questions/1725144/how-to-change-language-of-windows-11-single-language-without-format?answertab=scoredesc#tab-top)
 
-for those seeking to switch to en-us, i've been able to do it without downloading anything, as it seems preinstalled. in powershell:
+专业版支持修改系统语言，从家庭版升级为专业版，但是不能使用之前的企业自动激活了。
 
-```bat
-reg add HKLM\SYSTEM\CurrentControlSet\Control\Nls\Language /v InstallLanguage /t REG_SZ /d 0409 /f
-reg add HKLM\SYSTEM\CurrentControlSet\Control\Nls\Language /v Default /t REG_SZ /d 1033 /f
-```
+1. 断开网络。
+2. 在“更改产品密钥”处输入微软官方的通用技术密钥：
+   > `VK7JG-NPHTM-C97JM-9MPGT-3V66T` _注意：此密钥仅用于触发系统版本转换，并不能永久激活。_
+3. 等待系统升级重启。
+4. 联网激活。`irm https://get.activated.win | iex`
 
-List was generated from ["Language Identifier Constants and Strings"](http://msdn.microsoft.com/en-us/library/windows/desktop/dd318693(v=vs.85).aspx) in MSDN
-
-| Hex  | Dec  | Country code | Meaning                         |
-|------|------|--------------|---------------------------------|
-| 0004 | 4    | zh-CHS       | Chinese - Simplified            |
-| 0404 | 1028 | zh-TW        | Chinese (Traditional) - Taiwan  |
-| 0409 | 1033 | en-US        | English - United States         |
-
-### 让 Edge 标签不再出现在 Alt + Tab 切换器
+### 让 Edge 标签不再出现在 Alt+Tab 切换器
 
 Windows 11 设置步骤
-- 按下 Win + I​ 打开设置，在顶部搜索框输入并选中：Alt + Tab（或“对齐或按 Alt+Tab 时显示应用中的标签页”）。
-- 将“对齐或按 Alt+Tab 时显示应用中的标签页”设置为：不显示选项卡。
+- 按下 Win+I​ 打开设置，在顶部搜索框输入并选中：Alt+Tab（Choose how many windows and tabs appear on Alt+Tab and Snap Assist 或“对齐或按 Alt+Tab 时显示应用中的标签页”）。
+- 将“对齐或按 Alt+Tab 时显示应用中的标签页”设置为：不显示选项卡。Show tabs from apps when snapping or pressing Alt+ Tab: Don't show tabs
 - 可选：若只想略微精简，也可选择“打开窗口和最近的 3/5/30 个标签”，但若要完全不显示 Edge 标签，请选“不显示选项卡”。
-- 关闭设置，按 Alt + Tab​ 测试效果
+- 关闭设置，按 Alt+Tab​ 测试效果
 
 ## tool
 
@@ -448,23 +444,57 @@ Windows 11 设置步骤
 - [DevToys - A Swiss Army knife for developers](https://devtoys.app/)
 - [PDFgear - Bring Accessible PDF Software to the Masses](https://www.pdfgear.com/)
 - [appstat | Process Monitor for Windows](https://pragmar.com/appstat/)
+- [AutoHotkey](https://www.autohotkey.com/)
 
 ### shortcut
 
 Ditto - 剪贴板管理工具 Ctrl+`
 
 PowerToy
-    将窗口最大化至全屏    Control+Command+F    WindowsKey+Up
-    保存屏幕（截图）    Command+Shift+3    WindowsKey+Shift+S
+   将窗口最大化至全屏    Control+Command+F    WindowsKey+Up
+   保存屏幕（截图）    Command+Shift+3    WindowsKey+Shift+S
+联想电脑的 copilot 快捷键 设置为 Ctrl: 通过 PowerToy 的键盘管理: 重映射快捷键 Copilot (win+shift+F23) key 映射为 右Ctrl
 
 git config --list --show-origin
 git config path C:\Program Files\Git\etc\gitconfig
+
+AutoHotkey
+
+```ini
+#Requires AutoHotkey v2.0
+
+; 1. Global Variable to track the key state
+InstallKeybdHook()
+
+; 2. Define the Dual-Role Caps Lock
+; Tap it quickly: It sends an Escape keystroke (perfect for closing menus or Vim).
+; Hold it down: It becomes the Control key (perfect for Ctrl+C, Ctrl+T, etc.).
+; Ctrl+Caps Lock: It still toggles your Caps Lock state (ALL CAPS).
+*Capslock::
+{
+    Send "{LControl Down}"
+    KeyWait "Capslock"
+    Send "{LControl Up}"
+
+    ; If Caps Lock was pressed and released without any other keys...
+    if (A_PriorKey = "CapsLock")
+    {
+        Send "{Esc}"
+    }
+}
+
+; 3. Use Ctrl+Caps Lock to toggle the actual Caps Lock state
+^Capslock::
+{
+    SetCapsLockState !GetKeyState("CapsLock", "T")
+}
+```
 
 ### Windows Terminal
 
 1. Comment out Copy/Paste shortcut in setings.json, which are conflict with vim block selection
 2. defaultProfile 定义启动Windows Terminal时用作默认配置文件的GUID。
-   1. 将 copyOnSelect 设置为 true 可将选定的文本自动复制到剪贴板，而无需按 Ctrl + Shift +C。
+   1. 将 copyOnSelect 设置为 true 可将选定的文本自动复制到剪贴板，而无需按 Ctrl+Shift+C。
    2. 将 copyFormatting 设置为 false 即可仅复制纯文本而无需任何样式(颜色，字体)。
 
 ```json
@@ -546,7 +576,7 @@ chmod +x /etc/rc.local
 2. 设置Host-only网络
    1. 在安装完 VirtualBox后，在宿主机的【网络和共享中心】–【更改适配器设置】中可以看到【VirtualBox Host-Only Network】：右键【属性】–【Internet协议版本4（TCP/IPv4）】中可以看到 IP 地址是【192.168.56.1】
    2. 在 VirtualBox 主控制界面点击 Files > Tools > Network Manager
-   3. Host-only Networks > Create > IPv4 Address 192.168.56.1 > IPv4 Network Mask:255.255.255.0 > DHCP Server > Server Address ：192.168.56.100 > Server Mask:255.255.255.0 > Lower Address Bound ：192.168.56.101 > Upper Address Bound ：192.168.56.254
+   3. Host-only Networks > Create > IPv4 Address 192.168.56.1 > IPv4 Network Mask:E > DHCP Server > Server Address ：192.168.56.100 > Server Mask:255.255.255.0 > Lower Address Bound ：192.168.56.101 > Upper Address Bound ：192.168.56.254
    4. 在需要设置的虚拟机页面【设置】–【网络】–【网卡2】–【启用网络连接】，【连接方式】选【仅主机（Host-Only）网络】
    5. (可选，网卡自动配置好了，通过 `ip a` 查看，出现 Host only IP 192.168.56.x 即已经自动配置)开机后 执行命令 `cp ifcfg-enp0s3  ifcfg-enp0s8` 复制一份网卡配置
    6. (可选)vi ifcfg-enp0s8，内容如下文
@@ -672,7 +702,7 @@ ipconfig /flushdns
 
 ### 排查网络
 
-按Windows键 + R打开“运行”窗口，输入cmd并按Enter或单击“确定”来打开命令提示符，分别执行下面两个命令，并截图发回。
+按Windows键+R打开“运行”窗口，输入cmd并按Enter或单击“确定”来打开命令提示符，分别执行下面两个命令，并截图发回。
 
 ipconfig
 tracert -d example.com
@@ -682,7 +712,7 @@ tracert -d example.com
 ```bat
 REM REM 是 "Remark" 的缩写，用于添加注释。
 REM 查找端口占用
-netstat -ano | findstr :8080
+netstat -ano | findstr :7890
 
 REM 查找进程号
 tasklist | findstr 4476
@@ -834,13 +864,30 @@ taskkill /f /pid 1234 /PID 1241
 
 [Ubuntu2404-240425 download link](https://wslstorestorage.blob.core.windows.net/wslblob/Ubuntu2404-240425.AppxBundle)
 
+[Ubuntu 22.04 LTS Direct Download Link](https://aka.ms/wslubuntu2204)
+
 ```ps1
-Add-AppxPackage .\Ubuntu2404-240425.AppxBundle
+wsl --install
+# 启用 Windows 特性, 需要重启电脑
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+
 wsl --list --online
+# install on line
 wsl --install -d Ubuntu-24.04
+# install offline，then search Ubuntu2404 in "Start", click install
+Add-AppxPackage .\Ubuntu2404-240425.AppxBundle
 
 # 启动系统
 wsl --distribution Ubuntu-24.04
+
+wsl --list --online
+# install on line
+wsl --install -d Ubuntu-22.04
+# install offline，then search Ubuntu2204 in "Start", click install
+Add-AppxPackage .\Ubuntu2204-221101.AppxBundle
+# 启动系统
+wsl --distribution Ubuntu-22.04
 ```
 
 [My Windows Subsystem for Linux setup - Matthew Somerville](https://dracos.co.uk/wrote/wsl/)
@@ -907,6 +954,68 @@ git pull origin work
 # url = git@gitee.com:petergite/configuration.git
 ```
 
+### Move WSL to other drive from C drive
+
+change in Docker desktop
+
+[Move WSL to another drive. WSL (Windows Subsystem for Linux) is a… | by Hafiz Azhar | Medium](https://medium.com/@rahmanazhar/move-wsl-to-another-drive-ab8002152cf2)
+
+The default path is: %LOCALAPPDATA%\Packages\<DistroName>\LocalState\ext4.vhdx
+
+Replace `<DistroName>` with your specific distribution's name (e.g., CanonicalGroupLimited.Ubuntu24.04LTS_79rhkp1fndgsc)
+
+%USERPROFILE%\AppData\Local\wsl\{edb1bc3d-bf77-4206-98cc-844f9c202f83}
+
+%USERPROFILE%\AppData\Local\Docker\wsl
+%USERPROFILE%\AppData\Local\wsl
+
+```sh
+# [Move WSL (Bash on Windows) root filesystem to another hard drive? - Stack Overflow](https://stackoverflow.com/questions/38779801/move-wsl-bash-on-windows-root-filesystem-to-another-hard-drive)
+# get distro_name
+wsl --list --all
+
+# move
+wsl --shutdown
+wsl --manage <distro_name> --move <new_location>
+wsl -d <DistroName>
+wsl --manage Ubuntu-24.04 --move D:\wsl\ubuntu
+
+# export
+# 导出前清理临时文件
+rm -rf ~/.ansible/cp/*
+rm -rf ~/.ssh/socket/*
+wsl --shutdown
+# wsl.exe --export <DistroName> <Tar-FileName>
+# wsl --export Ubuntu D:\wsl\wsl-Ubuntu-22.04-2026-03-23.tar
+wsl --export Ubuntu-24.04 D:\wsl\wsl-Ubuntu-24.04-2026-03-23.tar
+wsl --unregister Ubuntu-24.04
+# wsl.exe --import <DistroName> <Folder-To-Install> <Tar-FileName>
+wsl --import Ubuntu-22.04 D:\wsl\ubuntu-22.04 D:\wsl\wsl-Ubuntu-22.04-2026-03-23.tar
+wsl --import Ubuntu-24.04 D:\wsl\ubuntu-24.04 D:\wsl\wsl-Ubuntu-24.04-2026-03-23.tar
+```
+
+Compact the VHDX File (Recommended)
+Exporting and importing the distribution is an automatic way to compact the VHDX and is also useful for moving a distro to a different drive.
+
+```sh
+sudo apt-get autoremove && sudo apt-get autoclean
+# Clean up Docker (this is aggressive, so use with caution)
+docker system prune -a
+sudo fstrim -v /
+
+# Compact the VHDX
+wsl --shutdown
+
+# Use diskpart (Windows Home/Pro): Open PowerShell/Command Prompt as Administrator and run:
+diskpart
+select vdisk file="<PathToVHDXFile>"
+compact vdisk
+exit
+
+# OR, Use Optimize-VHD (Windows Pro/Enterprise with Hyper-V enabled): Open PowerShell as Administrator and run
+Optimize-VHD -Path "<PathToVHDXFile>" -Mode full
+```
+
 ### wsl config
 
 - .wslconfig to configure global settings across all installed distributions running on WSL 2.
@@ -945,6 +1054,22 @@ size=100GB
 
 ```bat
 wsl --shutdown
+```
+
+使用 eth0 的 IP 代替 127.0.0.1 作为代理
+
+```sh
+# 自动抓取 eth0 网卡的 IP 地址
+export WSL_IP=$(ip addr show eth0 | grep "inet " | awk '{print $2}' | cut -d/ -f1)
+
+# 设置代理
+alias proxy_on="export http_proxy=http://\$WSL_IP:7890 && export https_proxy=http://\$WSL_IP:7890  && export all_proxy=\$WSL_IP:7890 && echo 'Proxy set to \$WSL_IP'"
+alias proxy_off="unset http_proxy && unset https_proxy && echo 'Proxy disabled'"
+```
+
+```sh
+curl -v --proxy http://127.0.0.1:7890 http://www.google.com
+curl -v --proxy http://$WSL_IP:7890 http://www.google.com
 ```
 
 #### [Rename tab title not working for WSL and Bash · Issue #5333 · microsoft/terminal · GitHub](https://github.com/microsoft/terminal/issues/5333)
@@ -991,62 +1116,6 @@ sudo bash -c 'echo "nameserver 114.114.114.114" >> /etc/resolv.conf'
 sudo bash -c 'echo "[network]" > /etc/wsl.conf'
 sudo bash -c 'echo "generateResolvConf = false" >> /etc/wsl.conf'
 sudo chattr +i /etc/resolv.conf
-
-### Move WSL to other drive from C drive
-
-change in Docker desktop
-
-[Move WSL to another drive. WSL (Windows Subsystem for Linux) is a… | by Hafiz Azhar | Medium](https://medium.com/@rahmanazhar/move-wsl-to-another-drive-ab8002152cf2)
-
-The default path is: %LOCALAPPDATA%\Packages\<DistroName>\LocalState\ext4.vhdx
-
-Replace `<DistroName>` with your specific distribution's name (e.g., CanonicalGroupLimited.Ubuntu24.04LTS_79rhkp1fndgsc)
-
-%USERPROFILE%\AppData\Local\wsl\{edb1bc3d-bf77-4206-98cc-844f9c202f83}
-
-%USERPROFILE%\AppData\Local\Docker\wsl
-%USERPROFILE%\AppData\Local\wsl
-
-```sh
-# [Move WSL (Bash on Windows) root filesystem to another hard drive? - Stack Overflow](https://stackoverflow.com/questions/38779801/move-wsl-bash-on-windows-root-filesystem-to-another-hard-drive)
-# get distro_name
-wsl --list --all
-wsl --shutdown
-# move
-wsl --manage <distro_name> --move <new_location>
-wsl -d <DistroName>
-
-wsl --manage Ubuntu-24.04 --move D:\wsl\ubuntu
-
-# wsl.exe --export <DistroName> <Tar-FileName>
-# wsl --export Ubuntu-22.04 D:\WSL\Ubuntu-22.04\Ubuntu-22.04.tar
-wsl --export Ubuntu-24.04 D:\wsl\ubuntu\Ubuntu-24.04.tar
-wsl --unregister Ubuntu-24.04
-# wsl.exe --import <DistroName> <Folder-To-Install> <Tar-FileName>
-wsl --import Ubuntu-24.04 D:\wsl\ubuntu D:\wsl\ubuntu\Ubuntu-24.04.tar
-```
-
-Compact the VHDX File (Recommended)
-Exporting and importing the distribution is an automatic way to compact the VHDX and is also useful for moving a distro to a different drive.
-
-```sh
-sudo apt-get autoremove && sudo apt-get autoclean
-# Clean up Docker (this is aggressive, so use with caution)
-docker system prune -a
-sudo fstrim -v /
-
-# Compact the VHDX
-wsl --shutdown
-
-# Use diskpart (Windows Home/Pro): Open PowerShell/Command Prompt as Administrator and run:
-diskpart
-select vdisk file="<PathToVHDXFile>"
-compact vdisk
-exit
-
-# OR, Use Optimize-VHD (Windows Pro/Enterprise with Hyper-V enabled): Open PowerShell as Administrator and run
-Optimize-VHD -Path "<PathToVHDXFile>" -Mode full
-```
 
 ### MySQL
 

@@ -79,6 +79,8 @@ ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 `Ctrl+;` to invoke the extension Maximize Terminal
 `Ctrl+Alt+M;` workbench.action.toggleMaximizedPanel
 
+`Ctrl + Alt + I` toggle copilot chat window
+
 [Can't enter Vim visual block mode in integrated terminal](https://github.com/microsoft/vscode/issues/88395#issuecomment-572822979)
 [Integrated Terminal - Azure Data Studio | Microsoft Learn](https://learn.microsoft.com/en-us/azure-data-studio/integrated-terminal#forcing-key-bindings-to-pass-through-the-terminal)
 
@@ -101,12 +103,7 @@ ssl vpn client: openFortiGUI https://hadler.me/linux/openfortigui/
 ## Chrome
 
 Alt+U or click the icon to copy URL without encoding from address bar
-
-### chrome解决http自动跳转https问题
-
-地址栏输入： chrome://net-internals/#hsts.
-找到底部 Delete domain security policies一栏，输入想处理的域名，点击delete。
-搞定了，再次访问http域名不再自动跳转https了。
+跨页面保存记录: DevTools Settings -> Preferences -> Global 中勾选 Auto-open DevTools for popups
 
 ### Extension
 
@@ -115,6 +112,12 @@ Alt+U or click the icon to copy URL without encoding from address bar
 3. [xifangczy/cat-catch: 猫抓 浏览器资源嗅探扩展 / cat-catch Browser Resource Sniffing Extension](https://github.com/xifangczy/cat-catch) 源码
 4. [copy-unicode-urls](https://github.com/ilyaigpetrov/copy-unicode-urls)
 5. [copy-as-markdown](https://github.com/yorkxin/copy-as-markdown)
+
+### Zero Omega
+
+Syncing (Experimental) with Personal access tokens:
+  Zero Omega Chrome sync  https://gist.github.com/
+Rule List: https://raw.githubusercontent.com/Rongronggg9/chinalist/main/chinalist_omega.txt
 
 ### 油猴脚本
 
@@ -140,6 +143,12 @@ Alt+U or click the icon to copy URL without encoding from address bar
 3. Scroll down and enable Use secure DNS.
 4. Select the With option, and from the drop-down menu choose Cloudflare (1.1. 1.1).
 5. [Browser Security Check | Cloudflare](https://www.cloudflare.com/ssl/encrypted-sni)
+
+### chrome解决http自动跳转https问题
+
+地址栏输入： chrome://net-internals/#hsts.
+找到底部 Delete domain security policies一栏，输入想处理的域名，点击delete。
+搞定了，再次访问http域名不再自动跳转https了。
 
 ## Application Usage
 
