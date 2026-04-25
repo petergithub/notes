@@ -1,6 +1,7 @@
 # AI Agent
 
 [What are AI agents? Definition, examples, and types | Google Cloud](https://cloud.google.com/discover/what-are-ai-agents)
+[Agents Companion | Kaggle](https://www.kaggle.com/whitepaper-agent-companion)
 
 ## AI Agent 基础设施
 
