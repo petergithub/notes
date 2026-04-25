@@ -214,7 +214,7 @@ echo "${NAME=value}"   # Is unset.            (Also, assign to "NAME.")
 1. 反引号括起来的字符串被shell解释为命令行, 在执行时, shell首先执行该命令行, 并以它的标准输出结果取代整个反引号（包括两个反引号）部分
 2. 反引号和$()是对等的, $()能够内嵌使用, 而且避免了转义符的麻烦
 
-[ ] 两边要加空格
+`[ ]` 两边要加空格
 `if [ $a=$b ]`才是对的. 注意: 这里的[]是test命令的一种形式, [是系统的一个内置命令,存在路径是/bin/[,它是调用test命令的标识, 右中括号是关闭条件判断的标识, 因此与测试语句`if test $a=$b`是等效的
 
 ### Shell 字符串
@@ -392,6 +392,9 @@ EOF
 
 [Other Comparison Operators](https://tldp.org/LDP/abs/html/comparison-ops.html)
 
+`[` 是 POSIX 兼容的语法
+`[[` 是 Bash Shell 的扩展语法，不是所有 Shell 都支持
+
 ```sh
 Operator    Meaning    Example
 -z  Zero-length string    [ -z "$myvar" ]
@@ -421,9 +424,9 @@ substr=ab
 if [[ "$a" != *z ]]; then echo "not end with z"; fi  # True if $a end with "z"
 [ $# -lt 3 ]判断输入命令行参数是否小于3个 (特殊变量$# 表示包含参数的个数)
 [ ! ]
--e file   Check if file exists. Is true even if file is a directory but exists.   [ -e $file ] is true.
--t 1  Check if the file descriptor 1 (standard output) is open and refers to a terminal.
-
+-e file   # Check if file exists. Is true even if file is a directory but exists.   [ -e $file ] is true.
+-t 1  # Check if the file descriptor 1 (standard output) is open and refers to a terminal.
+[ -s "/path/to/file" ] # A conditional test that checks if a file exists and has a size greater than zero (it’s not empty).
 ```
 
 #### compound comparison

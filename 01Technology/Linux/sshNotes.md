@@ -73,7 +73,11 @@ escape_char (default: '~').  The escape character is only recognized at the begi
 ```bash
 # 开启代理
 ssh-agent
-# 添加密钥到ssh-agent的高速缓存中
+# Start the ssh-agent in the background.
+eval "$(ssh-agent -s)"
+# > Agent pid 59566
+
+# 添加密钥到 ssh-agent 中
 ssh-add ~/.ssh/id_rsa
 # 查看是否添加成功
 ssh-add -l
@@ -85,6 +89,36 @@ ssh -p port root@server2
 ```
 
 ssh-agent的工作是依赖于环境变量 `SSH_AUTH_SOCK` 和 `SSH_AGENT_PID`
+
+其他命令
+
+[Working with SSH key passphrases - GitHub Docs](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases?platform=windows#auto-launching-ssh-agent-on-git-for-windows)
+
+```bash
+# 开启代理
+ssh-agent
+# Start the ssh-agent in the background.
+eval "$(ssh-agent -s)"
+# > Agent pid 59566
+
+# verify that ssh-agent is running on your computer, type the following command in the terminal:
+echo "$SSH_AUTH_SOCK"
+# Print out the SSH_AUTH_SOCK variable
+# > /tmp/launch-kNSlgU/Listeners
+
+# kill the agent
+ssh-agent
+
+# 添加密钥到ssh-agent的高速缓存中
+ssh-add ~/.ssh/id_rsa
+# 查看是否添加成功
+ssh-add -l
+# check that your key is visible to ssh-agent
+ssh-add -L
+
+# Instead  of  adding  identities, removes identities from the agent.
+ssh-add -d ~/.ssh/id_rsa
+```
 
 ## ssh config
 
