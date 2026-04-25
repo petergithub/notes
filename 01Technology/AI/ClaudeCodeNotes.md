@@ -3,7 +3,6 @@
 ## Document
 
 - [CC官方文档](https://docs.anthropic.com/en/docs/claude-code)
-- [CC最佳实践](https://www.anthropic.com/engineering/claude-code-best-practices)
 - [Claude Code in Action](https://anthropic.skilljar.com/claude-code-in-action)
 - [CC常用工作流](https://docs.anthropic.com/en/docs/claude-code/common-workflows#understand-new-codebases)
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code)
@@ -15,8 +14,23 @@ Tips
 
 - [My Claude Code Context Window Strategy (200k Is Not the Problem) : r/ClaudeAI](https://www.reddit.com/r/ClaudeAI/comments/1p05r7p/my_claude_code_context_window_strategy_200k_is/)
 - [官方：anthropics/skills](https://github.com/anthropics/skills)
-- [江湖：obra/superpowers skills](https://github.com/obra/superpowers/tree/main/skills)
+- [江湖：obra/superpowers skills](https://github.com/obra/superpowers)
 - [everything-claude-code: Complete Claude Code configuration collection - agents, skills, hooks, commands, rules, MCPs. Battle-tested configs from an Anthropic hackathon winner.](https://github.com/affaan-m/everything-claude-code/)
+
+learing
+
+1. anthropic
+   1. [Best Practices for Claude Code - Claude Code Docs](https://code.claude.com/docs/en/best-practices)
+   2. [Courses | Claude](https://claude.com/resources/courses)
+   3. [Introduction to agent skills](https://anthropic.skilljar.com/introduction-to-agent-skills)
+   4. [AI Learning Resources & Guides from Anthropic \ Anthropic](https://www.anthropic.com/learn)
+   5. [Engineering \ Anthropic](https://www.anthropic.com/engineering)
+   6. [Claude Code 一篇带你从入门到精通](https://mp.weixin.qq.com/s/1FIyJ08MaKb6bHY2PGAmbQ)
+2. [shareAI-lab/learn-claude-code: Bash is all you need - A nano claude code–like 「agent harness」, built from 0 to 1](https://github.com/shareAI-lab/learn-claude-code)
+   1. [Learn Claude Code - on line](https://learn.shareai.run/en/s01/)
+3. [wquguru/harness-books](https://github.com/wquguru/harness-books)
+   1. [Harness Books - on line](https://harness-books.agentway.dev/en/index.html)
+4. [Stanford CS230 | Autumn 2025 | Lecture 8: Agents, Prompts, and RAG - YouTube](https://www.youtube.com/watch?v=k1njvbBmfsw)
 
 ## Common Workflows
 
@@ -58,8 +72,36 @@ slash command [Slash commands - Claude Code Docs](https://code.claude.com/docs/e
 /add-dir  # Add additional working directories
 /export [filename] # Export the current conversation to a file or clipboard
 /context # Visualizes current context usage to see if it's actually filling up.
-/hooks # Check if any PreCompact hooks might be interfering:
+/hooks # Check if any PreCompact hooks might be interfering
+
+/compact [焦点]     # 压缩上下文，可指定保留重点
+/clear              # 清空对话，重新开始
+/context            # 查看上下文使用情况
+/memory             # 查看和管理 Memory
+/rewind             # 回退到某个 checkpoint
+/resume [名称]       # 恢复之前的对话
+/model              # 切换模型
+/effort [级别]       # 设置推理深度：low/medium/high/max
+/init               # 自动生成 CLAUDE.md
+/mcp                # 管理 MCP 服务器
+/permissions        # 查看权限规则
+/cost               # 查看 token 消耗
+/insights
 ```
+
+EXTENDED THINKING：对于复杂问题，让 CLAUDE 想深一点
+在提示词里写 ultrathink 可以强制触发最高推理深度。或者手动调整 effort 设置。
+```sh
+/effort high    # 更深入的推理
+/effort max     # 最大推理深度
+/effort low     # 简单任务，省 token
+```
+
+什么时候该用
+- 复杂的架构决策
+- 棘手的 debug（多个可能原因需要排除）
+- 多步骤的重构方案设计
+- 权衡多个方案的利弊
 
 ### Features to test
 
@@ -155,6 +197,11 @@ git worktree list
 git worktree remove ../project-feature-a
 ```
 
+### Code Review
+
+[Claude Code GitLab CI/CD - Claude Code Docs](https://code.claude.com/docs/en/gitlab-ci-cd)
+[GitLab Headless CLI Agents - Feedback Issue (#573776) · Issue · gitlab-org/gitlab](https://gitlab.com/gitlab-org/gitlab/-/work_items/573776)
+
 ## Setup
 
 [Quickstart - Claude Code Docs](https://code.claude.com/docs/en/quickstart)
@@ -182,7 +229,8 @@ claude update
 
 claude --settings $HOME/.claude/settings-deepseek.json
 
-alias c='claude --settings $HOME/.claude/settings-deepseek.json'
+# use a fixed version
+npx claude-code@2.1.98
 ```
 
 settings-deepseek.json
@@ -190,7 +238,8 @@ settings-deepseek.json
 ```json
 {
   "env": {
-    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_AUTH_TOKEN": "sk-xxxxxxxxxxxxxxx",
     "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
     "API_TIMEOUT_MS": "600000",
     "ANTHROPIC_MODEL": "deepseek-chat",
@@ -216,27 +265,35 @@ settings.json
 
 ```sh
 export ANTHROPIC_BASE_URL=https://api.deepseek.com
-export ANTHROPIC_AUTH_TOKEN=sk-xxx
+export ANTHROPIC_AUTH_TOKEN=sk-xxxxxx
 
 # 设置 Claude API 到 Deepseek官方平台 的别名
 alias set_claude_ds='export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"; unset ANTHROPIC_API_KEY; export ANTHROPIC_AUTH_TOKEN="sk-xxx"; export ANTHROPIC_MODEL="deepseek-chat"; export ANTHROPIC_SMALL_FAST_MODEL="deepseek-chat"; echo "Claude API 已设置为 Deepseek官方平台。"'
 
-# 设置 Claude API 到 Kimi 的别名
-alias set_claude_kimi='export ANTHROPIC_BASE_URL="https://api.moonshot.cn/anthropic"; export ANTHROPIC_AUTH_TOKEN="<Kimi API Key>"; export ANTHROPIC_MODEL="kimi-k2-0711-preview"; export ANTHROPIC_SMALL_FAST_MODEL="kimi-k2-0711-preview"; unset ANTHROPIC_API_KEY; echo "Claude API 已设置为 Kimi 配置。"'
-
 # 清空 Claude API 变量的别名
 alias unset_claude='unset ANTHROPIC_BASE_URL; unset ANTHROPIC_API_KEY; unset ANTHROPIC_MODEL; unset ANTHROPIC_AUTH_TOKEN; unset ANTHROPIC_SMALL_FAST_MODEL; echo "Claude API 变量已清空。"'
-
-# 输出 Claude API配置信息
-alias echo_claude_api_info='echo ANTHROPIC_BASE_URL=$ANTHROPIC_BASE_URL; echo ANTHROPIC_AUTH_TOKEN=$ANTHROPIC_AUTH_TOKEN; echo ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY; echo ANTHROPIC_MODEL=$ANTHROPIC_MODEL; echo ANTHROPIC_SMALL_FAST_MODEL=$ANTHROPIC_SMALL_FAST_MODEL'
 
 # ali
 # qwen3-max qwen3-coder-plus
 export ANTHROPIC_BASE_URL=https://dashscope.aliyuncs.com/apps/anthropic
-export ANTHROPIC_AUTH_TOKEN=sk-xxx
+export ANTHROPIC_AUTH_TOKEN=sk-xxxxxx
 
 claude --settings $HOME/.claude/settings-xxxxx.json
 alias claude_ds='claude --settings $HOME/.claude/settings-deepseek.json'
+```
+
+windows config
+
+```ps1
+winget install Anthropic.ClaudeCode
+
+$env:ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
+$env:ANTHROPIC_AUTH_TOKEN="sk-xxx"
+$env:ANTHROPIC_MODEL="deepseek-chat"
+$env:ANTHROPIC_DEFAULT_HAIKU_MODEL="deepseek-chat"
+$env:ANTHROPIC_DEFAULT_SONNET_MODEL="deepseek-chat"
+$env:ANTHROPIC_DEFAULT_OPUS_MODEL="deepseek-reasoner"
+$env:API_TIMEOUT_MS="600000"
 ```
 
 ### config
@@ -319,6 +376,17 @@ claude-doubao --version
 
 settings.json
 
+### rules
+
+一个 CLAUDE.md 文件塞不下所有规则。官方提供了一个更优雅的方案：把规则拆到 .claude/rules/ 目录下。
+
+```sh
+.claude/rules/
+├── testing.md        # 测试规范
+├── api-style.md      # API 编写风格
+└── frontend.md       # 前端约定
+```
+
 ### hooks
 
 [Another useful hook](https://anthropic.skilljar.com/claude-code-in-action/312427)
@@ -382,6 +450,26 @@ stop hooks
   }
 ```
 
+### sub agents
+
+自定义子 Agent 在 .claude/agents/ 目录下创建自定义 Agent：
+
+```sh
+---
+name: code-reviewer
+description: 代码审查专家。代码改动后自动触发。
+tools: Read, Grep, Glob, Bash
+model: sonnet
+---
+
+你是一位资深代码审查者。检查以下维度：
+- 代码清晰度和可读性
+- 错误处理是否完整
+- 有没有暴露敏感信息
+- 输入验证
+- 性能隐患
+```
+
 ### plugins
 
 [claude-plugins-official/README.md at main · anthropics/claude-plugins-official](https://github.com/anthropics/claude-plugins-official/blob/main/README.md)
@@ -415,7 +503,60 @@ location:
 1. ~/.claude/skills
 2. .claude/skills
 
-[Apifox CLI + Claude Skills：将接口自动化测试融入研发工作流](https://mp.weixin.qq.com/s/hTIGlKLqoT9CiHLYXLJASA)
+skills 列表
+1. [Apifox CLI + Claude Skills：将接口自动化测试融入研发工作流](https://mp.weixin.qq.com/s/hTIGlKLqoT9CiHLYXLJASA)
+2. [Frontend Design](https://github.com/anthropics/skills/tree/main/skills/frontend-design)
+3. [办公四件套docx、xlsx、pdf、pptx](https://github.com/anthropics/skills/tree/main/skills)
+4. [Web Access Skill](https://github.com/eze-is/web-access) 可以通过Chrome DevTools Protocol直接连你本地的Chrome进程。需要 `chrome://inspect/#remote-debugging` 勾选Allow remote debugging for this browser instance
+5. [claude-mem](https://github.com/thedotmack/claude-mem)
+6. [Skill-Creator](https://claude.com/plugins/skill-creator)
+
+### Channels
+
+claude.ai login only: API key and Console authentication do not work with Channels; you must be authenticated with a claude.ai account on Pro, Max, Team, or Enterprise.
+
+[Claude Code Channels | Setup Guide (Telegram & Discord)](https://www.lowcode.agency/blog/claude-code-channels-setup-telegram-discord)
+
+[Push events into a running session with channels - Claude Code Docs](https://code.claude.com/docs/en/channels)
+
+[claude-plugins-official discord](https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/discord/README.md)
+
+```sh
+/plugin install discord@claude-plugins-official
+claude --channels plugin:discord@claude-plugins-official
+```
+
+### sandbox
+
+[Sandboxing - Claude Code Docs](https://code.claude.com/docs/en/sandboxing)
+
+```sh
+sudo apt-get install bubblewrap socat
+npm install -g @anthropic-ai/sandbox-runtime
+```
+
+[Development containers - Claude Code Docs](https://code.claude.com/docs/en/devcontainer)
+
+The container’s enhanced security measures (isolation and firewall rules) allow you to run `claude --dangerously-skip-permissions` to bypass permission prompts for unattended operation.
+
+```sh
+#!/bin/bash
+
+# Configuration
+IMAGE_NAME="claude-code-sandbox:0.2"
+CONTAINER_NAME="claude-session-$(date +%s)"
+PROJECT_DIR=$(pwd)
+
+# Run the container
+echo "🛠 Entering sandbox for: $PROJECT_DIR"
+  # --rm \
+docker run -it \
+  --name "$CONTAINER_NAME" \
+  -v "$PROJECT_DIR":/app \
+  -e ANTHROPIC_API_KEY="$ANTHROPIC_API_KEY" \
+  $IMAGE_NAME \
+  claude --dangerously-skip-permissions
+```
 
 ## MCP servers
 
@@ -509,37 +650,40 @@ npx @modelcontextprotocol/inspector --cli https://my-mcp-server.example.com --tr
 docker run --rm --network host -p 6274:6274 -p 6277:6277 ghcr.io/modelcontextprotocol/inspector:latest
 ```
 
-### Playwright MCP server
+### web-access
 
-[microsoft/playwright-mcp: Playwright MCP server](https://github.com/microsoft/playwright-mcp)
+[eze-is/web-access: 给 Claude Code 装上完整联网能力的 skill：三层通道调度 + 浏览器 CDP + 并行分治](https://github.com/eze-is/web-access)
+
+```sh
+# Agent Skill 包管理器 install
+npx skills add eze-is/web-access
+# manual
+git clone https://github.com/eze-is/web-access ~/.claude/skills/web-access
+```
+
+### Playwright
+
+Playwright Cli [microsoft/playwright-cli: CLI for common Playwright actions. Record and generate Playwright code, inspect selectors and take screenshots.](https://github.com/microsoft/playwright-cli)
+
+```sh
+npm install -g @playwright/cli@latest
+playwright-cli --help
+# locally install skill
+playwright-cli install --skills
+
+# open a visual dashboard that lets you see and control all running browser sessions.
+playwright-cli show
+
+# cc
+> Test the "add todo" flow on https://demo.playwright.dev/todomvc using playwright-cli.
+Check playwright-cli --help for available commands.
+```
+
+Playwright MCP server [microsoft/playwright-mcp: Playwright MCP server](https://github.com/microsoft/playwright-mcp)
 
 ```sh
 claude mcp add playwright npx @playwright/mcp@latest
-```
-
-### serena
-
-[oraios/serena: A powerful coding agent toolkit providing semantic retrieval and editing capabilities (MCP server & other integrations)](https://github.com/oraios/serena)
-
-```sh
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code
-claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --project "$(pwd)"
-
-# Usage: serena [OPTIONS] COMMAND [ARGS]...
-
-#   Serena CLI commands. You can run `<command> --help` for more info on each command.
-# Options:
-#   --help  Show this message and exit.
-
-# Commands:
-#   config               Manage Serena configuration.
-#   context              Manage Serena contexts.
-#   mode                 Manage Serena modes.
-#   print-system-prompt  Print the system prompt for a project.
-#   project              Manage Serena projects.
-#   prompts              Commands related to Serena's prompts that are...
-#   start-mcp-server     Starts the Serena MCP server.
-#   tools                Commands related to Serena's tools.
+npx @playwright/mcp@latest --headless
 ```
 
 ### Chrome DevTools (MCP)
@@ -579,7 +723,34 @@ Localhost:8080 is loading slowly. Make it load faster.
 
 ```
 
-## Happy Coder
+### serena
+
+[oraios/serena: A powerful coding agent toolkit providing semantic retrieval and editing capabilities (MCP server & other integrations)](https://github.com/oraios/serena)
+
+```sh
+claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code
+claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context claude-code --project "$(pwd)"
+
+# Usage: serena [OPTIONS] COMMAND [ARGS]...
+
+#   Serena CLI commands. You can run `<command> --help` for more info on each command.
+# Options:
+#   --help  Show this message and exit.
+
+# Commands:
+#   config               Manage Serena configuration.
+#   context              Manage Serena contexts.
+#   mode                 Manage Serena modes.
+#   print-system-prompt  Print the system prompt for a project.
+#   project              Manage Serena projects.
+#   prompts              Commands related to Serena's prompts that are...
+#   start-mcp-server     Starts the Serena MCP server.
+#   tools                Commands related to Serena's tools.
+```
+
+## Remote control
+
+Happy Coder
 
 [slopus/happy: Mobile and Web client for Codex and Claude Code, with realtime voice, encryption and fully featured](https://github.com/slopus/happy)
 [Quick Start Guide](https://happy.engineering/docs/quick-start/)
@@ -589,6 +760,8 @@ npm install -g happy-coder
 
 happy
 ```
+
+[codex-im-bridge](https://github.com/clawvisual/codex-im-bridge) 直接飞书控制codex手机上刚好用飞书办公的话很方便
 
 ## Prompt
 
