@@ -44,9 +44,18 @@ python3.6 -V
 [pip](https://pip.pypa.io/en/stable/user_guide/)
 
 ```sh
+# 查看特定参数的来源
+pip config list -v
+
 # 临时使用镜像源
 pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple some-package
 pip install -i http://mirrors.aliyun.com/pypi/simple/ flask docx
+
+# uninstall
+python -m pip uninstall SomePackage
+
+# list
+python -m pip list
 
 # use proxy
 pip install -i http://pypi.douban.com/simple  --proxy http://localhost:1087 numpy
@@ -118,6 +127,9 @@ $ python3 -m venv .venv
 
 # Activate the environment
 $ . venv/bin/activate
+
+# exit the environment
+deactivate
 ```
 
 windows
@@ -274,7 +286,7 @@ conda update conda  # update
 
 # environment
 conda create --name environmentName  # Create a new environment
-conda create python=3.10 --name environmentName  # Create a new environment with package
+conda create python=3.12 --name environmentName  # Create a new environment with package
 conda activate environmentName  # To use, or "activate" the new environment
 conda info --envs  # list of all your environments
 conda activate  # Change your current environment back to the default (base)

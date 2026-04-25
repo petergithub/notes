@@ -95,6 +95,8 @@ sudo apt-get update # This is very important step to update system first.
 # /dev/sda5 /media/<username>/works            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 # /dev/nvme0n1p4 /media/pu/Data            ntfs    defaults,utf8,uid=1000,gid=1000,dmask=022,fmask=033,exec              0       0
 
+sudo apt install openssh-server vim -y
+
 ########## GVim config: clone configuration files from stash ##########
 ##sudo apt-get -y install vim-gnome
 

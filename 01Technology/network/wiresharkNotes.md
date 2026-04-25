@@ -90,6 +90,9 @@ tcpdump -i eth0 -vvv -nnnn host 172.25.4.80 and port 2381
 tcpdump -i eth0 -s 0 -w /tmp/1.pcap port 3306
 # 在远端调用tcpdump抓包，通过管道传回本地，然后让wireshark抓包
 ssh target "sudo tcpdump -s 0 -U -n -i eth0 not port 22 -w -" | wireshark -k -i -
+
+tcpdump -i lo -lXvvenns host 127.0.0.1 and port 7890
+sudo tcpdump -i any port 7890 -n -s 0 -w ~/Downloads/7890.pcap
 ```
 
 ### 过滤表达式

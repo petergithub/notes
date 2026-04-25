@@ -487,6 +487,8 @@ docker run -d -p 80:80 --name webserver nginx
 docker run -d --name tensorflow tensorflow/tensorflow
 
 docker run --rm --name redis -p 6379:6379 -d redis:6-alpine
+docker run --rm --name mysql -e MYSQL_ROOT_PASSWORD=pwd -p 3306:3306 -d mysql:8.0
+mysql -h 127.0.0.1 -P 3306 -u root -p'pwd'
 docker run --rm --name mongo -d mongo:4.2.7
 
 docker run -it --rm --name postgres postgres:16.3 psql

@@ -187,12 +187,12 @@ Triple Dot
 ## [Git - git-worktree Documentation](https://git-scm.com/docs/git-worktree)
 
 ```sh
-git worktree add ../temp -b emergency-fix master
-pushd ../temp
+git worktree add ./worktrees/feature-branch -b emergency-fix master
+pushd ../worktrees/feature-branch
 # ... hack hack hack ...
 git commit -a -m 'emergency fix for boss'
 popd
-git worktree remove ../temp
+git worktree remove ./worktrees/feature-branch
 ```
 
 ## [Git - Submodules 子模块](https://git-scm.com/book/en/v2/Git-Tools-Submodules)

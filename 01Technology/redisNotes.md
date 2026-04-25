@@ -258,7 +258,7 @@ SCAN return value is an array of two values
 # SCAN cursor [MATCH pattern] [COUNT count]
 SCAN 0 MATCH "*:foo:bar:*" COUNT 10
 
-redis-cli --scan | head -10`
+redis-cli --scan | head
 # 批量删除
 redis-cli -h host -p 6379 -n 2 --scan --pattern "*:foo:bar:*" | xargs -L 100 redis-cli -h host -p 6379 -n 2 DEL
 redis-cli -h host -p 6379 -n 4 -a $PWD --scan --pattern "*timeUnit: d*" | xargs -I {} redis-cli -h host -p 6379 -a $PWD -n 4 ttl {}

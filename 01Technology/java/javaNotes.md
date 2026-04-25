@@ -509,12 +509,16 @@ file=, 也可以直接指定文件名，file=可以被省略 `java -Xlog:gc*:fil
 示例：`java -Xlog:gc*=info:file=/project/log/gc.log,filecount=50,filesize=50m:time -version`
 
 ```sh
-LOG_PATH=/data/logs/gateway
+BASE_PATH=/data/gateway
+SERVER_NAME=gateway-1.0.0
+LOG_PATH=/data/log/gateway
+
 # heapError 存放路径
+mkdir -p $LOG_PATH/log/gateway/hprof
 HEAP_ERROR_PATH=$LOG_PATH/hprof
 HEAP_DUMP="-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HEAP_ERROR_PATH -XX:ErrorFile=$HEAP_ERROR_PATH/hs_err_pid%p.log"
 # GC LOG
-GC_LOG=-Xlog:gc*:file=$LOG_PATH/gc_pid%p.log:time,level
+GC_LOG=-Xlog:gc*:file="$LOG_PATH/gc_pid%p.log":time,level,tags:filecount=100,filesize=100M
 # JVM 参数
 #JAVA_OPS="-Xms512m -Xmx512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$HEAP_ERROR_PATH"
 JAVA_OPS="-Xms1024m -Xmx1024m $HEAP_DUMP $GC_LOG"
@@ -522,6 +526,33 @@ JAVA_OPS="-Xms1024m -Xmx1024m $HEAP_DUMP $GC_LOG"
 CONFIG="--spring.config.location=file:$BASE_PATH/application.yaml"
 nohup $JAVA_HOME/bin/java -server $JAVA_OPS $JAVA_AGENT -jar $BASE_PATH/$SERVER_NAME.jar $CONFIG > nohup.out 2>&1 &
 
+# Linux
+mkdir -p log/hprof
+java -server \
+  -Xms1024m \
+  -Xmx1024m \
+  -XX:+HeapDumpOnOutOfMemoryError \
+  -XX:HeapDumpPath=log/gateway/hprof \
+  -XX:ErrorFile=log/gateway/hprof/hs_err_pid%p.log \
+  -Xlog:gc*:file=log/gateway/gc_pid%p.log:time,level \
+  -jar gateway-1.0.0.jar \
+  --spring.config.location=file:resources/application.yaml
+```
+
+windows java gc 日志
+```bat
+@REM java "-Djava.io.tmpdir=tmp" -jar !latestFile! --spring.config.location=application.yml > log.txt 2>&1
+if not exist "log\hprof" mkdir "log\hprof"
+java -server ^
+   -Djava.io.tmpdir="tmp" ^
+   -Xms15g -Xmx15g ^
+   -XX:+HeapDumpOnOutOfMemoryError ^
+   -XX:HeapDumpPath="log/hprof/" ^
+   -XX:ErrorFile="log/hprof/hs_err_pid%%p.log" ^
+   -Xlog:gc*:file="log/gc_pid%%p.log":time,level,tags:filecount=100,filesize=100M ^
+   -XX:+AlwaysPreTouch ^
+   -jar $BASE_PATH/$SERVER_NAME.jar ^
+   --spring.config.location=file:application.yml > log.txt 2>&1
 ```
 
 #### 动态修改JVM日志级别

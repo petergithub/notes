@@ -1482,8 +1482,8 @@ MAILTO=username@example.org
 MAILTO='"'
 PATH=/data/software/pgsql-16.3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
 5 0 * * * sh /data/projects/account/cronjob.sh >> /data/projects/account/cronjob.log 2>&1
-# 查找并删除 30 天前的文件
 0 2 * * * find /data/backup/postgresql.temp -type f -mtime +3 | xargs gzip
+# 查找并删除 30 天前的文件
 0 3 * * * /data/backup/postgresql.temp -type f -mtime +30 -exec rm {} \;
 
 1 1 1 * * /usr/bin/docker exec jenkins-docker sh -c "docker image rm \$(docker image ls --format '{{.Repository}}:{{.Tag}}')" >> /var/log/docker_image_cleanup.log 2>&1
@@ -1907,7 +1907,6 @@ nc -vzw 1 <host1> 9999
 # udp -u
 nc -uvzw 1 host2 8472
 Connection to host2 8472 port [udp/otv] succeeded!
-
 ```
 
 ### mail
@@ -2824,7 +2823,7 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 
 `# mount -o remount, rw /home`  重新挂载改变/home分区的读写属性, remount是指重新挂载指定文件系统, rw指定重新挂载时的读写属性, 该命令不改变挂载点, 只是改变指定分区的读写属性.
 
-##### 磁盘满
+##### 磁盘满 disk
 
 `df -h` 查看当前已挂载的所有分区及使用情况
 `tune2fs -l /dev/sda2 | grep -i "block"`查看系统保留块
@@ -2834,6 +2833,11 @@ free 下面有一行“-/+ buffers/cache”, 该行显示的used是上一行“u
 `find / -name '*log*' -size +1000M -exec du -h {} \;` find files size more than 1G
 `du -s * | sort -nr | head | awk '{print $2}' | xargs du -sh` List size top 10 files in current folder
 `find /data/logs/* -mtime +8 -type f  | xargs rm -f` delete files which modify time 8 days ago
+
+```sh
+# 快速创建一个 100GB 的大文件（例如测试磁盘配额或清理脚本），而不关心实际的 I/O 写入过程，首选 fallocate。它直接在文件系统中分配预留块，速度极快（几乎瞬时）。
+sudo fallocate -l 100G /data/test_file
+```
 
 ##### I节点不足
 
@@ -3056,6 +3060,9 @@ while true;do netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a,S[a]}
 ##### traceroute
 
 ```sh
+# Try UDP-based trace
+traceroute
+
 # Try ICMP-based trace: uses Echo Requests instead of UDP, which sometimes bypasses basic filters.
 traceroute -I target_ip
 

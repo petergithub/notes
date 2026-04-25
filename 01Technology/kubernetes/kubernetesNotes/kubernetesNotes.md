@@ -945,9 +945,9 @@ kubectl get --all-namespaces pods --field-selector=spec.nodeName=<node name>
 
 Three possible effects exist:
 
-- `NoSchedule`, which means pods won't be scheduled to the node if they don't tol- erate the taint.
+- `NoSchedule`, which means pods won't be scheduled to the node if they don't tolerate the taint.
 - `PreferNoSchedule` is a soft version of NoSchedule, meaning the scheduler will try to avoid scheduling the pod to the node, but will schedule it to the node if it can't schedule it somewhere else.
-- `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect schedul- ing, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don't tolerate the NoExecute taint will be evicted from the node.
+- `NoExecute`, unlike NoSchedule and PreferNoSchedule that only affect scheduling, also affects pods already running on the node. If you add a NoExecute taint to a node, pods that are already running on that node and don't tolerate the NoExecute taint will be evicted from the node.
 
 ```sh
 # Remove the taint
@@ -986,11 +986,10 @@ kubectl uncordon my-node                    # 恢复调度
 [Kubernetes CLI](https://plugins.jenkins.io/kubernetes-cli/) 部署多个集群
 
 ```groovy
-withKubeConfig([credentialsId: 'k8s_config_prd'
-                    ]) {
-                  sh "kubectl config view"
-                  sh "kubectl get pods"
-                }
+withKubeConfig([credentialsId: 'k8s_config_prd']) {
+  sh "kubectl config view"
+  sh "kubectl get pods"
+}
 ```
 
 ### Volume (Disk)
