@@ -50,6 +50,8 @@ validate your planned changes carefully with a tool such as pt-upgrade
 连接MYSQL mysql -h主机地址 -Pport -u用户名 -p用户密码 -S /data/mysql/mysql.sock
 `mysql -h 110.110.110.110 -u root -p123 -D dbname`（注:p与密码之间可以不用加空格，其它必须加）
 
+mysql 
+
 ```sql
 -- 连接后设置字符集
 SET NAMES utf8mb4;

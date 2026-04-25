@@ -69,6 +69,9 @@ Output format options:
 - \c [database_name] 连接其他数据库。
 - \d 列出当前数据库的所有表格。
 - \dt 列出数据库中所有表
+- \dt schema_name.* 列出schema中所有表
+- \dm+ Lists all materialized views plus their size on disk and descriptions.
+- \dn+: 列出所有 Schema，并显示详细信息（包括所有者、权限和描述）。
 - \d [table_name] 列出表结构
 - \di 列出数据库中所有 index
 - \dv 列出数据库中所有 view \dv *.*
@@ -161,7 +164,9 @@ CREATE TABLE runoob (
 )
 
 -- 自定义创建模式（schema）
-create schema 模式名称;
+create schema schema_name;
+-- CASCADE 会自动删除该 Schema 及其包含的所有对象
+DROP SCHEMA IF EXISTS schema_name CASCADE;
 -- 查看数据库下的所有（schema）
 select * from information_schema.schemata;
 -- 查询schema中所有表
@@ -536,7 +541,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly_use
 SET ROLE readonly_user;
 
 -- 删除只读账号前先回收所有权限
-REVOKE ALL on DATABASE tmp_ems_test FROM readonly_user;
+REVOKE ALL on DATABASE tmp_db_name FROM readonly_user;
 REVOKE SELECT ON ALL TABLES IN SCHEMA public FROM readonly_user;
 -- 删除只读账号
 DROP USER readonly_user;
@@ -1619,6 +1624,28 @@ SET enable_seqscan = 'off';
 [pgBackRest - Reliable PostgreSQL Backup & Restore](https://pgbackrest.org/)
 
 [如何使用 PostgreSQL 14 的持续归档备份和基于时间点恢复 | Shall We Code?](https://waynerv.com/posts/postgresql-14-continuous-archiving-and-pitr/)
+
+备份示例
+
+```sh
+# export schema_only=true
+pg_dump -h localhost -p 5432 -U postgres --create --schema-only -d ems -t "public.*" -f ems_schema-2026-03-03.sql
+
+# 备份数据库 db_name 的表 dim_base
+pg_dump -h localhost -p 5432 -U postgres --clean --if-exists --create -d db_name -t dim_base -t dim_area -f db_name_dim_base_area.dump.sql
+pg_dump -h localhost -p 5432 -U postgres --clean --if-exists --create -Fc -d db_name -t dim_base -f db_name_dim_base.dump
+
+# 恢复到备份的数据库 db_name。参数 --create 会使用备份文件中的数据库。如果是新建库不要使用 --create
+pg_restore -d db_name --clean --if-exists --create db_name_dim_base.dump
+
+# 创建数据库 db_name_new
+createdb db_name_new --owner=db_owner
+# 恢复到新数据库
+pg_restore -d db_name_new db_name_dim_base.dump
+
+# 备份脚本
+/data/project/script/pg_backup.sh >> /data/log/script/pg_backup.log 2>&1
+```
 
 #### pg_dump 导出数据
 
